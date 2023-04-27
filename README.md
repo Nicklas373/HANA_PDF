@@ -84,8 +84,8 @@ Laravel Environment
 ---
 
 ## NOTE
-- If this error show while migration "Error: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes"
-  (Try to look [Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa) here as references)
+- If this error show while migration __"Error: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes"__
+  References: __[Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa)__
 
 ---
 
