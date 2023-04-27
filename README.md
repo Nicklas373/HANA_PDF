@@ -28,7 +28,7 @@ EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-e
 
 ---
 
-## Mode JS Module Requirements
+## Node JS Module Requirements
 
 - Vite
 
