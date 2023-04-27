@@ -22,15 +22,22 @@ EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-e
 - [Composer](http://getcomposer.org/)
 - [Java JRE 8.0.371](https://www.java.com/en/download/manual.jsp)
 - [MySQL 8.2](https://www.mysql.com/downloads/) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
+- [Node JS 18.16](https://nodejs.org/en)
 - [PHP 8.2.4](https://www.php.net/downloads.php)
 - [Python 3.10.x](https://www.python.org/downloads/release/python-31011/) (Do not use 3.11.x for temporary)
+
+---
+
+## Mode JS Module Requirements
+
+- Vite
 
 ---
 
 ## Python Module Requirements
 
 - Pandas
-- Tabula-io
+- Tabula-io (tabula-py)
 
 ---
 
@@ -40,6 +47,13 @@ EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-e
 2. Copy __.env.example__ file to __.env__ and modify database credentials
 3. Run the following command
 
+Node Environment
+```bash
+- npm install vite
+- npm run dev
+```
+
+Laravel Environment
 ```bash
 - composer install
 - composer dump-autoload
@@ -66,6 +80,12 @@ EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-e
 - [Python](https://www.python.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite JS](https://vitejs.dev/)
+
+---
+
+## NOTE
+- If this error show while migration "Error: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes"
+  (Try to look [Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa) here as references)
 
 ---
 
