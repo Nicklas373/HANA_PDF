@@ -133,9 +133,13 @@ class splitController extends Controller
 			$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 			$download_split_pdf = $pdfProcessed_Location.'/'.$file->getClientOriginalName();
 
-			if (file_exists($download_merge_pdf)) {
-				return redirect()->back()->with('success',$download_merge_pdf);
-			} else {
+			if ($mergeDBpdf == "false") {
+				if (file_exists($download_merge_pdf)) {
+					return redirect()->back()->with('success',$download_merge_pdf);
+				} else {
+					return redirect()->back()->withError('error',' has failed to split !')->withInput();
+				}
+			} else if ($mergeDBpdf == "true") {
 				if (file_exists($download_split_pdf)) {
 					return redirect()->back()->with('success',$download_split_pdf);
 				} else {
@@ -147,7 +151,7 @@ class splitController extends Controller
 
     function getPDFPages($document)
 	{
-    	$cmd = "C:\\xampp\\htdocs\\emsitpro-pdftools-tailwind\\public\\ext-library\\xpdf-tools-win-4.04\\bin64\\pdfinfo.exe";
+    	$cmd = "C:\\xampp\\htdocs\\EMSITPRO-PDF-Tools\public\\ext-library\\xpdf-tools-win-4.04\\bin64\\pdfinfo.exe";
     
     	exec("$cmd \"$document\"", $output);
 
