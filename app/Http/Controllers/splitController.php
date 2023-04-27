@@ -133,9 +133,13 @@ class splitController extends Controller
 			$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 			$download_split_pdf = $pdfProcessed_Location.'/'.$file->getClientOriginalName();
 
-			if (file_exists($download_merge_pdf)) {
-				return redirect()->back()->with('success',$download_merge_pdf);
-			} else {
+			if ($mergeDBpdf == "false") {
+				if (file_exists($download_merge_pdf)) {
+					return redirect()->back()->with('success',$download_merge_pdf);
+				} else {
+					return redirect()->back()->withError('error',' has failed to split !')->withInput();
+				}
+			} else if ($mergeDBpdf == "true") {
 				if (file_exists($download_split_pdf)) {
 					return redirect()->back()->with('success',$download_split_pdf);
 				} else {
