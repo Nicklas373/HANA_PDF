@@ -73,7 +73,7 @@ class extractController extends Controller
 
     function getPDFPages($document)
 	{
-    	$cmd = "C:\\xampp\\htdocs\\emsitpro-pdftools-tailwind\\public\\ext-library\\xpdf-tools-win-4.04\\bin64\\pdfinfo.exe";
+    	$cmd = "C:\\xampp\\htdocs\\EMSITPRO-PDF-Tools\public\\ext-library\\xpdf-tools-win-4.04\\bin64\\pdfinfo.exe";
     
     	exec("$cmd \"$document\"", $output);
 
