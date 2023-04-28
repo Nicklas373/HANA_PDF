@@ -27,6 +27,7 @@ class pdftowordController extends Controller
             $file = $request->file('file');
             $pdfUpload_Location = 'upload-pdf';
             $pdfProcessed_Location = 'temp';
+            $pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
             $file->move($pdfUpload_Location,$file->getClientOriginalName());
             $pdfFilename = pathinfo($pdfUpload_Location.'/'.$file->getClientOriginalName());
             $fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
@@ -61,12 +62,6 @@ class pdftowordController extends Controller
             $result = $wordsApi->saveAs($request);
 
             if (json_decode($result, true) !== NULL) {
-                echo "Success !";
-            } else {
-                echo "Error !";
-            }
-
-            if (file_exists($pdfProcessed_Location.'/converted.docx')) {
                 $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
                 return redirect()->back()->with('success',$download_word);
             } else {
