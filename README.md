@@ -8,7 +8,7 @@
 </p>
 
 ## EMSITPRO PDF Tools
-EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+[EMSITPRO PDF Tools](https://emsitpro.pdftools.elwilis.com/) is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
@@ -64,9 +64,6 @@ Laravel Environment
 
 4. Modify some static path into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
 - public/pdftoxlsx.py
-- public/pdftoword.py
-- app/http/controllers/extractcontroller.php
-- app/http/controllers/splitcontroller.php
 
 5. Create folder __temp-csv__ & __temp-merge__ in the root folder
 6. That's it
@@ -74,6 +71,7 @@ Laravel Environment
 ---
 
 ## Technology Stack
+- [Aspose](https://www.aspose.cloud/)
 - [Flowbite](https://flowbite.com/)
 - [iLovePDF](https://developer.ilovepdf.com/)
 - [Node JS](https://nodejs.org/en)
