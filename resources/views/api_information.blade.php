@@ -139,12 +139,12 @@
                 </a>
             </div>
             <div class="p-2 w-76 h-fit mt-6 sm:mx-4 sm:mt-4 sm:mb-4 md:mx-4 md:mb-16 md:h-auto lg:mt-6 lg:w-3/4 lg:h-auto lg:mx-auto lg:ms-32 xl:w-auto xl:mx-4 xl:h-fit bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
-                <a href="https://www.python.org/">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/python.png" alt="" height="125px" width="110px" />
+                <a href="https://www.aspose.cloud/">
+                    <img class="rounded-t-lg mx-auto p-4" src="/assets/aspose.jpg" alt="" height="200px" width="250px" />
                     <div class="p-5">
-                        <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Python</h5>
-                        <p class="mb-13 xl:mb-10 font-normal text-gray-700">An interpreted, object-oriented, high-level programming language with dynamic semantics.</p>
-                        <p class="mt-4 2xl:mt-5 font-normal text-gray-700">Python Version: <span class="bg-yellow-100 text-yellow-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300"><b>3.10.11</b></span></p>
+                        <h5 class="mb-4 mt-8 font-poppins font-semibold text-xl tracking-tight text-gray-900">Aspose Cloud</h5>
+                        <p class="mb-13 xl:mb-10 font-normal text-gray-700">RESTful APIs to Create, Edit & Convert over 100 File Formats from any Language, on any Platform</p>
+                        <p class="mt-4 2xl:mt-5 font-normal text-gray-700">Aspose Version: <span class="bg-yellow-100 text-yellow-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300"><b>23.3</b></span></p>
                     </div>
                 </a>
             </div>
