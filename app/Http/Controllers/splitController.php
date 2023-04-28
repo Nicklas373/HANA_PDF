@@ -66,7 +66,7 @@ class splitController extends Controller
 			}
 
 			if (empty($fromPage) == false){
-				$pdfTotalPages = $this->getPDFPages($file);
+				$pdfTotalPages = $this->count($file);
 				if ($toPage > $pdfTotalPages) {
 					return redirect()->back()->withError('error',$file->getClientOriginalName(). 'Invalid page range')->withInput();
 				} else if ($fromPage > $toPage) {
@@ -88,7 +88,7 @@ class splitController extends Controller
 			} else {
 				if(empty($fixedPage) == false) {
 					$pdfStartPages = $fixedPage;
-					$pdfTotalPages = $this->getPDFPages($file);
+					$pdfTotalPages = $this->count($file);
 					while($pdfStartPages <= intval($pdfTotalPages))
 					{
 						$pdfArrayPages[] = $pdfStartPages;
@@ -149,26 +149,12 @@ class splitController extends Controller
 		}
     }
 
-    function getPDFPages($document)
-	{
-    	$cmd = "C:\\xampp\\htdocs\\EMSITPRO-PDF-Tools\public\\ext-library\\xpdf-tools-win-4.04\\bin64\\pdfinfo.exe";
-    
-    	exec("$cmd \"$document\"", $output);
-
-    	// Iterate through lines
-    	$pagecount = 0;
-    	foreach($output as $op)
-    	{
-        	// Extract the number
-        	if(preg_match("/Pages:\s*(\d+)/i", $op, $matches) === 1)
-        	{
-            	$pagecount = intval($matches[1]);
-            	break;
-        	}
-    	}
-    
-    	return $pagecount;
-	}
+	function count($path)
+    {
+        $pdf = file_get_contents($path);
+        $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
+        return $number;
+    }
 
 	function convert($size,$unit) 
 	{
