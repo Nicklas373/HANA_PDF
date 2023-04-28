@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
 use App\Models\pdf_word;
+use Aspose\Words\WordsApi;
+use Aspose\Words\Model\Requests\{SaveAsRequest, UploadFileRequest};
+use Aspose\Words\Model\{DocxSaveOptionsData};
 
 class pdftowordController extends Controller
 {
@@ -24,9 +27,9 @@ class pdftowordController extends Controller
             $file = $request->file('file');
             $pdfUpload_Location = 'upload-pdf';
             $pdfProcessed_Location = 'temp';
-            $file->move($pdfUpload_Location,'convert_docx.pdf');
-            $pdfFilename = pathinfo($pdfUpload_Location.'/'.'convert_docx.pdf');
-            $fileSize = filesize($pdfUpload_Location.'/'.'convert_docx.pdf');
+            $file->move($pdfUpload_Location,$file->getClientOriginalName());
+            $pdfFilename = pathinfo($pdfUpload_Location.'/'.$file->getClientOriginalName());
+            $fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$hostName = gethostname();
 			$newFileSize = $this->convert($fileSize, "MB");
     
@@ -36,10 +39,35 @@ class pdftowordController extends Controller
 				'hostName' => $hostName
 			]);
 
-            $pythonScripts = escapeshellcmd('C:\Users\Nickl\AppData\Local\Programs\Python\Python310\python.exe ext-python\pdftoword.py');
-            $pythonRun = shell_exec($pythonScripts);
+            $clientId= '73751f49-388b-4366-aeb4-d76587d5123e';
+            $token = '1792ea481716ff7788b276c8c88df6b8';
+            
+            $wordsApi = new WordsApi($clientId, $token);
+            $uploadFileRequest = new UploadFileRequest($pdfUpload_Location.'/'.$file->getClientOriginalName(), $file->getClientOriginalName());
+            $wordsApi->uploadFile($uploadFileRequest);
+            $requestSaveOptionsData = new DocxSaveOptionsData(array(
+                "save_format" => "docx",
+                "file_name" => 'EMSITPRO-PDFTools/Completed/'.$pdfNameWithoutExtension.".docx",
+            ));
+
+            $request = new SaveAsRequest(
+                $file->getClientOriginalName(),
+                $requestSaveOptionsData,
+                NULL,
+                NULL,
+                NULL,
+                NULL
+            );
+            $result = $wordsApi->saveAs($request);
+
+            if (json_decode($result, true) !== NULL) {
+                echo "Success !";
+            } else {
+                echo "Error !";
+            }
+
             if (file_exists($pdfProcessed_Location.'/converted.docx')) {
-                $download_word = $pdfProcessed_Location.'/converted.docx';
+                $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
                 return redirect()->back()->with('success',$download_word);
             } else {
                 return redirect()->back()->withError('error',' has failed to convert !')->withInput();
