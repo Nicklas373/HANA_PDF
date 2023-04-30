@@ -28,7 +28,7 @@
 
 ---
 
-## Mode JS Module Requirements
+## Node JS Module Requirements
 
 - Flowbite
 - Material Tailwind
