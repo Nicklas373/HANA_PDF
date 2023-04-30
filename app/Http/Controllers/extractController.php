@@ -2,12 +2,13 @@
  
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
+use App\Models\extract_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use App\Models\extract_pdf;
 
 class extractController extends Controller
 {
@@ -26,7 +27,7 @@ class extractController extends Controller
 			$file = $request->file('file');
 			
 			$pdfStartPages = 1;
-			$pdfTotalPages = $this->count($file);
+			$pdfTotalPages = AppHelper::instance()->count($file);
 			while($pdfStartPages <= intval($pdfTotalPages))
 			{
 				$pdfArrayPages[] = $pdfStartPages;
@@ -41,7 +42,7 @@ class extractController extends Controller
 			$fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$hostName = gethostname();
 			$newCustomPage = "1 -".$pdfTotalPages;
-			$newFileSize = $this->convert($fileSize, "MB");
+			$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
 			extract_pdf::create([
 				'fileName' => $file->getClientOriginalName(),
@@ -51,8 +52,9 @@ class extractController extends Controller
                 'mergePDF' => "false"
 			]);
 
-			$ilovepdf = new Ilovepdf('project_public_325d386bc0c634a66ce67d65413fe30c_GE-Cv2861de258f64776f2928e69cb4868675','secret_key_a704c544b92db47bc422a824c6b3004e_QZVE20e592b1888ab4c21fca2f1b170b20f8b');
+			$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 			$ilovepdfTask = $ilovepdf->newTask('split');
+			$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 			$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$ilovepdfTask->setRanges($pdfNewRanges);
 			$ilovepdfTask->setMergeAfter(false);
@@ -63,6 +65,10 @@ class extractController extends Controller
 			
 			$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 			
+			if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+				unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+			}
+			
 			if (file_exists($download_pdf)) {
 				return redirect()->back()->with('success',$download_pdf);
 			} else {
@@ -70,27 +76,4 @@ class extractController extends Controller
 			}
 		}
     }
-
-    function count($path)
-    {
-        $pdf = file_get_contents($path);
-        $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
-        return $number;
-    }
-
-	function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
 }
