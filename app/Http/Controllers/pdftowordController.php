@@ -2,13 +2,14 @@
  
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Validator;
+use App\Helpers\AppHelper;
 use App\Models\pdf_word;
 use Aspose\Words\WordsApi;
 use Aspose\Words\Model\Requests\{SaveAsRequest, UploadFileRequest};
 use Aspose\Words\Model\{DocxSaveOptionsData};
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Validator;
 
 class pdftowordController extends Controller
 {
@@ -32,23 +33,20 @@ class pdftowordController extends Controller
             $pdfFilename = pathinfo($pdfUpload_Location.'/'.$file->getClientOriginalName());
             $fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$hostName = gethostname();
-			$newFileSize = $this->convert($fileSize, "MB");
+			$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
     
             pdf_word::create([
 				'fileName' => $file->getClientOriginalName(),
 				'fileSize' => $newFileSize,
 				'hostName' => $hostName
 			]);
-
-            $clientId= '73751f49-388b-4366-aeb4-d76587d5123e';
-            $token = '1792ea481716ff7788b276c8c88df6b8';
             
-            $wordsApi = new WordsApi($clientId, $token);
+            $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
             $uploadFileRequest = new UploadFileRequest($pdfUpload_Location.'/'.$file->getClientOriginalName(), $file->getClientOriginalName());
             $wordsApi->uploadFile($uploadFileRequest);
             $requestSaveOptionsData = new DocxSaveOptionsData(array(
                 "save_format" => "docx",
-                "file_name" => 'EMSITPRO-PDFTools/Completed/'.$pdfNameWithoutExtension.".docx",
+                "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
             ));
 
             $request = new SaveAsRequest(
@@ -62,27 +60,11 @@ class pdftowordController extends Controller
             $result = $wordsApi->saveAs($request);
 
             if (json_decode($result, true) !== NULL) {
-                $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
+                $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
                 return redirect()->back()->with('success',$download_word);
             } else {
                 return redirect()->back()->withError('error',' has failed to convert !')->withInput();
             }
         }
     }
-
-    function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
 }

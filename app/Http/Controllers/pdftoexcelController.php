@@ -2,10 +2,11 @@
  
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
+use App\Models\pdf_excel;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
-use App\Models\pdf_excel;
 
 class pdftoexcelController extends Controller
 {
@@ -28,7 +29,7 @@ class pdftoexcelController extends Controller
             $pdfFilename = pathinfo($pdfUpload_Location.'/convert_xlsx.pdf');
             $fileSize = filesize($pdfUpload_Location.'/convert_xlsx.pdf');
 			$hostName = gethostname();
-			$newFileSize = $this->convert($fileSize, "MB");
+			$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
     
             pdf_excel::create([
 				'fileName' => $file->getClientOriginalName(),
@@ -36,7 +37,11 @@ class pdftoexcelController extends Controller
 				'hostName' => $hostName
 			]);
 
-            $pythonScripts = escapeshellcmd('C:\Users\Nickl\AppData\Local\Programs\Python\Python310\python.exe ext-python\pdftoxlsx.py');
+            if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+                unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+            }
+
+            $pythonScripts = escapeshellcmd(env('PYTHON_EXECUTABLES').' ext-python\pdftoxlsx.py');
             $pythonRun = shell_exec($pythonScripts);
             if ($pythonRun = "true") {
                 if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
@@ -50,20 +55,4 @@ class pdftoexcelController extends Controller
             }
         }
     }
-
-    function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
 }
