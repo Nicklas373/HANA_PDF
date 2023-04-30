@@ -2,13 +2,14 @@
  
 namespace App\Http\Controllers;
 
+use App\Models\File;
+use App\Helpers\AppHelper;
+use App\Models\merge_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use App\Models\File;
-use App\Models\merge_pdf;
 
 class mergeController extends Controller
 {
@@ -35,8 +36,8 @@ class mergeController extends Controller
                 }
 
                 $fileNameArray = implode(', ', $pdfNameArray);
-                $fileSizeArray = $this->folderSize(public_path('temp-merge'));
-                $fileSizeInMB = $this->convert($fileSizeArray, "MB");
+                $fileSizeArray = AppHelper::instance()->folderSize(public_path('temp-merge'));
+                $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
                 $hostName = gethostname();
                 $pdfArray = scandir(public_path('temp-merge'));
                 $pdfStartPages = 1;
@@ -49,9 +50,9 @@ class mergeController extends Controller
                     'hostName' => $hostName
                 ]);
 
-                $ilovepdf = new Ilovepdf('project_public_325d386bc0c634a66ce67d65413fe30c_GE-Cv2861de258f64776f2928e69cb4868675','secret_key_a704c544b92db47bc422a824c6b3004e_QZVE20e592b1888ab4c21fca2f1b170b20f8b');
+                $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                 $ilovepdfTask = $ilovepdf->newTask('merge');
-                $ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
+                $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
                 foreach($pdfArray as $value) {
                     if (strlen($value) >= 4) {
                         $arrayCount = 1;
@@ -71,6 +72,10 @@ class mergeController extends Controller
                     }
                 }
     
+                if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+                    unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+                }
+                
                 if (file_exists($download_pdf)) {
                     return redirect()->back()->with('success',$download_pdf);
                 } else {
@@ -80,32 +85,5 @@ class mergeController extends Controller
                 return redirect()->back()->withError('error',' has failed to merged !')->withInput();
             }
         }
-    }
-
-    function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
-
-    function folderSize($dir)
-    {
-        $size = 0;
-
-        foreach (glob(rtrim($dir, '/').'/*', GLOB_NOSORT) as $each) {
-            $size += is_file($each) ? filesize($each) : folderSize($each);
-        }
-
-        return $size;
     }
 }

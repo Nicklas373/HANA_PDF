@@ -2,12 +2,13 @@
  
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
+use App\Models\watermark_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\WatermarkTask;
-use App\Models\watermark_pdf;
 
 class watermarkController extends Controller
 {
@@ -56,7 +57,7 @@ class watermarkController extends Controller
 			$file->move($pdfUpload_Location,$file->getClientOriginalName());
 			$fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$hostName = gethostname();
-			$newFileSize = $this->convert($fileSize, "MB");
+			$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
 			watermark_pdf::create([
 				'fileName' => $file->getClientOriginalName(),
@@ -69,7 +70,8 @@ class watermarkController extends Controller
 				'watermarkFontTransparency' => $watermarkFontTransparency
 			]);
 
-			$ilovepdfTask = new WatermarkTask('project_public_325d386bc0c634a66ce67d65413fe30c_GE-Cv2861de258f64776f2928e69cb4868675','secret_key_a704c544b92db47bc422a824c6b3004e_QZVE20e592b1888ab4c21fca2f1b170b20f8b');
+			$ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+			$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 			$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$ilovepdfTask->setMode("text");
 			$ilovepdfTask->setText($watermarkText);
@@ -86,6 +88,10 @@ class watermarkController extends Controller
 			
 			$download_pdf = $pdfProcessed_Location.'/'.$file->getClientOriginalName();
 			
+			if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+				unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+			}
+
 			if (file_exists($download_pdf)) {
 				return redirect()->back()->with('success',$download_pdf);
 			} else {
@@ -93,20 +99,4 @@ class watermarkController extends Controller
 			}
 		}
     }
-
-	function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
 }

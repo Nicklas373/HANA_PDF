@@ -2,11 +2,12 @@
  
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
+use App\Models\pdf_jpg;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\PdfjpgTask;
-use App\Models\pdf_jpg;
 
 class pdftojpgController extends Controller
 {
@@ -29,7 +30,7 @@ class pdftojpgController extends Controller
             $pdfFilename = pathinfo($pdfUpload_Location.'/'.$file->getClientOriginalName());
             $fileSize = filesize($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$hostName = gethostname();
-			$newFileSize = $this->convert($fileSize, "MB");
+			$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
     
             pdf_jpg::create([
 				'fileName' => $file->getClientOriginalName(),
@@ -37,7 +38,8 @@ class pdftojpgController extends Controller
 				'hostName' => $hostName
 			]);
 
-            $ilovepdfTask = new PdfjpgTask('project_public_325d386bc0c634a66ce67d65413fe30c_GE-Cv2861de258f64776f2928e69cb4868675','secret_key_a704c544b92db47bc422a824c6b3004e_QZVE20e592b1888ab4c21fca2f1b170b20f8b');
+            $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+			$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 			$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.$file->getClientOriginalName());
 			$ilovepdfTask->setOutputFileName($file->getClientOriginalName());
             $ilovepdfTask->setPackagedFilename($pdfFilename['filename']);
@@ -46,27 +48,18 @@ class pdftojpgController extends Controller
 			
 			$download_pdf = $pdfProcessed_Location.'/'.$pdfFilename['filename'].'.zip';
 
+			if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+				unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+			}
+			
 			if (file_exists($download_pdf)) {
+				if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+					unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+				}
 				return redirect()->back()->with('success',$download_pdf);
 			} else {
 				return redirect()->back()->withError('error',' has failed to convert !')->withInput();
 			}
         }
     }
-
-    function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
 }

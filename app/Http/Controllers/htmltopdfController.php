@@ -2,12 +2,12 @@
  
 namespace App\Http\Controllers;
 
+use App\Models\html_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\HtmlpdfTask;
-use App\Models\html_pdf;
 
 class htmltopdfController extends Controller
 {
@@ -32,7 +32,8 @@ class htmltopdfController extends Controller
                 'hostName' => $hostName
             ]);
 
-			$ilovepdfTask = new HtmlpdfTask('project_public_325d386bc0c634a66ce67d65413fe30c_GE-Cv2861de258f64776f2928e69cb4868675','secret_key_a704c544b92db47bc422a824c6b3004e_QZVE20e592b1888ab4c21fca2f1b170b20f8b');
+			$ilovepdfTask = new HtmlpdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+            $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 			$pdfFile = $ilovepdfTask->addUrl($request->post('urlToPDF'));
 			$ilovepdfTask->setOutputFileName('captured');
 			$ilovepdfTask->execute();
@@ -40,38 +41,15 @@ class htmltopdfController extends Controller
 			
 			$download_pdf = $pdfProcessed_Location.'/captured.pdf';
 
+            if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
+				unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
+			}
+            
 			if (file_exists($download_pdf)) {
 				return redirect()->back()->with('success',$download_pdf);
 			} else {
 				return redirect()->back()->withError('error',' has failed to convert !')->withInput();
 			}
         }
-    }
-
-    function convert($size,$unit) 
-	{
-		if($unit == "KB")
-		{
-			return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';	
-		}
-		if($unit == "MB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';	
-		}
-		if($unit == "GB")
-		{
-			return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';	
-		}
-	}
-
-    function folderSize($dir)
-    {
-        $size = 0;
-
-        foreach (glob(rtrim($dir, '/').'/*', GLOB_NOSORT) as $each) {
-            $size += is_file($each) ? filesize($each) : folderSize($each);
-        }
-
-        return $size;
     }
 }
