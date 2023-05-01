@@ -68,80 +68,77 @@
                     <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Reduce PDF file size while try to keep optimize for maximal PDF quality</p>
                 </div>
             </section>
-            <div role="status" id="spinner" class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 invisible">
-                <svg aria-hidden="true" class="w-16 h-16 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>
-            </div>
-            <div class="grid grid-rows-2 gap-6 p-4" id="grid-layout">
-                <div class="p-4 lg:p-2 w-full md:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
-                    <label class="block mb-2 font-poppins text-sm font-medium text-slate-900 dark:text-white" for="file_input">Upload PDF file</label>
-                    <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf">
-                    <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB).</p>
+            <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
+                <div id="pdfPreview" name="pdfPreview">
                     @if($message = Session::get('success'))
                         <br>
-                        <div class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
-                            <div class="ml-3 text-sm font-medium">
-                                Compress PDF Success !, Click <a href="{{ $message }}" class="font-poppins font-semibold underline hover:no-underline">Here </a>to download.
-                            </div>
-                        </div>
-                    @elseif($message = Session::get('error'))
+                        <?php
+                            if (str_contains($message, 'temp') == false) { 
+                                $pdfFileName = basename($message, '.png');
+                                $pdfAppend = "upload-pdf/".$pdfFileName.".pdf";
+                                echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="visibility: hidden;" value="'.$pdfAppend.'">
+                                    <div id="pdfImage" name="pdfImage" class="p-4 lg:p-2 w-full md:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
+                                        <figure class="max-w-lg mx-auto">
+                                            <img class="h-auto max-w-full rounded-lg mx-auto" src="'.$message.'" alt="image description">
+                                            <figcaption id="caption" name="caption" value="{{ $message }}" class="mt-1 text-sm text-center text-gray-500 dark:text-gray-400">Preview</figcaption>
+                                        </figure>
+                                    </div>
+                                ';
+                            }
+                        ?>
+                     @elseif($message = Session::get('error'))
                         <br>
                         <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
-                                <span class="font-poppins font-medium">Compress PDF Error ! </span> {{ $message }}
+                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                             </div>
                         </div>
-                    @elseif ($errors->any())
+                     @elseif ($errors->any())
                         <br>
                         {!! implode('', $errors->all(
-                            '<div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                                <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                                <span class="sr-only">Info</span>
-                                <div>
-                                    <span class="font-poppins font-medium">Compress PDF Error ! </span> :message
-                                </div>
-                            </div>'
+                        '<div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                            <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                            <span class="sr-only">Info</span>
+                            <div>
+                                <span class="font-poppins font-medium">Upload PDF Error ! </span> :message
+                            </div>
+                        </div>'
                         )) !!}
-                    @endif
-                    <h3 class="mb-5 mt-8 text-center font-poppins font-medium text-gray-900 dark:text-white">Compression Level</h3>
-                    <ul class="grid w-full gap-4 lg:grid-cols-1 2xl:grid-cols-3 mt-4">
-                        <li>
-                            <input type="radio" id="comp-low" name="compMethod" value="low" class="hidden peer">
-                            <label for="comp-low" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
-                                <div class="block">
-                                    <div class="w-full text-lg font-semibold">Lowest</div>
-                                    <div class="w-full">High quality, less compression</div>
-                                </div>
-                                <svg aria-hidden="true" class="w-6 h-6 ml-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </label>
-                        </li>
-                        <li>
-                            <input type="radio" id="comp-rec" name="compMethod" value="recommended" class="hidden peer">
-                            <label for="comp-rec" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
-                                <div class="block">
-                                    <div class="w-full text-lg font-semibold">Recommended</div>
-                                    <div class="w-full">Good quality, good compression</div>
-                                </div>
-                                <svg aria-hidden="true" class="w-6 h-6 ml-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </label>
-                        </li>
-                        <li>
-                            <input type="radio" id="comp-high" name="compMethod" value="extreme" class="hidden peer">
-                            <label for="comp-high" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
-                                <div class="block">
-                                    <div class="w-full text-lg font-semibold">High</div>
-                                    <div class="w-full">Less quality, high compression</div>
-                                </div>
-                                <svg aria-hidden="true" class="w-6 h-6 ml-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </label>
-                        </li>
-                    </ul>
+                     @endif
                 </div>
-                <button type="submit" id="submitBtn" class="mt-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 md:w-2/5 md:h-16 lg:w-1/5 lg:h-1/5 p-4 text-center" onClick="onClick()">Compress PDF</button>
+                <div role="status" id="spinner" class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 invisible">
+                    <svg aria-hidden="true" class="w-16 h-16 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>
+                </div>
+                <div class="p-4 lg:p-2 w-full md:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
+                    @if($message = Session::get('success'))
+                        <?php
+                            if(str_contains($message, 'temp')) {
+                                echo '
+                                    <div class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                                        <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                        <span class="sr-only">Info</span>
+                                            <div class="ml-3 text-sm font-medium">
+                                                Compress PDF Success !, Click <a href="'.$message.'" class="font-poppins font-semibold underline hover:no-underline">Here </a>to download.
+                                            </div>
+                                        </div>
+                                    <br>
+                                ';
+                            }
+                        ?>
+                    @endif
+                    <label class="block mb-2 font-poppins text-sm font-medium text-slate-900 dark:text-white" for="file_input">Upload PDF file</label>
+                    <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
+                    <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB).</p>
+                    <button type="submit" id="submitBtn" name="formAction" class="mt-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>  
+                </div>
+                <div id="pdfCompLayout" class="p-4 lg:p-2 w-full md:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow" style="visibility: hidden;">
+                    <div id="pdfComp" name="pdfComp"></div>
+                    <div id="pdfSubmit" name="pdfSubmit" class="w-full h-full mt-6 mx-auto"></div>
+                </div>
             </div>
+            <script src="/ext-js/compress.js"></script>
             <script src="/ext-js/spinner.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
         </body>
