@@ -1,7 +1,3 @@
-const angle = 90;
-const rotated = document.getElementById('pdfImageCaption');
-let rotation = 0;
-
 function changeButtonColor() {
     document.getElementById('file_input').addEventListener('change', function(e) {
         var fullPath = document.getElementById('file_input').value;
@@ -22,10 +18,6 @@ function changeButtonColor() {
     });
 }
 
-function rotate() {
-    rotation = (rotation + angle) % 360;
-    rotated.style.transform = `rotate(${rotation}deg)`;
-}
 
 function init() {
     var fullPath = document.getElementById('caption').value;
@@ -39,11 +31,6 @@ function init() {
         document.getElementById('submitBtn').style.color="#ffffff"
         pdfLayout.style.visibility="hidden"
     }
-}
-
-function remove() {
-    var pdfImage = document.getElementById('pdfImage')
-    pdfImage.style.visibility="hidden"
 }
 
 init();

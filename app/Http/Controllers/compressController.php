@@ -29,28 +29,31 @@ class compressController extends Controller
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
-					$pdfUpload_Location = env('pdf_upload');
+					if(isset($_POST['file'])) {
+						$pdfUpload_Location = env('pdf_upload');
+						$file = $request->file('file');
+						$file->move($pdfUpload_Location,$file->getClientOriginalName());
+						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
+						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
 
-					$file = $request->file('file');
-					$file->move($pdfUpload_Location,$file->getClientOriginalName());
-					$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
-					$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-
-					if (file_exists($pdfFileName)) {
-						$pdf = new Pdf($pdfFileName);
-						$pdf->setPage(1)
-							->setOutputFormat('png')
-							->width(400)
-							->saveImage(env('pdf_thumbnail'));
-						if (file_exists(env('pdf_thumbnail').'/1.png')) {
-							$thumbnail = file(env('pdf_thumbnail').'/1.png');
-							rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-							return redirect()->back()->with('success','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+						if (file_exists($pdfFileName)) {
+							$pdf = new Pdf($pdfFileName);
+							$pdf->setPage(1)
+								->setOutputFormat('png')
+								->width(400)
+								->saveImage(env('pdf_thumbnail'));
+							if (file_exists(env('pdf_thumbnail').'/1.png')) {
+								$thumbnail = file(env('pdf_thumbnail').'/1.png');
+								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('success','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+							} else {
+								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							}
 						} else {
 							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "compress") {
 					if(isset($_POST['fileAlt'])) {
