@@ -21,7 +21,8 @@ class mergeController extends Controller
     public function pdf_merge(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
             'file' => 'max:25000',
-			'fileAlt' => ''
+			'fileAlt' => '',
+            'dropFile' => ''
         ]);
 
         if($validator->fails()) {
@@ -53,10 +54,16 @@ class mergeController extends Controller
                     }
                 } else if ($request->post('formAction') == "merge") {
 					if(isset($_POST['fileAlt'])) {
+                        if(isset($_POST['dropFile']))
+						{
+							$dropFile = array($request->post('dropFile'));
+						} else {
+							$dropFile = array();
+						}
 						$fileNameArray = $request->post('fileAlt');
                         $fileSizeArray = AppHelper::instance()->folderSize(public_path('temp-merge'));
                         $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
-                        $hostName = gethostname();
+                        $hostName = AppHelper::instansce()->getUserIpAddr();
                         $pdfArray = scandir(public_path('temp-merge'));
                         $pdfStartPages = 1;
                         $pdfPreProcessed_Location = 'temp-merge';

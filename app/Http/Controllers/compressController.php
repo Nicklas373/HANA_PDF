@@ -29,7 +29,7 @@ class compressController extends Controller
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
-					if(isset($_POST['file'])) {
+					if($request->hasfile('file')) {
 						$pdfUpload_Location = env('pdf_upload');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
@@ -45,7 +45,7 @@ class compressController extends Controller
 							if (file_exists(env('pdf_thumbnail').'/1.png')) {
 								$thumbnail = file(env('pdf_thumbnail').'/1.png');
 								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('success','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 							}
@@ -68,11 +68,11 @@ class compressController extends Controller
 						$pdfName = basename($request->post('fileAlt'));
 						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
 						$fileSize = filesize($request->post('fileAlt'));
-						$hostName = gethostname();
+						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 			
 						compression_pdf::create([
-							'fileName' => $request->post('fileAlt'),
+							'fileName' => $pdfName,
 							'fileSize' => $newFileSize,
 							'compMethod' => $compMethod,
 							'hostName' => $hostName
