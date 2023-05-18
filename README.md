@@ -7,8 +7,8 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## EMSITPRO PDF Tools
-EMSITPRO PDF Tools is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+## EUREKA PDF Tools
+Eureka PDF Tools is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
@@ -90,7 +90,7 @@ Laravel Environment
 ---
 
 ## License
-The EMSITPRO PDF Tools is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The EUREKA PDF Tools is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 <br>
 
