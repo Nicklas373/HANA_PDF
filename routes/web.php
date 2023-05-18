@@ -36,7 +36,6 @@ Route::get('/pdftoword', 'App\Http\Controllers\pdftowordController@word');
 Route::get('/split', 'App\Http\Controllers\splitController@split');
 Route::get('/watermark', 'App\Http\Controllers\watermarkController@watermark');
 Route::post('/compress/pdf', 'App\Http\Controllers\compressController@pdf_init');
-Route::post('/extract/pdf', 'App\Http\Controllers\extractController@pdf_extract');
 Route::post('/htmltopdf/web', 'App\Http\Controllers\htmltopdfController@html_pdf');
 Route::post('/merge/pdf', 'App\Http\Controllers\mergeController@pdf_merge');
 Route::post('/pdftoexcel/xls', 'App\Http\Controllers\pdftoexcelController@pdf_excel');
