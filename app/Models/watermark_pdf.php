@@ -13,10 +13,16 @@ class watermark_pdf extends Model
         'fileName',
         'fileSize',
         'hostName',
-        'watermarkText',
-        'watermarkPage',
+        'watermarkFontFamily',
         'watermarkFontStyle',
         'watermarkFontSize',
-        'watermarkFontTransparency'
+        'watermarkFontTransparency',
+        'watermarkImage',
+        'watermarkLayout',
+        'watermarkMosaic',
+        'watermarkRotation',
+        'watermarkStyle',
+        'watermarkText',
+        'watermarkPage',
     ];
 }

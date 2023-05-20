@@ -61,25 +61,23 @@ class watermarkController extends Controller
 					}
 				} else if ($request->post('formAction') == "watermark") {
 					if(isset($_POST['fileAlt'])) {
-						if(isset($_POST['wmType']))
+						if(isset($_POST['isMosaic']))
 						{
-							$watermarkStyle = $request->post('wmType');
+							$tempPDF = $request->post('isMosaic');
+							$tempCompare = $tempPDF ? 'true' : 'false';
+							$isMosaicDB = "true";
+							$isMosaic = filter_var($tempCompare, FILTER_VALIDATE_BOOLEAN);
 						} else {
-							$watermarkStyle = '';
+							$tempCompare = false ? 'true' : 'false';
+							$isMosaicDB = "false";
+							$isMosaic = filter_var($tempCompare, FILTER_VALIDATE_BOOLEAN);
 						}
-						
+
 						if(isset($_POST['watermarkFontFamily']))
 						{
 							$watermarkFontFamily = $request->post('watermarkFontFamily');
 						} else {
 							$watermarkFontFamily = '';
-						}
-
-						if(isset($_POST['watermarkFontStyle']))
-						{
-							$watermarkFontStyle = $request->post('watermarkFontStyle');
-						} else {
-							$watermarkFontStyle = '';
 						}
 
 						if(isset($_POST['watermarkFontSize']))
@@ -89,9 +87,17 @@ class watermarkController extends Controller
 							$watermarkFontSize = '';
 						}
 
+						if(isset($_POST['watermarkFontStyle']))
+						{
+							$watermarkFontStyle = $request->post('watermarkFontStyle');
+						} else {
+							$watermarkFontStyle = '';
+						}
+
 						if(isset($_POST['watermarkFontTransparency']))
 						{
-							$watermarkFontTransparency = $request->post('watermarkFontTransparency');
+							$watermarkFontTransparencyTemp = $request->post('watermarkFontTransparency');
+							$watermarkFontTransparency = 100 - intval($watermarkFontTransparencyTemp);
 						} else {
 							$watermarkFontTransparency = '';
 						}
@@ -103,10 +109,42 @@ class watermarkController extends Controller
 							$watermarkLayoutStyle = '';
 						}
 
+						if(isset($_POST['watermarkPage']))
+						{
+							$watermarkPage = $request->post('watermarkPage');
+						} else {
+							$watermarkPage = '';
+						}
+
+						if(isset($_POST['watermarkRotation']))
+						{
+							$watermarkRotation = $request->post('watermarkRotation');
+						} else {
+							$watermarkRotation = '';
+						}
+
+						if(isset($_POST['watermarkText']))
+						{
+							$watermarkText = $request->post('watermarkText');
+						} else {
+							$watermarkText = '';
+						}
+
+						if($request->hasfile('wmfile')) {
+							$watermarkImage = $request->file('wmfile');
+						} else {
+							$watermarkImage = '';
+						}
+
+						if(isset($_POST['wmType']))
+						{
+							$watermarkStyle = $request->post('wmType');
+						} else {
+							$watermarkStyle = '';
+						}
+
 						$pdfUpload_Location = env('pdf_upload');
 						$file = $request->post('fileAlt');
-						$watermarkText = $request->post('watermarkText');
-						$watermarkPage = $request->post('watermarkPage');
 						$pdfProcessed_Location = 'temp';
 						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($file, ".pdf");
@@ -118,26 +156,33 @@ class watermarkController extends Controller
 							'fileName' => basename($file),
 							'fileSize' => $newFileSize,
 							'hostName' => $hostName,
-							'watermarkText' => $watermarkText,
-							'watermarkPage' => $watermarkPage,
+							'watermarkFontFamily' => $watermarkFontFamily,
 							'watermarkFontStyle' => $watermarkFontStyle,
 							'watermarkFontSize' => $watermarkFontSize,
-							'watermarkFontTransparency' => $watermarkFontTransparency
+							'watermarkFontTransparency' => $watermarkFontTransparency,
+							'watermarkImage' => basename($watermarkImage),
+							'watermarkLayout' => $watermarkLayoutStyle,
+							'watermarkMosaic' => $isMosaicDB,
+							'watermarkRotation' => $watermarkRotation,
+							'watermarkStyle' => $watermarkStyle,
+							'watermarkText' => $watermarkText,
+							'watermarkPage' => $watermarkPage
 						]);
 
 						if($watermarkStyle == "image") {
 							if($request->hasfile('wmfile')) {
 								$watermarkImage = $request->file('wmfile');
 								$watermarkImage->move($pdfUpload_Location,$watermarkImage->getClientOriginalName());
-
 								$ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 								$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 								$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
 								$wmImage = $ilovepdfTask->addElementFile($pdfUpload_Location.'/'.$watermarkImage->getClientOriginalName());
 								$ilovepdfTask->setMode("image");
 								$ilovepdfTask->setImageFile($wmImage);
-								$ilovepdfTask->setTransparency($watermarkFontTransparency);
+								$ilovepdfTask->setTransparency(intval($watermarkFontTransparency));
+								$ilovepdfTask->setRotation($watermarkRotation);
 								$ilovepdfTask->setLayer($watermarkLayoutStyle);
+								$ilovepdfTask->setMosaic($isMosaic);
 								$ilovepdfTask->execute();
 								$ilovepdfTask->download($pdfProcessed_Location);
 							} else {
@@ -151,13 +196,14 @@ class watermarkController extends Controller
 							$ilovepdfTask->setText($watermarkText);
 							$ilovepdfTask->setPages($watermarkPage);
 							$ilovepdfTask->setVerticalPosition("middle");
-							$ilovepdfTask->setRotation(45);
-							$ilovepdfTask->setFontColor('#ffffff');
+							$ilovepdfTask->setRotation($watermarkRotation);
+							$ilovepdfTask->setFontColor('#000000');
 							$ilovepdfTask->setFontFamily($watermarkFontFamily);
 							$ilovepdfTask->setFontStyle($watermarkFontStyle);
 							$ilovepdfTask->setFontSize($watermarkFontSize);
 							$ilovepdfTask->setTransparency($watermarkFontTransparency);
 							$ilovepdfTask->setLayer($watermarkLayoutStyle);
+							$ilovepdfTask->setMosaic($isMosaic);
 							$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 							$ilovepdfTask->execute();
 							$ilovepdfTask->download($pdfProcessed_Location);

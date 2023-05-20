@@ -25,7 +25,7 @@ class htmltopdfController extends Controller
         } else {
             $pdfUpload_Location = 'upload-pdf';
 			$pdfProcessed_Location = 'temp';
-            $hostName = gethostname();
+            $hostName = AppHelper::instance()->getUserIpAddr();
 
             html_pdf::create([
                 'urlName' => $request->post('urlToPDF'),

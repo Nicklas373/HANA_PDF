@@ -140,7 +140,7 @@ class splitController extends Controller
 						$pdfNameWithoutExtension = basename($file, '.pdf');
 						$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-						$hostName = AppHelper::instansce()->getUserIpAddr();
+						$hostName = AppHelper::instance()->getUserIpAddr();
 
 						split_pdf::create([
 							'fileName' => basename($file),
