@@ -42,10 +42,10 @@ function splitLayout2_split(){
 
 function splitLayout2_extract(){
     document.getElementById("splitLayout2").innerHTML = `
-        <div class="p-2 mx-auto mb-4">
-            <button type="submit" id="submitBtn_1" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="block mx-auto mb-4 mt-4 font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 md:w-2/5 md:h-16 lg:w-1/5 lg:h-1/5 p-4 text-center" onClick="onClick()" value="extract">Extract PDF</button>
-        </div>
+        <div class="mt-0"></div>
     `;
+    document.getElementById("submitBtn_2").style.display= "none";
+    document.getElementById("submitBtn_3").style.display= null;
 };
 
 function splitLayout3_cstm(){
@@ -63,8 +63,9 @@ function splitLayout3_cstm(){
                 </div>    
             </div>
         </div>
-        <button type="submit" id="submitBtn_1" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="block mx-auto mb-4 mt-4 font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 md:w-2/5 md:h-16 lg:w-3/5 lg:h-1/5 xl:w-1/5 xl:h-1/5 p-4 text-center" onClick="onClick()" value="split">Split PDF</button>
     `;
+    document.getElementById("submitBtn_2").style.display= null;
+    document.getElementById("submitBtn_3").style.display= "none";
 };
 
 function splitLayout3_wthn(){
@@ -86,8 +87,9 @@ function splitLayout3_wthn(){
                 <label for="mergePDF" class="ml-2 text-sm font-poppins font-medium text-gray-900 dark:text-gray-300">Merge all ranges in one PDF file.</label>
             </div>               
         </div>
-        <button type="submit" id="submitBtn_1" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="block mx-auto mb-4 mt-4 font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 md:w-2/5 md:h-16 lg:w-3/5 lg:h-1/5 xl:w-1/5 xl:h-1/5 p-4 text-center" onClick="onClick()" value="split">Split PDF</button>
     `;
+    document.getElementById("submitBtn_2").style.display= null;
+    document.getElementById("submitBtn_3").style.display= "none";
 };
 
 function splitLayout3_range(){
@@ -100,8 +102,9 @@ function splitLayout3_range(){
             </div>
         </div>         
     </div>
-    <button type="submit" id="submitBtn_1" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="block mx-auto mb-4 mt-4 font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 md:w-2/5 md:h-16 lg:w-3/5 lg:h-1/5 xl:w-1/5 xl:h-1/5 p-4 text-center" onClick="onClick()" value="split">Split PDF</button>
     `;
+    document.getElementById("submitBtn_2").style.display= null;
+    document.getElementById("submitBtn_3").style.display= "none";
 };
 
 function showLayout3() {
@@ -113,7 +116,7 @@ function remove_split() {
     var pdfCompBtn = document.getElementById('submitBtn_1');
     var pdfImage = document.getElementById('pdfPreview');
     var pdfSplit1 = document.getElementById("splitLayout1");
-    var pdfSplit2 = document.getElementById("splitLayout1");
+    var pdfSplit2 = document.getElementById("splitLayout2");
     if (pdfCompBtn !== null) {
         pdfCompBtn.style.display="none";
     };

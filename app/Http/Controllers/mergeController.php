@@ -63,7 +63,7 @@ class mergeController extends Controller
 						$fileNameArray = $request->post('fileAlt');
                         $fileSizeArray = AppHelper::instance()->folderSize(public_path('temp-merge'));
                         $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
-                        $hostName = AppHelper::instansce()->getUserIpAddr();
+                        $hostName = AppHelper::instance()->getUserIpAddr();
                         $pdfArray = scandir(public_path('temp-merge'));
                         $pdfStartPages = 1;
                         $pdfPreProcessed_Location = 'temp-merge';

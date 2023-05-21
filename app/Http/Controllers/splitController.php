@@ -100,7 +100,7 @@ class splitController extends Controller
 							$customPage = '';
 						}
 
-						if (empty($fromPage) == false){
+						if (!empty($fromPage)){
 							$pdfTotalPages = AppHelper::instance()->count($file);
 							if ($toPage > $pdfTotalPages) {
 								return redirect()->back()->withError('error',$file. 'Invalid page range')->withInput();
@@ -121,17 +121,17 @@ class splitController extends Controller
 								}
 							}
 						} else {
-							if(empty($fixedPage) == false) {
-								$pdfStartPages = $fixedPage;
-								$pdfTotalPages = AppHelper::instance()->count($file);
+							if(!empty($fixedPage)) {
+								$pdfStartPages = 1;
+								$pdfTotalPages = $fixedPage;
 								while($pdfStartPages <= intval($pdfTotalPages))
 								{
 									$pdfArrayPages[] = $pdfStartPages;
 									$pdfStartPages += 1;
 								}
 								$fixedPageRanges = implode(', ', $pdfArrayPages);
-							} else if(empty($customPage) == false) {
-								$fixedPageRanges = $customPage;
+							} else if(!empty($customPage)) {
+								$fixedPageRanges = '1-'.$customPage;
 							}
 						};
 
@@ -203,7 +203,6 @@ class splitController extends Controller
 					$pdfUpload_Location = 'upload-pdf';
 					$pdfProcessed_Location = 'temp';
 					$pdfNameWithoutExtension = basename($file, '.pdf');
-					$file->move($pdfUpload_Location,basename($file));
 					$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
 					$hostName = gethostname();
 					$newCustomPage = "1 -".$pdfTotalPages;
