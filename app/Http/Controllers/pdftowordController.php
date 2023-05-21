@@ -73,10 +73,14 @@ class pdftowordController extends Controller
                             'hostName' => $hostName
                         ]);
                         
+						ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                         $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
-                        $uploadFileRequest = new UploadFileRequest($file, $pdfName);
-                        $wordsApi->uploadFile($uploadFileRequest);
-                        $requestSaveOptionsData = new DocxSaveOptionsData(array(
+                        ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
+						$uploadFileRequest = new UploadFileRequest($file, $pdfName);
+                        ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
+						$wordsApi->uploadFile($uploadFileRequest);
+                        ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
+						$requestSaveOptionsData = new DocxSaveOptionsData(array(
                             "save_format" => "docx",
                             "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
                         ));
@@ -89,7 +93,9 @@ class pdftowordController extends Controller
                             NULL,
                             NULL
                         );
+						ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                         $result = $wordsApi->saveAs($request);
+						ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
 
                         if (json_decode($result, true) !== NULL) {
                             $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');

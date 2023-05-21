@@ -3,16 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Eureka PDF</title>
+        <title>EMSITPRO PDF Tools</title>
+        <link rel="icon" href="public/assets/elwilis.png" type="image/icon type">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
-        @vite(['resources/css/app.css','resources/js/app.js'])
+        <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
+        <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
-                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">Eureka</span>
-                    ''
-                    <span class="mr-14 self-center text-2xl font-poppins font-semibold text-slate-200">PDF</span>
+                    <img src="public/assets/elwilis.png" class="h-8 mr-3" alt="Elwilis Logo" />
+                    <span class="self-center ml-4 text-xl font-poppins text-slate-200 dark:text-gray-100">EMSITPRO PDF Tools</span>
                 </a>
                 <button data-collapse-toggle="navbar-dropdown" type="button" class="inline-flex items-center p-2 text-sm text-slate-200 rounded-lg md:hidden focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-dropdown" aria-expanded="false">
                     <span class="sr-only">Open main menu</span>
@@ -60,7 +61,7 @@
         <section>
             <div class="py-8 px-4 mt-16 md:mt-24 lg:mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF To Excel</h1>
-                <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Convert PDF files into Excel spreadsheet. Powered by <a href="https://www.python.org/"><b>Python</b></a></p>
+                <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Convert PDF files into Excel spreadsheet. Powered by <a href="https://pdftables.com/"><b>PDFTables</b></a></p>
             </div>
         </section>
         <div id="loadingModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">

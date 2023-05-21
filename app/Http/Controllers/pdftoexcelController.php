@@ -30,9 +30,9 @@ class pdftoexcelController extends Controller
 					if($request->hasfile('file')) {
 						$pdfUpload_Location = env('pdf_upload');
 						$file = $request->file('file');
-						$file->move($pdfUpload_Location,'convert_xlsx.pdf');
-						$pdfFileName = $pdfUpload_Location.'/convert_xlsx.pdf';
-						$pdfNameWithoutExtension = basename('convert_xlsx.pdf', '.pdf');
+						$file->move($pdfUpload_Location,$file->getClientOriginalName());
+						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
+						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
 
 						if (file_exists($pdfFileName)) {
 							$pdf = new Pdf($pdfFileName);
@@ -70,17 +70,31 @@ class pdftoexcelController extends Controller
                             'hostName' => $hostName
                         ]);
             
-                        $pythonScripts = escapeshellcmd(env('PYTHON_EXECUTABLES').' ext-python\pdftoxlsx.py');
-                        $pythonRun = shell_exec($pythonScripts);
-                        if ($pythonRun = "true") {
-                            if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
-                                $download_excel = $pdfProcessed_Location.'/converted.xlsx';
+                        $c = curl_init();
+
+						$cfile = curl_file_create($pdfUpload_Location.'/'.$file->getClientOriginalName(), 'application/pdf');
+
+						$apikey = env('PDFTABLES_API_KEY');
+						curl_setopt($c, CURLOPT_URL, "https://pdftables.com/api?key=$apikey&format=xlsx-single");
+						curl_setopt($c, CURLOPT_POSTFIELDS, array('file' => $cfile));
+						curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+						curl_setopt($c, CURLOPT_FAILONERROR,true);
+						curl_setopt($c, CURLOPT_ENCODING, "gzip,deflate");
+
+						$result = curl_exec($c);
+
+						if (curl_errno($c) > 0) {
+							return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+							curl_close($c);
+						} else {
+							file_put_contents ($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xls', $result);
+							curl_close($c);
+							if (file_exists($pdfProcessed_Location.$pdfNameWithoutExtension.'.xls')) {
+								$download_excel = $pdfProcessed_Location.$pdfNameWithoutExtension.'.xls';
                                 return redirect()->back()->with('success',$download_excel);
                             } else {
                                 return redirect()->back()->withError('error',' has failed to convert !')->withInput();
                             }
-                        } else {
-                            return redirect()->back()->withError('error',' has failed to convert !')->withInput();
                         }
 					} else {
 						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
