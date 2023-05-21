@@ -63,62 +63,59 @@
                 <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Easily and quickly merge, split, compress, convert, and add watermarks to PDF documents. Powered by <a href="https://www.ilovepdf.com/"><b>iLovePDF</b></a></p>
             </div>
         </section>
-        <h1 class="text-3xl font-poppins font-semibold tracking-tight leading-none text-gray-900 mt-10 ms-5 md:mt-10 md:ms-10 md:text-2xl lg:text-3xl dark:text-white">PDF Tools</h1>
-        <div class="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-5 p-4 mb-8">
-            <div class="p-2 w-76 h-fit mt-6 sm:mt-0 sm:h-auto md:mt-0 md:h-100 lg:w-3/4 lg:h-auto lg:mx-auto lg:me-24 xl:w-fit xl:mx-4 xl:h-auto xl:mx-4 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+        <h1 class="text-3xl text-center font-poppins font-semibold tracking-tight leading-none text-gray-900 mt-10 md:mt-10 md:text-2xl lg:text-3xl dark:text-white">Our PDF Tools</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 p-4 mx-4 mb-16 md:mx-auto lg:mx-0 2xl:mb-0">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mx-auto sm:mx-0 lg:mx-auto bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/convert">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/pdf.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/pdf.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Convert PDF</h5>
-                        <p class="font-normal text-gray-700">Convert PDF files into specified document format</p>
+                        <p class="text-sm font-poppins text-gray-700">Convert PDF files into specified document format</p>
                     </div>
                 </a>
             </div>
-            <div class="p-2 w-76 h-fit mt-6 sm:mt-0 sm:h-auto sm:mx-4 md:mt-0 md:h-100 lg:w-3/4 lg:h-auto lg:mx-4 xl:w-fit xl:mx-4 xl:h-fit xl:mx-4 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mt-6 sm:mt-0 mx-auto sm:mx-0 lg:mx-auto bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/compress">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/compression.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/compression.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Compress PDF</h5>
-                        <p class="font-normal text-gray-700">Reduce PDF file size while try to keep optimize for best PDF quality</p>
+                        <p class="text-sm font-poppins text-gray-700">Reduce PDF file size while try to keep optimize for best PDF quality</p>
                     </div>
                 </a>
             </div>
-            <div class="p-2 w-76 h-fit mt-6 sm:h-auto md:mt-6 md:h-100 lg:mt-6 lg:w-3/4 lg:h-auto lg:mx-auto lg:me-24 xl:w-fit xl:mx-4 xl:h-auto xl:mt-0 xl:mx-4 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mx-auto sm:mx-0 mt-6 sm:mt-6 md:mt-0 lg:mx-auto bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/merge">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/merge.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/merge.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Merge PDF</h5>
-                        <p class="font-normal text-gray-700">Combine several PDF in the order from user into one merged PDF file</p>
+                        <p class="text-sm font-poppins text-gray-700">Combine several PDF in the order from user into one merged PDF file</p>
                     </div>
                 </a>
             </div>
-            <div class="p-2 w-76 h-fit sm:mx-4 mt-6 md:mt-6 md:mx-4 lg:mt-6 lg:w-3/4 lg:h-auto lg:mx-4 xl:w-fit xl:mx-4 xl:mt-0 xl:h-auto 2xl:h-auto bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mx-auto sm:mx-0 lg:mx-auto mt-6 sm:mt-6 md:mt-6 lg:mt-0 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/split">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/split.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/split.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Split PDF</h5>
-                        <p class="font-normal text-gray-700">Separate one page or a whole page into independent PDF files</p>
+                        <p class="text-sm font-poppins text-gray-700">Separate one page or a whole page into independent PDF files</p>
                     </div>
                 </a>
             </div>
-            <div class="p-2 w-76 h-fit mt-6 sm:h-100 md:h-auto md:mt-6 lg:mt-6 lg:w-3/4 lg:h-auto lg:mx-auto lg:me-24 xl:w-auto xl:mx-4 xl:h-auto xl:mt-0 xl:h-auto 2xl:h-fit bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mx-auto sm:mx-0 lg:mx-auto mt-6 sm:mt-6 md:mt-6 lg:mt-6 xl:mt-0 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/watermark">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/watermark.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/watermark.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">Watermark PDF</h5>
-                        <p class="font-normal text-gray-700">Stamp an image or text over PDF to selected pages or all pages</p>
+                        <p class="text-sm font-poppins text-gray-700">Stamp an image or text over PDF to selected pages or all pages</p>
                     </div>
                 </a>
             </div>
-        </div>
-        <h1 class="text-3xl font-poppins font-semibold tracking-tight leading-none text-gray-900 mt-10 ms-5 md:mt-10 md:ms-10 md:text-2xl lg:text-3xl dark:text-white">Converter Tools</h1>
-        <div class="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-5 p-4 mb-16">
-            <div class="p-2 w-76 h-fit mt-6 sm:mt-0 sm:h-auto md:mt-0 md:h-100 lg:w-3/4 lg:h-auto lg:mx-auto lg:me-24 xl:w-fit xl:mx-4 xl:h-fit xl:mx-4 bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
+            <div class="h-64 w-full sm:w-72 md:w-11/12 mt-6 2xl:mt-0 mx-auto sm:mx-0 lg:mx-auto bg-white border border-gray-200 rounded-lg shadow hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300" type="button" data-ripple-dark="true">
                 <a href="/htmltopdf">
-                    <img class="rounded-t-lg mx-auto p-4" src="/assets/web.png" alt="" height="175px" width="175px" />
-                    <div class="p-5">
+                    <img class="mt-4 p-2" src="/assets/web.png" alt="" height="100px" width="100px" />
+                    <div class="p-4">
                         <h5 class="mb-4 font-poppins font-semibold text-xl tracking-tight text-gray-900">HTML To PDF</h5>
-                        <p class="font-normal text-gray-700">Convert URL address or web page into PDF format</p>
+                        <p class="text-sm font-poppins text-gray-700">Convert URL address or web page into PDF format</p>
                     </div>
                 </a>
             </div>
