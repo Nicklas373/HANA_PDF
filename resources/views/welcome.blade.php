@@ -67,7 +67,7 @@
         </p>
       </div>
     </section>
-    <h1 class="font-poppins mt-10 text-center text-3xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white md:mt-10 md:text-2xl lg:text-3xl">Our PDF Tools</h1>
+    <h1 class="font-poppins mt-10 mb-5 text-center text-3xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white md:text-2xl lg:text-3xl">Our PDF Tools</h1>
     <div class="mx-4 mb-16 grid grid-cols-1 p-4 sm:grid-cols-2 md:mx-auto md:grid-cols-3 lg:mx-0 lg:grid-cols-4 xl:grid-cols-5 2xl:mb-0 2xl:grid-cols-6">
       <div class="mx-auto h-64 w-full rounded-lg border border-gray-200 bg-white shadow hover:scale-105 hover:transform-gpu hover:transition hover:delay-150 hover:duration-300 hover:ease-in-out sm:mx-0 sm:w-72 md:w-11/12 lg:mx-auto" type="button" data-ripple-dark="true">
         <a href="/convert">
