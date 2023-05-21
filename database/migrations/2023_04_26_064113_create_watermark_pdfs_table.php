@@ -16,11 +16,17 @@ return new class extends Migration
             $table->string('fileName');
             $table->string('fileSize');
             $table->string('hostName');
-            $table->string('watermarkText')->nullable();
-            $table->string('watermarkPage')->nullable();
+            $table->string('watermarkFontFamily')->nullable();
             $table->string('watermarkFontStyle')->nullable();
             $table->string('watermarkFontSize')->nullable();
             $table->string('watermarkFontTransparency')->nullable();
+            $table->string('watermarkImage')->nullable();
+            $table->string('watermarkLayout')->nullable();
+            $table->string('watermarkMosaic')->nullable();
+            $table->string('watermarkRotation')->nullable();
+            $table->string('watermarkStyle')->nullable();
+            $table->string('watermarkText')->nullable();
+            $table->string('watermarkPage')->nullable();
             $table->timestamps();
         });
     }
