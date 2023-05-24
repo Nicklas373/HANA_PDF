@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -22,7 +22,7 @@ class compressController extends Controller
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
 			return redirect()->back()->withErrors($validator->messages())->withInput();
 		} else {
@@ -30,7 +30,7 @@ class compressController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -41,11 +41,11 @@ class compressController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 							}
@@ -63,21 +63,21 @@ class compressController extends Controller
 						} else {
 							$compMethod = "recommended";
 						}
-			
+
 						$pdfProcessed_Location = 'temp';
 						$pdfName = basename($request->post('fileAlt'));
 						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
 						$fileSize = filesize($request->post('fileAlt'));
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-			
+
 						compression_pdf::create([
 							'fileName' => $pdfName,
 							'fileSize' => $newFileSize,
 							'compMethod' => $compMethod,
 							'hostName' => $hostName
 						]);
-			
+
 						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 						$ilovepdfTask = $ilovepdf->newTask('compress');
 						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
@@ -86,13 +86,13 @@ class compressController extends Controller
 						$ilovepdfTask->setCompressionLevel($compMethod);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
-						
+
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-						
+
 						if(is_file($request->post('fileAlt'))) {
 							unlink($request->post('fileAlt'));
 						}
-			
+
 						if (file_exists($download_pdf)) {
 							return redirect()->back()->with('success',$download_pdf);
 						} else {

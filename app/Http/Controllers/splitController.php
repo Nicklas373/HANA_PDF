@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -23,7 +23,7 @@ class splitController extends Controller
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         } else {
@@ -31,7 +31,7 @@ class splitController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -42,11 +42,11 @@ class splitController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 							}
@@ -164,7 +164,7 @@ class splitController extends Controller
 						$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
-						
+
 						$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 						$download_split_pdf = $pdfProcessed_Location.'/'.basename($file);
 
@@ -190,7 +190,7 @@ class splitController extends Controller
 					}
 				} else if ($request->post('formAction') == "extract") {
 					$file = $request->post('fileAlt');
-			
+
 					$pdfStartPages = 1;
 					$pdfTotalPages = AppHelper::instance()->count($file);
 					while($pdfStartPages <= intval($pdfTotalPages))
@@ -226,13 +226,13 @@ class splitController extends Controller
 					$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 					$ilovepdfTask->execute();
 					$ilovepdfTask->download($pdfProcessed_Location);
-					
+
 					$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
-					
+
 					if(is_file($pdfUpload_Location.'/'.basename($file))) {
 						unlink($pdfUpload_Location.'/'.basename($file));
 					}
-					
+
 					if (file_exists($download_pdf)) {
 						return redirect()->back()->with('success',$download_pdf);
 					} else {

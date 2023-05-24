@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -31,7 +31,7 @@ class pdftowordController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -42,11 +42,11 @@ class pdftowordController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 							}
@@ -58,7 +58,7 @@ class pdftowordController extends Controller
 					}
 				} else if ($request->post('formAction') == "convert") {
 					if(isset($_POST['fileAlt'])) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
 						$pdfName = basename($request->post('fileAlt'));
@@ -66,13 +66,13 @@ class pdftowordController extends Controller
 						$fileSize = filesize($request->post('fileAlt'));
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                
+
                         pdf_word::create([
                             'fileName' => $pdfName,
                             'fileSize' => $newFileSize,
                             'hostName' => $hostName
                         ]);
-                        
+
                         $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                         $uploadFileRequest = new UploadFileRequest($file, $pdfName);
                         $wordsApi->uploadFile($uploadFileRequest);
