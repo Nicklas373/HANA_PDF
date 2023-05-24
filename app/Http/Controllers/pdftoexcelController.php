@@ -22,13 +22,13 @@ class pdftoexcelController extends Controller
 		]);
 
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect('pdftoexcel')->withErrors($validator->messages())->withInput();
         } else {
             if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -39,28 +39,28 @@ class pdftoexcelController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail').'/1.png')) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('pdftoexcel')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('pdftoexcel')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('pdftoexcel')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('pdftoexcel')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "convert") {
 					if(isset($_POST['fileAlt'])) {
-						$pdfUpload_Location = env('pdf_upload');
-						$file = $request->post('fileAlt');
-						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
-						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$pdfUpload_Location = public_path('upload-pdf');
+						$file = 'public/'.$request->post('fileAlt');
+						$pdfProcessed_Location = public_path('temp');
+						$pdfName = basename($file);
+						$pdfNameWithoutExtension = basename($file, ".pdf");
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 			
@@ -74,7 +74,7 @@ class pdftoexcelController extends Controller
 
 						$cfile = curl_file_create($pdfUpload_Location.'/'.$file->getClientOriginalName(), 'application/pdf');
 
-						$apikey = env('PDFTABLES_API_KEY');
+						$apikey = 'dgxqu0tl0w06';
 						curl_setopt($c, CURLOPT_URL, "https://pdftables.com/api?key=$apikey&format=xlsx-single");
 						curl_setopt($c, CURLOPT_POSTFIELDS, array('file' => $cfile));
 						curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
@@ -84,26 +84,26 @@ class pdftoexcelController extends Controller
 						$result = curl_exec($c);
 
 						if (curl_errno($c) > 0) {
-							return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+							return redirect('pdftoexcel')->withError('error',' has failed to convert !')->withInput();
 							curl_close($c);
 						} else {
 							file_put_contents ($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xls', $result);
 							curl_close($c);
 							if (file_exists($pdfProcessed_Location.$pdfNameWithoutExtension.'.xls')) {
 								$download_excel = $pdfProcessed_Location.$pdfNameWithoutExtension.'.xls';
-                                return redirect()->back()->with('success',$download_excel);
+                                return redirect('pdftoexcel')->with('success','temp'.'/'.$pdfNameWithoutExtension.'.xls');
                             } else {
-                                return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+                                return redirect('pdftoexcel')->withError('error',' has failed to convert !')->withInput();
                             }
                         }
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect('pdftoexcel')->withError('error',' REQUEST NOT FOUND !')->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect('pdftoexcel')->withError('error',' FILE NOT FOUND !')->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('pdftoexcel')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
         }
     }

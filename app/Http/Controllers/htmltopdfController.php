@@ -2,6 +2,7 @@
  
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Models\html_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -21,10 +22,10 @@ class htmltopdfController extends Controller
         ]);
 
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect('htmltopdf')->withErrors($validator->messages())->withInput();
         } else {
             $pdfUpload_Location = 'upload-pdf';
-			$pdfProcessed_Location = 'temp';
+			$pdfProcessed_Location = public_path('temp');
             $hostName = AppHelper::instance()->getUserIpAddr();
 
             html_pdf::create([
@@ -32,23 +33,19 @@ class htmltopdfController extends Controller
                 'hostName' => $hostName
             ]);
 
-			$ilovepdfTask = new HtmlpdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-            $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+			$ilovepdfTask = new HtmlpdfTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
+            $ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
 			$pdfFile = $ilovepdfTask->addUrl($request->post('urlToPDF'));
 			$ilovepdfTask->setOutputFileName('captured');
 			$ilovepdfTask->execute();
 			$ilovepdfTask->download($pdfProcessed_Location);
 			
-			$download_pdf = $pdfProcessed_Location.'/captured.pdf';
-
-            if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
-				unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
-			}
+			$download_pdf = 'temp/captured.pdf';
             
-			if (file_exists($download_pdf)) {
-				return redirect()->back()->with('success',$download_pdf);
+			if (file_exists(public_path('temp').'/captured.pdf')) {
+				return redirect('htmltopdf')->with('success',$download_pdf);
 			} else {
-				return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+				return redirect('htmltopdf')->withError('error',' has failed to convert !')->withInput();
 			}
         }
     }

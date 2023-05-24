@@ -25,13 +25,13 @@ class pdftowordController extends Controller
 		]);
 
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect('pdftoword')->withErrors($validator->messages())->withInput();
         } else {
             if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -42,28 +42,28 @@ class pdftowordController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail').'/1.png')) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('pdftoword')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('pdftoword')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('pdftoword')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('pdftoword')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "convert") {
 					if(isset($_POST['fileAlt'])) {
-						$pdfUpload_Location = env('pdf_upload');
-						$file = $request->post('fileAlt');
-						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
+						$pdfUpload_Location = public_path('upload-pdf');
+						$file = 'public/'.$request->post('fileAlt');
+						$pdfProcessed_Location = public_path('temp');
+						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($pdfName, ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                 
@@ -74,7 +74,7 @@ class pdftowordController extends Controller
                         ]);
                         
 						ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
-                        $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
+                        $wordsApi = new WordsApi('73751f49-388b-4366-aeb4-d76587d5123e', '1792ea481716ff7788b276c8c88df6b8');
                         ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
 						$uploadFileRequest = new UploadFileRequest($file, $pdfName);
                         ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
@@ -82,7 +82,7 @@ class pdftowordController extends Controller
                         ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
 						$requestSaveOptionsData = new DocxSaveOptionsData(array(
                             "save_format" => "docx",
-                            "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
+                            "file_name" => 'EMSITPRO-PDFTools/Completed/'.$pdfNameWithoutExtension.".docx",
                         ));
 
                         $request = new SaveAsRequest(
@@ -98,19 +98,19 @@ class pdftowordController extends Controller
 						ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
 
                         if (json_decode($result, true) !== NULL) {
-                            $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
-                            return redirect()->back()->with('success',$download_word);
+                            $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
+                            return redirect('pdftoword')->with('success',$download_word);
                         } else {
-                            return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+                            return redirect('pdftoword')->withError('error',' has failed to convert !')->withInput();
                         }
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect('pdftoword')->withError('error',' REQUEST NOT FOUND !')->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect('pdftoword')->withError('error',' FILE NOT FOUND !')->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('pdftoword')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
         }
     }

@@ -28,13 +28,13 @@ class watermarkController extends Controller
 		]);
  
 		if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect('watermark')->withErrors($validator->messages())->withInput();
         } else {
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -45,19 +45,19 @@ class watermarkController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail').'/1.png')) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('watermark')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('watermark')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('watermark')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "watermark") {
 					if(isset($_POST['fileAlt'])) {
@@ -143,9 +143,9 @@ class watermarkController extends Controller
 							$watermarkStyle = '';
 						}
 
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location =  public_path('upload-pdf');
 						$file = $request->post('fileAlt');
-						$pdfProcessed_Location = 'temp';
+						$pdfProcessed_Location = public_path('temp');
 						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($file, ".pdf");
 						$fileSize = filesize($file);
@@ -173,9 +173,9 @@ class watermarkController extends Controller
 							if($request->hasfile('wmfile')) {
 								$watermarkImage = $request->file('wmfile');
 								$watermarkImage->move($pdfUpload_Location,$watermarkImage->getClientOriginalName());
-								$ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-								$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-								$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
+								$ilovepdfTask = new WatermarkTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
+								$ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
+								$pdfFile = $ilovepdfTask->addFile($file);
 								$wmImage = $ilovepdfTask->addElementFile($pdfUpload_Location.'/'.$watermarkImage->getClientOriginalName());
 								$ilovepdfTask->setMode("image");
 								$ilovepdfTask->setImageFile($wmImage);
@@ -186,12 +186,12 @@ class watermarkController extends Controller
 								$ilovepdfTask->execute();
 								$ilovepdfTask->download($pdfProcessed_Location);
 							} else {
-								return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+								return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
 							}
 						} else if ($watermarkStyle == "text") {
-							$ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-							$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-							$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
+							$ilovepdfTask = new WatermarkTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
+								$ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
+							$pdfFile = $ilovepdfTask->addFile($file);
 							$ilovepdfTask->setMode("text");
 							$ilovepdfTask->setText($watermarkText);
 							$ilovepdfTask->setPages($watermarkPage);
@@ -211,23 +211,23 @@ class watermarkController extends Controller
 
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
 						
-						if(is_file($request->post('fileAlt'))) {
-							unlink($request->post('fileAlt'));
+						if(is_file($file)) {
+							unlink($file);
 						}
 			
 						if (file_exists($download_pdf)) {
-							return redirect()->back()->with('success',$download_pdf);
+							return redirect('watermark')->with('success','temp/'.$pdfName);
 						} else {
-							return redirect()->back()->withError('error',' has failed to watermark !')->withInput();
+							return redirect('watermark')->withError('error',' has failed to watermark !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+					return redirect('watermark')->withError('error',' REQUEST NOT FOUND !')->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('watermark')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
 		}
     }

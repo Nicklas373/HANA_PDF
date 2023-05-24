@@ -25,13 +25,13 @@ class splitController extends Controller
 		]);
  
 		if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect('split')->withErrors($validator->messages())->withInput();
         } else {
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -42,23 +42,23 @@ class splitController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail').'/1.png')) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('split')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('split')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('split')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('split')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
-						$file = $request->post('fileAlt');
+						$file = 'public/'.$request->post('fileAlt');
 
 						if(isset($_POST['fromPage']))
 						{
@@ -103,9 +103,9 @@ class splitController extends Controller
 						if (!empty($fromPage)){
 							$pdfTotalPages = AppHelper::instance()->count($file);
 							if ($toPage > $pdfTotalPages) {
-								return redirect()->back()->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect('split')->withError('error',$file. 'Invalid page range')->withInput();
 							} else if ($fromPage > $toPage) {
-								return redirect()->back()->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect('split')->withError('error',$file. 'Invalid page range')->withInput();
 							} else {
 								if ($mergeDBpdf == "true") {
 									$fixedPageRanges = $fromPage.'-'.$toPage;
@@ -135,8 +135,8 @@ class splitController extends Controller
 							}
 						};
 
-						$pdfUpload_Location = 'upload-pdf';
-						$pdfProcessed_Location = 'temp';
+						$pdfUpload_Location = public_path('upload-pdf');
+						$pdfProcessed_Location = public_path('temp');
 						$pdfNameWithoutExtension = basename($file, '.pdf');
 						$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -154,9 +154,9 @@ class splitController extends Controller
 							'mergePDF' => $mergeDBpdf
 						]);
 
-						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+						$ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
 						$ilovepdfTask = $ilovepdf->newTask('split');
-						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+						$ilovepdfTask->setFileEncryption('dgxqu0tl0w06');
 						$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.basename($file));
 						$ilovepdfTask->setRanges($fixedPageRanges);
 						$ilovepdfTask->setMergeAfter($mergePDF);
@@ -168,28 +168,28 @@ class splitController extends Controller
 						$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 						$download_split_pdf = $pdfProcessed_Location.'/'.basename($file);
 
-						if(is_file($pdfUpload_Location.'/'.basename($file))) {
-							unlink($pdfUpload_Location.'/'.basename($file));
+						if(is_file($file)) {
+							unlink($file);
 						}
 
 						if ($mergeDBpdf == "false") {
 							if (file_exists($download_merge_pdf)) {
-								return redirect()->back()->with('success',$download_merge_pdf);
+								return redirect('split')->with('success','temp/'.basename($file));
 							} else {
-								return redirect()->back()->withError('error',' has failed to split !')->withInput();
+								return redirect('split')->withError('error',' has failed to split !')->withInput();
 							}
 						} else if ($mergeDBpdf == "true") {
 							if (file_exists($download_split_pdf)) {
-								return redirect()->back()->with('success',$download_split_pdf);
+								return redirect('split')->with('success','temp/'.$pdfNameWithoutExtension.'.zip');
 							} else {
-								return redirect()->back()->withError('error',' has failed to split !')->withInput();
+								return redirect('split')->withError('error',' has failed to split !')->withInput();
 							}
 						}
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect('split')->withError('error',' REQUEST NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "extract") {
-					$file = $request->post('fileAlt');
+					$file = 'public/'.$request->post('fileAlt');
 			
 					$pdfStartPages = 1;
 					$pdfTotalPages = AppHelper::instance()->count($file);
@@ -200,11 +200,11 @@ class splitController extends Controller
 					}
 					$pdfNewRanges = implode(', ', $pdfArrayPages);
 
-					$pdfUpload_Location = 'upload-pdf';
-					$pdfProcessed_Location = 'temp';
+					$pdfUpload_Location = public_path('upload-pdf');
+					$pdfProcessed_Location = public_path('temp');
 					$pdfNameWithoutExtension = basename($file, '.pdf');
 					$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
-					$hostName = gethostname();
+					$hostName = AppHelper::instance()->getUserIpAddr();
 					$newCustomPage = "1 -".$pdfTotalPages;
 					$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
@@ -216,9 +216,9 @@ class splitController extends Controller
 						'mergePDF' => "false"
 					]);
 
-					$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+					$ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
 					$ilovepdfTask = $ilovepdf->newTask('split');
-					$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+					$ilovepdfTask->setFileEncryption('dgxqu0tl0w06');
 					$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.basename($file));
 					$ilovepdfTask->setRanges($pdfNewRanges);
 					$ilovepdfTask->setMergeAfter(false);
@@ -229,18 +229,18 @@ class splitController extends Controller
 					
 					$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 					
-					if(is_file($pdfUpload_Location.'/'.basename($file))) {
-						unlink($pdfUpload_Location.'/'.basename($file));
+					if(is_file($file)) {
+						unlink($file);
 					}
 					
 					if (file_exists($download_pdf)) {
-						return redirect()->back()->with('success',$download_pdf);
+						return redirect('split')->with('success','temp/'.$pdfNameWithoutExtension.'.zip');
 					} else {
-						return redirect()->back()->withError('error',' has failed to split !')->withInput();
+						return redirect('split')->withError('error',' has failed to split !')->withInput();
 					}
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('split')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
 		}
     }

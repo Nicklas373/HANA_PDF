@@ -24,13 +24,13 @@ class compressController extends Controller
 		]);
  
 		if($validator->fails()) {
-			return redirect()->back()->withErrors($validator->messages())->withInput();
+			return redirect('compress')->withErrors($validator->messages())->withInput();
 		} else {
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -41,19 +41,19 @@ class compressController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail'))) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('compress')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('compress')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('compress')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('compress')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "compress") {
 					if(isset($_POST['fileAlt'])) {
@@ -64,10 +64,11 @@ class compressController extends Controller
 							$compMethod = "recommended";
 						}
 			
-						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
-						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+			            $pdfFileLoc = 'public/'.$request->post('fileAlt');
+						$pdfProcessed_Location = public_path('temp');
+						$pdfName = basename($pdfFileLoc);
+						$pdfNameWithoutExtension = basename($pdfFileLoc);
+						$fileSize = filesize($pdfFileLoc);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 			
@@ -78,10 +79,10 @@ class compressController extends Controller
 							'hostName' => $hostName
 						]);
 			
-						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+						$ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
 						$ilovepdfTask = $ilovepdf->newTask('compress');
 						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-						$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
+						$pdfFile = $ilovepdfTask->addFile($pdfFileLoc);
 						$ilovepdfTask->setOutputFileName($pdfName);
 						$ilovepdfTask->setCompressionLevel($compMethod);
 						$ilovepdfTask->execute();
@@ -89,23 +90,23 @@ class compressController extends Controller
 						
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
 						
-						if(is_file($request->post('fileAlt'))) {
-							unlink($request->post('fileAlt'));
+						if(is_file($pdfFileLoc)) {
+							unlink($pdfFileLoc);
 						}
 			
 						if (file_exists($download_pdf)) {
-							return redirect()->back()->with('success',$download_pdf);
+							return redirect('compress')->with('success','temp/'.$pdfName);
 						} else {
-							return redirect()->back()->withError('error',' has failed to compress !')->withInput();
+							return redirect('compress')->withError('error',' has failed to compress !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect('compress')->withError('error',' REQUEST NOT FOUND !')->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect('compress')->withError('error',' FILE NOT FOUND !')->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('compress')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
 		}
 	}
