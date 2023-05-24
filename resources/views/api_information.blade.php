@@ -70,7 +70,7 @@
     <div class="mx-4 mb-16 grid grid-cols-1 p-4 sm:grid-cols-2 md:mx-auto md:grid-cols-3 md:gap-2 xl:mx-auto xl:grid-cols-4 2xl:mb-12">
       <div class="mx-auto h-80 w-full rounded-lg border border-gray-200 bg-white shadow hover:scale-105 hover:transform-gpu hover:transition hover:delay-150 hover:duration-300 hover:ease-in-out sm:mx-auto sm:w-72 md:h-96 md:w-64 lg:h-80 lg:w-72 2xl:w-96" type="button" data-ripple-dark="true">
         <a href="https://laravel.com/">
-          <img class="mx-auto mt-4 p-4" src="/assets/laravel.png" alt="" height="125px" width="125px" />
+          <img class="mx-auto mt-4 p-4" src="/assets/Laravel.png" alt="" height="125px" width="125px" />
           <div class="p-4">
             <h5 class="font-poppins mb-2 text-xl font-semibold tracking-tight text-gray-900 sm:mt-4">Laravel Framework</h5>
             <p class="font-poppins mb-4 text-sm text-gray-700 md:mb-12 lg:mb-4 2xl:mb-6">Open source web application framework with expressive, elegant syntax</p>
@@ -127,7 +127,7 @@
             <p class="font-poppins mb-4 text-sm text-gray-700 md:mb-16 lg:mb-4 2xl:mb-6">Our PDF tools in a REST API for developers</p>
             <div class="mb-2 flex justify-between">
               <span class="font-poppins text-sm text-blue-700 dark:text-white">Processed files this month:</span>
-              <span id="progressValue" class="font-poppins mt-0.5 text-sm text-blue-700 dark:text-white"><?php include 'ext-php/iLovePDFLimit.php';?></span>
+              <span id="progressValue" class="font-poppins mt-0.5 text-sm text-blue-700 dark:text-white"><?php include 'public/ext-php/iLovePDFLimit.php';?></span>
             </div>
             <div class="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
               <div id="progressBar" class="h-2.5 rounded-full bg-blue-600" style="width: 23.5%"></div>
@@ -168,7 +168,7 @@
             <p class="font-poppins mt-8 text-sm text-gray-700 md:mt-16 lg:mt-12 xl:mt-12 2xl:mt-9">
               MySQL Version:
               <span class="mr-2 rounded bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                ><b><?php echo mysqli_get_client_info(); ?></b></span
+                ><b>8.2.26</b></span
               >
             </p>
           </div>
