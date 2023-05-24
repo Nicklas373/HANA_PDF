@@ -78,7 +78,7 @@
         </div>
         <form action="/split/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
-            <div class="grid grid-rows-1 gap-2 p-4 mb-8 md:mb-0 xl:mb-8 2xl:mb-0" id="grid-layout">
+            <div class="grid grid-rows-1 gap-2 p-4 mb-8" id="grid-layout">
                 <div id="pdfPreview" name="pdfPreview" class="mb-2">
                     @if($message = Session::get('upload'))
                         <br>
