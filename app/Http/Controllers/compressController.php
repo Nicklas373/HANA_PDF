@@ -64,10 +64,11 @@ class compressController extends Controller
 							$compMethod = "recommended";
 						}
 
+						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
-						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$pdfName = basename($file);
+						$pdfNameWithoutExtension = basename($file, ".pdf");
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
@@ -81,7 +82,7 @@ class compressController extends Controller
 						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 						$ilovepdfTask = $ilovepdf->newTask('compress');
 						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-						$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
+						$pdfFile = $ilovepdfTask->addFile($file);
 						$ilovepdfTask->setOutputFileName($pdfName);
 						$ilovepdfTask->setCompressionLevel($compMethod);
 						$ilovepdfTask->execute();
@@ -89,8 +90,8 @@ class compressController extends Controller
 
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
 
-						if(is_file($request->post('fileAlt'))) {
-							unlink($request->post('fileAlt'));
+						if(is_file($file)) {
+							unlink($file);
 						}
 
 						if (file_exists($download_pdf)) {

@@ -59,9 +59,9 @@ class pdftojpgController extends Controller
 						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
+						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($pdfName, ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
@@ -80,8 +80,8 @@ class pdftojpgController extends Controller
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
 
-						if(is_file($request->post('fileAlt'))) {
-							unlink($request->post('fileAlt'));
+						if(is_file($file)) {
+							unlink($file);
 						}
 
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';

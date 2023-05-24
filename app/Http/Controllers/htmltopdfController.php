@@ -41,10 +41,6 @@ class htmltopdfController extends Controller
 
 		$download_pdf = $pdfProcessed_Location.'/captured.pdf';
 
-		if(is_file($pdfUpload_Location.'/'.$file->getClientOriginalName())) {
-			unlink($pdfUpload_Location.'/'.$file->getClientOriginalName());
-		}
-
 		if (file_exists($download_pdf)) {
 			return redirect()->back()->with('success',$download_pdf);
 		} else {

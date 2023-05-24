@@ -61,9 +61,9 @@ class pdftowordController extends Controller
 						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
+						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($pdfName, ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 

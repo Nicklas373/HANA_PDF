@@ -58,9 +58,9 @@ class pdftoexcelController extends Controller
 						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
-						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$pdfName = basename($file);
+						$pdfNameWithoutExtension = basename($file, ".pdf");
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
