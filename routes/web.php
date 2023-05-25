@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controller\apiController;
+use App\Http\Controller\convertController;
 use App\Http\Controller\compressController;
 use App\Http\Controller\htmltopdfController;
 use App\Http\Controller\mergeController;
@@ -28,6 +29,7 @@ Route::get('/', function () {
 
 Route::get('/api', 'App\Http\Controllers\apiController@api');
 Route::get('/compress', 'App\Http\Controllers\compressController@compress');
+Route::get('/convert', 'App\Http\Controllers\convertController@compress');
 Route::get('/htmltopdf', 'App\Http\Controllers\htmltopdfController@html');
 Route::get('/merge', 'App\Http\Controllers\mergeController@merge');
 Route::get('/pdftoexcel', 'App\Http\Controllers\pdftoexcelController@excel');
@@ -36,6 +38,7 @@ Route::get('/pdftoword', 'App\Http\Controllers\pdftowordController@word');
 Route::get('/split', 'App\Http\Controllers\splitController@split');
 Route::get('/watermark', 'App\Http\Controllers\watermarkController@watermark');
 Route::post('/compress/pdf', 'App\Http\Controllers\compressController@pdf_init');
+Route::post('/convert/pdf', 'App\Http\Controllers\convertController@pdf_init');
 Route::post('/htmltopdf/web', 'App\Http\Controllers\htmltopdfController@html_pdf');
 Route::post('/merge/pdf', 'App\Http\Controllers\mergeController@pdf_merge');
 Route::post('/pdftoexcel/xls', 'App\Http\Controllers\pdftoexcelController@pdf_excel');
