@@ -36,7 +36,7 @@ class convertController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -47,11 +47,11 @@ class convertController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
 							}
@@ -68,7 +68,7 @@ class convertController extends Controller
 
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = $request->post('fileAlt');
                                 $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
@@ -76,14 +76,14 @@ class convertController extends Controller
                                 $fileSize = filesize($file);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                    
+        
                                 pdf_excel::create([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'hostName' => $hostName
                                 ]);
-                    
-                                $pythonScripts = escapeshellcmd(env('PYTHON_EXECUTABLES').' ext-python\pdftoxlsx.py');
+        
+                                $pythonScripts = escapeshellcmd('python /var/www/html/Eureka-PDF/public/ext-python/pdftoxlsx.py');
                                 $pythonRun = shell_exec($pythonScripts);
                                 if ($pythonRun = "true") {
                                     if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
@@ -100,7 +100,7 @@ class convertController extends Controller
                             }
                         } else if ($convertType == 'docx') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = $request->post('fileAlt');
                                 $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
@@ -144,7 +144,7 @@ class convertController extends Controller
                             }
                         } else if ($convertType == 'jpg') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = $request->post('fileAlt');
                                 $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
