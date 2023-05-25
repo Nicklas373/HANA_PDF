@@ -25,20 +25,7 @@
                         <a href="/compress" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Compress PDF</a>
                     </li>
                     <li>
-                        <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 pl-3 pr-4 font-poppins font-semibold text-slate-200 rounded md:hover:bg-slate-900 md:border-0 md:hover:text-sky-400 md:p-0 md:w-auto">Convert PDF <svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
-                        <div id="dropdownNavbar" class="z-10 hidden font-poppins font-semibold text-slate-200 bg-slate-900 divide-y divide-text-slate-200 rounded-lg shadow w-44">
-                            <ul class="py-2 font-poppins font-semibold text-slate-200" aria-labelledby="dropdownLargeButton">
-                                <li>
-                                    <a href="/pdftoexcel" class="block px-4 py-2 hover:text-sky-400">PDF To Excel</a>
-                                </li>
-                                <li>
-                                    <a href="/pdftoword" class="block px-4 py-2 hover:text-sky-400">PDF To Word</a>
-                                </li>
-                                <li>
-                                    <a href="/pdftojpg" class="block px-4 py-2 hover:text-sky-400">PDF To JPG</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <a href="/convert" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Convert PDF</a>
                     </li>
                     <li>
                         <a href="/merge" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Merge PDF</a>
@@ -60,7 +47,7 @@
     <body class="bg-white dark:bg-slate-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <section>
             <div class="py-8 px-4 mt-16 md:mt-24 lg:mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Convert</h1>
+                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Convert PDF</h1>
                 <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Convert PDF files into specified document format</p>
             </div>
         </section>
