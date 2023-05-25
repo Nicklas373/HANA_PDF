@@ -61,7 +61,7 @@
   </head>
   <body class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
     <section>
-      <div class="relative z-0 mx-auto mt-16 max-w-screen-xl px-4 py-8 text-center md:mt-24 lg:mt-16 lg:py-16">
+      <div class="relative z-0 mx-auto mt-28 max-w-screen-xl px-4 py-8 text-center sm:mt-16 md:mt-24 lg:mt-16 lg:py-16">
         <h1 class="font-poppins mb-4 text-4xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">Learn the technology stack</h1>
         <p class="font-poppins mb-8 text-lg font-normal text-gray-500 dark:text-gray-200 sm:px-16 lg:px-48 lg:text-xl">Meet the front-end and back-end technology to build this website</p>
       </div>
