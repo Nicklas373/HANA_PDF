@@ -30,13 +30,13 @@ class convertController extends Controller
 		]);
  
 		if($validator->fails()) {
-			return redirect()->back()->withErrors($validator->messages())->withInput();
+			return redirect('convert')->withErrors($validator->messages())->withInput();
 		} else {
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = env('pdf_upload');
+						$pdfUpload_Location = public_path('upload-pdf');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -47,19 +47,19 @@ class convertController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('pdf_thumbnail'));
-							if (file_exists(env('pdf_thumbnail').'/1.png')) {
-								$thumbnail = file(env('pdf_thumbnail').'/1.png');
-								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(public_path('thumbnail'));
+							if (file_exists(public_path('thumbnail').'/1.png')) {
+								$thumbnail = file(public_path('thumbnail').'/1.png');
+								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								return redirect('convert')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect('convert')->withError('error',' has failed to upload !')->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect('convert')->withError('error',' has failed to upload !')->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect('convert')->withError('error',' FILE NOT FOUND !')->withInput();
 					}
 				} else if ($request->post('formAction') == "convert") {
                     if(isset($_POST['convertType']))
@@ -68,9 +68,9 @@ class convertController extends Controller
 
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
-                                $file = $request->post('fileAlt');
-                                $pdfProcessed_Location = 'temp';
+                                $pdfUpload_Location = public_path('upload-pdf');
+                                $file = 'public/'.$request->post('fileAlt');
+                                $pdfProcessed_Location = public_path('temp');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($file, ".pdf");
                                 $fileSize = filesize($file);
@@ -83,26 +83,40 @@ class convertController extends Controller
                                     'hostName' => $hostName
                                 ]);
                     
-                                $pythonScripts = escapeshellcmd(env('PYTHON_EXECUTABLES').' ext-python\pdftoxlsx.py');
-                                $pythonRun = shell_exec($pythonScripts);
-                                if ($pythonRun = "true") {
-                                    if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
-                                        $download_excel = $pdfProcessed_Location.'/converted.xlsx';
-                                        return redirect()->back()->with('success',$download_excel);
-                                    } else {
-                                        return redirect()->back()->withError('error',' has failed to convert !')->withInput();
-                                    }
+                                $c = curl_init();
+
+                                $cfile = curl_file_create($pdfUpload_Location.'/'.$file->getClientOriginalName(), 'application/pdf');
+
+                                $apikey = 'dgxqu0tl0w06';
+                                curl_setopt($c, CURLOPT_URL, "https://pdftables.com/api?key=$apikey&format=xlsx-single");
+                                curl_setopt($c, CURLOPT_POSTFIELDS, array('file' => $cfile));
+                                curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+                                curl_setopt($c, CURLOPT_FAILONERROR,true);
+                                curl_setopt($c, CURLOPT_ENCODING, "gzip,deflate");
+
+                                $result = curl_exec($c);
+
+                                if (curl_errno($c) > 0) {
+                                    return redirect('convert')->withError('error',' has failed to convert !')->withInput();
+                                    curl_close($c);
                                 } else {
-                                    return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+                                    file_put_contents ($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xls', $result);
+                                    curl_close($c);
+                                    if (file_exists($pdfProcessed_Location.$pdfNameWithoutExtension.'.xls')) {
+                                        $download_excel = $pdfProcessed_Location.$pdfNameWithoutExtension.'.xls';
+                                        return redirect('convert')->with('success','temp'.'/'.$pdfNameWithoutExtension.'.xls');
+                                    } else {
+                                        return redirect('convert')->withError('error',' has failed to convert !')->withInput();
+                                    }
                                 }
                             } else {
-                                return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+                                return redirect('convert')->withError('error',' REQUEST NOT FOUND !')->withInput();
                             }
                         } else if ($convertType == 'docx') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
-                                $file = $request->post('fileAlt');
-                                $pdfProcessed_Location = 'temp';
+                                $pdfUpload_Location = public_path('upload-pdf');
+                                $file = 'public/'.$request->post('fileAlt');
+                                $pdfProcessed_Location = public_path('temp');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
                                 $fileSize = filesize($file);
@@ -115,12 +129,16 @@ class convertController extends Controller
                                     'hostName' => $hostName
                                 ]);
                                 
-                                $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
+                                $wordsApi = new WordsApi('73751f49-388b-4366-aeb4-d76587d5123e', '1792ea481716ff7788b276c8c88df6b8');
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $uploadFileRequest = new UploadFileRequest($file, $pdfName);
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $wordsApi->uploadFile($uploadFileRequest);
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $requestSaveOptionsData = new DocxSaveOptionsData(array(
                                     "save_format" => "docx",
-                                    "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
+                                    "file_name" => 'EMSITPRO-PDFTools/Completed/'.$pdfNameWithoutExtension.".docx",
                                 ));
         
                                 $request = new SaveAsRequest(
@@ -131,22 +149,24 @@ class convertController extends Controller
                                     NULL,
                                     NULL
                                 );
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $result = $wordsApi->saveAs($request);
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
         
                                 if (json_decode($result, true) !== NULL) {
-                                    $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
-                                    return redirect()->back()->with('success',$download_word);
+                                    $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
+                                    return redirect('convert')->with('success',$download_word);
                                 } else {
-                                    return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+                                    return redirect('convert')->withError('error',' has failed to convert !')->withInput();
                                 }
                             } else {
-                                return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+                                return redirect('convert')->withError('error',' REQUEST NOT FOUND !')->withInput();
                             }
                         } else if ($convertType == 'jpg') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = env('pdf_upload');
-                                $file = $request->post('fileAlt');
-                                $pdfProcessed_Location = 'temp';
+                                $pdfUpload_Location = public_path('upload-pdf');
+                                $file = 'public/'.$request->post('fileAlt');
+                                $pdfProcessed_Location = public_path('temp');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
                                 $fileSize = filesize($file);
@@ -159,15 +179,15 @@ class convertController extends Controller
                                     'hostName' => $hostName
                                 ]);
                     
-                                $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                                $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+                                $ilovepdfTask = new PdfjpgTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
+                                $ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
                                 $pdfFile = $ilovepdfTask->addFile($file);
                                 $ilovepdfTask->setMode('pages');
                                 $ilovepdfTask->setOutputFileName($pdfName);
                                 $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download($pdfProcessed_Location);
-        
+                                
                                 if(is_file($file)) {
                                     unlink($file);
                                 }
@@ -175,29 +195,29 @@ class convertController extends Controller
                                 $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
         
                                 if (file_exists($download_pdf)) {
-                                    return redirect()->back()->with('success',$download_pdf);
+                                    return redirect('convert')->with('success',$download_pdf);
                                 } else {
                                     $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg';
                                     if (file_exists($download_pdf)) {
-                                        return redirect()->back()->with('success',$download_pdf);
+                                        return redirect('convert')->with('success','temp'.'/'.$pdfNameWithoutExtension.'-0001.jpg');
                                     } else {
-                                        return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+                                        return redirect('convert')->withError('error',' has failed to convert !')->withInput();
                                     }
                                 }
                             } else {
-                                return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+                                return redirect('convert')->withError('error',' REQUEST NOT FOUND !')->withInput();
                             }
                         } else {
-                            return redirect()->back()->withError('error','INVALID OPTION !')->withInput();
+                            return redirect('convert')->withError('error','INVALID OPTION !')->withInput();
                         }
                     } else {
-                        return redirect()->back()->withError('error','MISSING VALUE !')->withInput();
+                        return redirect('convert')->withError('error','MISSING VALUE !')->withInput();
                     }
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect('convert')->withError('error',' FILE NOT FOUND !')->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect('convert')->withError('error',' REQUEST NOT FOUND !')->withInput();
 			}
 		}
 	}
