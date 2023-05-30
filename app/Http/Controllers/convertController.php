@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -28,7 +28,7 @@ class convertController extends Controller
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
 			return redirect()->back()->withErrors($validator->messages())->withInput();
 		} else {
@@ -76,14 +76,15 @@ class convertController extends Controller
                                 $fileSize = filesize($file);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-        
+
                                 pdf_excel::create([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'hostName' => $hostName
                                 ]);
-        
-                                $pythonScripts = escapeshellcmd('python /var/www/html/Eureka-PDF/public/ext-python/pdftoxlsx.py');
+
+				rename($pdfUpload_Location.'/'.$pdfName, $pdfUpload_Location.'/convert_xlsx.pdf');
+                                $pythonScripts = escapeshellcmd('python /var/www/html/pdf-hanaci/public/ext-python/pdftoxlsx.py');
                                 $pythonRun = shell_exec($pythonScripts);
                                 if ($pythonRun = "true") {
                                     if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
@@ -104,25 +105,26 @@ class convertController extends Controller
                                 $file = $request->post('fileAlt');
                                 $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
-                                $pdfNameWithoutExtension = basename($pdfName, ".pdf");
+				$pdfNameInfo = pathinfo($file);
+                                $pdfNameWithoutExtension = $pdfNameInfo['filename'];
                                 $fileSize = filesize($file);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        
+
                                 pdf_word::create([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'hostName' => $hostName
                                 ]);
-                                
+
                                 $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                                 $uploadFileRequest = new UploadFileRequest($file, $pdfName);
                                 $wordsApi->uploadFile($uploadFileRequest);
                                 $requestSaveOptionsData = new DocxSaveOptionsData(array(
                                     "save_format" => "docx",
-                                    "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
+                                    "file_name" => env('ASPOSE_CLOUD_STORAGE_DIR').$pdfNameWithoutExtension.".docx",
                                 ));
-        
+
                                 $request = new SaveAsRequest(
                                     $pdfName,
                                     $requestSaveOptionsData,
@@ -132,13 +134,13 @@ class convertController extends Controller
                                     NULL
                                 );
                                 $result = $wordsApi->saveAs($request);
-        
-                                if (json_decode($result, true) !== NULL) {
+
+                                /*if (json_decode($result, true) !== NULL) {
                                     $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
                                     return redirect()->back()->with('success',$download_word);
                                 } else {
                                     return redirect()->back()->withError('error',' has failed to convert !')->withInput();
-                                }
+                                }*/
                             } else {
                                 return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
                             }
@@ -152,13 +154,13 @@ class convertController extends Controller
                                 $fileSize = filesize($file);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        
+
                                 pdf_jpg::create([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'hostName' => $hostName
                                 ]);
-                    
+
                                 $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                 $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
                                 $pdfFile = $ilovepdfTask->addFile($file);
@@ -167,13 +169,13 @@ class convertController extends Controller
                                 $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download($pdfProcessed_Location);
-        
+
                                 if(is_file($file)) {
                                     unlink($file);
                                 }
-                                
+
                                 $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
-        
+
                                 if (file_exists($download_pdf)) {
                                     return redirect()->back()->with('success',$download_pdf);
                                 } else {

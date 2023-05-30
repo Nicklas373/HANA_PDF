@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Eureka PDF</title>
+        <title>Hana-CI PDF</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
         <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
@@ -11,7 +11,7 @@
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
-                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">Eureka</span>
+                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">HANA-CI</span>
                     ''
                     <span class="mr-14 self-center text-2xl font-poppins font-semibold text-slate-200">PDF</span>
                 </a>
@@ -148,13 +148,13 @@
                         <label for="convertType" class="block mb-2 font-poppins text-sm font-medium text-gray-900 dark:text-white">Convert Format:</label>
                         <select id="convertType" name="convertType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option selected>Choose document format</option>
-                            <option value="jpg">Image (.Jpg)</option>
-                            <option value="excel">Spreadsheet (.Xlsx)</option>
-                            <option value="docx">Word Document (.Docx)</option>
+                            <option value="jpg">Image (*.jpg)</option>
+                            <option value="excel">Spreadsheet (*.xlsx)</option>
+                            <option value="docx">Word Document (*.docx)</option>
                         </select>
                     </div>
                 </div>
-                <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-8 mb-8 sm:mb-4 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Compress PDF</button>
+                <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-8 mb-8 sm:mb-4 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Convert PDF</button>
             </div>
         </form>
         <script src="/ext-js/compress.js"></script>

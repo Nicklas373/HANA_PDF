@@ -19,8 +19,4 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
-    # Redirect Local IP To Domain...
-    RewriteCond %{HTTP_HOST} ^194\.163\.40\.122$
-    RewriteRule ^(.*)$ https://eurekapdf.xyz/$1 [L,R=301]
-
 </IfModule>

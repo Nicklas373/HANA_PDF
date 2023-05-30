@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Eureka PDF</title>
+        <title>Hana-CI PDF</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
         <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
@@ -11,7 +11,7 @@
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
-                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">Eureka</span>
+                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">HANA-CI</span>
                     ''
                     <span class="mr-14 self-center text-2xl font-poppins font-semibold text-slate-200">PDF</span>
                 </a>

@@ -48,6 +48,18 @@ class AppHelper
         return $ip;
     }
 
+	function moveFiles($source, $target) {
+  		// add missing "/" after target
+  		if(substr($target,-1) != '/') $target .= '/';
+
+  		$files = glob($source);
+  		foreach($files as $file) {
+    			$info = pathinfo($file);
+    			$destination = $target . $info['filename'];
+    			rename($file, $destination);
+  		}
+	}
+
     public static function instance()
      {
          return new AppHelper();

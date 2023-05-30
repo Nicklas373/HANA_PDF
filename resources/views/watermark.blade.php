@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Eureka PDF</title>
+        <title>HANA-CI PDF</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
         <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
@@ -11,7 +11,7 @@
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
-                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">Eureka</span>
+                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">HANA-CI</span>
                     ''
                     <span class="mr-14 self-center text-2xl font-poppins font-semibold text-slate-200">PDF</span>
                 </a>
@@ -48,7 +48,7 @@
         <section>
             <div class="py-8 px-4 mt-16 md:mt-24 lg:mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Watermark</h1>
-                <p class="mb-8 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Stamp an image or text over PDF to selected pages or all page</p>
+                <p class="mb-4 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Stamp an image or text over PDF to selected pages or all page</p>
             </div>
         </section>
         <div id="loadingModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -66,7 +66,7 @@
         <form action="/watermark/pdf" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
             `<div class="grid grid-rows-1 gap-2 p-4 mb-12 md:mb-0 xl:mb-12 2xl:mb-0" id="grid-layout">
-                <div id="pdfPreview" name="pdfPreview" class="mb-2">
+                <div id="pdfPreview" name="pdfPreview">
                     @if($message = Session::get('upload'))
                         <br>
                         <?php
