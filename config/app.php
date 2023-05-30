@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://pdf.hana-ci.com'),
 
     'asset_url' => env('ASSET_URL'),
 
