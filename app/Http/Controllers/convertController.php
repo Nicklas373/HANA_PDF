@@ -131,8 +131,8 @@ class convertController extends Controller
                                     NULL,
                                     NULL
                                 );
+
                                 $result = $wordsApi->saveAs($request);
-        
                                 if (json_decode($result, true) !== NULL) {
                                     $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
                                     return redirect()->back()->with('success',$download_word);
