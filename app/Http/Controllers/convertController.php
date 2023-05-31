@@ -120,7 +120,7 @@ class convertController extends Controller
                                 $wordsApi->uploadFile($uploadFileRequest);
                                 $requestSaveOptionsData = new DocxSaveOptionsData(array(
                                     "save_format" => "docx",
-                                    "file_name" => env('ASPOSE_CLOUD_STORAGE_COMPLETED_DIR').$pdfNameWithoutExtension.".docx",
+                                    "file_name" => $pdfNameWithoutExtension.".docx",
                                 ));
         
                                 $request = new SaveAsRequest(
@@ -134,8 +134,12 @@ class convertController extends Controller
 
                                 $result = $wordsApi->saveAs($request);
                                 if (json_decode($result, true) !== NULL) {
-                                    $download_word = env('ASPOSE_CLOUD_STORAGE_COMPLETED_LINK');
-                                    return redirect()->back()->with('success',$download_word);
+				    if (AppHelper::instance()->getFtpResponse($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx", $pdfNameWithoutExtension.".docx") == true) {
+				    	$download_word = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx";
+			            	return redirect()->back()->with('success',$download_word);
+				    } else {
+					return redirect()->back()->withError('error',' has failed to convert !')->withInput();
+				    }
                                 } else {
                                     return redirect()->back()->withError('error',' has failed to convert !')->withInput();
                                 }
