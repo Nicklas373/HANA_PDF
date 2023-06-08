@@ -204,7 +204,7 @@ class splitController extends Controller
 					$pdfProcessed_Location = 'temp';
 					$pdfNameWithoutExtension = basename($file, '.pdf');
 					$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
-					$hostName = gethostname();
+					$hostName = AppHelper::instance()->getUserIpAddr();
 					$newCustomPage = "1 -".$pdfTotalPages;
 					$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
