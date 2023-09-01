@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Eureka PDF</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+        <title>HANA-CI PDF</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
-        <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
-        <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
+        <link rel="stylesheet" href="{{ asset('build/assets/app-51e83a02.css') }}" />
+        <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
@@ -25,20 +25,7 @@
                         <a href="/compress" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Compress PDF</a>
                     </li>
                     <li>
-                        <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 pl-3 pr-4 font-poppins font-semibold text-slate-200 rounded md:hover:bg-slate-900 md:border-0 md:hover:text-sky-400 md:p-0 md:w-auto">Convert PDF <svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
-                        <div id="dropdownNavbar" class="z-10 hidden font-poppins font-semibold text-slate-200 bg-slate-900 divide-y divide-text-slate-200 rounded-lg shadow w-44">
-                            <ul class="py-2 font-poppins font-semibold text-slate-200" aria-labelledby="dropdownLargeButton">
-                                <li>
-                                    <a href="/pdftoexcel" class="block px-4 py-2 hover:text-sky-400">PDF To Excel</a>
-                                </li>
-                                <li>
-                                    <a href="/pdftoword" class="block px-4 py-2 hover:text-sky-400">PDF To Word</a>
-                                </li>
-                                <li>
-                                    <a href="/pdftojpg" class="block px-4 py-2 hover:text-sky-400">PDF To JPG</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <a href="/convert" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Convert PDF</a>
                     </li>
                     <li>
                         <a href="/merge" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Merge PDF</a>
@@ -78,7 +65,7 @@
         </div>
         <form action="/split/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
-            <div class="grid grid-rows-1 gap-2 p-4 mb-8 md:mb-0 xl:mb-8 2xl:mb-0" id="grid-layout">
+            <div class="grid grid-rows-1 gap-2 p-4 mb-8" id="grid-layout">
                 <div id="pdfPreview" name="pdfPreview" class="mb-2">
                     @if($message = Session::get('upload'))
                         <br>
@@ -138,21 +125,20 @@
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
-                                <span class="font-poppins font-medium">Split PDF Error ! </span> {{ $message }}.
+                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                             </div>
                         </div>
                     @elseif ($errors->any())
-                        {!! implode('', $errors->all(
-                            '
+                        @error('error')
                             <br>
                             <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                                 <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                                 <span class="sr-only">Info</span>
                                 <div>
-                                    <span class="font-poppins font-medium">Split PDF Error ! </span> :message.
+                                    <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                                 </div>
-                            </div>'
-                        )) !!}
+                            </div>
+                        @enderror
                     @endif
                 </div>
                 <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 mb-4 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
@@ -172,7 +158,7 @@
         </form>
         <script src="/ext-js/split.js"></script>
         <script src="/ext-js/spinner.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
     </body>
     <footer class="fixed bottom-0 left-0 right-0 w-full p-2 bg-slate-900 border-t border-text-slate-200 shadow md:flex md:items-center md:justify-between">
         <span class="font-poppins font-semibold rounded text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>

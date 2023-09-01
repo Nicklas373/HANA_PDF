@@ -47,13 +47,13 @@ class compressController extends Controller
 								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "compress") {
 					if(isset($_POST['fileAlt'])) {
@@ -63,11 +63,12 @@ class compressController extends Controller
 						} else {
 							$compMethod = "recommended";
 						}
-			
+
+						$file = $request->post('fileAlt');
 						$pdfProcessed_Location = 'temp';
-						$pdfName = basename($request->post('fileAlt'));
-						$pdfNameWithoutExtension = basename($request->post('fileAlt'), ".pdf");
-						$fileSize = filesize($request->post('fileAlt'));
+						$pdfName = basename($file);
+						$pdfNameWithoutExtension = basename($file, ".pdf");
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 			
@@ -81,31 +82,31 @@ class compressController extends Controller
 						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 						$ilovepdfTask = $ilovepdf->newTask('compress');
 						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-						$pdfFile = $ilovepdfTask->addFile($request->post('fileAlt'));
+						$pdfFile = $ilovepdfTask->addFile($file);
 						$ilovepdfTask->setOutputFileName($pdfName);
 						$ilovepdfTask->setCompressionLevel($compMethod);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
 						
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-						
-						if(is_file($request->post('fileAlt'))) {
-							unlink($request->post('fileAlt'));
+
+						if(is_file($file)) {
+							unlink($file);
 						}
 			
 						if (file_exists($download_pdf)) {
 							return redirect()->back()->with('success',$download_pdf);
 						} else {
-							return redirect()->back()->withError('error',' has failed to compress !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Compress process error !'])->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
 		}
 	}

@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eureka PDF</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+    <title>HANA-CI PDF</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
-    <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
+    <link rel="stylesheet" href="{{ asset('build/assets/app-51e83a02.css') }}" />
     <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
     <nav class="fixed left-0 top-0 z-20 w-full border-b bg-slate-900 dark:bg-slate-800">
       <div class="flex max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -25,22 +25,7 @@
               <a href="/compress" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Compress PDF</a>
             </li>
             <li>
-              <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="font-poppins flex w-full items-center justify-between rounded py-2 pl-3 pr-4 font-semibold text-slate-200 md:w-auto md:border-0 md:p-0 md:hover:bg-slate-900 md:hover:text-sky-400">
-                Convert PDF <svg class="ml-1 h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-              </button>
-              <div id="dropdownNavbar" class="font-poppins divide-text-slate-200 z-10 hidden w-44 divide-y rounded-lg bg-slate-900 font-semibold text-slate-200 shadow">
-                <ul class="font-poppins py-2 font-semibold text-slate-200" aria-labelledby="dropdownLargeButton">
-                  <li>
-                    <a href="/pdftoexcel" class="block px-4 py-2 hover:text-sky-400">PDF To Excel</a>
-                  </li>
-                  <li>
-                    <a href="/pdftoword" class="block px-4 py-2 hover:text-sky-400">PDF To Word</a>
-                  </li>
-                  <li>
-                    <a href="/pdftojpg" class="block px-4 py-2 hover:text-sky-400">PDF To JPG</a>
-                  </li>
-                </ul>
-              </div>
+              <a href="/convert" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Convert PDF</a>
             </li>
             <li>
               <a href="/merge" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Merge PDF</a>
@@ -90,7 +75,7 @@
             <h5 class="font-poppins mb-2 text-xl font-semibold tracking-tight text-gray-900 sm:mt-6">Tailwind CSS</h5>
             <p class="font-poppins mb-4 text-sm text-gray-700 md:mb-12 lg:mb-4 2xl:mb-6">A utility-first CSS framework packed that can be composed to build any design.</p>
             <p class="font-poppins text-sm text-gray-700">
-              Tailwind CSS Version: <span class="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"><b>3.3.1</b></span>
+              Tailwind CSS Version: <span class="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"><b>3.3.3</b></span>
             </p>
           </div>
         </a>
@@ -102,7 +87,7 @@
             <h5 class="font-poppins mb-2 text-xl font-semibold tracking-tight text-gray-900 sm:mt-6">Flowbite</h5>
             <p class="font-poppins mb-4 text-sm text-gray-700 md:mb-7 lg:mb-4 2xl:mb-6">Open-source library of web components built with the utility-first classes from Tailwind CSS.</p>
             <p class="font-poppins text-sm text-gray-700">
-              Flowbite Version: <span class="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"><b>1.6.5</b></span>
+              Flowbite Version: <span class="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"><b>1.8.1</b></span>
             </p>
           </div>
         </a>
@@ -114,7 +99,7 @@
             <h5 class="font-poppins mb-2 text-xl font-semibold tracking-tight text-gray-900 sm:mt-6 md:mt-0 lg:mt-2 xl:mt-4">Vite JS</h5>
             <p class="font-poppins lg:md-3 mb-3 text-sm text-gray-700 md:mb-12 lg:mb-4 2xl:mb-6">Frontend build tooling that significantly improves the frontend development experience.</p>
             <p class="font-poppins text-sm text-gray-700">
-              Vite JS Version: <span class="mr-2 rounded bg-indigo-100 px-2.5 py-0.5 text-sm font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"><b>4.3.2</b></span>
+              Vite JS Version: <span class="mr-2 rounded bg-indigo-100 px-2.5 py-0.5 text-sm font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"><b>4.4.9</b></span>
             </p>
           </div>
         </a>
@@ -154,7 +139,7 @@
             <h5 class="font-poppins mb-2 text-xl font-semibold tracking-tight text-gray-900 sm:mt-8 xl:mt-6">Aspose Cloud</h5>
             <p class="font-poppins mb-6 text-sm text-gray-700 md:mb-4 lg:mb-6">RESTful APIs to Create, Edit & Convert over 100 File Formats from any Language, on any Platform</p>
             <p class="font-poppins mt-8 text-sm text-gray-700 md:mt-12 lg:mt-6 2xl:mt-9">
-              Aspose Version: <span class="mr-2 rounded bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"><b>23.3</b></span>
+              Aspose Version: <span class="mr-2 rounded bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"><b>23.7</b></span>
             </p>
           </div>
         </a>
@@ -177,7 +162,7 @@
     </div>
     <script src="/ext-js/progress.js"></script>
     <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
   </body>
   <footer class="border-text-slate-200 fixed bottom-0 left-0 right-0 w-full border-t bg-slate-900 p-2 shadow md:flex md:items-center md:justify-between">
     <span class="font-poppins rounded font-semibold text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>

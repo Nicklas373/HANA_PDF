@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eureka PDF</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+    <title>HANA-CI PDF</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
-    <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
-    <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
+    <link rel="stylesheet" href="{{ asset('build/assets/app-51e83a02.css') }}" />
+    <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
     <nav class="fixed left-0 top-0 z-20 w-full border-b bg-slate-900 dark:bg-slate-800">
       <div class="flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <a href="/" class="flex items-center">
@@ -25,22 +25,7 @@
               <a href="/compress" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Compress PDF</a>
             </li>
             <li>
-              <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="font-poppins flex w-full items-center justify-between rounded py-2 pl-3 pr-4 font-semibold text-slate-200 md:w-auto md:border-0 md:p-0 md:hover:bg-slate-900 md:hover:text-sky-400">
-                Convert PDF <svg class="ml-1 h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-              </button>
-              <div id="dropdownNavbar" class="font-poppins divide-text-slate-200 z-10 hidden w-44 divide-y rounded-lg bg-slate-900 font-semibold text-slate-200 shadow">
-                <ul class="font-poppins py-2 font-semibold text-slate-200" aria-labelledby="dropdownLargeButton">
-                  <li>
-                    <a href="/pdftoexcel" class="block px-4 py-2 hover:text-sky-400">PDF To Excel</a>
-                  </li>
-                  <li>
-                    <a href="/pdftoword" class="block px-4 py-2 hover:text-sky-400">PDF To Word</a>
-                  </li>
-                  <li>
-                    <a href="/pdftojpg" class="block px-4 py-2 hover:text-sky-400">PDF To JPG</a>
-                  </li>
-                </ul>
-              </div>
+              <a href="/convert" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Convert PDF</a>
             </li>
             <li>
               <a href="/merge" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Merge PDF</a>
@@ -126,7 +111,7 @@
       </div>
     </div>
     <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
   </body>
   <footer class="border-text-slate-200 fixed bottom-0 left-0 right-0 w-full border-t bg-slate-900 p-2 shadow md:flex md:items-center md:justify-between">
     <span class="font-poppins rounded font-semibold text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>
