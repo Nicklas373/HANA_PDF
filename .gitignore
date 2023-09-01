@@ -21,3 +21,10 @@ Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+
+# Laravel Public Folder
+public/temp
+public/temp-csv
+public/temp-merge
+public/thumbnail
+public/upload-pdf
