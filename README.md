@@ -7,12 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## EUREKA PDF
-Eureka PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+## HANA-CI PDF
+HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
-![Eureka](screenshot/1.png)
+![HANA](screenshot/1.png)
 
 ---
 
@@ -39,6 +39,7 @@ Eureka PDF is a __Laravel__ based project with mix use from some front-end and b
 
 - Pandas
 - Tabula-io (tabula-py)
+- OpenPyXL
 
 ---
 
@@ -86,7 +87,7 @@ Laravel Environment
 ---
 
 ## License
-The Eureka PDF is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The HANA-CI PDF is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 <br>
 
