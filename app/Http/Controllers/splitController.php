@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -23,7 +23,7 @@ class splitController extends Controller
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
             return redirect('split')->withErrors($validator->messages())->withInput();
         } else {
@@ -48,13 +48,13 @@ class splitController extends Controller
 								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect('split')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect('split')->withError('error',' has failed to upload !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
 							}
 						} else {
-							return redirect('split')->withError('error',' has failed to upload !')->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 						}
 					} else {
-						return redirect('split')->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
@@ -103,9 +103,9 @@ class splitController extends Controller
 						if (!empty($fromPage)){
 							$pdfTotalPages = AppHelper::instance()->count($file);
 							if ($toPage > $pdfTotalPages) {
-								return redirect('split')->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect()->back()->withErrors(['error'=>'ToPage selected value has more than total PDF pages ! (total pages:'.$pdfTotalPages])->withInput();
 							} else if ($fromPage > $toPage) {
-								return redirect('split')->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect()->back()->withErrors(['error'=>'FirstPage value has more than ToPage value !'])->withInput();
 							} else {
 								if ($mergeDBpdf == "true") {
 									$fixedPageRanges = $fromPage.'-'.$toPage;
@@ -164,7 +164,7 @@ class splitController extends Controller
 						$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
-						
+
 						$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 						$download_split_pdf = $pdfProcessed_Location.'/'.basename($file);
 
@@ -176,21 +176,21 @@ class splitController extends Controller
 							if (file_exists($download_merge_pdf)) {
 								return redirect('split')->with('success','temp/'.basename($file));
 							} else {
-								return redirect('split')->withError('error',' has failed to split !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Split process error !'])->withInput();
 							}
 						} else if ($mergeDBpdf == "true") {
 							if (file_exists($download_split_pdf)) {
 								return redirect('split')->with('success','temp/'.$pdfNameWithoutExtension.'.zip');
 							} else {
-								return redirect('split')->withError('error',' has failed to split !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Split process error !'])->withInput();
 							}
 						}
 					} else {
-						return redirect('split')->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "extract") {
 					$file = 'public/'.$request->post('fileAlt');
-			
+
 					$pdfStartPages = 1;
 					$pdfTotalPages = AppHelper::instance()->count($file);
 					while($pdfStartPages <= intval($pdfTotalPages))
@@ -226,21 +226,21 @@ class splitController extends Controller
 					$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 					$ilovepdfTask->execute();
 					$ilovepdfTask->download($pdfProcessed_Location);
-					
+
 					$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
-					
+
 					if(is_file($file)) {
 						unlink($file);
 					}
-					
+
 					if (file_exists($download_pdf)) {
 						return redirect('split')->with('success','temp/'.$pdfNameWithoutExtension.'.zip');
 					} else {
-						return redirect('split')->withError('error',' has failed to split !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'Extract process error !'])->withInput();
 					}
 				}
 			} else {
-				return redirect('split')->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 			}
 		}
     }

@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Models\File;
@@ -31,7 +31,7 @@ class mergeController extends Controller
             if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
-					if ($request->hasfile('file')) { 
+					if ($request->hasfile('file')) {
                         foreach ($request->file('file') as $file) {
                             $filename = $file->getClientOriginalName();
 						    $pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
@@ -45,12 +45,13 @@ class mergeController extends Controller
 								$thumbnail = file(public_path('thumbnail').'/1.png');
 								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
                                 $pdfResponse[] = 'temp-merge/'.$pdfNameWithoutExtension.'.pdf';
+							} else {
+								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 							}
                         }
-                        
-                        return redirect('merge')->with('upload', implode(',',$pdfResponse));
+                        return redirect()->back()->with('upload', implode(',',$pdfResponse));
                     } else {
-                        return redirect('merge')->withError('error',' has failed to merged !')->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
                     }
                 } else if ($request->post('formAction') == "merge") {
 					if(isset($_POST['fileAlt'])) {
@@ -69,13 +70,13 @@ class mergeController extends Controller
                         $pdfStartPages = 1;
                         $pdfPreProcessed_Location = public_path('temp-merge');
                         $pdfProcessed_Location = public_path('temp');
-            
+
                         merge_pdf::create([
                             'fileName' => $fileName,
                             'fileSize' => $fileSizeInMB,
                             'hostName' => $hostName
                         ]);
-			
+
                         $ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
                         $ilovepdfTask = $ilovepdf->newTask('merge');
                         $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
@@ -90,27 +91,27 @@ class mergeController extends Controller
                         $ilovepdfTask->execute();
                         $ilovepdfTask->download($pdfProcessed_Location);
                         $download_pdf = $pdfProcessed_Location.'/'.'merged.pdf';
-            
+
                         $tempPDFfiles = glob($pdfPreProcessed_Location . '/*');
                         foreach($tempPDFfiles as $file){
                             if(is_file($file)) {
                                 unlink($file);
                             }
                         }
-                        
+
                         if (file_exists($download_pdf)) {
                             return redirect('merge')->with('success','temp/merged.pdf');
                         } else {
-                            return redirect('merge')->withError('error',' has failed to merged !')->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Merged process error !'])->withInput();
                         }
 					} else {
-						return redirect('merge')->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect('merge')->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect('merge')->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
         }
     }

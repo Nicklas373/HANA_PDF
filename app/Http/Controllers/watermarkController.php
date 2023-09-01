@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -26,7 +26,7 @@ class watermarkController extends Controller
 			'watermarkPage' => '',
 			'wmType' => '',
 		]);
- 
+
 		if($validator->fails()) {
             return redirect('watermark')->withErrors($validator->messages())->withInput();
         } else {
@@ -51,13 +51,13 @@ class watermarkController extends Controller
 								rename(public_path('thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect('watermark')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect('watermark')->withError('error',' has failed to upload !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
 							}
 						} else {
-							return redirect('watermark')->withError('error',' has failed to upload !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 						}
 					} else {
-						return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "watermark") {
 					if(isset($_POST['fileAlt'])) {
@@ -151,7 +151,7 @@ class watermarkController extends Controller
 						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-			
+
 						watermark_pdf::create([
 							'fileName' => basename($file),
 							'fileSize' => $newFileSize,
@@ -186,7 +186,7 @@ class watermarkController extends Controller
 								$ilovepdfTask->execute();
 								$ilovepdfTask->download($pdfProcessed_Location);
 							} else {
-								return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 							}
 						} else if ($watermarkStyle == "text") {
 							$ilovepdfTask = new WatermarkTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
@@ -210,24 +210,24 @@ class watermarkController extends Controller
 						}
 
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-						
+
 						if(is_file($file)) {
 							unlink($file);
 						}
-			
+
 						if (file_exists($download_pdf)) {
 							return redirect('watermark')->with('success','temp/'.$pdfName);
 						} else {
-							return redirect('watermark')->withError('error',' has failed to watermark !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Watermark process error !'])->withInput();
 						}
 					} else {
-						return redirect('watermark')->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect('watermark')->withError('error',' REQUEST NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect('watermark')->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
 		}
     }
