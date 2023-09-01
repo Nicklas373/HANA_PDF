@@ -45,12 +45,13 @@ class mergeController extends Controller
 								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
 								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
                                 $pdfResponse[] = 'temp-merge/'.$pdfNameWithoutExtension.'.pdf';
+							} else {
+								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 							}
                         }
-
                         return redirect()->back()->with('upload', implode(',',$pdfResponse));
                     } else {
-                        return redirect()->back()->withError('error',' has failed to merged !')->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
                     }
                 } else if ($request->post('formAction') == "merge") {
 					if(isset($_POST['fileAlt'])) {
@@ -100,16 +101,16 @@ class mergeController extends Controller
                         if (file_exists($download_pdf)) {
                             return redirect()->back()->with('success',$download_pdf);
                         } else {
-                            return redirect()->back()->withError('error',' has failed to merged !')->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Merged process error !'])->withInput();
                         }
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
         }
     }

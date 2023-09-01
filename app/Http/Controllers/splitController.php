@@ -48,13 +48,13 @@ class splitController extends Controller
 								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
@@ -103,9 +103,9 @@ class splitController extends Controller
 						if (!empty($fromPage)){
 							$pdfTotalPages = AppHelper::instance()->count($file);
 							if ($toPage > $pdfTotalPages) {
-								return redirect()->back()->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect()->back()->withErrors(['error'=>'ToPage selected value has more than total PDF pages ! (total pages:'.$pdfTotalPages])->withInput();
 							} else if ($fromPage > $toPage) {
-								return redirect()->back()->withError('error',$file. 'Invalid page range')->withInput();
+								return redirect()->back()->withErrors(['error'=>'FirstPage value has more than ToPage value !'])->withInput();
 							} else {
 								if ($mergeDBpdf == "true") {
 									$fixedPageRanges = $fromPage.'-'.$toPage;
@@ -176,17 +176,17 @@ class splitController extends Controller
 							if (file_exists($download_merge_pdf)) {
 								return redirect()->back()->with('success',$download_merge_pdf);
 							} else {
-								return redirect()->back()->withError('error',' has failed to split !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Split process error !'])->withInput();
 							}
 						} else if ($mergeDBpdf == "true") {
 							if (file_exists($download_split_pdf)) {
 								return redirect()->back()->with('success',$download_split_pdf);
 							} else {
-								return redirect()->back()->withError('error',' has failed to split !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Split process error !'])->withInput();
 							}
 						}
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "extract") {
 					$file = $request->post('fileAlt');
@@ -236,11 +236,11 @@ class splitController extends Controller
 					if (file_exists($download_pdf)) {
 						return redirect()->back()->with('success',$download_pdf);
 					} else {
-						return redirect()->back()->withError('error',' has failed to split !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'Extract process error !'])->withInput();
 					}
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 			}
 		}
     }
