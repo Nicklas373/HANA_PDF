@@ -137,8 +137,7 @@
                             <div>
                                 <span class="font-poppins font-medium">Upload PDF Error ! </span> :message
                             </div>
-                        </div>'
-                        )) !!}
+                        @enderror
                     @endif
                 </div>
                 <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 sm:mb-12 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 md:mb-8" onClick="onClick()" value="upload">Upload PDF</button>
