@@ -119,27 +119,26 @@
                                 Watermark PDF Success !, Click <a href="{{ $message }}" class="font-poppins font-semibold underline hover:no-underline">Here </a>to download.
                             </div>
                         </div>
-                        @elseif($message = Session::get('error'))
+                    @elseif($message = Session::get('error'))
                         <br>
-                        <div class="flex p-4 mt-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                        <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> :message
+                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                             </div>
                         </div>
-                        @elseif ($errors->any())
-                        {!! implode('', $errors->all(
-                        '
-                        <br>
-                        <div class="flex p-4 mt-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
-                            <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> :message
+                    @elseif ($errors->any())
+                        @error('error')
+                            <br>
+                            <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                                <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                <span class="sr-only">Info</span>
+                                <div>
+                                    <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
+                                </div>
                             </div>
-                        </div>'
-                        )) !!}
+                        @enderror
                     @endif
                 </div>
                 <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-fit mx-auto mt-4 mb-8 lg:mb-8 xl:mb-0 bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
@@ -158,7 +157,7 @@
                 </div>
                 <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 sm:mb-12 md:mb-8 mb-2" onClick="onClick()" value="upload">Upload PDF</button>
                 <div class="grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24 sm:mb-12 md:mb-12 mb-2" id="grid-layout_2" style="display: none;">
-                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>  
+                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
                     <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="watermark">Watermark PDF</button>
                 </div>
             </div>

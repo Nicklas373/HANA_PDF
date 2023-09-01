@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Models\File;
@@ -31,7 +31,7 @@ class mergeController extends Controller
             if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
-					if ($request->hasfile('file')) { 
+					if ($request->hasfile('file')) {
                         foreach ($request->file('file') as $file) {
                             $filename = $file->getClientOriginalName();
 						    $pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
@@ -45,12 +45,13 @@ class mergeController extends Controller
 								$thumbnail = file(env('pdf_thumbnail').'/1.png');
 								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
                                 $pdfResponse[] = 'temp-merge/'.$pdfNameWithoutExtension.'.pdf';
+							} else {
+								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 							}
                         }
-                        
                         return redirect()->back()->with('upload', implode(',',$pdfResponse));
                     } else {
-                        return redirect()->back()->withError('error',' has failed to merged !')->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
                     }
                 } else if ($request->post('formAction') == "merge") {
 					if(isset($_POST['fileAlt'])) {
@@ -68,13 +69,13 @@ class mergeController extends Controller
                         $pdfStartPages = 1;
                         $pdfPreProcessed_Location = 'temp-merge';
                         $pdfProcessed_Location = 'temp';
-            
+
                         merge_pdf::create([
                             'fileName' => $fileNameArray,
                             'fileSize' => $fileSizeInMB,
                             'hostName' => $hostName
                         ]);
-			
+
                         $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                         $ilovepdfTask = $ilovepdf->newTask('merge');
                         $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
@@ -89,27 +90,27 @@ class mergeController extends Controller
                         $ilovepdfTask->execute();
                         $ilovepdfTask->download($pdfProcessed_Location);
                         $download_pdf = $pdfProcessed_Location.'/merged.pdf';
-            
+
                         $tempPDFfiles = glob($pdfPreProcessed_Location . '/*');
                         foreach($tempPDFfiles as $file){
                             if(is_file($file)) {
                                 unlink($file);
                             }
                         }
-                        
+
                         if (file_exists($download_pdf)) {
                             return redirect()->back()->with('success',$download_pdf);
                         } else {
-                            return redirect()->back()->withError('error',' has failed to merged !')->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Merged process error !'])->withInput();
                         }
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
         }
     }

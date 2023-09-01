@@ -47,13 +47,13 @@ class compressController extends Controller
 								rename(env('pdf_thumbnail').'/1.png', env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect()->back()->with('upload','/'.env('pdf_thumbnail').'/'.$pdfNameWithoutExtension.'.png');
 							} else {
-								return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
 							}
 						} else {
-							return redirect()->back()->withError('error',' has failed to upload !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !'])->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else if ($request->post('formAction') == "compress") {
 					if(isset($_POST['fileAlt'])) {
@@ -97,16 +97,16 @@ class compressController extends Controller
 						if (file_exists($download_pdf)) {
 							return redirect()->back()->with('success',$download_pdf);
 						} else {
-							return redirect()->back()->withError('error',' has failed to compress !')->withInput();
+							return redirect()->back()->withErrors(['error'=>'Compress process error !'])->withInput();
 						}
 					} else {
-						return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !'])->withInput();
 					}
 				} else {
-					return redirect()->back()->withError('error',' FILE NOT FOUND !')->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
 				}
 			} else {
-				return redirect()->back()->withError('error',' REQUEST NOT FOUND !')->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !'])->withInput();
 			}
 		}
 	}
