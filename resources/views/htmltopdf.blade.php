@@ -6,7 +6,7 @@
         <title>Hana-CI PDF</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
-        <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
+        <link rel="stylesheet" href="{{ asset('build/assets/app-51e83a02.css') }}" />
         <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
