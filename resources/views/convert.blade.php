@@ -123,20 +123,10 @@
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ session('errors')->first('error'); }}
+                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                             </div>
                         </div>
                     @elseif ($errors->any())
-<<<<<<< HEAD
-                        {!! implode('', $errors->all(
-                        '
-                        <br>
-                        <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
-                            <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ session('errors')->first('error'); }}
-=======
                         @error('error')
                             <div class="flex p-4 mt-2 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                                 <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
@@ -144,28 +134,12 @@
                                 <div>
                                     <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
                                 </div>
->>>>>>> 7633023 (treewide: Update and re-position layout)
                             </div>
-                        </div>'
-                        )) !!}
+                        @enderror
                     @endif
                 </div>
                 <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5" onClick="onClick()" value="upload">Upload PDF</button>
                 <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
-<<<<<<< HEAD
-                    <h3 class="mb-5 font-poppins font-semibold text-slate-900 dark:text-white">Convert Options:</h3>
-                    <div class="mt-4">
-                        <label for="convertType" class="block mb-2 font-poppins text-sm font-medium text-gray-900 dark:text-white">Convert Format:</label>
-                        <select id="convertType" name="convertType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected>Choose document format</option>
-                            <option value="jpg">Image (.Jpg)</option>
-                            <option value="excel">Spreadsheet (.Xlsx)</option>
-                            <option value="docx">Word Document (.Docx)</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-8 mb-8 sm:mb-4 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Compress PDF</button>
-=======
                     <label class="block mb-2 font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Document Format</label>
                     <select id="convertType" name="convertType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option selected>Choose document format</option>
@@ -175,7 +149,6 @@
                     </select>
                 </div>
                 <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Convert PDF</button>
->>>>>>> 7633023 (treewide: Update and re-position layout)
             </div>
         </form>
         <script src="/ext-js/compress.js"></script>
