@@ -11,7 +11,7 @@
     <nav class="fixed left-0 top-0 z-20 w-full border-b bg-slate-900 dark:bg-slate-800">
       <div class="flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <a href="/" class="flex items-center">
-          <span class="font-poppins h-8 self-center text-2xl font-semibold text-sky-400">Eureka</span>
+          <span class="font-poppins h-8 self-center text-2xl font-semibold text-sky-400">HANA-CI</span>
           ''
           <span class="font-poppins mr-14 self-center text-2xl font-semibold text-slate-200">PDF</span>
         </a>

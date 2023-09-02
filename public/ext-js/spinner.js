@@ -32,7 +32,7 @@ function rotate() {
 }
 
 function remove() {
-    var pdfCompBtn = document.getElementById('submitBtn_1');
+    var pdfCompBtn = document.getElementById('submitBtn');
     var pdfComp = document.getElementById('pdfCompLayout');
     var pdfImage = document.getElementById('pdfPreview');
     var pdfSplit1 = document.getElementById("splitLayout1");
