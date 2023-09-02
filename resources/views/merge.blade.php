@@ -44,7 +44,7 @@
             </div>
         </nav>
     </head>
-    <body class="bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+    <body class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <section>
             <div class="py-8 px-4 mt-16 md:mt-24 lg:mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Merge</h1>
@@ -68,6 +68,7 @@
         {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div id="pdfPreview" name="pdfPreview">
+                    <br>
                     @if($message = Session::get('upload'))
                         <?php
                             echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="visibility: none;" value="'.$message.'">';
@@ -111,8 +112,7 @@
                     <pre id="filelist" class="mt-4 font-poppins text-sm text-slate-200 p-4 mb-4 rounded-lg bg-slate-900" style="display:none; white-space: pre-line;"></pre>
                     <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="multiple_files_help">PDF (Max. 25 MB) | Multiple upload files supported.</p>
                     @if ($message = Session::get('success'))
-                        <br>
-                        <div class="flex p-4 mb-2 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                        <div class="flex p-4 mt-2 mb-2 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div class="ml-3 text-sm font-medium">
@@ -120,8 +120,7 @@
                             </div>
                         </div>
                     @elseif($message = Session::get('error'))
-                        <br>
-                        <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                        <div class="flex p-4 mt-2 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
@@ -130,8 +129,7 @@
                         </div>
                     @elseif ($errors->any())
                         @error('error')
-                            <br>
-                            <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                            <div class="flex p-4 mt-2 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                                 <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                                 <span class="sr-only">Info</span>
                                 <div>
@@ -141,10 +139,10 @@
                         @enderror
                     @endif
                 </div>
-                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mb-2 h-16" onClick="onClick()" value="upload" style="visibility: visible;">Upload PDF</button>
+                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mb-2 h-16" onClick="onClick()" value="upload" style="visibility: visible;">Upload PDF</button>
                 <div class="grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
-                    <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
-                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="merge">Merge PDF</button>
+                    <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
+                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="merge">Merge PDF</button>
                 </div>
             </div>
         </form>
