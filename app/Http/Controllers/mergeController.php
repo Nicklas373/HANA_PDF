@@ -35,8 +35,8 @@ class mergeController extends Controller
                         foreach ($request->file('file') as $file) {
                             $filename = $file->getClientOriginalName();
 						    $pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-                            $file->move(public_path('temp-merge'), $filename);
-                            $pdf = new Pdf(public_path('temp-merge').'/'.$filename);
+                            $file->move(env('PDF_MERGE_TEMP'), $filename);
+                            $pdf = new Pdf(env('PDF_MERGE_TEMP').'/'.$filename);
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
@@ -62,13 +62,13 @@ class mergeController extends Controller
 							$dropFile = array();
 						}
 						$fileNameArray = $request->post('fileAlt');
-                        $fileSizeArray = AppHelper::instance()->folderSize(public_path('temp-merge'));
+                        $fileSizeArray = AppHelper::instance()->folderSize(env('PDF_MERGE_TEMP'));
                         $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
                         $hostName = AppHelper::instance()->getUserIpAddr();
-                        $pdfArray = scandir(public_path('temp-merge'));
+                        $pdfArray = scandir(env('PDF_MERGE_TEMP'));
                         $pdfStartPages = 1;
-                        $pdfPreProcessed_Location = 'temp-merge';
-                        $pdfProcessed_Location = 'temp';
+                        $pdfPreProcessed_Location = env('PDF_MERGE_TEMP');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
 
                         merge_pdf::create([
                             'fileName' => $fileNameArray,
