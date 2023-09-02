@@ -44,6 +44,7 @@ function init() {
     var mBtnLayout = document.getElementById('grid-layout')
     var mBtnLayout_2 = document.getElementById('grid-layout_2')
     var pdfLayout = document.getElementById('pdfCompLayout')
+    document.getElementById("fileAlt").style.display = "none";
     if (fullPath !== '') {
         document.getElementById('submitBtn').style.backgroundColor="#e2e8f0"
         document.getElementById('submitBtn').style.color="#0f172a"
