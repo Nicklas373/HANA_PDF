@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1fc24650fcaf4f8a37bd7299badb9492",
+    "content-hash": "0687044fe21b56d630ce98cf91e2b44b",
     "packages": [
         {
             "name": "aspose-cloud/aspose-words-cloud",
-            "version": "23.3.0",
+            "version": "23.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aspose-words-cloud/aspose-words-cloud-php.git",
-                "reference": "4a591b9821717ca9911cf58b95cb377639215645"
+                "reference": "bfaade3654284260015d1fc4d18ab0dc126aae1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aspose-words-cloud/aspose-words-cloud-php/zipball/4a591b9821717ca9911cf58b95cb377639215645",
-                "reference": "4a591b9821717ca9911cf58b95cb377639215645",
+                "url": "https://api.github.com/repos/aspose-words-cloud/aspose-words-cloud-php/zipball/bfaade3654284260015d1fc4d18ab0dc126aae1e",
+                "reference": "bfaade3654284260015d1fc4d18ab0dc126aae1e",
                 "shasum": ""
             },
             "require": {
@@ -94,9 +94,9 @@
             ],
             "support": {
                 "issues": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/issues",
-                "source": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/tree/23.3.0"
+                "source": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/tree/23.7.0"
             },
-            "time": "2023-04-09T14:38:48+00:00"
+            "time": "2023-07-24T07:54:52+00:00"
         },
         {
             "name": "brick/math",
@@ -4961,16 +4961,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v6.2.8",
+            "version": "v6.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "75ed64103df4f6615e15a7fe38b8111099f47416"
+                "reference": "0b5c29118f2e980d455d2e34a5659f4579847c54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/75ed64103df4f6615e15a7fe38b8111099f47416",
-                "reference": "75ed64103df4f6615e15a7fe38b8111099f47416",
+                "url": "https://api.github.com/repos/symfony/process/zipball/0b5c29118f2e980d455d2e34a5659f4579847c54",
+                "reference": "0b5c29118f2e980d455d2e34a5659f4579847c54",
                 "shasum": ""
             },
             "require": {
@@ -5002,7 +5002,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v6.2.8"
+                "source": "https://github.com/symfony/process/tree/v6.3.4"
             },
             "funding": [
                 {
@@ -5018,7 +5018,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-03-09T16:20:02+00:00"
+            "time": "2023-08-07T10:39:22+00:00"
         },
         {
             "name": "symfony/routing",

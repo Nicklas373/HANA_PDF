@@ -5,10 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>EMSITPRO PDF Tools</title>
         <link rel="icon" href="public/assets/elwilis.png" type="image/icon type">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
-        <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
-        <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
+        <link rel="stylesheet" href="{{ asset('build/assets/app-e405037d.css') }}" />
+        <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
         <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
                 <a href="/" class="flex items-center">
@@ -141,13 +141,13 @@
                         )) !!}
                     @endif
                 </div>
-                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 sm:mb-12 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 md:mb-8" onClick="onClick()" value="upload">Upload PDF</button>  
+                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 sm:mb-12 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 md:mb-8" onClick="onClick()" value="upload">Upload PDF</button>
                 <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
                     <h3 class="mb-5 font-poppins font-semibold text-slate-900 dark:text-white">Compression quality:</h3>
                     <ul class="grid w-full gap-4 lg:grid-cols-1 2xl:grid-cols-3 mt-4 mb-4">
                         <li>
                             <input type="radio" id="comp-low" name="compMethod" value="low" class="hidden peer">
-                            <label for="comp-low" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
+                            <label for="comp-low" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">
                                 <div class="block">
                                     <div class="w-full text-lg font-semibold">Lowest</div>
                                     <div class="w-full">High quality, less compression</div>
@@ -157,7 +157,7 @@
                         </li>
                         <li>
                             <input type="radio" id="comp-rec" name="compMethod" value="recommended" class="hidden peer">
-                            <label for="comp-rec" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
+                            <label for="comp-rec" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">
                                 <div class="block">
                                     <div class="w-full text-lg font-semibold">Recommended</div>
                                     <div class="w-full">Good quality, good compression</div>
@@ -167,7 +167,7 @@
                         </li>
                         <li>
                             <input type="radio" id="comp-high" name="compMethod" value="extreme" class="hidden peer">
-                            <label for="comp-high" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">                           
+                            <label for="comp-high" class="inline-flex items-center justify-between w-full p-5 text-slate-200 bg-slate-900 border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-slate-900 peer-checked:bg-slate-200 hover:text-slate-900 hover:bg-slate-200">
                                 <div class="block">
                                     <div class="w-full text-lg font-semibold">High</div>
                                     <div class="w-full">Less quality, high compression</div>
@@ -182,7 +182,7 @@
         </form>
         <script src="/ext-js/compress.js"></script>
         <script src="/ext-js/spinner.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
     </body>
     <footer class="fixed bottom-0 left-0 right-0 w-full p-2 bg-slate-900 border-t border-text-slate-200 shadow md:flex md:items-center md:justify-between">
         <span class="font-poppins font-semibold rounded text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>

@@ -7,8 +7,8 @@
     <link rel="icon" href="public/assets/elwilis.png" type="image/icon type">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
-    <link rel="stylesheet" href="{{ asset('build/assets/app-b604bc3f.css') }}" />
-    <link rel="script" href="{{ asset('assets/app-547abec6.js') }}" />
+    <link rel="stylesheet" href="{{ asset('build/assets/app-e405037d.css') }}" />
+    <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
     <nav class="fixed left-0 top-0 z-20 w-full border-b bg-slate-900 dark:bg-slate-800">
       <div class="flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <a href="/" class="flex items-center">
