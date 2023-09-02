@@ -44,9 +44,9 @@
             </div>
         </nav>
     </head>
-    <body class="bg-white dark:bg-slate-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+    <body class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <section>
-            <div class="py-8 px-4 mt-16 md:mt-24 lg:mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
+            <div class="py-8 px-4 mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Watermark</h1>
                 <p class="mb-4 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Stamp an image or text over PDF to selected pages or all page</p>
             </div>
@@ -65,16 +65,16 @@
         </div>
         <form action="/watermark/pdf" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
-            `<div class="grid grid-rows-1 gap-2 p-4 mb-12 md:mb-0 xl:mb-12 2xl:mb-0" id="grid-layout">
+            <div class="grid grid-rows-1 gap-4 p-4 mb-8" id="grid-layout">
                 <div id="pdfPreview" name="pdfPreview">
+                    <br>
                     @if($message = Session::get('upload'))
-                        <br>
                         <?php
                                 $pdfFileName = basename($message, '.png');
                                 $pdfAppend = "upload-pdf/".$pdfFileName.".pdf";
                                 $pdfRealName = trim($pdfFileName, ".png").".pdf";
-                                echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="visibility: hidden;" value="'.$pdfAppend.'">
-                                    <div id="pdfImage" name="pdfImage" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
+                                echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="visibility: none;" value="'.$pdfAppend.'">
+                                    <div id="pdfImage" name="pdfImage" class="p-4 mb-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
                                         <div class="text-left">
                                             <button type="button" class="text-white bg-slate-900 mr-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:text-slate-900 hover:bg-slate-200" onClick="rotate()">
                                                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -109,10 +109,10 @@
                 <div class="p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
                     <label class="block mb-2 font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Upload PDF file</label>
                     <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
-                    <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB).</p>
+                    <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB)</p>
                     @if($message = Session::get('success'))
                         <br>
-                        <div class="flex p-4 mt-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                        <div class="flex p-4 mt-4 mb-2 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div class="ml-3 text-sm font-medium">
@@ -121,7 +121,7 @@
                         </div>
                     @elseif($message = Session::get('error'))
                         <br>
-                        <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                        <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                             <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                             <span class="sr-only">Info</span>
                             <div>
@@ -131,7 +131,7 @@
                     @elseif ($errors->any())
                         @error('error')
                             <br>
-                            <div class="flex p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                            <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
                                 <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                                 <span class="sr-only">Info</span>
                                 <div>
@@ -141,24 +141,24 @@
                         @enderror
                     @endif
                 </div>
-                <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-fit mx-auto mt-4 mb-8 lg:mb-8 xl:mb-0 bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
-                    <div class="p-2 mx-auto">
-                        <h3 class="font-poppins font-medium text-gray-900 dark:text-white">Watermark style :</h3>
-                        <div class="grid sm:grid-cols-1 lg:grid-cols-2 gap-6 mt-4" role="group">
-                            <button type="button" class="px-4 py-2 me-2 font-poppins font-medium text-slate-200 bg-slate-900 rounded-lg border border-blue-700 hover:bg-slate-200 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-slate-200 focus:ring-slate-900 focus:text-slate-900" onClick="wmLayout_image()">
+                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto mb-2 font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
+                <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-fit mx-auto mt-4 bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
+                    <div class="mx-auto">
+                        <label class="block font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Watermark Options</label>
+                        <div class="grid grid-cols-2 gap-6 mt-2" role="group">
+                            <button type="button" class="px-4 mb-2 py-2 me-2 font-poppins font-medium text-slate-200 bg-slate-900 rounded-lg border border-blue-700 hover:bg-slate-200 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-slate-200 focus:ring-slate-900 focus:text-slate-900" onclick="wmLayout_image()">
                                 Image
                             </button>
-                            <button type="button" class="px-4 py-2 me-2 font-poppins font-medium text-slate-200 bg-slate-900 rounded-lg border border-blue-700 hover:bg-slate-200 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-slate-200 focus:ring-slate-900 focus:text-slate-900" onClick="wmLayout_text()">
+                            <button type="button" class="px-4 mb-2 py-2 me-2 font-poppins font-medium text-slate-200 bg-slate-900 rounded-lg border border-blue-700 hover:bg-slate-200 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-slate-200 focus:ring-slate-900 focus:text-slate-900" onclick="wmLayout_text()">
                                 Text
                             </button>
                         </div>
-                        <div class="mt-4" id="wmLayout1" style="display:none;"></div>
+                        <div class="mt-2" id="wmLayout1" style="display:none;"></div>
                     </div>
                 </div>
-                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 sm:mb-12 md:mb-8 mb-2" onClick="onClick()" value="upload">Upload PDF</button>
-                <div class="grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24 sm:mb-12 md:mb-12 mb-2" id="grid-layout_2" style="display: none;">
-                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
-                    <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mt-4 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="watermark">Watermark PDF</button>
+                <div class="grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
+                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
+                    <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="watermark">Watermark PDF</button>
                 </div>
             </div>
         </form>
