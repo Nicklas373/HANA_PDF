@@ -71,7 +71,7 @@
                     <br>
                     @if($message = Session::get('upload'))
                         <?php
-                            echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="visibility: none;" value="'.$message.'">';
+                            echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$message.'">';
                             $strToArr = explode(',', $message);
                             $i = 1;
                             foreach ($strToArr as $pdfFileName) {
