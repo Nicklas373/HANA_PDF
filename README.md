@@ -7,12 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## EUREKA PDF Tools
-Eureka PDF Tools is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+## HANA-CI PDF [EMSITPRO PDF Tools]
+HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
-![EMS](screenshot/1.png)
+![HANA](screenshot/1.png)
 
 ---
 
@@ -23,32 +23,42 @@ Eureka PDF Tools is a __Laravel__ based project with mix use from some front-end
 - [Java JRE 8.0.371](https://www.java.com/en/download/manual.jsp)
 - [MySQL 8.2](https://www.mysql.com/downloads/) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
 - [Node JS 18.16](https://nodejs.org/en)
-- [PHP 8.2.4](https://www.php.net/downloads.php)
-- [Python 3.10.x](https://www.python.org/downloads/release/python-31011/) (Do not use 3.11.x for temporary)
+- [PHP 8.1.17](https://www.php.net/downloads.php)
+- [PHP Imagick 3.7.0-8.1](https://windows.php.net/downloads/pecl/releases/imagick/3.7.0/php_imagick-3.7.0-8.1-ts-vs16-x64.zip)
 
 ---
 
-## Mode JS Module Requirements
+## Node JS Module Requirements
 
+- Flowbite
+- Material Tailwind
+- Tailwind CSS
 - Vite
-
----
-
-## Python Module Requirements
-
-- Pandas
-- Tabula-io (tabula-py)
-
----
 
 ## How to use
 
 1. Clone the repository with __git clone__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
-3. Run the following command
+3. Add additional environment into __.env__ with this string (Add yourself value :p)
+
+````bash
+- ASPOSE_CLOUD_CLIENT_ID="Aspose cloud AppId, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
+- ASPOSE_CLOUD_TOKEN="Aspose Cloud storage token, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
+- ASPOSE_CLOUD_STORAGE_COMPLETED_DIR="ASPOSE_STORAGE_DIR"
+- ASPOSE_CLOUD_STORAGE_COMPLETED_LINK="Declare 3rd party storage link if you use it"
+- ILOVEPDF_ENC_KEY="Generate your hash key (Max. 25 digits)"
+- ILOVEPDF_PUBLIC_KEY="iLovePDF secret key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
+- ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
+- PDFTABLES_API_KEY="PDF Tables API key, get it in __(PDFTables)__[https://pdftables.com/pdf-to-excel-api]"
+````
+
+4. Run the following command
 
 Node Environment
 ```bash
+- npm i @material-tailwind/react
+- npm install flowbite
+- npm install -D tailwindcss postcss autoprefixer
 - npm install vite
 - npm run dev
 ```
@@ -62,18 +72,14 @@ Laravel Environment
 - php artisan serve
 ```
 
-4. Modify some static path into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
-- public/pdftoxlsx.py
-- public/pdftoword.py
-- app/http/controllers/extractcontroller.php
-- app/http/controllers/splitcontroller.php
-
+4. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
 5. Create folder __temp-csv__ & __temp-merge__ in the root folder
 6. That's it
 
 ---
 
 ## Technology Stack
+- [Aspose](https://www.aspose.cloud/)
 - [Flowbite](https://flowbite.com/)
 - [iLovePDF](https://developer.ilovepdf.com/)
 - [Node JS](https://nodejs.org/en)
@@ -85,12 +91,12 @@ Laravel Environment
 
 ## NOTE
 - If this error show while migration __"Error: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes"__
-  References: __[Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa)__
+  Do this as solution: __[Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa)__
 
 ---
 
 ## License
-The EUREKA PDF Tools is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The HANA-CI PDF is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 <br>
 
