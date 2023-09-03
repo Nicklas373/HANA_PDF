@@ -148,7 +148,7 @@
                         <option value="docx">Word Document (.docx)</option>
                     </select>
                 </div>
-                <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Convert PDF</button>
+                <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-6 sm:mb-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 text-center" onClick="onClick()" value="convert" style="display: none;">Convert PDF</button>
             </div>
         </form>
         <script src="/ext-js/compress.js"></script>

@@ -151,8 +151,8 @@
                     </div>
                     <div id="splitLayout2"></div>
                 </div>
-                <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 mb-4 p-4 text-center" onClick="onClick()" value="split" style="display: none;">Split PDF</button>
-                <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 mb-4 p-4 text-center" onClick="onClick()" value="extract" style="display: none;">Extract PDF</button>
+                <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-6 sm:mb-2 mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 mb-4 p-4 text-center" onClick="onClick()" value="split" style="display: none;">Split PDF</button>
+                <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-6 sm:mb-2 mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 mb-4 p-4 text-center" onClick="onClick()" value="extract" style="display: none;">Extract PDF</button>
             </div>
         </form>
         <script src="/ext-js/split.js"></script>
