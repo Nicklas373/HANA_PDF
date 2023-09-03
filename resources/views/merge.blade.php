@@ -140,9 +140,9 @@
                     @endif
                 </div>
                 <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mb-2 h-16" onClick="onClick()" value="upload" style="visibility: visible;">Upload PDF</button>
-                <div class="grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
-                    <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
-                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="merge">Merge PDF</button>
+                <div class="mb-6 sm:mb-2 grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
+                    <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
+                    <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium font-semibold w-full h-full" onClick="onClick()" value="merge">Merge PDF</button>
                 </div>
             </div>
         </form>
