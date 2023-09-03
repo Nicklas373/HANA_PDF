@@ -31,6 +31,9 @@ HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and 
 
 ## Node JS Module Requirements
 
+- Flowbite
+- Material Tailwind
+- Tailwind CSS
 - Vite
 
 ---
@@ -47,10 +50,27 @@ HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and 
 
 1. Clone the repository with __git clone__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
-3. Run the following command
+3. Add additional environment into __.env__ with this string (Add yourself value :p)
+
+````bash
+- ASPOSE_CLOUD_CLIENT_ID="Aspose cloud AppId, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
+- ASPOSE_CLOUD_TOKEN="Aspose Cloud storage token, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
+- ASPOSE_CLOUD_STORAGE_COMPLETED_DIR="ASPOSE_STORAGE_DIR"
+- ASPOSE_CLOUD_STORAGE_COMPLETED_LINK="Declare 3rd party storage link if you use it"
+- ILOVEPDF_ENC_KEY="Generate your hash key (Max. 25 digits)"
+- ILOVEPDF_PUBLIC_KEY="iLovePDF secret key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
+- ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
+- PDFTABLES_API_KEY="PDF Tables API key, get it in __(PDFTables)__[https://pdftables.com/pdf-to-excel-api]"
+- PYTHON_EXECUTABLES="PYTHON_BINARY_EXECUTABLES_DIRECTORY" #Target to .exe or binary files
+````
+
+4. Run the following command
 
 Node Environment
 ```bash
+- npm i @material-tailwind/react
+- npm install flowbite
+- npm install -D tailwindcss postcss autoprefixer
 - npm install vite
 - npm run dev
 ```
@@ -71,6 +91,7 @@ Laravel Environment
 ---
 
 ## Technology Stack
+- [Aspose](https://www.aspose.cloud/)
 - [Flowbite](https://flowbite.com/)
 - [iLovePDF](https://developer.ilovepdf.com/)
 - [Node JS](https://nodejs.org/en)
