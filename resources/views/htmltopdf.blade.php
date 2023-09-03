@@ -97,7 +97,7 @@
                         @enderror
                     @endif
                 </div>
-                <button type="submit" id="submitBtn" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 font-semibold" onClick="onClick()">Convert to PDF</button>
+                <button type="submit" id="submitBtn" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-6 sm:mb-2 mx-auto font-poppins text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-16 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 font-semibold" onClick="onClick()">Convert to PDF</button>
             </div>
         </form>
         <script src="/ext-js/spinner.js"></script>
