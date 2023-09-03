@@ -24,8 +24,8 @@ class htmltopdfController extends Controller
         if($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         } else {
-            $pdfUpload_Location = 'upload-pdf';
-            $pdfProcessed_Location = 'temp';
+            $pdfUpload_Location = env('PDF_UPLOAD');
+            $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $hostName = AppHelper::instance()->getUserIpAddr();
 
             html_pdf::create([

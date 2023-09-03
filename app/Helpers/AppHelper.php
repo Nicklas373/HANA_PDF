@@ -32,6 +32,20 @@ class AppHelper
         return $size;
     }
 
+    function getFtpResponse($download_file, $proc_file){
+	    $ftp_server = env('FTP_SERVER');
+	    $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+	    $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
+
+	    if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
+		    return true;
+	    } else {
+		    return false;
+        }
+
+	    ftp_close($ftp_conn);
+    }
+    
     function getUserIpAddr(){
         if(!empty($_SERVER['HTTP_CLIENT_IP'])){
             $ip = $_SERVER['HTTP_CLIENT_IP'];

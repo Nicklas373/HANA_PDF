@@ -36,7 +36,7 @@ class convertController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = public_path('upload-pdf');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -47,10 +47,10 @@ class convertController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(public_path('thumbnail'));
-							if (file_exists(public_path('thumbnail').'/1.png')) {
-								$thumbnail = file(public_path('thumbnail').'/1.png');
-								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
 								return redirect('convert')->with('upload','thumbnail/'.$pdfNameWithoutExtension.'.png');
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !'])->withInput();
@@ -68,9 +68,9 @@ class convertController extends Controller
 
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = public_path('upload-pdf');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = 'public/'.$request->post('fileAlt');
-                                $pdfProcessed_Location = public_path('temp');
+                                $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($file, ".pdf");
                                 $fileSize = filesize($file);
@@ -85,9 +85,9 @@ class convertController extends Controller
 
                                 $c = curl_init();
 
-                                $cfile = curl_file_create($pdfUpload_Location.'/'.$file->getClientOriginalName(), 'application/pdf');
+                                $cfile = curl_file_create($pdfUpload_Location.'/'.$file, 'application/pdf');
 
-                                $apikey = 'dgxqu0tl0w06';
+                                $apikey = env('PDFTABLES_API_KEY');
                                 curl_setopt($c, CURLOPT_URL, "https://pdftables.com/api?key=$apikey&format=xlsx-single");
                                 curl_setopt($c, CURLOPT_POSTFIELDS, array('file' => $cfile));
                                 curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
@@ -114,9 +114,9 @@ class convertController extends Controller
                             }
                         } else if ($convertType == 'docx') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = public_path('upload-pdf');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = 'public/'.$request->post('fileAlt');
-                                $pdfProcessed_Location = public_path('temp');
+                                $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
                                 $fileSize = filesize($file);
@@ -130,7 +130,7 @@ class convertController extends Controller
                                 ]);
 
                                 ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
-                                $wordsApi = new WordsApi('73751f49-388b-4366-aeb4-d76587d5123e', '1792ea481716ff7788b276c8c88df6b8');
+                                $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                                 ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $uploadFileRequest = new UploadFileRequest($file, $pdfName);
                                 ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
@@ -138,9 +138,9 @@ class convertController extends Controller
                                 ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $requestSaveOptionsData = new DocxSaveOptionsData(array(
                                     "save_format" => "docx",
-                                    "file_name" => 'EMSITPRO-PDFTools/Completed/'.$pdfNameWithoutExtension.".docx",
+                                    "file_name" => $pdfNameWithoutExtension.".docx",
                                 ));
-
+                                ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
                                 $request = new SaveAsRequest(
                                     $pdfName,
                                     $requestSaveOptionsData,
@@ -154,19 +154,23 @@ class convertController extends Controller
                                 ini_set('memory_limit','-1'); // Server side exhausted memory limit, bypass it for now
 
                                 if (json_decode($result, true) !== NULL) {
-                                    $download_word = 'https://drive.google.com/drive/folders/1D3YicPoJDk595tVw01NUyx_Osf3Q2Ca8?usp=sharing';
-                                    return redirect('convert')->with('success',$download_word);
+                                    if (AppHelper::instance()->getFtpResponse($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx", $pdfNameWithoutExtension.".docx") == true) {$download_word = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx";
+                                    
+                                        return redirect()->back()->with('success',$download_word);
+				                    } else {
+					                    return redirect()->back()->withErrors(['error'=>'FTP_CONNECTION_ERROR !'])->withInput();
+				                    }
                                 } else {
-                                    return redirect()->back()->withErrors(['error'=>'GDRIVE_CONNECTION_ERROR !'])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
                                 }
                             } else {
                                 return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !'])->withInput();
                             }
                         } else if ($convertType == 'jpg') {
                             if(isset($_POST['fileAlt'])) {
-                                $pdfUpload_Location = public_path('upload-pdf');
+                                $pdfUpload_Location = env('PDF_UPLOAD');
                                 $file = 'public/'.$request->post('fileAlt');
-                                $pdfProcessed_Location = public_path('temp');
+                                $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
                                 $fileSize = filesize($file);
@@ -179,8 +183,8 @@ class convertController extends Controller
                                     'hostName' => $hostName
                                 ]);
 
-                                $ilovepdfTask = new PdfjpgTask('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
-                                $ilovepdfTask->setFileEncryption('XrPiOcvugxyGrJnX');
+                                $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                                $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
                                 $pdfFile = $ilovepdfTask->addFile($file);
                                 $ilovepdfTask->setMode('pages');
                                 $ilovepdfTask->setOutputFileName($pdfName);

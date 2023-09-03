@@ -156,7 +156,7 @@ class splitController extends Controller
 
 						$ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
 						$ilovepdfTask = $ilovepdf->newTask('split');
-						$ilovepdfTask->setFileEncryption('dgxqu0tl0w06');
+						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 						$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.basename($file));
 						$ilovepdfTask->setRanges($fixedPageRanges);
 						$ilovepdfTask->setMergeAfter($mergePDF);
@@ -172,13 +172,13 @@ class splitController extends Controller
 							unlink($file);
 						}
 
-						if ($mergeDBpdf == "false") {
+						if ($mergeDBpdf == "true") {
 							if (file_exists($download_merge_pdf)) {
 								return redirect('split')->with('success','temp/'.basename($file));
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Split process error !'])->withInput();
 							}
-						} else if ($mergeDBpdf == "true") {
+						} else if ($mergeDBpdf == "false") {
 							if (file_exists($download_split_pdf)) {
 								return redirect('split')->with('success','temp/'.$pdfNameWithoutExtension.'.zip');
 							} else {
@@ -218,7 +218,7 @@ class splitController extends Controller
 
 					$ilovepdf = new Ilovepdf('project_public_0ba8067b84cb4d4582b8eac3aa0591b2_XwmRS824bc5681a3ca4955a992dde44da6ac1','secret_key_937ea5acab5e22f54c6c7601fd7866dc_jT3DA5ed31082177f48cd792801dcf664c41b');
 					$ilovepdfTask = $ilovepdf->newTask('split');
-					$ilovepdfTask->setFileEncryption('dgxqu0tl0w06');
+					$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
 					$pdfFile = $ilovepdfTask->addFile($pdfUpload_Location.'/'.basename($file));
 					$ilovepdfTask->setRanges($pdfNewRanges);
 					$ilovepdfTask->setMergeAfter(false);
