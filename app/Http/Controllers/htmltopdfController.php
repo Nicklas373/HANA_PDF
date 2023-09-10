@@ -12,10 +12,6 @@ use Ilovepdf\HtmlpdfTask;
 
 class htmltopdfController extends Controller
 {
-    public function html() {
-        return view('htmltopdf');
-    }
-
     public function html_pdf(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
 		    'urlToPDF' => 'required',

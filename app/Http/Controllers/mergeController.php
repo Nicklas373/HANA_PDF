@@ -14,10 +14,6 @@ use Spatie\PdfToImage\Pdf;
 
 class mergeController extends Controller
 {
-    public function merge() {
-        return view('merge');
-    }
-
     public function pdf_merge(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
             'file' => 'max:25000',

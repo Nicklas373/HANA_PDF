@@ -14,10 +14,6 @@ use Spatie\PdfToImage\Pdf;
 
 class splitController extends Controller
 {
-    public function split() {
-        return view('split');
-    }
-
     public function pdf_split(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',
