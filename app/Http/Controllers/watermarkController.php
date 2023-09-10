@@ -13,10 +13,6 @@ use Spatie\PdfToImage\Pdf;
 
 class watermarkController extends Controller
 {
-	public function watermark(){
-		return view('watermark');
-	}
-
 	public function pdf_watermark(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',

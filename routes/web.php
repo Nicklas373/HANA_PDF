@@ -23,17 +23,38 @@ use App\Http\Controller\watermarkController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function()
+{
+   return View::make('pages.welcome');
 });
-
-Route::get('/api', 'App\Http\Controllers\apiController@api');
-Route::get('/compress', 'App\Http\Controllers\compressController@compress');
-Route::get('/convert', 'App\Http\Controllers\convertController@compress');
-Route::get('/htmltopdf', 'App\Http\Controllers\htmltopdfController@html');
-Route::get('/merge', 'App\Http\Controllers\mergeController@merge');
-Route::get('/split', 'App\Http\Controllers\splitController@split');
-Route::get('/watermark', 'App\Http\Controllers\watermarkController@watermark');
+Route::get('/api', function()
+{
+   return View::make('pages.api_information');
+});
+Route::get('/compress', function()
+{
+   return View::make('pages.compress');
+});
+Route::get('/convert', function()
+{
+   return View::make('pages.convert');
+});
+Route::get('/htmltopdf', function()
+{
+    return View::make('pages.htmltopdf');
+});
+Route::get('/merge', function()
+{
+   return View::make('pages.merge');
+});
+Route::get('/split', function()
+{
+   return View::make('pages.split');
+});
+Route::get('/watermark', function()
+{
+   return View::make('pages.watermark');
+});
 Route::post('/compress/pdf', 'App\Http\Controllers\compressController@pdf_init');
 Route::post('/convert/pdf', 'App\Http\Controllers\convertController@pdf_init');
 Route::post('/htmltopdf/web', 'App\Http\Controllers\htmltopdfController@html_pdf');

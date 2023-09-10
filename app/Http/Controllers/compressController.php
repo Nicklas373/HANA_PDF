@@ -13,10 +13,6 @@ use Spatie\PdfToImage\Pdf;
 
 class compressController extends Controller
 {
-	public function compress(){
-		return view('compress');
-	}
-
 	public function pdf_init(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',
