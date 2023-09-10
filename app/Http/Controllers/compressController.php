@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -13,16 +13,12 @@ use Spatie\PdfToImage\Pdf;
 
 class compressController extends Controller
 {
-	public function compress(){
-		return view('compress');
-	}
-
 	public function pdf_init(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
 			return redirect()->back()->withErrors($validator->messages())->withInput();
 		} else {
@@ -71,14 +67,14 @@ class compressController extends Controller
 						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-			
+
 						compression_pdf::create([
 							'fileName' => $pdfName,
 							'fileSize' => $newFileSize,
 							'compMethod' => $compMethod,
 							'hostName' => $hostName
 						]);
-			
+
 						$ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
 						$ilovepdfTask = $ilovepdf->newTask('compress');
 						$ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
@@ -87,13 +83,13 @@ class compressController extends Controller
 						$ilovepdfTask->setCompressionLevel($compMethod);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
-						
+
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
 
 						if(is_file($file)) {
 							unlink($file);
 						}
-			
+
 						if (file_exists($download_pdf)) {
 							return redirect()->back()->with('success',$download_pdf);
 						} else {

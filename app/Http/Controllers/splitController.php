@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -14,16 +14,12 @@ use Spatie\PdfToImage\Pdf;
 
 class splitController extends Controller
 {
-    public function split() {
-        return view('split');
-    }
-
     public function pdf_split(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',
 			'fileAlt' => ''
 		]);
- 
+
 		if($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         } else {
@@ -164,7 +160,7 @@ class splitController extends Controller
 						$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 						$ilovepdfTask->execute();
 						$ilovepdfTask->download($pdfProcessed_Location);
-						
+
 						$download_merge_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
 						$download_split_pdf = $pdfProcessed_Location.'/'.basename($file);
 
@@ -190,7 +186,7 @@ class splitController extends Controller
 					}
 				} else if ($request->post('formAction') == "extract") {
 					$file = $request->post('fileAlt');
-			
+
 					$pdfStartPages = 1;
 					$pdfTotalPages = AppHelper::instance()->count($file);
 					while($pdfStartPages <= intval($pdfTotalPages))
@@ -226,13 +222,13 @@ class splitController extends Controller
 					$ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
 					$ilovepdfTask->execute();
 					$ilovepdfTask->download($pdfProcessed_Location);
-					
+
 					$download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
-					
+
 					if(is_file($pdfUpload_Location.'/'.basename($file))) {
 						unlink($pdfUpload_Location.'/'.basename($file));
 					}
-					
+
 					if (file_exists($download_pdf)) {
 						return redirect()->back()->with('success',$download_pdf);
 					} else {

@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
@@ -13,10 +13,6 @@ use Spatie\PdfToImage\Pdf;
 
 class watermarkController extends Controller
 {
-	public function watermark(){
-		return view('watermark');
-	}
-
 	public function pdf_watermark(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25000',
@@ -26,7 +22,7 @@ class watermarkController extends Controller
 			'watermarkPage' => '',
 			'wmType' => '',
 		]);
- 
+
 		if($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         } else {
@@ -151,7 +147,7 @@ class watermarkController extends Controller
 						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-			
+
 						watermark_pdf::create([
 							'fileName' => basename($file),
 							'fileSize' => $newFileSize,
@@ -210,11 +206,11 @@ class watermarkController extends Controller
 						}
 
 						$download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-						
+
 						if(is_file($request->post('fileAlt'))) {
 							unlink($request->post('fileAlt'));
 						}
-			
+
 						if (file_exists($download_pdf)) {
 							return redirect()->back()->with('success',$download_pdf);
 						} else {
