@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('fileName');
             $table->string('fileSize');
             $table->string('hostName');
+            $table->boolean('result');
+            $table->string('err_reason')->nullable();
+            $table->string('err_api_reason')->nullable();
+            $table->string('uuid');
             $table->timestamps();
         });
     }

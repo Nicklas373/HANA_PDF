@@ -11,6 +11,10 @@ class html_pdf extends Model
 
     protected $fillable = [
         'urlName',
-        'hostName'
+        'hostName',
+        'result',
+        'err_reason',
+        'err_api_reason',
+        'uuid'
     ];
 }

@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('watermarkStyle')->nullable();
             $table->string('watermarkText')->nullable();
             $table->string('watermarkPage')->nullable();
+            $table->boolean('result');
+            $table->string('err_reason')->nullable();
+            $table->string('err_api_reason')->nullable();
+            $table->string('uuid');
             $table->timestamps();
         });
     }

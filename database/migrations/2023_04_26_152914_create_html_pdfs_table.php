@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('urlName');
             $table->string('hostName');
+            $table->boolean('result');
+            $table->string('err_reason')->nullable();
+            $table->string('err_api_reason')->nullable();
+            $table->string('uuid');
             $table->timestamps();
         });
     }

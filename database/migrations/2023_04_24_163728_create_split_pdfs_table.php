@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('fixedPage')->nullable();
             $table->string('fixedPageRange')->nullable();
             $table->string('mergePDF')->nullable();
+            $table->boolean('result');
+            $table->string('err_reason')->nullable();
+            $table->string('err_api_reason')->nullable();
+            $table->string('uuid');
             $table->timestamps();
         });
     }
