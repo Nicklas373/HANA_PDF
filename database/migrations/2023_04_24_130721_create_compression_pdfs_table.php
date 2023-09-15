@@ -15,8 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
+            $table->string('compFileSize')->nullable();
             $table->string('compMethod');
             $table->string('hostName');
+            $table->boolean('result');
+            $table->string('err_reason')->nullable();
+            $table->string('err_api_reason')->nullable();
+            $table->string('uuid');
             $table->timestamps();
         });
     }
