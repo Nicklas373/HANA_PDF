@@ -32,20 +32,37 @@ class AppHelper
         return $size;
     }
 
-    function getFtpResponse($download_file, $proc_file){
-	    $ftp_server = env('FTP_SERVER');
-	    $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
-	    $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
 
-	    if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
-		    return true;
-	    } else {
-		    return false;
+    function getCurrentTimeZone() {
+        date_default_timezone_set('Asia/Jakarta');
+        $currentDateTime = date('Y-m-d H:i:s');
+        return $currentDateTime;
+    }
+
+
+    function getFtpResponse($download_file, $proc_file){
+        $ftp_server = env('FTP_SERVER');
+        $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+        $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
+
+        if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
+            return true;
+        } else {
+            return false;
         }
 
-	    ftp_close($ftp_conn);
+        ftp_close($ftp_conn);
     }
-    
+
+    function get_guid() {
+        if (function_exists('com_create_guid') === true)
+            return trim(com_create_guid(), '{}');
+        $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
     function getUserIpAddr(){
         if(!empty($_SERVER['HTTP_CLIENT_IP'])){
             $ip = $_SERVER['HTTP_CLIENT_IP'];
