@@ -4,7 +4,7 @@
     @include('includes.head')
     <header>@include('includes.header')</header>
   </head>
-  <body>
+  <body class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
     <div>
       <div>
         @yield('content')
