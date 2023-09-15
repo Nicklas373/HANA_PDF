@@ -1,6 +1,6 @@
 @extends('layouts.default')
 @section('content')
-    <div class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+    <div>
         <section>
             <div class="py-8 px-4 mt-4 mx-auto max-w-screen-xl text-center lg:py-16 z-0 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Watermark</h1>
@@ -66,35 +66,81 @@
                     <label class="block mb-2 font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Upload PDF file</label>
                     <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
                     <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB)</p>
-                    @if($message = Session::get('success'))
-                        <div class="flex p-4 mt-4 mb-2 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
-                            <div class="ml-3 text-sm font-medium">
-                                Watermark PDF Success !, Click <a href="{{ $message }}" class="font-poppins font-semibold underline hover:no-underline">Here </a>to download.
+                    @if ($message = Session::get('stats'))
+                        <div id="alert-additional-content-3" class="p-4 mt-2 mb-2 text-slate-900 border border-slate-900 rounded-lg bg-gray-50" role="alert">
+                            <div class="flex items-center mb-2">
+                                <svg class="flex-shrink-0 w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                                </svg>
+                                <span class="sr-only">Info</span>
+                                <h3 class="text-md font-poppins">PDF has successfully to apply watermark !</h3>
+                            </div>
+                            <div class="flex">
+                                <button type="button" class="text-white bg-slate-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-slate-900 font-medium font-poppins rounded-lg text-xs px-3 py-1.5 mr-2 text-center inline-flex items-center">
+                                    <svg class="ml-0.5 mr-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"> <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"></path> <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path> </svg>
+                                    <b><a href="{{ session('res') }}">Download File</a></b>
+                                </button>
+                                <button type="button" class="text-slate-900 bg-transparent border border-slate-900 hover:bg-gray-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-slate-900 font-medium font-poppins rounded-lg text-xs px-3 py-1.5 mr-2 text-center inline-flex items-center" data-dismiss-target="#alert-additional-content-3" aria-label="Close">
+                                    <b>Dismiss</b>
+                                </button>
                             </div>
                         </div>
                     @elseif($message = Session::get('error'))
-                        <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
+                        <div class="flex p-4 mt-2 mb-2 text-sm font-poppins text-red-800 rounded-lg bg-red-50" role="alert">
+                            <svg class="flex-shrink-0 inline w-4 h-4 mr-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                            </svg>
+                            <span class="sr-only">Danger</span>
                             <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
+                                <span class="font-medium"><b>PDF has failed to apply watermark !</b></span>
+                                <br>
+                                <br>
+                                <span class="font-medium">Errors may occur that may come from this factor:</span>
+                                <ul class="mt-1.5 ml-4 list-disc list-inside">
+                                    <li>Error due failure connection to API </li>
+                                    <li>Error while uploading PDF to the server</li>
+                                    <li>Filename contain ambigous characters or symbols</li>
+                                </ul>
+                                <br>
+                                @error('error')
+                                <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
+                                @enderror
+                                <br>
+                                @error('uuid')
+                                    <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
+                                @enderror
                             </div>
                         </div>
                     @elseif ($errors->any())
                         @error('error')
-                            <div class="flex p-4 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                                <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                                <span class="sr-only">Info</span>
+                            <div class="flex p-4 mt-2 mb-2 text-sm font-poppins text-red-800 rounded-lg bg-red-50" role="alert">
+                                <svg class="flex-shrink-0 inline w-4 h-4 mr-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                                </svg>
+                                <span class="sr-only">Danger</span>
                                 <div>
-                                    <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
+                                    <span class="font-medium"><b>PDF has failed to apply watermark !</b></span>
+                                    <br>
+                                    <span class="font-medium">Errors may occur that may come from this factor:</span>
+                                    <ul class="mt-1.5 ml-4 list-disc list-inside">
+                                        <li>Error due failure connection to API </li>
+                                        <li>Error while uploading PDF to the server</li>
+                                        <li>Filename contain ambigous characters or symbols</li>
+                                    </ul>
+                                    <br>
+                                    @error('error')
+                                        <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
+                                    @enderror
+                                    <br>
+                                    @error('uuid')
+                                        <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
+                                    @enderror
                                 </div>
                             </div>
                         @enderror
                     @endif
                 </div>
-                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto mb-2 font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
+                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto mb-6 sm:mb-2 font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
                 <div id="pdfCompLayout" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-fit mx-auto mt-4 bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
                     <div class="mx-auto">
                         <label class="block font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Watermark Options</label>
@@ -109,7 +155,7 @@
                         <div class="mt-2" id="wmLayout1" style="display:none;"></div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 mb-6 sm:mb-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
+                <div class="mb-6 sm:mb-2 grid grid-cols-2 gap-4 p-4 mx-auto w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-24" id="grid-layout_2" style="display: none;">
                     <button type="submit" id="submitBtn_2" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="upload">Upload PDF</button>
                     <button type="submit" id="submitBtn_3" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto font-poppins font-semibold text-slate-200 bg-slate-900 rounded-lg cursor-pointer font-medium w-full h-full" onClick="onClick()" value="watermark">Watermark PDF</button>
                 </div>
