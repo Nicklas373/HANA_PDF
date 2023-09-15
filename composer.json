@@ -9,7 +9,7 @@
         "aspose-cloud/aspose-words-cloud": "^23.7",
         "guzzlehttp/guzzle": "^7.2",
         "ilovepdf/ilovepdf-php": "^1.2",
-        "laravel/framework": "^10.8",
+        "laravel/framework": "^10.16",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "spatie/pdf-to-image": "^2.2",
