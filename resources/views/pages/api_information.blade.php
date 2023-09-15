@@ -1,5 +1,5 @@
 @extends('layouts.default') @section('content')
-<div class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+<div>
   <section>
     <div class="relative z-0 mx-auto mt-4 max-w-screen-xl px-4 py-8 text-center lg:py-16">
       <h1 class="font-poppins mb-4 text-4xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">Learn the technology stack</h1>
