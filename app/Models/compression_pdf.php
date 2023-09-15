@@ -12,7 +12,12 @@ class compression_pdf extends Model
     protected $fillable = [
         'fileName',
         'fileSize',
+        'compFileSize',
         'compMethod',
-        'hostName'
+        'hostName',
+        'result',
+        'err_reason',
+        'err_api_reason',
+        'uuid'
     ];
 }

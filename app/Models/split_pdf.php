@@ -18,6 +18,10 @@ class split_pdf extends Model
         'customPage',
         'fixedPage',
         'fixedPageRange',
-        'mergePDF'
+        'mergePDF',
+        'result',
+        'err_reason',
+        'err_api_reason',
+        'uuid'
     ];
 }
