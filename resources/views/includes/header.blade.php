@@ -40,30 +40,29 @@
   </nav>
   <div id="defaultModal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0">
     <div class="relative max-h-full w-full max-w-2xl">
-      <!-- Modal content -->
-      <div class="relative rounded-lg bg-slate-900 shadow dark:bg-slate-800">
-        <!-- Modal header -->
-        <div class="flex items-start justify-between rounded-t border-b bg-slate-900 p-4 hover:text-sky-400 dark:bg-slate-800">
-          <h3 class="font-poppins text-xl font-semibold text-slate-200">Get Started</h3>
-          <button type="button" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-slate-900 hover:text-sky-400" data-modal-hide="defaultModal">
-            <svg class="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
-            <span class="sr-only">Close modal</span>
-          </button>
-        </div>
-        <!-- Modal body -->
-        <div class="space-y-6 p-6">
-          <p class="font-poppins text-base leading-relaxed text-gray-400"><b>HANA-CI PDF</b> is Laravel web-based project that has integrated with iLovePDF API that has feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.</p>
-          <p class="font-poppins text-base leading-relaxed text-gray-400">
-            Explore more with our manual book or visit more on our main<a href="https://hana-ci.com" target="_blank"><b> website</b></a>
-          </p>
-        </div>
-        <!-- Modal footer -->
-        <div class="flex items-center space-x-2 rounded-b border-t border-gray-200 p-6 dark:border-gray-600">
-          <button data-modal-hide="defaultModal" type="button" class="rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"><a href="guide/manual_book_20230903_rev1.pdf">Get Manual Book</a></button>
-          <button data-modal-hide="defaultModal" type="button" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-600">Skip</button>
+        <!-- Modal content -->
+        <div class="relative rounded-lg bg-slate-200 shadow">
+          <!-- Modal header -->
+          <div class="flex items-start justify-between rounded-t border-b bg-slate-900 p-4 hover:text-sky-400">
+            <h3 class="font-poppins text-xl text-center font-semibold text-slate-200">Welcome to HANA-CI PDF</h3>
+            <button type="button" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-200 text-sm text-slate-900 hover:text-blue-600" data-modal-hide="defaultModal">
+              <svg class="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+              </svg>
+              <span class="sr-only">Close modal</span>
+            </button>
+          </div>
+          <!-- Modal body -->
+          <div class="space-y-4 p-4">
+            <p class="font-poppins text-base leading-relaxed text-slate-900"><b>HANA-CI PDF</b> Introducing a web-based application that has feature to manage PDF files easily and quicky. It has features to compress, convert, merge, split, watermarks and more (soon).</p>
+            <p class="font-poppins text-base leading-relaxed text-slate-900">Empowered by using iLovePDF and Aspose Cloud SDK to support much feature for PDF management tools, visit more on our main website !
+            </p>
+          </div>
+          <!-- Modal footer -->
+          <div class="flex items-center space-x-2 rounded-b border-t border-gray-200 p-4">
+            <button data-modal-hide="defaultModal" type="button" class="rounded-lg bg-slate-900 px-5 py-2.5 text-center text-sm font-poppins text-white hover:bg-gray-300 hover:text-slate-900 focus:outline-none focus:ring-4"><a href="https://hana-ci.com" target="_blank">Visit Main Website</a></button>
+            <button data-modal-hide="defaultModal" type="button" class="rounded-lg bg-slate-900 px-5 py-2.5 text-center text-sm font-poppins text-white hover:bg-gray-300 hover:text-slate-900 focus:outline-none focus:ring-4"><a href="guide/manual_book_20230903_rev1.pdf">Manual Book</a></button>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+ </div>
