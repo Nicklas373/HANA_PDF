@@ -1,52 +1,8 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>HANA-CI PDF</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css"/>
-        <link rel="stylesheet" href="{{ asset('build/assets/app-51e83a02.css') }}" />
-        <link rel="script" href="{{ asset('build/assets/app-547abec6.js') }}" />
-        <nav class="bg-slate-900 dark:bg-slate-800 fixed w-full z-20 top-0 left-0 border-b">
-            <div class="max-w-screen-xl flex flex-wrap items-center justify-between p-4">
-                <a href="/" class="flex items-center">
-                    <span class="h-8 self-center text-2xl font-poppins font-semibold text-sky-400">HANA-CI</span>
-                    ''
-                    <span class="mr-14 self-center text-2xl font-poppins font-semibold text-slate-200">PDF</span>
-                </a>
-                <button data-collapse-toggle="navbar-dropdown" type="button" class="inline-flex items-center p-2 text-sm text-slate-200 rounded-lg md:hidden focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-dropdown" aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                </button>
-                <div class="w-full md:block md:w-auto md:mt-4 lg:mt-0 hidden" id="navbar-dropdown">
-                <ul class="flex flex-col font-medium p-4 md:p-0 mt-2 border border-slate-900 rounded-lg bg-slate-900 md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-slate-800 dark:border-slate-800">
-                    <li>
-                        <a href="/compress" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Compress PDF</a>
-                    </li>
-                    <li>
-                        <a href="/convert" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Convert PDF</a>
-                    </li>
-                    <li>
-                        <a href="/merge" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Merge PDF</a>
-                    </li>
-                    <li>
-                        <a href="/split" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Split PDF</a>
-                    </li>
-                    <li>
-                        <a href="/watermark" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">Watermark PDF</a>
-                    </li>
-                    <li>
-                        <a href="/api" class="block py-2 pl-3 pr-4 font-poppins font-semibold rounded text-slate-200 md:p-0 hover:text-sky-400" aria-current="page">About</a>
-                    </li>
-                </ul>
-                </div>
-            </div>
-        </nav>
-    </head>
-    <body class="bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-slate-900 dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+@extends('layouts.default')
+@section('content')
+    <div>
         <section>
-            <div class="py-8 px-4 mt-16 mx-auto max-w-screen-xl text-center lg:py-16 z-10 relative">
+            <div class="py-8 px-4 mt-4 mx-auto max-w-screen-xl text-center lg:py-16 z-10 relative">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">PDF Split</h1>
                 <p class="mb-4 text-lg font-poppins font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-200">Separate one page or a whole page into independent PDF files</p>
             </div>
@@ -110,35 +66,81 @@
                     <label class="block mb-2 font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Upload PDF file</label>
                     <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
                     <p class="mt-1 font-poppins text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PDF (Max. 25 MB)</p>
-                    @if ($message = Session::get('success'))
-                        <div class="flex p-4 mt-2 mb-2 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
-                            <div class="ml-3 text-sm font-medium">
-                                Split PDF Success !, Click <a href="{{ $message }}" class="font-poppins font-semibold underline hover:no-underline">Here </a>to download.
+                    @if ($message = Session::get('stats'))
+                        <div id="alert-additional-content-3" class="p-4 mt-2 mb-2 text-slate-900 border border-slate-900 rounded-lg bg-gray-50" role="alert">
+                            <div class="flex items-center mb-2">
+                                <svg class="flex-shrink-0 w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                                </svg>
+                                <span class="sr-only">Info</span>
+                                <h3 class="text-md font-poppins">PDF has successfully split !</h3>
+                            </div>
+                            <div class="flex">
+                                <button type="button" class="text-white bg-slate-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-slate-900 font-medium font-poppins rounded-lg text-xs px-3 py-1.5 mr-2 text-center inline-flex items-center">
+                                    <svg class="ml-0.5 mr-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"> <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"></path> <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path> </svg>
+                                    <b><a href="{{ session('res') }}">Download File</a></b>
+                                </button>
+                                <button type="button" class="text-slate-900 bg-transparent border border-slate-900 hover:bg-gray-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-slate-900 font-medium font-poppins rounded-lg text-xs px-3 py-1.5 mr-2 text-center inline-flex items-center" data-dismiss-target="#alert-additional-content-3" aria-label="Close">
+                                    <b>Dismiss</b>
+                                </button>
                             </div>
                         </div>
                     @elseif($message = Session::get('error'))
-                        <div class="flex p-4 mt-2 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                            <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Info</span>
+                        <div class="flex p-4 mt-2 mb-2 text-sm font-poppins text-red-800 rounded-lg bg-red-50" role="alert">
+                            <svg class="flex-shrink-0 inline w-4 h-4 mr-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                            </svg>
+                            <span class="sr-only">Danger</span>
                             <div>
-                                <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
+                                <span class="font-medium"><b>PDF has failed to split !</b></span>
+                                <br>
+                                <br>
+                                <span class="font-medium">Errors may occur that may come from this factor:</span>
+                                <ul class="mt-1.5 ml-4 list-disc list-inside">
+                                    <li>Error due failure connection to API </li>
+                                    <li>Error while uploading PDF to the server</li>
+                                    <li>Filename contain ambigous characters or symbols</li>
+                                </ul>
+                                <br>
+                                @error('error')
+                                <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
+                                @enderror
+                                <br>
+                                @error('uuid')
+                                    <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
+                                @enderror
                             </div>
                         </div>
                     @elseif ($errors->any())
                         @error('error')
-                            <div class="flex p-4 mt-2 mb-2 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
-                                <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                                <span class="sr-only">Info</span>
+                            <div class="flex p-4 mt-2 mb-2 text-sm font-poppins text-red-800 rounded-lg bg-red-50" role="alert">
+                                <svg class="flex-shrink-0 inline w-4 h-4 mr-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                                </svg>
+                                <span class="sr-only">Danger</span>
                                 <div>
-                                    <span class="font-poppins font-medium">Upload PDF Error ! </span> {{ $message }}
+                                    <span class="font-medium"><b>PDF has failed to split !</b></span>
+                                    <br>
+                                    <span class="font-medium">Errors may occur that may come from this factor:</span>
+                                    <ul class="mt-1.5 ml-4 list-disc list-inside">
+                                        <li>Error due failure connection to API </li>
+                                        <li>Error while uploading PDF to the server</li>
+                                        <li>Filename contain ambigous characters or symbols</li>
+                                    </ul>
+                                    <br>
+                                    @error('error')
+                                        <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
+                                    @enderror
+                                    <br>
+                                    @error('uuid')
+                                        <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
+                                    @enderror
                                 </div>
                             </div>
                         @enderror
                     @endif
                 </div>
-                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-2 mx-auto font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
+                <button type="submit" id="submitBtn" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mb-6 sm:mb-2 mx-auto font-poppins font-semibold text-slate-900 bg-slate-200 rounded-lg cursor-pointer font-medium w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-16 p-4 text-center" onClick="onClick()" value="upload">Upload PDF</button>
                 <div id="splitLayout1"div class="p-4 mb-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 h-fit mx-auto bg-white border border-gray-200 rounded-lg shadow" style="display: none;">
                     <label class="block mb-2 font-poppins text-sm font-semibold text-slate-900 dark:text-white" for="file_input">Split or Extract Pages</label>
                     <div id="splitCol" class="grid grid-cols-2 gap-4 mb-2">
@@ -157,9 +159,5 @@
         </form>
         <script src="/ext-js/split.js"></script>
         <script src="/ext-js/spinner.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
-    </body>
-    <footer class="fixed bottom-0 left-0 right-0 w-full p-2 bg-slate-900 border-t border-text-slate-200 shadow md:flex md:items-center md:justify-between">
-        <span class="font-poppins font-semibold rounded text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>
-    </footer>
-</html>
+       @stop
+    </div>

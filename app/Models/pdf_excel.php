@@ -13,5 +13,9 @@ class pdf_excel extends Model
         'fileName',
         'fileSize',
         'hostName',
+        'result',
+        'err_reason',
+        'err_api_reason',
+        'uuid'
     ];
 }

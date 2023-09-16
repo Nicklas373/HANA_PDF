@@ -14,6 +14,10 @@ class extract_pdf extends Model
         'fileSize',
         'customPage',
         'hostName',
-        'mergePDF'
+        'mergePDF',
+        'result',
+        'err_reason',
+        'err_api_reason',
+        'uuid'
     ];
 }
