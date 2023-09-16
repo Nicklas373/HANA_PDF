@@ -22,9 +22,9 @@
         <form action="/htmltopdf/web" id="splitForm" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
             <div class="grid grid-rows-1 p-4 mb-8" id="grid-layout">
-                <div class="p-2 mb-4 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
+                <div class="p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
                     <label for="urlToPDF" class="block mb-2 font-poppins text-sm font-semibold text-gray-900 dark:text-white">Write the Website URL</label>
-                    <input type="text" id="urlToPDF" name="urlToPDF" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 font-poppins text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="https://hana-ci.com" required>
+                    <input type="text" id="urlToPDF" name="urlToPDF" class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 font-poppins text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="https://elwilis.com" required>
                     @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-2 mb-2 text-slate-900 border border-slate-900 rounded-lg bg-gray-50" role="alert">
                             <div class="flex items-center mb-2">

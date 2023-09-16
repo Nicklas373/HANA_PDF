@@ -31,8 +31,8 @@
                             $strToArr = explode(',', $message);
                             $i = 1;
                             foreach ($strToArr as $pdfFileName) {
-                                $pdfRealName = trim($pdfFileName,"//temp-merge//");
-                                $pdfThumbnail = "thumbnail/".trim(trim($pdfFileName,"//temp-merge//"),".pdf").".png";
+                                $pdfRealName = trim($pdfFileName,"//public//temp-merge//");
+                                $pdfThumbnail = "thumbnail/".trim(trim($pdfFileName,"//public//temp-merge//"),".pdf").".png";
                                 echo '
                                 <div id="pdfImage_'.$i.'" name="pdfImage" class="p-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mb-4 mx-auto bg-white border border-gray-200 rounded-lg shadow">
                                     <div class="text-left">

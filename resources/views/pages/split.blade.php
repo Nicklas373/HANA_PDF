@@ -159,14 +159,5 @@
         </form>
         <script src="/ext-js/split.js"></script>
         <script src="/ext-js/spinner.js"></script>
-<<<<<<< HEAD:resources/views/split.blade.php
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
-    </body>
-    <footer class="fixed bottom-0 left-0 right-0 w-full p-2 bg-slate-900 border-t border-text-slate-200 shadow md:flex md:items-center md:justify-between">
-        <span class="font-poppins font-semibold rounded text-slate-200">© 2023 <a href="https://github.com/HANA-CI-Build-Project" class="hover:underline">HANA-CI Build Project</a>. All Rights Reserved.</span>
-    </footer>
-</html>
-=======
        @stop
     </div>
->>>>>>> ff5732c (Treewide: De-commonize layout):resources/views/pages/split.blade.php
