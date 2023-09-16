@@ -83,7 +83,7 @@ class mergeController extends Controller
                             }
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download($pdfProcessed_Location);
-                        }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                        } catch (\Ilovepdf\Exceptions\StartException $e) {
 							DB::table('merge_pdfs')->insert([
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,

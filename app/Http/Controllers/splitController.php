@@ -326,7 +326,7 @@ class splitController extends Controller
                                     'err_reason' => null,
                                     'err_api_reason' => null,
                                     'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
