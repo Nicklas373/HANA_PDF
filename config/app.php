@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://pdf.hana-ci.com'),
+    'url' => env('APP_URL', 'https://pdf.hana-ci.com'),
 
     'asset_url' => env('ASSET_URL'),
 
@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
