@@ -399,7 +399,7 @@ class watermarkController extends Controller
                                 $ilovepdfTask->setTransparency($watermarkFontTransparency);
                                 $ilovepdfTask->setLayer($watermarkLayoutStyle);
                                 $ilovepdfTask->setMosaic($isMosaic);
-                                $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                                $ilovepdfTask->setOutputFileName($randomizeFileName);
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download($pdfProcessed_Location);
                             }						catch (\Ilovepdf\Exceptions\StartException $e) {
