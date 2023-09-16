@@ -39,11 +39,11 @@ class mergeController extends Controller
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(public_path('thumbnail'));
-							if (file_exists(public_path('thumbnail').'/1.png')) {
-								$thumbnail = file(public_path('thumbnail').'/1.png');
-								rename(public_path('thumbnail').'/1.png', public_path('thumbnail').'/'.$pdfNameWithoutExtension.'.png');
-                                $pdfResponse[] = 'temp-merge/'.$pdfNameWithoutExtension.'.pdf';
+								->saveImage(env('PDF_THUMBNAIL'));
+							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
+								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
+								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+                                $pdfResponse[] = env('PDF_MERGE_TEMP').'/'.$pdfNameWithoutExtension.'.pdf';
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
 							}
@@ -61,14 +61,14 @@ class mergeController extends Controller
 							$dropFile = array();
 						}
 						$fileNameArray = 'public/'.$request->post('fileAlt');
-						$fileName = basename($request->post('fileAlt'));
-                        $fileSizeArray = AppHelper::instance()->folderSize(public_path('temp-merge'));
+						$fileName = basename('public/'.$request->post('fileAlt'));
+                        $fileSizeArray = AppHelper::instance()->folderSize(env('PDF_MERGE_TEMP'));
                         $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
                         $hostName = AppHelper::instance()->getUserIpAddr();
                         $pdfArray = scandir(env('PDF_MERGE_TEMP'));
                         $pdfStartPages = 1;
-                        $pdfPreProcessed_Location = public_path('temp-merge');
-                        $pdfProcessed_Location = public_path('temp');
+                        $pdfPreProcessed_Location = env('PDF_MERGE_TEMP');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
 
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));

@@ -147,10 +147,10 @@ class watermarkController extends Controller
                         $randomizeFileName = md5($str);
 						$pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
-						$file = $request->post('fileAlt');
+						$file = 'public/'.$request->post('fileAlt');
 						$pdfName = basename($file);
 						$pdfNameWithoutExtension = basename($file, ".pdf");
-						$fileSize = filesize(public_path($file));
+						$fileSize = filesize($file);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
@@ -399,7 +399,7 @@ class watermarkController extends Controller
                                 $ilovepdfTask->setTransparency($watermarkFontTransparency);
                                 $ilovepdfTask->setLayer($watermarkLayoutStyle);
                                 $ilovepdfTask->setMosaic($isMosaic);
-                                $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                                $ilovepdfTask->setOutputFileName($randomizeFileName);
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download($pdfProcessed_Location);
                             }						catch (\Ilovepdf\Exceptions\StartException $e) {

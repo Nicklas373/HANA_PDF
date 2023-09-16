@@ -65,7 +65,7 @@ class compressController extends Controller
 
                         $str = rand();
                         $randomizeFileName = md5($str);
-						$file = $request->post('fileAlt');
+						$file = 'public/'.$request->post('fileAlt');
 						$pdfProcessed_Location = env('PDF_DOWNLOAD');
                         $pdfUpload_Location = env('PDF_UPLOAD');
 						$pdfName = basename($file);

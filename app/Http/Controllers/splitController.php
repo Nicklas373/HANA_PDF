@@ -30,7 +30,7 @@ class splitController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$pdfUpload_Location = public_path('upload-pdf');
+						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
@@ -57,7 +57,7 @@ class splitController extends Controller
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
-						$file = $request->post('fileAlt');
+						$file = 'public/'.$request->post('fileAlt');
 
 						if(isset($_POST['fromPage']))
 						{

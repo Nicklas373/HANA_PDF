@@ -69,7 +69,7 @@ class convertController extends Controller
                         if ($convertType == 'docx') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');
-                                $file = $request->post('fileAlt');
+                                $file = 'public/'.$request->post('fileAlt');
                                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
@@ -158,7 +158,7 @@ class convertController extends Controller
                                 $str = rand();
                                 $randomizeFileName = md5($str);
                                 $pdfUpload_Location = env('PDF_UPLOAD');
-                                $file = $request->post('fileAlt');
+                                $file = 'public/'.$request->post('fileAlt');
                                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
