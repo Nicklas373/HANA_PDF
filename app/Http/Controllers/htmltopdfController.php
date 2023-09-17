@@ -28,7 +28,6 @@ class htmltopdfController extends Controller
             $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $pdfUpload_Location = env('PDF_UPLOAD');
             $hostName = AppHelper::instance()->getUserIpAddr();
-            $uuid = AppHelper::Instance()->get_guid();
 
             try {
                 $ilovepdfTask = new HtmlpdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));

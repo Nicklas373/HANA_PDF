@@ -68,8 +68,7 @@ class convertController extends Controller
                     if(isset($_POST['convertType']))
                     {
                         $convertType = $request->post('convertType');
-                        $uuid = AppHelper::Instance()->get_guid();
-
+                        
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');

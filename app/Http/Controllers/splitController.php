@@ -27,7 +27,6 @@ class splitController extends Controller
 		if($validator->fails()) {
             return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
         } else {
-            $uuid = AppHelper::Instance()->get_guid();
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
