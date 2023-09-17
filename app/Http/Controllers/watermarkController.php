@@ -26,10 +26,11 @@ class watermarkController extends Controller
 			'wmType' => '',
 		]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
 		if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
         } else {
-            $uuid = AppHelper::Instance()->get_guid();
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
@@ -75,23 +76,33 @@ class watermarkController extends Controller
 
 						if(isset($_POST['watermarkFontFamily']))
 						{
-							$watermarkFontFamily = $request->post('watermarkFontFamily');
+							$watermarkFontFamilyFetch = $request->post('watermarkFontFamily');
+                            if (strcmp($watermarkFontFamilyFetch, 'Choose font family') == 0) {
+                                $watermarkFontFamily = 'Arial';
+                            } else {
+                                $watermarkFontFamily = $watermarkFontFamilyFetch;
+                            }
 						} else {
-							$watermarkFontFamily = '';
+							$watermarkFontFamily = 'Arial';
 						}
 
 						if(isset($_POST['watermarkFontSize']))
 						{
 							$watermarkFontSize = $request->post('watermarkFontSize');
 						} else {
-							$watermarkFontSize = '';
+							$watermarkFontSize = '14';
 						}
 
 						if(isset($_POST['watermarkFontStyle']))
 						{
-							$watermarkFontStyle = $request->post('watermarkFontStyle');
+                            $watermarkFontStyleFetch = $request->post('watermarkFontStyle');
+                            if (strcmp($watermarkFontStyleFetch, 'Choose font style') == 0) {
+                                $watermarkFontStyle = 'Regular';
+                            } else {
+                                $watermarkFontStyle = $watermarkFontStyleFetch;
+                            }
 						} else {
-							$watermarkFontStyle = '';
+							$watermarkFontStyle = 'Regular';
 						}
 
 						if(isset($_POST['watermarkFontTransparency']))
@@ -99,28 +110,38 @@ class watermarkController extends Controller
 							$watermarkFontTransparencyTemp = $request->post('watermarkFontTransparency');
 							$watermarkFontTransparency = 100 - intval($watermarkFontTransparencyTemp);
 						} else {
-							$watermarkFontTransparency = '';
+							$watermarkFontTransparency = '100';
 						}
 
 						if(isset($_POST['watermarkLayoutStyle']))
 						{
-							$watermarkLayoutStyle = $request->post('watermarkLayoutStyle');
+							$watermarkLayoutFetch = $request->post('watermarkLayoutStyle');
+                            if (strcmp($watermarkLayoutFetch, 'Choose layer style') == 0) {
+                                $watermarkLayoutStyle = 'above';
+                            } else {
+                                $watermarkLayoutStyle = $watermarkLayoutFetch;
+                            }
 						} else {
-							$watermarkLayoutStyle = '';
+							$watermarkLayoutStyle = 'above';
 						}
 
 						if(isset($_POST['watermarkPage']))
 						{
 							$watermarkPage = $request->post('watermarkPage');
 						} else {
-							$watermarkPage = '';
+							$watermarkPage = 'all';
 						}
 
 						if(isset($_POST['watermarkRotation']))
 						{
-							$watermarkRotation = $request->post('watermarkRotation');
+							$watermarkRotationFetch = $request->post('watermarkRotation');
+                            if (strcmp($watermarkRotationFetch, 'Choose orientation degrees') == 0) {
+                                $watermarkRotation = 0;
+                            } else {
+                                $watermarkRotation = $watermarkRotationFetch;
+                            }
 						} else {
-							$watermarkRotation = '';
+							$watermarkRotation = 0;
 						}
 
 						if(isset($_POST['watermarkText']))
@@ -159,7 +180,6 @@ class watermarkController extends Controller
 						if($watermarkStyle == "image") {
 							if($request->hasfile('wmfile')) {
                                 try {
-                                    $watermarkImage = $request->file('wmfile');
                                     $watermarkImage->move($pdfUpload_Location,$watermarkImage->getClientOriginalName());
                                     $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                     $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
@@ -170,10 +190,11 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setTransparency(intval($watermarkFontTransparency));
                                     $ilovepdfTask->setRotation($watermarkRotation);
                                     $ilovepdfTask->setLayer($watermarkLayoutStyle);
+                                    $ilovepdfTask->setPages($watermarkPage);
                                     $ilovepdfTask->setMosaic($isMosaic);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download($pdfProcessed_Location);
-                                }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                                } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('watermark_pdfs')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
@@ -375,34 +396,220 @@ class watermarkController extends Controller
                                     'watermarkText' => $watermarkText,
                                     'watermarkPage' => $watermarkPage,
                                     'result' => false,
-                                    'err_reason' => 'PDF file not found on the server !',
+                                    'err_reason' => 'Image file not found on the server !',
                                     'err_api_reason' => null,
                                     'uuid' => $uuid,
                                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                 ]);
-								return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !'])->withInput();
+								return redirect()->back()->withErrors(['error'=>'Image file not found on the server !'])->withInput();
 							}
 						} else if ($watermarkStyle == "text") {
-                            try {
-                                $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                                $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                                $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
-                                $ilovepdfTask->setMode("text");
-                                $ilovepdfTask->setText($watermarkText);
-                                $ilovepdfTask->setPages($watermarkPage);
-                                $ilovepdfTask->setVerticalPosition("middle");
-                                $ilovepdfTask->setRotation($watermarkRotation);
-                                $ilovepdfTask->setFontColor('#000000');
-                                $ilovepdfTask->setFontFamily($watermarkFontFamily);
-                                $ilovepdfTask->setFontStyle($watermarkFontStyle);
-                                $ilovepdfTask->setFontSize($watermarkFontSize);
-                                $ilovepdfTask->setTransparency($watermarkFontTransparency);
-                                $ilovepdfTask->setLayer($watermarkLayoutStyle);
-                                $ilovepdfTask->setMosaic($isMosaic);
-                                $ilovepdfTask->setOutputFileName($randomizeFileName);
-                                $ilovepdfTask->execute();
-                                $ilovepdfTask->download($pdfProcessed_Location);
-                            }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                            if ($watermarkText != '') {
+                                try {
+                                    $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                                    $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+                                    $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
+                                    $ilovepdfTask->setMode("text");
+                                    $ilovepdfTask->setText($watermarkText);
+                                    $ilovepdfTask->setPages($watermarkPage);
+                                    $ilovepdfTask->setVerticalPosition("middle");
+                                    $ilovepdfTask->setRotation($watermarkRotation);
+                                    $ilovepdfTask->setFontColor('#000000');
+                                    $ilovepdfTask->setFontFamily($watermarkFontFamily);
+                                    $ilovepdfTask->setFontStyle($watermarkFontStyle);
+                                    $ilovepdfTask->setFontSize($watermarkFontSize);
+                                    $ilovepdfTask->setTransparency($watermarkFontTransparency);
+                                    $ilovepdfTask->setLayer($watermarkLayoutStyle);
+                                    $ilovepdfTask->setMosaic($isMosaic);
+                                    $ilovepdfTask->setOutputFileName($randomizeFileName);
+                                    $ilovepdfTask->execute();
+                                    $ilovepdfTask->download($pdfProcessed_Location);
+                                }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on StartException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\AuthException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\UploadException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\ProcessException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\DownloadException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\TaskException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Ilovepdf\Exceptions\PathException $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on PathException',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('watermark_pdfs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => basename($watermarkImage),
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'iLovePDF API Error !, Catch on Exception',
+                                        'err_api_reason' => $e->getMessage(),
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                }
+                            } else {
                                 DB::table('watermark_pdfs')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
@@ -419,173 +626,12 @@ class watermarkController extends Controller
                                     'watermarkText' => $watermarkText,
                                     'watermarkPage' => $watermarkPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                                    'err_api_reason' => $e->getMessage(),
+                                    'err_reason' => 'Watermark text can not empty !',
+                                    'err_api_reason' => null,
                                     'uuid' => $uuid,
                                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                 ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Ilovepdf\Exceptions\PathException $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
-                            } catch (\Exception $e) {
-                                DB::table('watermark_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => basename($watermarkImage),
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Watermark text can not empty !', 'uuid'=>$uuid])->withInput();
                             }
 						}
 

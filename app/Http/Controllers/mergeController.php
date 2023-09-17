@@ -23,10 +23,11 @@ class mergeController extends Controller
             'dropFile' => ''
         ]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
         } else {
-            $uuid = AppHelper::Instance()->get_guid();
             if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {

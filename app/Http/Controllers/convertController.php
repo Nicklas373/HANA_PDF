@@ -29,8 +29,10 @@ class convertController extends Controller
 			'fileAlt' => ''
 		]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
 		if($validator->fails()) {
-			return redirect()->back()->withErrors($validator->messages())->withInput();
+			return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
 		} else {
 			if(isset($_POST['formAction']))
 			{
@@ -66,8 +68,7 @@ class convertController extends Controller
                     if(isset($_POST['convertType']))
                     {
                         $convertType = $request->post('convertType');
-                        $uuid = AppHelper::Instance()->get_guid();
-
+                        
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');
