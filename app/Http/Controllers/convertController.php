@@ -27,8 +27,10 @@ class convertController extends Controller
 			'fileAlt' => ''
 		]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
 		if($validator->fails()) {
-			return redirect('convert')->withErrors($validator->messages())->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
 		} else {
 			if(isset($_POST['formAction']))
 			{
@@ -39,8 +41,6 @@ class convertController extends Controller
 						$file->move($pdfUpload_Location,$file->getClientOriginalName());
 						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
 						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-                        $uuid = AppHelper::Instance()->get_guid();
-
 						if (file_exists($pdfFileName)) {
 							$pdf = new Pdf($pdfFileName);
 							$pdf->setPage(1)
