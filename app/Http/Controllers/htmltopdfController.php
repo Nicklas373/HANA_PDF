@@ -20,8 +20,10 @@ class htmltopdfController extends Controller
 		    'urlToPDF' => 'required',
 	    ]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
         if($validator->fails()) {
-            return redirect()->back()->withErrors($validator->messages())->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
         } else {
             $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $pdfUpload_Location = env('PDF_UPLOAD');
