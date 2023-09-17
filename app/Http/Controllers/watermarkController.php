@@ -26,10 +26,11 @@ class watermarkController extends Controller
 			'wmType' => '',
 		]);
 
+        $uuid = AppHelper::Instance()->get_guid();
+
 		if($validator->fails()) {
-            return redirect('watermark')->withErrors($validator->messages())->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
         } else {
-            $uuid = AppHelper::Instance()->get_guid();
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
@@ -75,33 +76,33 @@ class watermarkController extends Controller
 
 						if(isset($_POST['watermarkFontFamily']))
 						{
-							$watermarkFontFamily = $request->post('watermarkFontFamily');
-                            if ($watermarkFontFamilyFetch = 'Choose font family') {
-                                $watermarkFontFamily = '';
+							$watermarkFontFamilyFetch = $request->post('watermarkFontFamily');
+                            if (strcmp($watermarkFontFamilyFetch, 'Choose font family') == 0) {
+                                $watermarkFontFamily = 'Arial';
                             } else {
                                 $watermarkFontFamily = $watermarkFontFamilyFetch;
                             }
 						} else {
-							$watermarkFontFamily = '';
+							$watermarkFontFamily = 'Arial';
 						}
 
 						if(isset($_POST['watermarkFontSize']))
 						{
 							$watermarkFontSize = $request->post('watermarkFontSize');
 						} else {
-							$watermarkFontSize = '';
+							$watermarkFontSize = '14';
 						}
 
 						if(isset($_POST['watermarkFontStyle']))
 						{
-							$watermarkFontStyle = $request->post('watermarkFontStyle');
-                            if ($watermarkFontStyleFetch = 'Choose font style') {
-                                $watermarkFontStyle = '';
+                            $watermarkFontStyleFetch = $request->post('watermarkFontStyle');
+                            if (strcmp($watermarkFontStyleFetch, 'Choose font style') == 0) {
+                                $watermarkFontStyle = 'Regular';
                             } else {
                                 $watermarkFontStyle = $watermarkFontStyleFetch;
                             }
 						} else {
-							$watermarkFontStyle = '';
+							$watermarkFontStyle = 'Regular';
 						}
 
 						if(isset($_POST['watermarkFontTransparency']))
@@ -109,38 +110,38 @@ class watermarkController extends Controller
 							$watermarkFontTransparencyTemp = $request->post('watermarkFontTransparency');
 							$watermarkFontTransparency = 100 - intval($watermarkFontTransparencyTemp);
 						} else {
-							$watermarkFontTransparency = '';
+							$watermarkFontTransparency = '100';
 						}
 
 						if(isset($_POST['watermarkLayoutStyle']))
 						{
 							$watermarkLayoutFetch = $request->post('watermarkLayoutStyle');
-                            if ($watermarkLayoutFetch = 'Choose layer style') {
-                                $watermarkLayoutStyle = '';
+                            if (strcmp($watermarkLayoutFetch, 'Choose layer style') == 0) {
+                                $watermarkLayoutStyle = 'above';
                             } else {
-                                $watermarkLayoutStyle = $watermarkFetch;
+                                $watermarkLayoutStyle = $watermarkLayoutFetch;
                             }
 						} else {
-							$watermarkLayoutStyle = '';
+							$watermarkLayoutStyle = 'above';
 						}
 
 						if(isset($_POST['watermarkPage']))
 						{
 							$watermarkPage = $request->post('watermarkPage');
 						} else {
-							$watermarkPage = '';
+							$watermarkPage = 'all';
 						}
 
 						if(isset($_POST['watermarkRotation']))
 						{
 							$watermarkRotationFetch = $request->post('watermarkRotation');
-                            if ($watermarkRotationFetch = 'Choose orientation degrees') {
-                                $watermarkRotation = '';
+                            if (strcmp($watermarkRotationFetch, 'Choose orientation degrees') == 0) {
+                                $watermarkRotation = 0;
                             } else {
                                 $watermarkRotation = $watermarkRotationFetch;
                             }
 						} else {
-							$watermarkRotation = '';
+							$watermarkRotation = 0;
 						}
 
 						if(isset($_POST['watermarkText']))
@@ -189,6 +190,7 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setTransparency(intval($watermarkFontTransparency));
                                     $ilovepdfTask->setRotation($watermarkRotation);
                                     $ilovepdfTask->setLayer($watermarkLayoutStyle);
+                                    $ilovepdfTask->setPages($watermarkPage);
                                     $ilovepdfTask->setMosaic($isMosaic);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download($pdfProcessed_Location);
@@ -394,12 +396,12 @@ class watermarkController extends Controller
                                     'watermarkText' => $watermarkText,
                                     'watermarkPage' => $watermarkPage,
                                     'result' => false,
-                                    'err_reason' => 'Image file for watermark not found on the server !',
+                                    'err_reason' => 'Image file not found on the server !',
                                     'err_api_reason' => null,
                                     'uuid' => $uuid,
                                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                 ]);
-								return redirect()->back()->withErrors(['error'=>'mage file for watermark not found on the server !'])->withInput();
+								return redirect()->back()->withErrors(['error'=>'Image file not found on the server !'])->withInput();
 							}
 						} else if ($watermarkStyle == "text") {
                             if ($watermarkText != '') {
