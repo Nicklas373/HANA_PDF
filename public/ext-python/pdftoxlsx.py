@@ -5,10 +5,10 @@ import pandas as pd
 import os,sys, os.path
 from os import path
 
-pdf_input = r"/var/www/html/pdf-hanaci/public/upload-pdf"
-csv_input = r"/var/www/html/pdf-hanaci/public/temp-csv"
-pdf_output = r"/var/www/html/pdf-hanaci/public/temp-csv"
-csv_output = r"/var/www/html/pdf-hanaci/public/temp"
+pdf_input = r"/var/www/html/hanaci-pdf/public/upload-pdf"
+csv_input = r"/var/www/html/hanaci-pdf/public/temp-csv"
+pdf_output = r"/var/www/html/hanaci-pdf/public/temp-csv"
+csv_output = r"/var/www/html/hanaci-pdf/public/temp"
 
 df = tabula.read_pdf(pdf_input+"/convert_xlsx.pdf", encoding='utf-8', multiple_tables=True, pages='all')
 tabula.convert_into(pdf_input+"/convert_xlsx.pdf", pdf_output+"/converted.csv", output_format="csv", pages='all')

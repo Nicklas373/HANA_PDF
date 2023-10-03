@@ -81,7 +81,7 @@ class convertController extends Controller
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 				                rename($pdfUpload_Location.'/'.$pdfName, $pdfUpload_Location.'/convert_xlsx.pdf');
                                 $process = new Process([
-                                    'python',
+                                    'python3',
                                     public_path().'/ext-python/pdftoxlsx.py'],
                                     null,
                                     [
@@ -92,7 +92,7 @@ class convertController extends Controller
                                 $process->run();
 
                                 if (!$process->isSuccessful()) {
-				                    //throw new ProcessFailedException($process); -> Debugging Only
+				    		//throw new ProcessFailedException($process); -> For debugging only
                                     DB::table('pdf_excels')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
