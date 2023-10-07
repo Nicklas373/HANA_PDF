@@ -7,6 +7,7 @@ use App\Models\compression_pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
@@ -30,22 +31,27 @@ class compressController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
+                        $str = rand();
 						$pdfUpload_Location = env('PDF_UPLOAD');
-						$file = $request->file('file');
-						$file->move($pdfUpload_Location,$file->getClientOriginalName());
-						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
-						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-
-						if (file_exists($pdfFileName)) {
-							$pdf = new Pdf($pdfFileName);
+                        $file = $request->file('file');
+                        $randomizePdfFileName = md5($str);
+                        $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
+						$pdfFileName = $file->getClientOriginalName();
+                        $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
+						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
+							$pdf = new Pdf(Storage::disk('local')->path('public/'.$randomizePdfPath));
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('PDF_THUMBNAIL'));
-							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
-								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
-								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
+							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
+                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
+                                return redirect()->back()->with([
+                                    'status' => true,
+                                    'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
+                                    'pdfThumbName' => Storage::disk('local')->url(env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png'),
+                                    'pdfOriName' => $pdfFileName,
+                                ]);
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
 							}
@@ -64,24 +70,21 @@ class compressController extends Controller
 							$compMethod = "recommended";
 						}
 
-                        $str = rand();
-                        $randomizeFileName = md5($str);
 						$file = $request->post('fileAlt');
-						$pdfProcessed_Location = env('PDF_DOWNLOAD');
-                        $pdfUpload_Location = env('PDF_UPLOAD');
+                        $pdfUpload_Location = Storage::disk('local')->path('public/'.env('PDF_UPLOAD'));
+                        $pdfProcessed_Location = Storage::disk('local')->path('public/'.env('PDF_DOWNLOAD'));
 						$pdfName = basename($file);
-						$fileSize = filesize($file);
+                        $pdfNewPath = $pdfUpload_Location.'/'.$pdfName;
+						$fileSize = filesize($pdfNewPath);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
-                        $newRandomizeFile = $pdfUpload_Location.'/'.$randomizeFileName.'.pdf';
 
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('compress');
                             $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                            $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
-                            $ilovepdfTask->setOutputFileName($randomizeFileName);
+                            $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
+                            $ilovepdfTask->setOutputFileName($pdfName);
                             $ilovepdfTask->setCompressionLevel($compMethod);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download($pdfProcessed_Location);
@@ -199,14 +202,12 @@ class compressController extends Controller
                             return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
                         }
 
-                        if (is_file($newRandomizeFile)) {
-                            unlink($newRandomizeFile);
+                        if (file_exists($pdfNewPath)) {
+                            unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf', $pdfProcessed_Location.'/'.$pdfName);
-                            $download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-                            $compFileSize = filesize($download_pdf);
+                        if (file_exists($pdfProcessed_Location.'/'.$pdfName)) {
+                            $compFileSize = filesize($pdfProcessed_Location.'/'.$pdfName);
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
 
                             DB::table('compression_pdfs')->insert([
@@ -221,9 +222,9 @@ class compressController extends Controller
                                 'uuid' => $uuid,
                                 'created_at' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-							return redirect()->back()->with([
+                            return redirect()->back()->with([
                                 "stats" => "scs",
-                                "res"=>$download_pdf,
+                                "res"=>Storage::disk('local')->url('temp/'.$pdfName),
                                 "curFileSize"=>$newFileSize,
                                 "newFileSize"=>$newCompFileSize,
                                 "compMethod"=>$compMethod
