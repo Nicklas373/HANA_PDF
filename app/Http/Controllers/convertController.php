@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\Exceptions;
@@ -38,23 +39,27 @@ class convertController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
+                        $str = rand();
 						$pdfUpload_Location = env('PDF_UPLOAD');
 						$file = $request->file('file');
-						$file->move($pdfUpload_Location,$file->getClientOriginalName());
-						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
-						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-                        $uuid = AppHelper::Instance()->get_guid();
-
-						if (file_exists($pdfFileName)) {
-							$pdf = new Pdf($pdfFileName);
+                        $randomizePdfFileName = md5($str);
+                        $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
+						$pdfFileName = $file->getClientOriginalName();
+                        $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
+						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
+							$pdf = new Pdf(Storage::disk('local')->path('public/'.$randomizePdfPath));
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('PDF_THUMBNAIL'));
-							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
-								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
-								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
+							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
+                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
+                                return redirect()->back()->with([
+                                    'status' => true,
+                                    'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
+                                    'pdfThumbName' => Storage::disk('local')->url(env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png'),
+                                    'pdfOriName' => $pdfFileName,
+                                ]);
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail file not found !', 'uuid'=>$uuid])->withInput();
 							}
@@ -68,18 +73,19 @@ class convertController extends Controller
                     if(isset($_POST['convertType']))
                     {
                         $convertType = $request->post('convertType');
-                        
+
                         if ($convertType == 'excel') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');
+                                $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $file = $request->post('fileAlt');
-                                $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($file, ".pdf");
-                                $fileSize = filesize($file);
+                                $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-				                rename($pdfUpload_Location.'/'.$pdfName, $pdfUpload_Location.'/convert_xlsx.pdf');
+				                rename(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName), Storage::disk('local')->path('public/'.$pdfUpload_Location.'/convert_xlsx.pdf'));
                                 $process = new Process([
                                     'python3',
                                     public_path().'/ext-python/pdftoxlsx.py'],
@@ -92,7 +98,7 @@ class convertController extends Controller
                                 $process->run();
 
                                 if (!$process->isSuccessful()) {
-				    		//throw new ProcessFailedException($process); -> For debugging only
+				                    //throw new ProcessFailedException($process); -> For debugging only
                                     DB::table('pdf_excels')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
@@ -105,8 +111,8 @@ class convertController extends Controller
                                     ]);
                                     return redirect()->back()->withErrors(['error'=>'Python process fail !', 'uuid'=>$uuid])->withInput();
                                 } else {
-                                    if (file_exists($pdfProcessed_Location.'/converted.xlsx')) {
-                                        $download_excel = $pdfProcessed_Location.'/converted.xlsx';
+                                    if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/converted.xlsx'))) {
+                                        $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/converted.xlsx');
                                         DB::table('pdf_excels')->insert([
                                             'fileName' => $pdfName,
                                             'fileSize' => $newFileSize,
@@ -138,18 +144,19 @@ class convertController extends Controller
                         } else if ($convertType == 'docx') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');
+                                $pdfProcessed_Location = env('PDF_DOWNLOAD');
                                 $file = $request->post('fileAlt');
-                                $pdfProcessed_Location = 'temp';
                                 $pdfName = basename($file);
 				                $pdfNameInfo = pathinfo($file);
                                 $pdfNameWithoutExtension = $pdfNameInfo['filename'];
-                                $fileSize = filesize($file);
+                                $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
                                 try {
                                     $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
-                                    $uploadFileRequest = new UploadFileRequest($file, $pdfName);
+                                    $uploadFileRequest = new UploadFileRequest($pdfNewPath, $pdfName);
                                     $wordsApi->uploadFile($uploadFileRequest);
                                     $requestSaveOptionsData = new DocxSaveOptionsData(array(
                                         "save_format" => "docx",
@@ -181,8 +188,8 @@ class convertController extends Controller
                                 }
 
                                 if (json_decode($result, true) !== NULL) {
-                                    if (AppHelper::instance()->getFtpResponse($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx", $pdfNameWithoutExtension.".docx") == true) {
-                                        $download_word = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx";
+                                    if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx"), $pdfNameWithoutExtension.".docx") == true) {
+                                        $download_word = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx");
                                         DB::table('pdf_words')->insert([
                                             'fileName' => $pdfName,
                                             'fileSize' => $newFileSize,
@@ -193,7 +200,10 @@ class convertController extends Controller
                                             'uuid' => $uuid,
                                             'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                         ]);
-                                        return redirect()->back()->with(["stats" => "scs", "res"=>$download_word]);
+                                        return redirect()->back()->with([
+                                            "stats" => "scs",
+                                            "res"=>$download_word
+                                        ]);
                                     } else {
                                         DB::table('pdf_words')->insert([
                                             'fileName' => $pdfName,
@@ -225,29 +235,25 @@ class convertController extends Controller
                             }
                         } else if ($convertType == 'jpg') {
                             if(isset($_POST['fileAlt'])) {
-                                $str = rand();
-                                $randomizeFileName = md5($str);
                                 $pdfUpload_Location = env('PDF_UPLOAD');
-                                $file = $request->post('fileAlt');
                                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
+                                $file = $request->post('fileAlt');
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
-                                $fileSize = filesize($file);
+                                $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                                rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
-                                $newRandomizeFile = $pdfUpload_Location.'/'.$randomizeFileName.'.pdf';
-
                                 try {
                                     $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                     $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                                    $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
+                                    $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                                     $ilovepdfTask->setMode('pages');
-                                    $ilovepdfTask->setOutputFileName($randomizeFileName);
-                                    $ilovepdfTask->setPackagedFilename($randomizeFileName);
+                                    $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                                    $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
                                     $ilovepdfTask->execute();
-                                    $ilovepdfTask->download($pdfProcessed_Location);
-                                }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                                    $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
+                                } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('pdf_jpgs')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
@@ -345,70 +351,53 @@ class convertController extends Controller
                                     return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
                                 }
 
-                                if (is_file($newRandomizeFile)) {
-                                    unlink($newRandomizeFile);
+                                if (file_exists($pdfNewPath)) {
+                                    unlink($pdfNewPath);
                                 }
 
-                                if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.zip')) {
-                                    rename($pdfProcessed_Location.'/'.$randomizeFileName.'.zip', $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                                    $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
-
-                                    if (file_exists($download_pdf)) {
-                                        DB::table('pdf_jpgs')->insert([
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'hostName' => $hostName,
-                                            'result' => true,
-                                            'err_reason' => null,
-                                            'err_api_reason' => null,
-                                            'uuid' => $uuid,
-                                            'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
-                                    } else {
-                                        DB::table('pdf_jpgs')->insert([
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'hostName' => $hostName,
-                                            'result' => false,
-                                            'err_reason' => 'Failed to download converted file from iLovePDF API !',
-                                            'err_api_reason' => null,
-                                            'uuid' => $uuid,
-                                            'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'Failed to download converted file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
-                                    }
-                                } else if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'-0001.jpg')) {
-                                    rename($pdfProcessed_Location.'/'.$randomizeFileName.'-0001.jpg', $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg');
-                                    $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg';
-
-                                    if (file_exists($download_pdf)) {
-                                        DB::table('pdf_jpgs')->insert([
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'hostName' => $hostName,
-                                            'result' => true,
-                                            'err_reason' => null,
-                                            'err_api_reason' => null,
-                                            'uuid' => $uuid,
-                                            'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf, 'uuid'=>$uuid])->withInput();
-                                    } else {
-                                        DB::table('pdf_jpgs')->insert([
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'hostName' => $hostName,
-                                            'result' => false,
-                                            'err_reason' => 'Failed to download file from iLovePDF API !',
-                                            'err_api_reason' => null,
-                                            'uuid' => $uuid,
-                                            'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
-                                    }
+                                if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
+                                    DB::table('pdf_jpgs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'result' => true,
+                                        'err_reason' => null,
+                                        'err_api_reason' => null,
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->with([
+                                        "stats" => "scs",
+                                        "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip')
+                                    ]);
+                                } else if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg')) {
+                                    DB::table('pdf_jpgs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'result' => true,
+                                        'err_reason' => null,
+                                        'err_api_reason' => null,
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->with([
+                                        "stats" => "scs",
+                                        "res"=>Storage::disk('local')->url('temp/'.$pdfNameWithoutExtension.'-0001.jpg'),
+                                        'uuid'=>$uuid
+                                    ])->withInput();
                                 } else {
-                                    return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
+                                    DB::table('pdf_jpgs')->insert([
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'hostName' => $hostName,
+                                        'result' => false,
+                                        'err_reason' => 'Failed to download converted file from iLovePDF API !',
+                                        'err_api_reason' => null,
+                                        'uuid' => $uuid,
+                                        'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'Failed to download converted file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
                                 }
                             } else {
                                 return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
