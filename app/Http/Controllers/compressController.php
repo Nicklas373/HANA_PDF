@@ -71,10 +71,10 @@ class compressController extends Controller
 						}
 
 						$file = $request->post('fileAlt');
-                        $pdfUpload_Location = Storage::disk('local')->path('public/'.env('PDF_UPLOAD'));
-                        $pdfProcessed_Location = Storage::disk('local')->path('public/'.env('PDF_DOWNLOAD'));
+                        $pdfUpload_Location = env('PDF_UPLOAD');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
 						$pdfName = basename($file);
-                        $pdfNewPath = $pdfUpload_Location.'/'.$pdfName;
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
 						$fileSize = filesize($pdfNewPath);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -87,7 +87,7 @@ class compressController extends Controller
                             $ilovepdfTask->setOutputFileName($pdfName);
                             $ilovepdfTask->setCompressionLevel($compMethod);
                             $ilovepdfTask->execute();
-                            $ilovepdfTask->download($pdfProcessed_Location);
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('compression_pdfs')->insert([
                                 'fileName' => $pdfName,
@@ -206,8 +206,8 @@ class compressController extends Controller
                             unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$pdfName)) {
-                            $compFileSize = filesize($pdfProcessed_Location.'/'.$pdfName);
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+                            $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName));
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
 
                             DB::table('compression_pdfs')->insert([
@@ -224,7 +224,7 @@ class compressController extends Controller
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
-                                "res"=>Storage::disk('local')->url('temp/'.$pdfName),
+                                "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName),
                                 "curFileSize"=>$newFileSize,
                                 "newFileSize"=>$newCompFileSize,
                                 "compMethod"=>$compMethod
