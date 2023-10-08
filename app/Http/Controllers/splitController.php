@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\Exceptions;
@@ -31,22 +32,29 @@ class splitController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
+						$str = rand();
 						$pdfUpload_Location = env('PDF_UPLOAD');
-						$file = $request->file('file');
-						$file->move($pdfUpload_Location,$file->getClientOriginalName());
-						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
-						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-
-						if (file_exists($pdfFileName)) {
-							$pdf = new Pdf($pdfFileName);
+                        $file = $request->file('file');
+                        $randomizePdfFileName = md5($str);
+                        $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
+						$pdfFileName = $file->getClientOriginalName();
+                        $pdfTotalPages = AppHelper::instance()->count($file);
+                        $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
+						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
+							$pdf = new Pdf(Storage::disk('local')->path('public/'.$randomizePdfPath));
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('PDF_THUMBNAIL'));
-							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
-								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
-								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
+							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
+                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
+                                return redirect()->back()->with([
+                                    'status' => true,
+                                    'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
+                                    'pdfThumbName' => Storage::disk('local')->url(env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png'),
+                                    'pdfOriName' => $pdfFileName,
+                                    'pdfTotalPages' => $pdfTotalPages
+                                ]);
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
 							}
@@ -59,6 +67,16 @@ class splitController extends Controller
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
 						$file = $request->post('fileAlt');
+
+                        $pdfUpload_Location = env('PDF_UPLOAD');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
+						$pdfName = basename($file);
+                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
+						$fileSize = filesize($pdfNewPath);
+						$hostName = AppHelper::instance()->getUserIpAddr();
+						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
 						if(isset($_POST['fromPage']))
 						{
@@ -101,20 +119,20 @@ class splitController extends Controller
 						}
 
 						if ($fromPage != ''){
-							$pdfTotalPages = AppHelper::instance()->count($file);
+							$pdfTotalPages = AppHelper::instance()->count($pdfNewPath);
 							if ($toPage > $pdfTotalPages) {
 								return redirect()->back()->withErrors([
-                                    'error'=>'ToPage selected value has more than total PDF pages ! (total pages: '.$pdfTotalPages.')',
+                                    'error'=>'To Page selected value has more than total PDF pages ! (total pages: '.$pdfTotalPages.')',
                                     'uuid'=>$uuid
                                     ])->withInput();
                             } else if ($fromPage > $pdfTotalPages) {
                                 return redirect()->back()->withErrors([
-                                    'error'=>'FromPage selected value has more than total PDF pages ! (total pages: '.$pdfTotalPages.')',
+                                    'error'=>'From Page selected value has more than total PDF pages ! (total pages: '.$pdfTotalPages.')',
                                     'uuid'=>$uuid
                                     ])->withInput();
                             } else if ($fromPage > $toPage) {
 								return redirect()->back()->withErrors([
-                                    'error'=>'FirstPage value has more than ToPage value !',
+                                    'error'=>'First Page value has more than To Page value !',
                                     'uuid'=>$uuid
                                     ])->withInput();
 							} else {
@@ -135,29 +153,17 @@ class splitController extends Controller
 							$fixedPageRanges = $customPage;
 						};
 
-                        $str = rand();
-                        $randomizeFileName = md5($str);
-                        $pdfUpload_Location = env('PDF_UPLOAD');
-                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
-                        $pdfName = basename($file);
-						$pdfNameWithoutExtension = basename($file, '.pdf');
-						$fileSize = filesize($pdfUpload_Location.'/'.basename($file));
-						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-						$hostName = AppHelper::instance()->getUserIpAddr();
-                        rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
-                        $newRandomizeFile = $pdfUpload_Location.'/'.$randomizeFileName.'.pdf';
-
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('split');
                             $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                            $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
+                            $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                             $ilovepdfTask->setRanges($fixedPageRanges);
                             $ilovepdfTask->setMergeAfter($mergePDF);
-                            $ilovepdfTask->setPackagedFilename($randomizeFileName);
-                            $ilovepdfTask->setOutputFileName($randomizeFileName);
+                            $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
+                            $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->execute();
-                            $ilovepdfTask->download($pdfProcessed_Location);
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('split_pdfs')->insert([
                                 'fileName' => $pdfName,
@@ -304,98 +310,58 @@ class splitController extends Controller
                             return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
                         }
 
-                        if (is_file($newRandomizeFile)) {
-                            unlink($newRandomizeFile);
+                        if (file_exists($pdfNewPath)) {
+                            unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.zip')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.zip', $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
+                        if (file_exists($thumbName)) {
+                            unlink($thumbName);
+                        }
 
-                            if (file_exists($download_pdf)) {
-                                DB::table('split_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'fromPage' => $fromPage,
-                                    'toPage' => $toPage,
-                                    'customPage' => $customPage,
-                                    'fixedPage' => $fixedPage,
-                                    'fixedPageRange' => $fixedPageRanges,
-                                    'hostName' => $hostName,
-                                    'mergePDF' => $mergeDBpdf,
-                                    'result' => true,
-                                    'err_reason' => null,
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->with([
-                                    "stats" => "scs",
-                                    "res"=>$download_pdf,
-                                ]);
-							} else {
-                                DB::table('split_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'fromPage' => $fromPage,
-                                    'toPage' => $toPage,
-                                    'customPage' => $customPage,
-                                    'fixedPage' => $fixedPage,
-                                    'fixedPageRange' => $fixedPageRanges,
-                                    'hostName' => $hostName,
-                                    'mergePDF' => $mergeDBpdf,
-                                    'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-								return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
-							}
-                        } else if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf', $pdfProcessed_Location.'/'.$pdfName);
-                            $download_pdf = $pdfProcessed_Location.'/'.$pdfName;
-
-                            if (file_exists($download_pdf)) {
-								DB::table('split_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'fromPage' => $fromPage,
-                                    'toPage' => $toPage,
-                                    'customPage' => $customPage,
-                                    'fixedPage' => $fixedPage,
-                                    'fixedPageRange' => $fixedPageRanges,
-                                    'hostName' => $hostName,
-                                    'mergePDF' => $mergeDBpdf,
-                                    'result' => true,
-                                    'err_reason' => null,
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->with([
-                                    "stats" => "scs",
-                                    "res"=>$download_pdf,
-                                ]);
-							} else {
-                                DB::table('split_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'fromPage' => $fromPage,
-                                    'toPage' => $toPage,
-                                    'customPage' => $customPage,
-                                    'fixedPage' => $fixedPage,
-                                    'fixedPageRange' => $fixedPageRanges,
-                                    'hostName' => $hostName,
-                                    'mergePDF' => $mergeDBpdf,
-                                    'result' => false,
-                                    'err_reason' => 'Splitted file not found on the server !',
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-								return redirect()->back()->withErrors(['error'=>'Splitted file not found on the server !', 'uuid'=>$uuid])->withInput();
-							}
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            DB::table('split_pdfs')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'fromPage' => $fromPage,
+                                'toPage' => $toPage,
+                                'customPage' => $customPage,
+                                'fixedPage' => $fixedPage,
+                                'fixedPageRange' => $fixedPageRanges,
+                                'hostName' => $hostName,
+                                'mergePDF' => $mergeDBpdf,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
+                        } else if (file_existsStorage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName)) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
+                            DB::table('split_pdfs')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'fromPage' => $fromPage,
+                                'toPage' => $toPage,
+                                'customPage' => $customPage,
+                                'fixedPage' => $fixedPage,
+                                'fixedPageRange' => $fixedPageRanges,
+                                'hostName' => $hostName,
+                                'mergePDF' => $mergeDBpdf,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
                         } else {
                             DB::table('split_pdfs')->insert([
                                 'fileName' => $pdfName,
@@ -431,29 +397,25 @@ class splitController extends Controller
 
                         $pdfNewRanges = $customPage;
 
-                        $str = rand();
-                        $randomizeFileName = md5($str);
-                        $pdfUpload_Location = env('PDF_UPLOAD');
-                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
                         $pdfName = basename($file);
-						$pdfNameWithoutExtension = basename($pdfName, '.pdf');
-                        $fileSize = filesize($pdfUpload_Location.'/'.$pdfName);
-                        $hostName = AppHelper::instance()->getUserIpAddr();
-                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
-                        $newRandomizeFile = $pdfUpload_Location.'/'.$randomizeFileName.'.pdf';
+                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
+						$fileSize = filesize($pdfNewPath);
+						$hostName = AppHelper::instance()->getUserIpAddr();
+						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('split');
                             $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                            $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
+                            $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                             $ilovepdfTask->setRanges($pdfNewRanges);
                             $ilovepdfTask->setMergeAfter(false);
-                            $ilovepdfTask->setPackagedFilename($randomizeFileName);
-                            $ilovepdfTask->setOutputFileName($randomizeFileName);
+                            $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
+                            $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->execute();
-                            $ilovepdfTask->download($pdfProcessed_Location);
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('extract_pdfs')->insert([
                                 'fileName' => $pdfName,
@@ -560,78 +522,49 @@ class splitController extends Controller
                             return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
                         }
 
-                        if (is_file($newRandomizeFile)) {
-                            unlink($newRandomizeFile);
+                        if (file_exists($pdfNewPath)) {
+                            unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf', $pdfProcessed_Location.'/'.$pdfName);
-                            $download_pdf = $pdfProcessed_Location.'/'.$pdfName;
+                        if (file_exists($thumbName)) {
+                            unlink($thumbName);
+                        }
 
-                            if (file_exists($download_pdf)) {
-                                DB::table('extract_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'customPage' => $customPage,
-                                    'hostName' => $hostName,
-                                    'result' => true,
-                                    'err_reason' => null,
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->with([
-                                    "stats" => "scs",
-                                    "res"=>$download_pdf,
-                                ]);
-                            } else {
-                                DB::table('extract_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'customPage' => $customPage,
-                                    'hostName' => $hostName,
-                                    'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
-                            }
-                        } else if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.zip')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.zip', $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $download_pdf = $pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip';
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
 
-                            if (file_exists($download_pdf)) {
-                                DB::table('extract_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'customPage' => $customPage,
-                                    'hostName' => $hostName,
-                                    'result' => true,
-                                    'err_reason' => null,
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->with([
-                                    "stats" => "scs",
-                                    "res"=>$download_pdf,
-                                ]);
-                            } else {
-                                DB::table('extract_pdfs')->insert([
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'customPage' => $customPage,
-                                    'hostName' => $hostName,
-                                    'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => null,
-                                    'uuid' => $uuid,
-                                    'created_at' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
-                            }
+                            DB::table('extract_pdfs')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'customPage' => $customPage,
+                                'hostName' => $hostName,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            DB::table('extract_pdfs')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'customPage' => $customPage,
+                                'hostName' => $hostName,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
                         } else {
                             DB::table('extract_pdfs')->insert([
                                 'fileName' => $pdfName,
