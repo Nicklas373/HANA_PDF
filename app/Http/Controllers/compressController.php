@@ -75,6 +75,7 @@ class compressController extends Controller
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
 						$pdfName = basename($file);
                         $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						$fileSize = filesize($pdfNewPath);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -204,6 +205,10 @@ class compressController extends Controller
 
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
+                        }
+
+                        if (file_exists($thumbName)) {
+                            unlink($thumbName);
                         }
 
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {

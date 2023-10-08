@@ -82,6 +82,7 @@ class convertController extends Controller
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($file, ".pdf");
                                 $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                                $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -96,6 +97,14 @@ class convertController extends Controller
                                     ]
                                 );
                                 $process->run();
+
+                                if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/convert_xlsx.pdf'))) {
+                                    unlink(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/convert_xlsx.pdf'));
+                                }
+
+                                if (file_exists($thumbName)) {
+                                    unlink($thumbName);
+                                }
 
                                 if (!$process->isSuccessful()) {
 				                    //throw new ProcessFailedException($process); -> For debugging only
@@ -113,6 +122,7 @@ class convertController extends Controller
                                 } else {
                                     if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/converted.xlsx'))) {
                                         $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/converted.xlsx');
+
                                         DB::table('pdf_excels')->insert([
                                             'fileName' => $pdfName,
                                             'fileSize' => $newFileSize,
@@ -150,6 +160,7 @@ class convertController extends Controller
 				                $pdfNameInfo = pathinfo($file);
                                 $pdfNameWithoutExtension = $pdfNameInfo['filename'];
                                 $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                                $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -187,9 +198,18 @@ class convertController extends Controller
                                     return redirect()->back()->withErrors(['error'=>'Aspose PDF API Error !', 'uuid'=>$uuid])->withInput();
                                 }
 
+                                if (file_exists($pdfNewPath)) {
+                                    unlink($pdfNewPath);
+                                }
+
+                                if (file_exists($thumbName)) {
+                                    unlink($thumbName);
+                                }
+
                                 if (json_decode($result, true) !== NULL) {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx"), $pdfNameWithoutExtension.".docx") == true) {
                                         $download_word = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx");
+
                                         DB::table('pdf_words')->insert([
                                             'fileName' => $pdfName,
                                             'fileSize' => $newFileSize,
@@ -241,6 +261,7 @@ class convertController extends Controller
                                 $pdfName = basename($file);
                                 $pdfNameWithoutExtension = basename($pdfName, ".pdf");
                                 $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                                $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -353,6 +374,10 @@ class convertController extends Controller
 
                                 if (file_exists($pdfNewPath)) {
                                     unlink($pdfNewPath);
+                                }
+
+                                if (file_exists($thumbName)) {
+                                    unlink($thumbName);
                                 }
 
                                 if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
