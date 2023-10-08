@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\Exceptions;
@@ -35,22 +36,27 @@ class watermarkController extends Controller
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
+						$str = rand();
 						$pdfUpload_Location = env('PDF_UPLOAD');
-						$file = $request->file('file');
-						$file->move($pdfUpload_Location,$file->getClientOriginalName());
-						$pdfFileName = $pdfUpload_Location.'/'.$file->getClientOriginalName();
-						$pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-
-						if (file_exists($pdfFileName)) {
-							$pdf = new Pdf($pdfFileName);
+                        $file = $request->file('file');
+                        $randomizePdfFileName = md5($str);
+                        $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
+						$pdfFileName = $file->getClientOriginalName();
+                        $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
+						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
+							$pdf = new Pdf(Storage::disk('local')->path('public/'.$randomizePdfPath));
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('PDF_THUMBNAIL'));
-							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
-								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
-								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
-								return redirect()->back()->with('upload','/'.env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
+								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
+							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
+                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
+                                return redirect()->back()->with([
+                                    'status' => true,
+                                    'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
+                                    'pdfThumbName' => Storage::disk('local')->url(env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png'),
+                                    'pdfOriName' => $pdfFileName,
+                                ]);
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
 							}
@@ -164,27 +170,25 @@ class watermarkController extends Controller
 							$watermarkStyle = '';
 						}
 
-                        $str = rand();
-                        $randomizeFileName = md5($str);
-						$pdfUpload_Location = env('PDF_UPLOAD');
+                        $file = $request->post('fileAlt');
+                        $pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
-						$file = $request->post('fileAlt');
 						$pdfName = basename($file);
-						$pdfNameWithoutExtension = basename($file, ".pdf");
-						$fileSize = filesize($file);
+                        $pdfNameWithoutExtention = basename($pdfName, '.pdf');
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
+						$fileSize = filesize($pdfNewPath);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        rename($file, $pdfUpload_Location.'/'.$randomizeFileName.'.pdf');
-                        $newRandomizeFile = $pdfUpload_Location.'/'.$randomizeFileName.'.pdf';
 
 						if($watermarkStyle == "image") {
 							if($request->hasfile('wmfile')) {
                                 try {
-                                    $watermarkImage->move($pdfUpload_Location,$watermarkImage->getClientOriginalName());
+                                    $watermarkImage->move(Storage::disk('local')->path('public/'.$pdfUpload_Location),$watermarkImage->getClientOriginalName());
                                     $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                     $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                                    $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
-                                    $wmImage = $ilovepdfTask->addElementFile($pdfUpload_Location.'/'.$watermarkImage->getClientOriginalName());
+                                    $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
+                                    $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$watermarkImage->getClientOriginalName()));
                                     $ilovepdfTask->setMode("image");
                                     $ilovepdfTask->setImageFile($wmImage);
                                     $ilovepdfTask->setTransparency(intval($watermarkFontTransparency));
@@ -193,7 +197,7 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setPages($watermarkPage);
                                     $ilovepdfTask->setMosaic($isMosaic);
                                     $ilovepdfTask->execute();
-                                    $ilovepdfTask->download($pdfProcessed_Location);
+                                    $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('watermark_pdfs')->insert([
                                         'fileName' => $pdfName,
@@ -401,14 +405,14 @@ class watermarkController extends Controller
                                     'uuid' => $uuid,
                                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                 ]);
-								return redirect()->back()->withErrors(['error'=>'Image file not found on the server !'])->withInput();
+								return redirect()->back()->withErrors(['error'=>'Image file not found on the server !', 'uuid'=>$uuid])->withInput();
 							}
 						} else if ($watermarkStyle == "text") {
                             if ($watermarkText != '') {
                                 try {
                                     $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                     $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                                    $pdfFile = $ilovepdfTask->addFile($newRandomizeFile);
+                                    $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                                     $ilovepdfTask->setMode("text");
                                     $ilovepdfTask->setText($watermarkText);
                                     $ilovepdfTask->setPages($watermarkPage);
@@ -421,10 +425,10 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setTransparency($watermarkFontTransparency);
                                     $ilovepdfTask->setLayer($watermarkLayoutStyle);
                                     $ilovepdfTask->setMosaic($isMosaic);
-                                    $ilovepdfTask->setOutputFileName($randomizeFileName);
+                                    $ilovepdfTask->setOutputFileName($pdfNameWithoutExtention);
                                     $ilovepdfTask->execute();
-                                    $ilovepdfTask->download($pdfProcessed_Location);
-                                }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                                    $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
+                                } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('watermark_pdfs')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
@@ -635,13 +639,16 @@ class watermarkController extends Controller
                             }
 						}
 
-                        if(is_file($newRandomizeFile)) {
-							unlink($newRandomizeFile);
-						}
+                        if (file_exists($pdfNewPath)) {
+                            unlink($pdfNewPath);
+                        }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf')) {
-                            rename($pdfProcessed_Location.'/'.$randomizeFileName.'.pdf', $pdfProcessed_Location.'/'.$pdfName);
-						    $download_pdf = $pdfProcessed_Location.'/'.$pdfName;
+                        if (file_exists($thumbName)) {
+                            unlink($thumbName);
+                        }
+
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+						    $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
 
                             DB::table('watermark_pdfs')->insert([
                                 'fileName' => $pdfName,

@@ -24,12 +24,13 @@
             <div class="grid grid-rows-1 gap-4 p-4 mb-8" id="grid-layout">
                 <div id="pdfPreview" name="pdfPreview">
                     <br>
-                    @if($message = Session::get('upload'))
+                    @if($message = Session::get('status'))
                         <?php
-                                $pdfFileName = basename($message, '.png');
-                                $pdfAppend = "upload-pdf/".$pdfFileName.".pdf";
-                                $pdfRealName = trim($pdfFileName, ".png").".pdf";
-                                echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfAppend.'">
+                                $pdfFileName = basename(session('pdfOriName'), '.png');
+                                $pdfFileAppend = session('pdfRndmName');
+                                $pdfThumbAppend = session('pdfThumbName');
+                                $pdfRealName = session('pdfOriName');
+                                echo '<input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
                                     <div id="pdfImage" name="pdfImage" class="p-4 mb-4 lg:p-2 w-full sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 mx-auto bg-white border border-gray-200 rounded-lg shadow">
                                         <div class="text-left">
                                             <button type="button" class="text-white bg-slate-900 mr-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:text-slate-900 hover:bg-slate-200" onClick="rotate()">
@@ -37,7 +38,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
                                                 </svg>
                                             </button>
-                                            <a href="'.$pdfAppend.'" target="_blank">
+                                            <a href="'.$pdfFileAppend.'" target="_blank">
                                                 <button type="button" class="text-white mr-2 bg-slate-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 hover:text-slate-900 hover:bg-slate-200"">
                                                     <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
@@ -52,10 +53,10 @@
                                             </button>
                                         </div>
                                         <div id="pdfImageCaption" class="p-4 lg:p-2 mb-6 w-fit mx-auto hover:transition hover:ease-in-out hover:delay-150 hover:scale-105 hover:transform-gpu hover:duration-300">
-                                            <img class="max-h-[50%] max-w-[50%] rounded-lg mx-auto" src="'.$message.'" alt="image description">
+                                            <img class="max-h-[50%] max-w-[50%] rounded-lg mx-auto" src="'.asset($pdfThumbAppend).'" alt="image description">
                                         </div>
                                         <div class="text-center">
-                                            <span id="caption" class="mt-2 mx-auto text-sm text-center text-slate-900 font-semibold" value="{{ $message }}" >'.$pdfRealName.'</span>
+                                            <span id="caption" class="mt-2 mx-auto text-sm text-center text-slate-900 font-semibold" value="'.$pdfRealName.'">'.$pdfRealName.'</span>
                                         </div>
                                     </div>
                                 ';
