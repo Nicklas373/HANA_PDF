@@ -35,8 +35,8 @@ class htmltopdfController extends Controller
                 $pdfFile = $ilovepdfTask->addUrl($request->post('urlToPDF'));
                 $ilovepdfTask->setOutputFileName('captured');
                 $ilovepdfTask->execute();
-                $ilovepdfTask->download($pdfProcessed_Location);
-            }						catch (\Ilovepdf\Exceptions\StartException $e) {
+                $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
+            } catch (\Ilovepdf\Exceptions\StartException $e) {
                 DB::table('html_pdfs')->insert([
                     'urlName' => $request->post('urlToPDF'),
                     'hostName' => $hostName,
@@ -126,9 +126,8 @@ class htmltopdfController extends Controller
                 return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
             }
 
-            $download_pdf = $pdfProcessed_Location.'/captured.pdf';
-
-            if (file_exists($download_pdf)) {
+            if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/captured.pdf'))) {
+                $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/captured.pdf');
                 DB::table('html_pdfs')->insert([
                     'urlName' => $request->post('urlToPDF'),
                     'hostName' => $hostName,
