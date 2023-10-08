@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+// FIX VIEW NEXT
 use App\Models\File;
 use App\Helpers\AppHelper;
 use App\Models\merge_pdf;
@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\Exceptions;
@@ -33,18 +34,17 @@ class mergeController extends Controller
 				if($request->post('formAction') == "upload") {
 					if ($request->hasfile('file')) {
                         foreach ($request->file('file') as $file) {
-                            $filename = $file->getClientOriginalName();
-						    $pdfNameWithoutExtension = basename($file->getClientOriginalName(), '.pdf');
-                            $file->move(env('PDF_MERGE_TEMP'), $filename);
-                            $pdf = new Pdf(env('PDF_MERGE_TEMP').'/'.$filename);
+                            $str = rand();
+                            $randomizePdfFileName = md5($str);
+                            $file->storeAs('public/'.env('PDF_MERGE_TEMP'), $randomizePdfFileName.'.pdf');
+                            $pdf = new Pdf(Storage::disk('local')->path('public/'.env('PDF_MERGE_TEMP').'/'.$randomizePdfFileName.'.pdf'));
 							$pdf->setPage(1)
 								->setOutputFormat('png')
 								->width(400)
-								->saveImage(env('PDF_THUMBNAIL'));
-							if (file_exists(env('PDF_THUMBNAIL').'/1.png')) {
-								$thumbnail = file(env('PDF_THUMBNAIL').'/1.png');
-								rename(env('PDF_THUMBNAIL').'/1.png', env('PDF_THUMBNAIL').'/'.$pdfNameWithoutExtension.'.png');
-                                $pdfResponse[] = 'temp-merge/'.$pdfNameWithoutExtension.'.pdf';
+								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
+							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
+                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
+                                $pdfResponse[] = Storage::disk('local')->url(env('PDF_MERGE_TEMP').'/'.$randomizePdfFileName.'.pdf');
 							} else {
 								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
 							}
@@ -61,11 +61,13 @@ class mergeController extends Controller
 						} else {
 							$dropFile = array();
 						}
+                        $str = rand();
+                        $randomizePdfFileName = md5($str);
 						$fileNameArray = $request->post('fileAlt');
-                        $fileSizeArray = AppHelper::instance()->folderSize(env('PDF_MERGE_TEMP'));
+                        $fileSizeArray = AppHelper::instance()->folderSize(Storage::disk('local')->path('public/'.env('PDF_MERGE_TEMP')));
                         $fileSizeInMB = AppHelper::instance()->convert($fileSizeArray, "MB");
                         $hostName = AppHelper::instance()->getUserIpAddr();
-                        $pdfArray = scandir(env('PDF_MERGE_TEMP'));
+                        $pdfArray = scandir(Storage::disk('local')->path('public/'.env('PDF_MERGE_TEMP')));
                         $pdfStartPages = 1;
                         $pdfPreProcessed_Location = env('PDF_MERGE_TEMP');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
@@ -78,12 +80,12 @@ class mergeController extends Controller
                                 if (strlen($value) >= 4) {
                                     $arrayCount = 1;
                                     $arrayOrder = strval($arrayCount);
-                                    $pdfName = $ilovepdfTask->addFile($pdfPreProcessed_Location.'/'.$value);
+                                    $pdfName = $ilovepdfTask->addFile(Storage::disk('local')->path('public/'.$pdfPreProcessed_Location.'/'.$value));
                                     $arrayCount += 1;
                                 }
                             }
                             $ilovepdfTask->execute();
-                            $ilovepdfTask->download($pdfProcessed_Location);
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
 							DB::table('merge_pdfs')->insert([
                                 'fileName' => $fileNameArray,
@@ -182,15 +184,23 @@ class mergeController extends Controller
                             return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
                         }
 
-                        $tempPDFfiles = glob($pdfPreProcessed_Location . '/*');
+                        $tempPDFfiles = glob(Storage::disk('local')->path('public/'.$pdfPreProcessed_Location.'/*'));
+                        $tempThumbfiles = glob(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/*'));
                         foreach($tempPDFfiles as $file){
                             if(is_file($file)) {
                                 unlink($file);
                             }
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/merged.pdf')) {
-                            $download_pdf = $pdfProcessed_Location.'/merged.pdf';
+                        foreach($tempThumbfiles as $file){
+                            if(is_file($file)) {
+                                unlink($file);
+                            }
+                        }
+
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/merged.pdf'))) {
+                            Storage::disk('local')->move('public/'.$pdfProcessed_Location.'/merged.pdf', 'public/'.$pdfProcessed_Location.'/'.$randomizePdfFileName.'.pdf');
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$randomizePdfFileName.'.pdf');
 
                             DB::table('merge_pdfs')->insert([
                                 'fileName' => $fileNameArray,
