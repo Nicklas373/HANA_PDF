@@ -54,7 +54,7 @@
           </div>
           <!-- Modal body -->
           <div class="space-y-4 p-4">
-            <p class="font-poppins text-base leading-relaxed text-slate-900"><b>HANA-CI PDF</b> Introducing a web-based application that has feature to manage PDF files easily and quicky. It has features to compress, convert, merge, split, watermarks and more (soon).</p>
+            <p class="font-poppins text-base leading-relaxed text-slate-900"><b>HANA-CI PDF</b> A web-based application that has feature to manage PDF files easily and quicky. It has features to compress, convert, merge, split, watermarks and more (soon).</p>
             <p class="font-poppins text-base leading-relaxed text-slate-900">Empowered by using iLovePDF and Aspose Cloud SDK to support much feature for PDF management tools, visit more on our main website !
             </p>
           </div>
