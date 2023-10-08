@@ -74,7 +74,8 @@ class compressController extends Controller
                         $pdfUpload_Location = Storage::disk('local')->path('public/'.env('PDF_UPLOAD'));
                         $pdfProcessed_Location = Storage::disk('local')->path('public/'.env('PDF_DOWNLOAD'));
 						$pdfName = basename($file);
-                        $pdfNewPath = $pdfUpload_Location.'/'.$pdfName;
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						$fileSize = filesize($pdfNewPath);
 						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -206,8 +207,12 @@ class compressController extends Controller
                             unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$pdfName)) {
-                            $compFileSize = filesize($pdfProcessed_Location.'/'.$pdfName);
+                        if (file_exists($thumbName)) {
+                            unlink($thumbName);
+                        }
+
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+                            $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName));
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
 
                             DB::table('compression_pdfs')->insert([
