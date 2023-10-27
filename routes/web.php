@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controller\apiController;
+//use App\Http\Controller\apiController;
 use App\Http\Controller\convertController;
 use App\Http\Controller\compressController;
 use App\Http\Controller\htmltopdfController;
@@ -27,10 +27,10 @@ Route::get('/', function()
 {
    return View::make('pages.welcome');
 });
-Route::get('/api', function()
-{
-   return View::make('pages.api_information');
-});
+//Route::get('/api', function()
+//{
+//   return View::make('pages.api_information');
+//});
 Route::get('/compress', function()
 {
    return View::make('pages.compress');

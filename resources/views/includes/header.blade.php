@@ -31,9 +31,6 @@
           <li>
             <a href="/watermark" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">Watermark PDF</a>
           </li>
-          <li>
-            <a href="/api" class="font-poppins block rounded py-2 pl-3 pr-4 font-semibold text-slate-200 hover:text-sky-400 md:p-0" aria-current="page">About</a>
-          </li>
         </ul>
       </div>
     </div>
