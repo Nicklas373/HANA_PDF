@@ -104,6 +104,7 @@
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfThumbAppend = session('pdfThumbName');
                                 $pdfRealName = session('pdfOriName');
+				$pdfLink = "https://docs.google.com/viewerng/viewer?url=https://pdf.hana-ci.com".$pdfFileAppend."&embedded=true";
                                 echo '
                                     <label id="PreviewName" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview '.$pdfRealName.'</label>
                                     <input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
@@ -114,7 +115,7 @@
                                             Loading document preview...
                                         </p>
                                     </div>
-                                    <iframe id="iFrame" src="https://docs.google.com/viewerng/viewer?url=https://pdf.hana-ci.com/storage/sample.pptx&embedded=true" style="display: none;" class="w-full h-96"></iframe>
+                                    <iframe id="iFrame" src="'.$pdfLink.'" style="display: none;" class="w-full h-96"></iframe>
                                 ';
                             ?>
                         @endif
