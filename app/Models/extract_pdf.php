@@ -13,7 +13,6 @@ class extract_pdf extends Model
         'fileName',
         'fileSize',
         'customPage',
-        'hostName',
         'mergePDF',
         'result',
         'err_reason',
