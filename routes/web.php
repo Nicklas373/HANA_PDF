@@ -27,17 +27,27 @@ Route::get('/', function()
 {
    return View::make('pages.welcome');
 });
-//Route::get('/api', function()
-//{
-//   return View::make('pages.api_information');
-//});
+/*
+Route::get('/api', function()
+{
+   return View::make('pages.api_information');
+});
+*/
 Route::get('/compress', function()
 {
    return View::make('pages.compress');
 });
 Route::get('/convert', function()
 {
-   return View::make('pages.convert');
+   return View::make('pages.cnvMain');
+});
+Route::get('/cnvFromPDF', function()
+{
+   return View::make('pages.cnvFromPDF');
+});
+Route::get('/cnvToPDF', function()
+{
+   return View::make('pages.cnvToPDF');
 });
 Route::get('/htmltopdf', function()
 {

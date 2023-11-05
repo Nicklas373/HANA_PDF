@@ -1,12 +1,26 @@
 {
+  "_index-f475cd16.js": {
+    "file": "assets/index-f475cd16.js"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-51e83a02.css",
+    "file": "assets/app-93b9d882.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.js": {
-    "file": "assets/app-547abec6.js",
+    "file": "assets/app-c1194546.js",
+    "imports": [
+      "_index-f475cd16.js"
+    ],
     "isEntry": true,
     "src": "resources/js/app.js"
+  },
+  "resources/js/flowbite.js": {
+    "file": "assets/flowbite-5fb3e959.js",
+    "imports": [
+      "_index-f475cd16.js"
+    ],
+    "isEntry": true,
+    "src": "resources/js/flowbite.js"
   }
 }

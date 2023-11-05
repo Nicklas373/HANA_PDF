@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('split_pdfs', function (Blueprint $table) {
+        Schema::create('pdf_split', function (Blueprint $table) {
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
-            $table->string('hostName');
             $table->string('fromPage')->nullable();
             $table->string('toPage')->nullable();
             $table->string('customPage')->nullable();
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('split_pdfs');
+        Schema::dropIfExists('pdf_split');
     }
 };

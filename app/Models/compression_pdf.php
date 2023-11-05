@@ -14,7 +14,6 @@ class compression_pdf extends Model
         'fileSize',
         'compFileSize',
         'compMethod',
-        'hostName',
         'result',
         'err_reason',
         'err_api_reason',

@@ -12,7 +12,6 @@ class merge_pdf extends Model
     protected $fillable = [
         'fileName',
         'fileSize',
-        'hostName',
         'result',
         'err_reason',
         'err_api_reason',

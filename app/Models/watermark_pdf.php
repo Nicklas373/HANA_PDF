@@ -12,7 +12,6 @@ class watermark_pdf extends Model
     protected $fillable = [
         'fileName',
         'fileSize',
-        'hostName',
         'watermarkFontFamily',
         'watermarkFontStyle',
         'watermarkFontSize',
