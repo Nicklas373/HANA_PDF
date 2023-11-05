@@ -1,14 +1,14 @@
 @extends('layouts.default')
 @section('content')
-    <div class="px-4 md:px-12">
+    <div class="px-4 md:px-12" id="cnvFrPDF">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Compress</h1>
-                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Reduce PDF file size while try to keep optimize for maximal PDF quality</p>
+                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Convert</h1>
+                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Convert PDF files into specified document format</p>
             </div>
         </section>
         @include('includes.modal')
-        <form action="/compress/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
+        <form action="/convert/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
@@ -23,10 +23,8 @@
                                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
                                 </svg>
                                 <span class="sr-only">Info</span>
-                                <h3 class="text-sm font-poppins">PDF has successfully compressed !</h3>
-                            </div>
-                            <div class="mt-2 mb-4 text-xs font-poppins">
-                                PDF has been compressed to <b>{{ session('newFileSize') }}</b> from <b>{{ session('curFileSize') }}</b> with compression level at <b>{{ session('compMethod') }}</b> !
+                                <h3 class="text-sm font-poppins">PDF has successfully converted !</h3>
+                                <br><br>
                             </div>
                             <div class="flex">
                                 <button type="button" class="text-green-50 bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-100 text-xs font-poppins rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center">
@@ -37,6 +35,7 @@
                                     <b>Dismiss</b>
                                 </button>
                             </div>
+                            <div class="mt-2 mb-4"></div>
                         </div>
                         @elseif($message = Session::get('error'))
                             <div class="flex p-4 mt-4 mb-2 text-sm font-poppins text-red-800 border border-red-300 rounded-lg bg-red-50" role="alert">
@@ -103,16 +102,18 @@
                             <?php
                                 $pdfFileName = basename(session('pdfOriName'), '.png');
                                 $pdfFileAppend = session('pdfRndmName');
+                                $pdfThumbAppend = session('pdfThumbName');
                                 $pdfRealName = session('pdfOriName');
+                                $pdfClientID = env('ADOBE_CLIENT_ID');
                                 echo '
                                 <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
                                 <input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
                                 <div id="caption" class="" placeholder="" style="display: none;" value="'.$pdfRealName.'" ></div>
-                                <div id="adobe-dc-view" class="w-full h-80"></div>
+                                <div id="adobe-dc-view" class="w-full h-96"></div>
                                 <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
                                 <script type="text/javascript">
                                     document.addEventListener("adobe_dc_view_sdk.ready", function(){
-                                        var adobeDCView = new AdobeDC.View({clientId: "'.env('ADOBE_CLIENT_ID').'", divId: "adobe-dc-view"});
+                                        var adobeDCView = new AdobeDC.View({clientId: "'.$pdfClientID.'", divId: "adobe-dc-view"});
                                         adobeDCView.previewFile({
                                             content:{location: {url: "'.$pdfFileAppend.'"}},
                                             metaData:{fileName: "'.$pdfRealName.'"}
@@ -124,44 +125,55 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Compression Quality</label>
-                        <ul class="grid grid-cols-1 xl:grid-cols-3 gap-2 xl:gap-4 mt-4 mb-4">
+                        <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
+                        <ul class="grid grid-cols-1 xl:grid-cols-4 gap-2 xl:gap-4 mt-4 mb-4">
                             <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-low" name="compMethod" value="lowest" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="LowChkClick()">
+                                        <input id="convertType" name="convertType" value="jpg" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="LowChkClick()">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Lowest</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">High quality, less compression</p>
+                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Image</label>
+                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.jpg)</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li id="ulChk" class="border border-slate-200 p-2 mt-2 rounded">
+                                <div class="flex">
+                                    <div class="flex items-center h-5">
+                                        <input id="convertType" name="convertType" value="pptx" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="UlChkClick()">
+                                    </div>
+                                    <div class="ml-4">
+                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="ul-txt">Powerpoint Presentation</label>
+                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.pptx)</p>
                                     </div>
                                 </div>
                             </li>
                             <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-rec" name="compMethod" value="recommended" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="RecChkClick()">
+                                        <input id="convertType" name="convertType" value="excel" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="RecChkClick()">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Recommended</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Good quality, good compression</p>
+                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Spreadsheet</label>
+                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.xlsx)</p>
                                     </div>
                                 </div>
                             </li>
                             <li id="highestChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-high" name="compMethod" value="extreme" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="HighChkClick()">
+                                        <input id="convertType" name="convertType" value="docx" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="HighChkClick()">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">High</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Less quality, high compression</p>
+                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">Word Document</label>
+                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.docx)</p>
                                     </div>
                                 </div>
                             </li>
                         </ul>
                         <div dir="ltl">
-                            <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="compress" style="">Compress PDF</button>
+                            <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="convert" style="">Convert PDF</button>
                         </div>
                     </div>
                 </div>
@@ -169,5 +181,5 @@
         </form>
         <script src="/ext-js/compress.js"></script>
         <script src="/ext-js/spinner.js"></script>
-    @stop
+       @stop
     </div>
