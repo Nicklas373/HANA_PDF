@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\HtmlpdfTask;
@@ -27,7 +28,6 @@ class htmltopdfController extends Controller
         } else {
             $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $pdfUpload_Location = env('PDF_UPLOAD');
-            $hostName = AppHelper::instance()->getUserIpAddr();
 
             try {
                 $ilovepdfTask = new HtmlpdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
@@ -37,100 +37,90 @@ class htmltopdfController extends Controller
                 $ilovepdfTask->execute();
                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
             } catch (\Ilovepdf\Exceptions\StartException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on StartException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Ilovepdf\Exceptions\PathException $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on PathException',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             } catch (\Exception $e) {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'iLovePDF API Error !, Catch on Exception',
                     'err_api_reason' => $e->getMessage(),
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !', 'uuid'=>$uuid])->withInput();
             }
-
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/captured.pdf'))) {
                 $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/captured.pdf');
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => true,
                     'err_reason' => null,
                     'err_api_reason' => null,
@@ -139,16 +129,15 @@ class htmltopdfController extends Controller
                 ]);
                 return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
             } else {
-                DB::table('html_pdfs')->insert([
+                DB::table('pdf_html')->insert([
                     'urlName' => $request->post('urlToPDF'),
-                    'hostName' => $hostName,
                     'result' => false,
                     'err_reason' => 'Failed to download converted file from iLovePDF API !',
                     'err_api_reason' => null,
                     'uuid' => $uuid,
                     'created_at' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>'Failed to download converted file from iLovePDF API !'])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML To PDF process failed !'])->withInput();
             }
         }
     }
