@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
 use Ilovepdf\Exceptions;
 use Ilovepdf\WatermarkTask;
-use Spatie\PdfToImage\Pdf;
 
 class watermarkController extends Controller
 {
@@ -44,22 +43,11 @@ class watermarkController extends Controller
 						$pdfFileName = $file->getClientOriginalName();
                         $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
 						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
-							$pdf = new Pdf(Storage::disk('local')->path('public/'.$randomizePdfPath));
-							$pdf->setPage(1)
-								->setOutputFormat('png')
-								->width(400)
-								->saveImage(Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL')));
-							if (Storage::disk('local')->exists('public/'.env('PDF_THUMBNAIL').'/1.png')) {
-                                Storage::disk('local')->move('public/'.env('PDF_THUMBNAIL').'/1.png', 'public/'.env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png');
-                                return redirect()->back()->with([
-                                    'status' => true,
-                                    'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
-                                    'pdfThumbName' => Storage::disk('local')->url(env('PDF_THUMBNAIL').'/'.$randomizePdfFileName.'.png'),
-                                    'pdfOriName' => $pdfFileName,
-                                ]);
-							} else {
-								return redirect()->back()->withErrors(['error'=>'Thumbnail failed to generated !', 'uuid'=>$uuid])->withInput();
-							}
+							return redirect()->back()->with([
+                                'status' => true,
+                                'pdfRndmName' => Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$randomizePdfFileName.'.pdf'),
+                                'pdfOriName' => $pdfFileName,
+                            ]);
 						} else {
                             return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'uuid'=>$uuid])->withInput();
 						}
@@ -79,7 +67,6 @@ class watermarkController extends Controller
 							$isMosaicDB = "false";
 							$isMosaic = filter_var($tempCompare, FILTER_VALIDATE_BOOLEAN);
 						}
-
 						if(isset($_POST['watermarkFontFamily']))
 						{
 							$watermarkFontFamilyFetch = $request->post('watermarkFontFamily');
@@ -91,14 +78,12 @@ class watermarkController extends Controller
 						} else {
 							$watermarkFontFamily = 'Arial';
 						}
-
 						if(isset($_POST['watermarkFontSize']))
 						{
 							$watermarkFontSize = $request->post('watermarkFontSize');
 						} else {
 							$watermarkFontSize = '14';
 						}
-
 						if(isset($_POST['watermarkFontStyle']))
 						{
                             $watermarkFontStyleFetch = $request->post('watermarkFontStyle');
@@ -110,7 +95,6 @@ class watermarkController extends Controller
 						} else {
 							$watermarkFontStyle = 'Regular';
 						}
-
 						if(isset($_POST['watermarkFontTransparency']))
 						{
 							$watermarkFontTransparencyTemp = $request->post('watermarkFontTransparency');
@@ -118,7 +102,6 @@ class watermarkController extends Controller
 						} else {
 							$watermarkFontTransparency = '100';
 						}
-
 						if(isset($_POST['watermarkLayoutStyle']))
 						{
 							$watermarkLayoutFetch = $request->post('watermarkLayoutStyle');
@@ -130,14 +113,12 @@ class watermarkController extends Controller
 						} else {
 							$watermarkLayoutStyle = 'above';
 						}
-
 						if(isset($_POST['watermarkPage']))
 						{
 							$watermarkPage = $request->post('watermarkPage');
 						} else {
 							$watermarkPage = 'all';
 						}
-
 						if(isset($_POST['watermarkRotation']))
 						{
 							$watermarkRotationFetch = $request->post('watermarkRotation');
@@ -149,38 +130,31 @@ class watermarkController extends Controller
 						} else {
 							$watermarkRotation = 0;
 						}
-
 						if(isset($_POST['watermarkText']))
 						{
 							$watermarkText = $request->post('watermarkText');
 						} else {
 							$watermarkText = '';
 						}
-
 						if($request->hasfile('wmfile')) {
 							$watermarkImage = $request->file('wmfile');
 						} else {
 							$watermarkImage = '';
 						}
-
 						if(isset($_POST['wmType']))
 						{
 							$watermarkStyle = $request->post('wmType');
 						} else {
 							$watermarkStyle = '';
 						}
-
                         $file = $request->post('fileAlt');
                         $pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
 						$pdfName = basename($file);
                         $pdfNameWithoutExtention = basename($pdfName, '.pdf');
                         $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
-                        $thumbName = Storage::disk('local')->path('public/'.env('PDF_THUMBNAIL').'/'.basename($pdfName, ".pdf").'.png');
 						$fileSize = filesize($pdfNewPath);
-						$hostName = AppHelper::instance()->getUserIpAddr();
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-
 						if($watermarkStyle == "image") {
 							if($request->hasfile('wmfile')) {
                                 try {
@@ -198,11 +172,11 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setMosaic($isMosaic);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
+                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -220,12 +194,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -243,12 +216,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -266,12 +238,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -289,12 +260,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -312,12 +282,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -335,12 +304,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\PathException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -358,12 +326,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -381,13 +348,12 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 }
 							} else {
-                                DB::table('watermark_pdfs')->insert([
+                                DB::table('pdf_watermark')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
                                     'watermarkFontFamily' => $watermarkFontFamily,
                                     'watermarkFontStyle' => $watermarkFontStyle,
                                     'watermarkFontSize' => $watermarkFontSize,
@@ -428,11 +394,11 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setOutputFileName($pdfNameWithoutExtention);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
+                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -450,12 +416,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -473,12 +438,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -496,12 +460,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -519,12 +482,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -542,12 +504,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -565,12 +526,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Ilovepdf\Exceptions\PathException $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -588,12 +548,11 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    DB::table('watermark_pdfs')->insert([
+                                    DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
                                         'fileSize' => $newFileSize,
-                                        'hostName' => $hostName,
                                         'watermarkFontFamily' => $watermarkFontFamily,
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
@@ -611,13 +570,12 @@ class watermarkController extends Controller
                                         'uuid' => $uuid,
                                         'created_at' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'iLovePDF API Error !', 'uuid'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                                 }
                             } else {
-                                DB::table('watermark_pdfs')->insert([
+                                DB::table('pdf_watermark')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
-                                    'hostName' => $hostName,
                                     'watermarkFontFamily' => $watermarkFontFamily,
                                     'watermarkFontStyle' => $watermarkFontStyle,
                                     'watermarkFontSize' => $watermarkFontSize,
@@ -638,22 +596,14 @@ class watermarkController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'Watermark text can not empty !', 'uuid'=>$uuid])->withInput();
                             }
 						}
-
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
                         }
-
-                        if (file_exists($thumbName)) {
-                            unlink($thumbName);
-                        }
-
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
 						    $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-
-                            DB::table('watermark_pdfs')->insert([
+                            DB::table('pdf_watermark')->insert([
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
-                                'hostName' => $hostName,
                                 'watermarkFontFamily' => $watermarkFontFamily,
                                 'watermarkFontStyle' => $watermarkFontStyle,
                                 'watermarkFontSize' => $watermarkFontSize,
@@ -676,10 +626,9 @@ class watermarkController extends Controller
                                 "res"=>$download_pdf,
                             ]);
                         } else {
-                            DB::table('watermark_pdfs')->insert([
+                            DB::table('pdf_watermark')->insert([
                                 'fileName' => basename($file),
                                 'fileSize' => $newFileSize,
-                                'hostName' => $hostName,
                                 'watermarkFontFamily' => $watermarkFontFamily,
                                 'watermarkFontStyle' => $watermarkFontStyle,
                                 'watermarkFontSize' => $watermarkFontSize,
@@ -697,7 +646,7 @@ class watermarkController extends Controller
                                 'uuid' => $uuid,
                                 'created_at' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-							return redirect()->back()->withErrors(['error'=>'Failed to download file from iLovePDF API !', 'uuid'=>$uuid])->withInput();
+							return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'uuid'=>$uuid])->withInput();
                         }
 					} else {
 						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
