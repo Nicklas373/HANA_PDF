@@ -12,34 +12,65 @@ function changeButtonColor() {
             }
             if (filename == "") {
                 document.getElementById('submitBtn').style.backgroundColor="#e2e8f0"
-                document.getElementById('submitBtn').style.color="#0f172a"
+                document.getElementById('submitBtn').style.color="#38bdf8"
+                document.getElementById('file_input').style.backgroundColor="#e2e8f0"
             } else {
-                document.getElementById('submitBtn').style.backgroundColor="#0f172a"
+                document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
                 document.getElementById('submitBtn').style.color="#ffffff"
+                document.getElementById('file_input').style.backgroundColor="#f8fafc"
             }
         }
     });
 }
 
-function onClick() {
-    document.getElementById("grid-layout").style.opacity = "0.25";
+function LowChkClick() {
+    document.getElementById("lowestChk").style.borderColor = '#38bdf8'
+    document.getElementById("lowest-txt").style.color = '#38bdf8'
+    document.getElementById("recChk").style.borderColor = '#e2e8f0'
+    document.getElementById("rec-txt").style.color = '#1e293b'
+    document.getElementById("highestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("highest-txt").style.color = '#1e293b'
+    document.getElementById("ulChk").style.borderColor = '#e2e8f0'
+    document.getElementById("ul-txt").style.color = '#1e293b'
+    document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+    document.getElementById("submitBtn_1").style.color = "#e2e8f0"
 }
 
-function rotate() {
-    const rotated = document.getElementById('pdfImageCaption');
-    rotation = (rotation + angle) % 360;
-    rotated.style.transform = `rotate(${rotation}deg)`;
+function RecChkClick() {
+    document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("lowest-txt").style.color = '#1e293b'
+    document.getElementById("recChk").style.borderColor = '#38bdf8'
+    document.getElementById("rec-txt").style.color = '#38bdf8'
+    document.getElementById("highestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("highest-txt").style.color = '#1e293b'
+    document.getElementById("ulChk").style.borderColor = '#e2e8f0'
+    document.getElementById("ul-txt").style.color = '#1e293b'
+    document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+    document.getElementById("submitBtn_1").style.color = "#e2e8f0"
 }
 
-function remove() {
-    var pdfCompBtn = document.getElementById('submitBtn');
-    var pdfComp = document.getElementById('pdfCompLayout');
-    var pdfImage = document.getElementById('pdfPreview');
-    var pdfSplit1 = document.getElementById("splitLayout1");
-    var pdfSplit2 = document.getElementById("splitLayout2");
-    pdfCompBtn.style.display="none";
-    pdfComp.style.display="none";
-    pdfImage.style.display="none";
-    pdfSplit1.style.display="none";
-    pdfSplit2.style.display="none";
+function HighChkClick() {
+    document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("lowest-txt").style.color = '#1e293b'
+    document.getElementById("recChk").style.borderColor = '#e2e8f0'
+    document.getElementById("rec-txt").style.color = '#1e293b'
+    document.getElementById("highestChk").style.borderColor = '#38bdf8'
+    document.getElementById("highest-txt").style.color = '#38bdf8'
+    document.getElementById("ulChk").style.borderColor = '#e2e8f0'
+    document.getElementById("ul-txt").style.color = '#1e293b'
+    document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+    document.getElementById("submitBtn_1").style.color = "#e2e8f0"
+}
+
+function UlChkClick() {
+    document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("lowest-txt").style.color = '#1e293b'
+    document.getElementById("recChk").style.borderColor = '#e2e8f0'
+    document.getElementById("rec-txt").style.color = '#1e293b'
+    document.getElementById("highestChk").style.borderColor = '#e2e8f0'
+    document.getElementById("highest-txt").style.color = '#1e293b'
+    document.getElementById("ulChk").style.borderColor = '#38bdf8'
+    document.getElementById("ul-txt").style.color = '#38bdf8'
+    document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+    document.getElementById("submitBtn_1").style.color = "#e2e8f0"
 }
