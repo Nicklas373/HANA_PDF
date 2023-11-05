@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('compression_pdfs', function (Blueprint $table) {
+        Schema::create('pdf_compress', function (Blueprint $table) {
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
             $table->string('compFileSize')->nullable();
             $table->string('compMethod');
-            $table->string('hostName');
             $table->boolean('result');
             $table->string('err_reason')->nullable();
             $table->string('err_api_reason')->nullable();
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('compression_pdfs');
+        Schema::dropIfExists('pdf_compress');
     }
 };

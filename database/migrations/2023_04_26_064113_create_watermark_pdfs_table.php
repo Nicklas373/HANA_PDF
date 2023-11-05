@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('watermark_pdfs', function (Blueprint $table) {
+        Schema::create('pdf_watermark', function (Blueprint $table) {
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
-            $table->string('hostName');
             $table->string('watermarkFontFamily')->nullable();
             $table->string('watermarkFontStyle')->nullable();
             $table->string('watermarkFontSize')->nullable();
@@ -40,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('watermark_pdfs');
+        Schema::dropIfExists('pdf_watermark');
     }
 };

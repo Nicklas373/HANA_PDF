@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('html_pdfs', function (Blueprint $table) {
+        Schema::create('pdf_html', function (Blueprint $table) {
             $table->id();
             $table->string('urlName');
-            $table->string('hostName');
             $table->boolean('result');
             $table->string('err_reason')->nullable();
             $table->string('err_api_reason')->nullable();
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('html_pdfs');
+        Schema::dropIfExists('pdf_html');
     }
 };

@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('extract_pdfs', function (Blueprint $table) {
+        Schema::create('pdf_extract', function (Blueprint $table) {
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
-            $table->string('hostName');
             $table->string('customPage')->nullable();
             $table->string('mergePDF')->nullable();
             $table->boolean('result');
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('extract_pdfs');
+        Schema::dropIfExists('pdf_extract');
     }
 };
