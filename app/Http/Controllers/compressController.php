@@ -58,10 +58,10 @@ class compressController extends Controller
 							$compMethod = "recommended";
 						}
 						$file = $request->post('fileAlt');
-                        $pdfUpload_Location = Storage::disk('local')->path('public/'.env('PDF_UPLOAD'));
-                        $pdfProcessed_Location = Storage::disk('local')->path('public/'.env('PDF_DOWNLOAD'));
+                        $pdfUpload_Location = env('PDF_UPLOAD');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
 						$pdfName = basename($file);
-                        $pdfNewPath = $pdfUpload_Location.'/'.$pdfName;
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
 						$fileSize = filesize($pdfNewPath);
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         try {

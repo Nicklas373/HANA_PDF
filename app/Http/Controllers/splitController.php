@@ -398,6 +398,8 @@ class splitController extends Controller
 						} else {
 							$customPage = '';
 						}
+                        $pdfUpload_Location = env('PDF_UPLOAD');
+                        $pdfProcessed_Location = env('PDF_DOWNLOAD');
                         $pdfNewRanges = $customPage;
                         $pdfName = basename($file);
                         $pdfNameWithoutExtension = basename($pdfName, '.pdf');
