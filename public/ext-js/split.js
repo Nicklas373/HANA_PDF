@@ -119,7 +119,8 @@ function splitLayout3_cstm(){
     </div>
     `;
     RecChkSplitClick2();
-
+    document.getElementById("submitBtn_2").style.display= "none";
+    document.getElementById("submitBtn_3").style.display= null;
 };
 
 function splitLayout3_wthn(){
