@@ -12,7 +12,6 @@ class split_pdf extends Model
     protected $fillable = [
         'fileName',
         'fileSize',
-        'hostName',
         'fromPage',
         'toPage',
         'customPage',

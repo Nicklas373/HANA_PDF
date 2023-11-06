@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_excels', function (Blueprint $table) {
+        Schema::create('pdf_convert', function (Blueprint $table) {
             $table->id();
             $table->string('fileName');
             $table->string('fileSize');
-            $table->string('hostName');
+            $table->string('container');
             $table->boolean('result');
             $table->string('err_reason')->nullable();
             $table->string('err_api_reason')->nullable();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_excels');
+        Schema::dropIfExists('pdf_convert');
     }
 };

@@ -1,5 +1,5 @@
-## HANA-CI PDF
-HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ and __Aspose Cloud__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+## HANA PDF
+HANA PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ and __Aspose Cloud__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
@@ -11,29 +11,24 @@ HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and 
 
 - [Apache 2.4](https://httpd.apache.org/download.cgi) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
 - [Composer](http://getcomposer.org/)
-- [Java JRE 8.0.371](https://www.java.com/en/download/manual.jsp)
 - [MySQL 8.2](https://www.mysql.com/downloads/) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
-- [Node JS 18.16](https://nodejs.org/en)
-- [PHP 8.1.17](https://www.php.net/downloads.php)
-- [PHP Imagick 3.7.0-8.1](https://windows.php.net/downloads/pecl/releases/imagick/3.7.0/php_imagick-3.7.0-8.1-ts-vs16-x64.zip)
+- [Node JS 18.18](https://nodejs.org/en)
+- [PHP 8.2.12](https://www.php.net/downloads.php)
 - [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
 
 ---
 
 ## Node JS Module Requirements
 
-- Flowbite
-- Material Tailwind
-- Tailwind CSS
-- Vite
+- [Flowbite](https://flowbite.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite JS](https://vitejs.dev/)
 
 ---
 
 ## Python Module Requirements
 
-- Pandas
-- Tabula-io (tabula-py)
-- OpenPyXL
+- Requests
 
 ---
 
@@ -46,6 +41,7 @@ HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and 
 ````bash
 - ASPOSE_CLOUD_CLIENT_ID="Aspose cloud AppId, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
 - ASPOSE_CLOUD_TOKEN="Aspose Cloud storage token, get it in __(Aspose Cloud)__[https://dashboard.aspose.cloud/]"
+- ADOBE_CLIENT_ID="Adobe API key for PDF embed API, get it in __(Adobe PDF)__[https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]"
 - FTP_USERNAME="Used for 3rd party cloud storage for Aspose Cloud"
 - FTP_USERPASS="Used for 3rd party cloud storage for Aspose Cloud"
 - FTP_SERVER="Used for 3rd party cloud storage for Aspose Cloud"
@@ -56,7 +52,6 @@ HANA-CI PDF is a __Laravel__ based project with mix use from some front-end and 
 - PDF_THUMBNAIL="thumbnail"
 - PDF_UPLOAD="upload-pdf"
 - PDF_DOWNLOAD="temp"
-- PYTHON_EXECUTABLES="PYTHON_BINARY_EXECUTABLES_DIRECTORY" #Target to .exe or binary files
 ````
 
 4. Run the following command
@@ -67,7 +62,6 @@ Node Environment
 - npm install flowbite
 - npm install -D tailwindcss postcss autoprefixer
 - npm install vite
-- npm run dev
 ```
 
 Laravel Environment
@@ -76,12 +70,13 @@ Laravel Environment
 - composer dump-autoload
 - php artisan key:generate
 - php artisan migrate
-- php artisan serve
 ```
 
-4. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
-5. Create folder __temp-csv__ & __temp-merge__ in the root folder
-6. That's it
+5. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
+6. Create folder __temp-csv__ & __temp-merge__ in the root folder
+7. Initiate vite and laravel
+8. npm run dev
+9. php artisan serve
 
 ---
 
@@ -93,14 +88,6 @@ Laravel Environment
 - [Python](https://www.python.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite JS](https://vitejs.dev/)
-
----
-
-## NOTE
-- If this error show while migration __"Error: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes"__
-  Do this as solution: __[Stackoverflow](https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa)__
-
----
 
 ## License
 The HANA-CI PDF is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).

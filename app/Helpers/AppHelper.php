@@ -12,13 +12,13 @@ class AppHelper
 
     function convert($size,$unit)
     {
-	if ($unit == "KB") {
-		return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';
-	} else if($unit == "MB") {
-		return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';
-	} else if($unit == "GB") {
-		return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';
-	}
+        if ($unit == "KB") {
+            return $fileSize = number_format(round($size / 1024,4), 2) . ' KB';
+        } else if ($unit == "MB") {
+            return $fileSize = number_format(round($size / 1024 / 1024,4), 2) . ' MB';
+        } else if ($unit == "GB") {
+            return $fileSize = number_format(round($size / 1024 / 1024 / 1024,4), 2) . ' GB';
+        }
     }
 
     function folderSize($dir)
@@ -32,22 +32,23 @@ class AppHelper
         return $size;
     }
 
-
     function getCurrentTimeZone() {
         date_default_timezone_set('Asia/Jakarta');
         $currentDateTime = date('Y-m-d H:i:s');
         return $currentDateTime;
     }
 
-
     function getFtpResponse($download_file, $proc_file){
         $ftp_server = env('FTP_SERVER');
         $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
         $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
+        $login_pasv = ftp_pasv($ftp_conn, true) or die("Cannot switch to passive mode");
 
-        if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
+        if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY) ) {
             return true;
         } else {
+            die("Cannot find specified file");
+            ftp_close($ftp_conn);
             return false;
         }
 

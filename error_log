@@ -1,2 +1,0 @@
-[24-May-2023 13:53:22 UTC] PHP Fatal error:  Declaration of Monolog\Logger::emergency(Stringable|string $message, array $context = []): void must be compatible with PsrExt\Log\LoggerInterface::emergency($message, array $context = []) in /home/k0839507/public_html/emsitpro-pdftools/vendor/monolog/monolog/src/Monolog/Logger.php on line 669
-[24-May-2023 13:54:15 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 11185816 bytes) in /home/k0839507/public_html/emsitpro-pdftools/vendor/guzzlehttp/psr7/src/Utils.php on line 414
