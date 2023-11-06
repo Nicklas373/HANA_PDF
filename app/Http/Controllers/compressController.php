@@ -73,7 +73,6 @@ class compressController extends Controller
                             $ilovepdfTask->setCompressionLevel($compMethod);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                            $ilovepdfTask->deleteFile($pdfNewPath);
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_compress')->insert([
                                 'fileName' => $pdfName,

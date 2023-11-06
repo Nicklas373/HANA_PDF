@@ -143,7 +143,6 @@ class splitController extends Controller
                             $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                            $ilovepdfTask->deleteFile($pdfNewPath);
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_split')->insert([
                                 'fileName' => $pdfName,
@@ -305,7 +304,7 @@ class splitController extends Controller
                                 "stats" => "scs",
                                 "res"=>$download_pdf,
                             ]);
-                        } else if (file_existsStorage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName)) {
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
                             DB::table('pdf_split')->insert([
                                 'fileName' => $pdfName,
@@ -326,7 +325,49 @@ class splitController extends Controller
                                 "stats" => "scs",
                                 "res"=>$download_pdf,
                             ]);
-                        } else {
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            DB::table('pdf_split')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'fromPage' => $fromPage,
+                                'toPage' => $toPage,
+                                'customPage' => $customPage,
+                                'fixedPage' => $fixedPage,
+                                'fixedPageRange' => $fixedPageRanges,
+                                'mergePDF' => $mergeDBpdf,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
+                            DB::table('pdf_split')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'fromPage' => $fromPage,
+                                'toPage' => $toPage,
+                                'customPage' => $customPage,
+                                'fixedPage' => $fixedPage,
+                                'fixedPageRange' => $fixedPageRanges,
+                                'mergePDF' => $mergeDBpdf,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
+                         } else {
                             DB::table('pdf_split')->insert([
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
@@ -375,7 +416,6 @@ class splitController extends Controller
                             $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                            $ilovepdfTask->deleteFile($pdfNewPath);
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_extract')->insert([
                                 'fileName' => $pdfName,
@@ -508,7 +548,23 @@ class splitController extends Controller
                                 "stats" => "scs",
                                 "res"=>$download_pdf,
                             ]);
-                        } else {
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
+                            DB::table('pdf_extract')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'customPage' => $customPage,
+                                'result' => true,
+                                'err_reason' => null,
+                                'err_api_reason' => null,
+                                'uuid' => $uuid,
+                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->with([
+                                "stats" => "scs",
+                                "res"=>$download_pdf,
+                            ]);
+                         } else {
                             DB::table('pdf_extract')->insert([
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,

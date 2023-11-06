@@ -393,7 +393,6 @@ class convertController extends Controller
                                     $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('pdf_convert')->insert([
                                         'fileName' => $pdfName,
@@ -559,7 +558,6 @@ class convertController extends Controller
                                     $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('pdf_convert')->insert([
                                         'fileName' => $pdfName,

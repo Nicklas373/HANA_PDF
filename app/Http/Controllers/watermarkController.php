@@ -172,7 +172,6 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setMosaic($isMosaic);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
@@ -394,7 +393,6 @@ class watermarkController extends Controller
                                     $ilovepdfTask->setOutputFileName($pdfNameWithoutExtention);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                                    $ilovepdfTask->deleteFile($pdfNewPath);
                                 } catch (\Ilovepdf\Exceptions\StartException $e) {
                                     DB::table('pdf_watermark')->insert([
                                         'fileName' => $pdfName,
