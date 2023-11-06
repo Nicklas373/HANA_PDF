@@ -20,10 +20,9 @@ HANA PDF is a __Laravel__ based project with mix use from some front-end and bac
 
 ## Node JS Module Requirements
 
-- Flowbite
-- Material Tailwind
-- Tailwind CSS
-- Vite
+- [Flowbite](https://flowbite.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite JS](https://vitejs.dev/)
 
 ---
 
@@ -63,7 +62,6 @@ Node Environment
 - npm install flowbite
 - npm install -D tailwindcss postcss autoprefixer
 - npm install vite
-- npm run dev
 ```
 
 Laravel Environment
@@ -72,12 +70,13 @@ Laravel Environment
 - composer dump-autoload
 - php artisan key:generate
 - php artisan migrate
-- php artisan serve
 ```
 
-4. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
-5. Create folder __temp-csv__ & __temp-merge__ in the root folder
-6. That's it
+5. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
+6. Create folder __temp-csv__ & __temp-merge__ in the root folder
+7. Initiate vite and laravel
+8. npm run dev
+9. php artisan serve
 
 ---
 
