@@ -14,7 +14,7 @@
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
                     <div>
                         <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Enter the Website URL</label>
-                        <input type="text" id="urlToPDF" name="urlToPDF" class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" placeholder="https://pdf.hana-ci.com" required>
+                        <input type="text" id="urlToPDF" name="urlToPDF" class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" placeholder="https://pdf.hana-ci.com">
                         @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-4 mb-2 text-green-800 border border-green-300 rounded-lg bg-green-50" role="alert">
                             <div class="flex items-center">
