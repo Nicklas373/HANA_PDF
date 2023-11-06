@@ -9,7 +9,7 @@
     <div>
       <div id="content">
         @yield('content')
-        <script src="/build/assets/flowbite-5fb3e959.js" type="module"></script>
+        <script src="/build/assets/flowbite-44f515b4.js" type="module"></script>
         <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
       </div>
       <footer>@include('includes.footer')</footer>
