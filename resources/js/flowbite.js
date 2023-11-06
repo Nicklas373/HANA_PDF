@@ -22,11 +22,9 @@ const newModal = new Modal($newModal, options);
 let form_submit = document.querySelector('form');
 
 form_submit.onsubmit = function(event) {
-    var file = document.getElementById("file_input");
-    var multiFile = document.getElementById("filelist");
     var errMessage = document.getElementById("errMessageModal");
     var errSubMessage = document.getElementById("errSubMessageModal");
-    if (multiFile !== null) {
+    if (document.getElementById("filelist") !== null) {
         var input = document.getElementById('multiple_files').files;
         var extErr = false;
         var falseCount = 0;
@@ -64,69 +62,208 @@ form_submit.onsubmit = function(event) {
             newModal.hide();
             modal.show();
         }
-    } else {
-        let fileSize = file.files[0].size;
+    }
+    if (document.getElementById("file_input") !== null) {
         if (document.getElementById('cnvFrPDF') !== null) {
-            if (file.files[0].type == "application/pdf")
-            {
-                if (fileSize >= 25000000) {
-                    event.preventDefault();
-                    errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
-                    errSubMessage.style.visibility = null;
-                    newModal.show();
-                } else {
-                    errMessage.style.visibility = null;
-                    errSubMessage.style.visibility = null;
-                    newModal.hide();
-                    modal.show();
-                }
+            if (document.getElementById('submitBtn_1') !== null && !document.getElementById("file_input").value) {
+                errMessage.style.visibility = null;
+                errSubMessage.style.visibility = null;
+                newModal.hide();
+                modal.show();
             } else {
-                event.preventDefault();
-                errMessage.innerHTML  = "Unsupported file format !";
-                errSubMessage.innerHTML = "Supported file format: pdf";
-                newModal.show();
+                var file = document.getElementById("file_input");
+                let fileSize = file.files[0].size;
+                if (file.files[0].type == "application/pdf")
+                {
+                    if (fileSize >= 25000000) {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                        errSubMessage.style.visibility = null;
+                        newModal.show();
+                    } else {
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        newModal.hide();
+                        modal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Unsupported file format !";
+                    errSubMessage.innerHTML = "Supported file format: pdf";
+                    newModal.show();
+                }
             }
         } else if (document.getElementById('cnvToPDF') !== null) {
-            if (file.files[0].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            || file.files[0].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || file.files[0].type == "application/vnd.openxmlformats-officedocument.presentationml.presentation")
-            {
-                if (fileSize >= 25000000) {
-                    event.preventDefault();
-                    errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
-                    errSubMessage.style.visibility = null;
-                    newModal.show();
+            if (document.getElementById('submitBtn_1') !== null && !document.getElementById("file_input").value) {
+                errMessage.style.visibility = null;
+                errSubMessage.style.visibility = null;
+                newModal.hide();
+                modal.show();
+            } else {
+                var file = document.getElementById("file_input");
+                let fileSize = file.files[0].size;
+                if (file.files[0].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                || file.files[0].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                file.files[0].type == "application/vnd.openxmlformats-officedocument.presentationml.presentation")
+                {
+                    if (fileSize >= 25000000) {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                        errSubMessage.style.visibility = null;
+                        newModal.show();
+                    } else {
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        newModal.hide();
+                        modal.show();
+                    }
                 } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Unsupported file format !";
+                    errSubMessage.innerHTML = "Supported file format: docx, xlsx, pptx";
+                    newModal.show();
+                }
+            }
+        } else if (document.getElementById('splitLayout1')) {
+            if (document.getElementById('submitBtn_2') !== null && !document.getElementById("file_input").value) {
+                errMessage.style.visibility = null;
+                errSubMessage.style.visibility = null;
+                newModal.hide();
+                modal.show();
+            } else if (document.getElementById('submitBtn_3') !== null && !document.getElementById("file_input").value) {
+                errMessage.style.visibility = null;
+                errSubMessage.style.visibility = null;
+                newModal.hide();
+                modal.show();
+            } else {
+                var file = document.getElementById("file_input");
+                let fileSize = file.files[0].size;
+                if (file.files[0].type == "application/pdf")
+                {
+                    if (fileSize >= 25000000) {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                        errSubMessage.style.visibility = null;
+                        newModal.show();
+                    } else {
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        newModal.hide();
+                        modal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Unsupported file format !";
+                    errSubMessage.innerHTML = "Supported file format: pdf";
+                    newModal.show();
+                }
+            }
+        } else if (document.getElementById('wmLayout1')) {
+            if (document.getElementById('submitBtn_1') !== null && !document.getElementById("file_input").value && !document.getElementById("wm_file_input")) {
+                if (document.getElementById('watermarkText').value) {
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     newModal.hide();
                     modal.show();
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Please set text for watermark !";
+                    errSubMessage.style.visibility = null;
+                    newModal.show();
+                }
+            } else if (document.getElementById('submitBtn_1') !== null && !document.getElementById("file_input").value && document.getElementById("wm_file_input")) {
+                if (document.getElementById("wm_file_input").value) {
+                    var imgFile = document.getElementById("wm_file_input");
+                    let fileSize = imgFile.files[0].size;
+                    if (imgFile.files[0].type == "image/jpeg" || imgFile.files[0].type == "image/png") {
+                        if (fileSize >= 25000000) {
+                            event.preventDefault();
+                            errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                            errSubMessage.style.visibility = null;
+                            newModal.show();
+                        } else {
+                            errMessage.style.visibility = null;
+                            errSubMessage.style.visibility = null;
+                            newModal.hide();
+                            modal.show();
+                        }
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Unsupported file format !";
+                        errSubMessage.innerHTML = "Supported file format: jpg, png";
+                        newModal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Please set image for watermark !";
+                    errSubMessage.style.visibility = null;
+                    newModal.show();
                 }
             } else {
-                event.preventDefault();
-                errMessage.innerHTML  = "Unsupported file format !";
-                errSubMessage.innerHTML = "Supported file format: docx, xlsx, pptx";
-                newModal.show();
+                var file = document.getElementById("file_input");
+                let fileSize = file.files[0].size;
+                if (file.files[0].type == "application/pdf")
+                {
+                    if (fileSize >= 25000000) {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                        errSubMessage.style.visibility = null;
+                        newModal.show();
+                    } else {
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        newModal.hide();
+                        modal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Unsupported file format !";
+                    errSubMessage.innerHTML = "Supported file format: pdf";
+                    newModal.show();
+                }
             }
         } else {
-            if (file.files[0].type == "application/pdf")
-            {
-                if (fileSize >= 25000000) {
-                    event.preventDefault();
-                    errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
-                    errSubMessage.style.visibility = null;
-                    newModal.show();
-                } else {
-                    errMessage.style.visibility = null;
-                    errSubMessage.style.visibility = null;
-                    newModal.hide();
-                    modal.show();
-                }
+            if (document.getElementById('submitBtn_1') !== null && !document.getElementById("file_input").value) {
+                errMessage.style.visibility = null;
+                errSubMessage.style.visibility = null;
+                newModal.hide();
+                modal.show();
             } else {
-                event.preventDefault();
-                errMessage.innerHTML  = "Unsupported file format !";
-                errSubMessage.innerHTML = "Supported file format: pdf";
-                newModal.show();
+                var file = document.getElementById("file_input");
+                let fileSize = file.files[0].size;
+                if (file.files[0].type == "application/pdf")
+                {
+                    if (fileSize >= 25000000) {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Uploaded file has exceeds the limit !";
+                        errSubMessage.style.visibility = null;
+                        newModal.show();
+                    } else {
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        newModal.hide();
+                        modal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerHTML  = "Unsupported file format !";
+                    errSubMessage.innerHTML = "Supported file format: pdf";
+                    newModal.show();
+                }
             }
+        }
+    }
+    if (document.getElementById('urlToPDF') !== null) {
+        if (document.getElementById('urlToPDF').value) {
+            errMessage.style.visibility = null;
+            errSubMessage.style.visibility = null;
+            newModal.hide();
+            modal.show();
+        } else {
+            event.preventDefault();
+            errMessage.innerHTML  = "Please set URL address !";
+            errSubMessage.style.visibility = null;
+            newModal.show();
         }
     }
 }
