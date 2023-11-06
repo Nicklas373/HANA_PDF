@@ -161,7 +161,7 @@
                             </li>
                         </ul>
                         <div dir="ltl">
-                            <button type="submit" id="submitBtn_1" name="formAction" data-modal-target="loadingModal" data-modal-toggle="loadingModal" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="compress" style="">Compress PDF</button>
+                            <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="compress" style="">Compress PDF</button>
                         </div>
                     </div>
                 </div>
