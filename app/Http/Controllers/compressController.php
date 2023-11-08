@@ -61,6 +61,7 @@ class compressController extends Controller
                         $pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
 						$pdfName = basename($file);
+                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
                         $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
 						$fileSize = filesize($pdfNewPath);
 						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -69,7 +70,7 @@ class compressController extends Controller
                             $ilovepdfTask = $ilovepdf->newTask('compress');
                             $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
                             $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
-                            $ilovepdfTask->setOutputFileName($pdfName);
+                            $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->setCompressionLevel($compMethod);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download($pdfProcessed_Location);
