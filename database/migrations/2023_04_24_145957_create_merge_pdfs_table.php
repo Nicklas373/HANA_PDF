@@ -7,19 +7,27 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * The database connection that should be used by the migration.
+     *
+     * @var string
+     */
+    protected $connection = 'pgsql';
+
+    /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('pdf_merge', function (Blueprint $table) {
-            $table->id();
-            $table->string('fileName');
-            $table->string('fileSize');
+            $table->uuid('processId');
+            $table->text('fileName');
+            $table->string('fileSize', 25);
             $table->boolean('result');
             $table->string('err_reason')->nullable();
             $table->string('err_api_reason')->nullable();
-            $table->string('uuid');
-            $table->timestamps();
+            $table->timestamp('procStartAt')->nullable();
+
+            $table->primary('processId');
         });
     }
 

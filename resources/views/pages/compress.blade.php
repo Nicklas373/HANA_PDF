@@ -1,20 +1,20 @@
+<!DOCTYPE html>
 @extends('layouts.default')
 @section('content')
-    <div class="px-4 md:px-12">
+    <div class="px-4 md:px-12" id="compPDF">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
                 <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Compress</h1>
                 <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Reduce PDF file size while try to keep optimize for maximal PDF quality</p>
             </div>
         </section>
-        @include('includes.modal')
         <form action="/compress/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
                     <div>
-                        <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload PDF file</label>
-                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
+                        <label for="file_input" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload PDF file</label>
+                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onclick="changeButtonColor('kaoA')">
                         <p class="mt-1 font-poppins text-sm text-gray-500" id="file_input_help">PDF (Max. 25 MB)</p>
                         @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-4 mb-2 text-green-800 border border-green-300 rounded-lg bg-green-50" role="alert">
@@ -59,7 +59,7 @@
                                         <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
                                     @enderror
                                     <br>
-                                    @error('uuid')
+                                    @error('processId')
                                         <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
                                     @enderror
                                 </div>
@@ -85,7 +85,7 @@
                                         <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
                                     @enderror
                                     <br>
-                                    @error('uuid')
+                                    @error('processId')
                                         <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
                                     @enderror
                                     </div>
@@ -94,7 +94,7 @@
                         @endif
                     </div>
                     <div>
-                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-8 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="upload">Upload PDF</button>
+                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-8 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="upload">Upload PDF</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 mt-6">
@@ -105,7 +105,7 @@
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfRealName = session('pdfOriName');
                                 echo '
-                                <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
+                                <label for="fileAlt" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
                                 <input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
                                 <div id="caption" class="" placeholder="" style="display: none;" value="'.$pdfRealName.'" ></div>
                                 <div id="adobe-dc-view" class="w-full h-80"></div>
@@ -124,15 +124,15 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Compression Quality</label>
+                        <label for="comp-low" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Compression Quality</label>
                         <ul class="grid grid-cols-1 xl:grid-cols-3 gap-2 xl:gap-4 mt-4 mb-4">
                             <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-low" name="compMethod" value="lowest" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="LowChkClick()">
+                                        <input id="comp-low" name="compMethod" value="low" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Lowest</label>
+                                        <label for="comp-low" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Lowest</label>
                                         <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">High quality, less compression</p>
                                     </div>
                                 </div>
@@ -140,10 +140,10 @@
                             <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-rec" name="compMethod" value="recommended" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="RecChkClick()">
+                                        <input id="comp-rec" name="compMethod" value="recommended" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Recommended</label>
+                                        <label for="comp-rec" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Recommended</label>
                                         <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Good quality, good compression</p>
                                     </div>
                                 </div>
@@ -151,23 +151,21 @@
                             <li id="highestChk" class="border border-slate-200 p-2 mt-2 rounded">
                                 <div class="flex">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-high" name="compMethod" value="extreme" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="HighChkClick()">
+                                        <input id="comp-high" name="compMethod" value="extreme" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">High</label>
+                                        <label for="comp-high" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">High</label>
                                         <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Less quality, high compression</p>
                                     </div>
                                 </div>
                             </li>
                         </ul>
                         <div dir="ltl">
-                            <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="compress" style="">Compress PDF</button>
+                            <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold bg-sky-400 text-white rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5" value="compress" style="">Compress PDF</button>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-        <script src="/ext-js/compress.js"></script>
-        <script src="/ext-js/spinner.js"></script>
     @stop
     </div>

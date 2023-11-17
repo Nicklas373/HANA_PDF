@@ -1,5 +1,5 @@
 @extends('layouts.default') @section('content')
-<div class="px-4 md:px-12">
+<div class="px-4 md:px-12" id="api">
    <section>
     <div class="py-8 px-4 mt-16 max-w-screen-xl mt-20 z-0">
         <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">Learn the technology stack</h1>
@@ -110,6 +110,5 @@
       </a>
     </div>
   </div>
-  <script src="/ext-js/progress.js"></script>
   @stop
 </div>
