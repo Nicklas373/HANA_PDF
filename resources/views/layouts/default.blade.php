@@ -8,7 +8,7 @@
     <div>
       <div id="content">
         @include('includes.modal') @yield('content')
-        <!--<script src="/build/assets/flowbite-5fb3e959.js" type="module"></script>-->
+        <<script src="/build/assets/kao-logic-f8ab9501.js" type="module"></script>
         <script src="/ext-js/kao-main.js"></script>
         <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
       </div>

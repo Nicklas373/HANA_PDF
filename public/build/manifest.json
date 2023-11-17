@@ -3,7 +3,7 @@
     "file": "assets/index-f475cd16.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-93b9d882.css",
+    "file": "assets/app-86b5075b.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -15,12 +15,12 @@
     "isEntry": true,
     "src": "resources/js/app.js"
   },
-  "resources/js/flowbite.js": {
-    "file": "assets/flowbite-44f515b4.js",
+  "resources/js/kao-logic.js": {
+    "file": "assets/kao-logic-f8ab9501.js",
     "imports": [
       "_index-f475cd16.js"
     ],
     "isEntry": true,
-    "src": "resources/js/flowbite.js"
+    "src": "resources/js/kao-logic.js"
   }
 }
