@@ -7,25 +7,33 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * The database connection that should be used by the migration.
+     *
+     * @var string
+     */
+    protected $connection = 'pgsql';
+
+    /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('pdf_split', function (Blueprint $table) {
-            $table->id();
-            $table->string('fileName');
-            $table->string('fileSize');
-            $table->string('fromPage')->nullable();
-            $table->string('toPage')->nullable();
-            $table->string('customPage')->nullable();
-            $table->string('fixedPage')->nullable();
-            $table->string('fixedPageRange')->nullable();
-            $table->string('mergePDF')->nullable();
+           $table->uuid('processId');
+            $table->text('fileName');
+            $table->string('fileSize', 25);
+            $table->string('fromPage', 5)->nullable();
+            $table->string('toPage', 5)->nullable();
+            $table->text('customPage')->nullable();
+            $table->text('fixedPage')->nullable();
+            $table->text('fixedPageRange')->nullable();
+            $table->string('mergePDF', 25)->nullable();
             $table->boolean('result');
-            $table->string('err_reason')->nullable();
-            $table->string('err_api_reason')->nullable();
-            $table->string('uuid');
-            $table->timestamps();
+            $table->text('err_reason')->nullable();
+            $table->text('err_api_reason')->nullable();
+            $table->timestamp('procStartAt')->nullable();
+
+            $table->primary('processId');
         });
     }
 
