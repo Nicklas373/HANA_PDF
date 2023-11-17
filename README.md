@@ -1,5 +1,5 @@
 ## HANA PDF
-HANA PDF is a __Laravel__ based project with mix use from some front-end and back-end programming stack, that focusly to build this website. It also integrated with several front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ and __Aspose Cloud__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
+HANA PDF is a __Laravel__ based project powered by front-end framework like __ViteJS__ and __Tailwind CSS__ and used of __Flowbite__ library to maintain responsive and materialize interface. And with integration from __iLovePDF__ and __Aspose Cloud__ API as one of the back-end, it have feature to merge, split, compress, convert, and add watermarks to PDF documents, that can handle easily and quickly.
 
 ---
 
@@ -11,7 +11,7 @@ HANA PDF is a __Laravel__ based project with mix use from some front-end and bac
 
 - [Apache 2.4](https://httpd.apache.org/download.cgi) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
 - [Composer](http://getcomposer.org/)
-- [MySQL 8.2](https://www.mysql.com/downloads/) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
+- [PostgreSQL 16.2](https://www.postgresql.org/)
 - [Node JS 18.18](https://nodejs.org/en)
 - [PHP 8.2.12](https://www.php.net/downloads.php)
 - [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
@@ -49,7 +49,6 @@ HANA PDF is a __Laravel__ based project with mix use from some front-end and bac
 - ILOVEPDF_PUBLIC_KEY="iLovePDF public key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
 - ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in __(iLovePDF)__[https://developer.ilovepdf.com/]"
 - PDF_MERGE_TEMP="temp-merge"
-- PDF_THUMBNAIL="thumbnail"
 - PDF_UPLOAD="upload-pdf"
 - PDF_DOWNLOAD="temp"
 ````
@@ -73,10 +72,8 @@ Laravel Environment
 ```
 
 5. Modify some static path (on ENV) into your current laravel project location (__Make sure all static patch already re-mapped correctly__)
-6. Create folder __temp-csv__ & __temp-merge__ in the root folder
-7. Initiate vite and laravel
-8. npm run dev
-9. php artisan serve
+7. npm run dev -- --host
+8. php artisan serve --host=localhost --port=80
 
 ---
 
