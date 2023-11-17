@@ -18,14 +18,14 @@ class splitController extends Controller
 {
     public function pdf_split(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
-			'file' => 'mimes:pdf|max:25000',
+			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => ''
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();
 
 		if($validator->fails()) {
-            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
         } else {
 			if(isset($_POST['formAction']))
 			{
@@ -47,10 +47,10 @@ class splitController extends Controller
                                 'pdfTotalPages' => $pdfTotalPages
                             ]);
 						} else {
-                            return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
 						}
 					} else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
@@ -103,17 +103,17 @@ class splitController extends Controller
 							if ($toPage > $pdfTotalPages) {
 								return redirect()->back()->withErrors([
                                     'error'=>'Last page has more pages than total PDF pages ! (total pages: '.$pdfTotalPages.')',
-                                    'uuid'=>$uuid
+                                    'processId'=>$uuid
                                     ])->withInput();
                             } else if ($fromPage > $pdfTotalPages) {
                                 return redirect()->back()->withErrors([
                                     'error'=>'First page has more pages than total PDF pages ! (total pages: '.$pdfTotalPages.')',
-                                    'uuid'=>$uuid
+                                    'processId'=>$uuid
                                     ])->withInput();
                             } else if ($fromPage > $toPage) {
 								return redirect()->back()->withErrors([
                                     'error'=>'First Page has more pages than last page !',
-                                    'uuid'=>$uuid
+                                    'processId'=>$uuid
                                     ])->withInput();
 							} else {
 								if ($mergeDBpdf == "true") {
@@ -145,6 +145,7 @@ class splitController extends Controller
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -156,12 +157,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on StartException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -173,12 +174,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -190,12 +191,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -207,12 +208,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -224,12 +225,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -241,12 +242,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -258,12 +259,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on PathException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -275,10 +276,9 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on Exception',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         }
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
@@ -286,6 +286,7 @@ class splitController extends Controller
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -297,8 +298,7 @@ class splitController extends Controller
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -307,6 +307,7 @@ class splitController extends Controller
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -318,8 +319,7 @@ class splitController extends Controller
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -328,6 +328,7 @@ class splitController extends Controller
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -339,8 +340,7 @@ class splitController extends Controller
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -349,6 +349,7 @@ class splitController extends Controller
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -360,8 +361,7 @@ class splitController extends Controller
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -369,6 +369,7 @@ class splitController extends Controller
                             ]);
                          } else {
                             DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'fromPage' => $fromPage,
@@ -380,13 +381,12 @@ class splitController extends Controller
                                 'result' => false,
                                 'err_reason' => 'Failed to download file from iLovePDF API !',
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         }
 					} else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
 					}
 				} else if ($request->post('formAction') == "extract") {
                     if(isset($_POST['fileAlt'])) {
@@ -420,100 +420,100 @@ class splitController extends Controller
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on StartException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on PathException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error ! Catch on Exception',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         }
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
@@ -521,14 +521,14 @@ class splitController extends Controller
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -537,14 +537,14 @@ class splitController extends Controller
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -553,14 +553,14 @@ class splitController extends Controller
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -568,25 +568,25 @@ class splitController extends Controller
                             ]);
                          } else {
                             DB::table('pdf_extract')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'customPage' => $customPage,
                                 'result' => false,
                                 'err_reason' => 'Failed to download file from iLovePDF API !',
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
                         }
                     } else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
                     }
 				} else {
-                    return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'uuid'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'processId'=>$uuid])->withInput();
                 }
 			} else {
-				return redirect()->back()->withErrors(['error'=>'ERROR_OUT_OF_BOUND !', 'uuid'=>$uuid])->withInput();
+				return redirect()->back()->withErrors(['error'=>'ERROR_OUT_OF_BOUND !', 'processId'=>$uuid])->withInput();
 			}
 		}
     }
