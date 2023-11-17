@@ -17,14 +17,14 @@ class compressController extends Controller
 {
 	public function pdf_init(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
-			'file' => 'mimes:pdf|max:25000',
+			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => ''
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();
 
 		if($validator->fails()) {
-			return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
+			return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
 		} else {
 			if(isset($_POST['formAction']))
 			{
@@ -44,10 +44,10 @@ class compressController extends Controller
                                 'pdfOriName' => $pdfFileName,
                             ]);
 						} else {
-							return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'uuid'=>$uuid])->withInput();
+							return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
 						}
 					} else {
-						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
 					}
 				} else if ($request->post('formAction') == "compress") {
 					if(isset($_POST['fileAlt'])) {
@@ -76,6 +76,7 @@ class compressController extends Controller
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -83,12 +84,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on StartException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
                            DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -96,12 +97,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
                            DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -109,12 +110,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                            DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -122,12 +123,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                           DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -135,12 +136,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
                            DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -148,12 +149,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
                            DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -161,12 +162,12 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on PathException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
                             DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -174,10 +175,9 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on Exception',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         }
 
                         if (file_exists($pdfNewPath)) {
@@ -187,8 +187,8 @@ class compressController extends Controller
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName));
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
-
                             DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => $newCompFileSize,
@@ -196,8 +196,7 @@ class compressController extends Controller
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with([
                                 "stats" => "scs",
@@ -208,6 +207,7 @@ class compressController extends Controller
                             ]);
                         } else {
                             DB::table('pdf_compress')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $pdfName,
                                 'fileSize' => $newFileSize,
                                 'compFileSize' => null,
@@ -215,19 +215,18 @@ class compressController extends Controller
                                 'result' => false,
                                 'err_reason' => 'Failed to download file from iLovePDF API !',
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-							return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'uuid'=>$uuid])->withInput();
+							return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         }
 					} else {
-						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
 					}
 				} else {
-					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'uuid'=>$uuid])->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'processId'=>$uuid])->withInput();
 				}
 			} else {
-				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !', 'uuid'=>$uuid])->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !', 'processId'=>$uuid])->withInput();
 			}
 		}
 	}
