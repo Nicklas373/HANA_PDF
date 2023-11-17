@@ -7,30 +7,38 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * The database connection that should be used by the migration.
+     *
+     * @var string
+     */
+    protected $connection = 'pgsql';
+
+    /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('pdf_watermark', function (Blueprint $table) {
-            $table->id();
-            $table->string('fileName');
-            $table->string('fileSize');
-            $table->string('watermarkFontFamily')->nullable();
-            $table->string('watermarkFontStyle')->nullable();
-            $table->string('watermarkFontSize')->nullable();
-            $table->string('watermarkFontTransparency')->nullable();
-            $table->string('watermarkImage')->nullable();
-            $table->string('watermarkLayout')->nullable();
-            $table->string('watermarkMosaic')->nullable();
-            $table->string('watermarkRotation')->nullable();
-            $table->string('watermarkStyle')->nullable();
-            $table->string('watermarkText')->nullable();
-            $table->string('watermarkPage')->nullable();
+            $table->uuid('processId');
+            $table->text('fileName');
+            $table->string('fileSize', 25);
+            $table->string('watermarkFontFamily', 25)->nullable();
+            $table->string('watermarkFontStyle', 25)->nullable();
+            $table->string('watermarkFontSize', 5)->nullable();
+            $table->string('watermarkFontTransparency', 5)->nullable();
+            $table->text('watermarkImage')->nullable();
+            $table->string('watermarkLayout', 25)->nullable();
+            $table->string('watermarkMosaic', 25)->nullable();
+            $table->string('watermarkRotation', 25)->nullable();
+            $table->string('watermarkStyle', 25)->nullable();
+            $table->text('watermarkText')->nullable();
+            $table->string('watermarkPage', 25)->nullable();
             $table->boolean('result');
-            $table->string('err_reason')->nullable();
-            $table->string('err_api_reason')->nullable();
-            $table->string('uuid');
-            $table->timestamps();
+            $table->text('err_reason')->nullable();
+            $table->text('err_api_reason')->nullable();
+            $table->timestamp('procStartAt')->nullable();
+
+            $table->primary('processId');
         });
     }
 
