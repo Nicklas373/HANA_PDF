@@ -18,7 +18,7 @@ class mergeController extends Controller
 {
     public function pdf_merge(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
-            'file' => 'max:25000',
+            'file' => 'max:25600',
 			'fileAlt' => '',
             'dropFile' => ''
         ]);
@@ -26,7 +26,7 @@ class mergeController extends Controller
         $uuid = AppHelper::Instance()->get_guid();
 
         if($validator->fails()) {
-            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'uuid'=>$uuid])->withInput();
+            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
         } else {
             if(isset($_POST['formAction']))
 			{
@@ -46,7 +46,7 @@ class mergeController extends Controller
                             'pdfOrigName' => implode(',', $pdfOrigNameResponse),
                         ]);
                     } else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
                     }
                 } else if ($request->post('formAction') == "merge") {
 					if(isset($_POST['fileAlt'])) {
@@ -81,92 +81,92 @@ class mergeController extends Controller
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on StartException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on PathException',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
 							DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'iLovePDF API Error !, Catch on Exception',
                                 'err_api_reason' => $e->getMessage(),
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         }
                         $tempPDFfiles = glob(Storage::disk('local')->path('public/'.$pdfPreProcessed_Location.'/*'));
                         foreach($tempPDFfiles as $file){
@@ -179,44 +179,44 @@ class mergeController extends Controller
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$randomizePdfFileName.'.pdf');
 
                             DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => true,
                                 'err_reason' => null,
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
                         } else {
                             DB::table('pdf_merge')->insert([
+                                'processId' => $uuid,
                                 'fileName' => $fileNameArray,
                                 'fileSize' => $fileSizeInMB,
                                 'result' => false,
                                 'err_reason' => 'Failed to download file from iLovePDF API !',
                                 'err_api_reason' => null,
-                                'uuid' => $uuid,
-                                'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'uuid'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         }
 					} else {
                         DB::table('pdf_merge')->insert([
+                            'processId' => $uuid,
                             'fileName' => $fileNameArray,
                             'fileSize' => $fileSizeInMB,
                             'result' => false,
                             'err_reason' => 'PDF failed to upload !',
                             'err_api_reason' => null,
-                            'uuid' => $uuid,
-                            'created_at' => AppHelper::instance()->getCurrentTimeZone()
+                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                         ]);
-						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'uuid'=>$uuid])->withInput();
+						return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
 					}
 				} else {
-					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'uuid'=>$uuid])->withInput();
+					return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'processId'=>$uuid])->withInput();
 				}
 			} else {
-				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !', 'uuid'=>$uuid])->withInput();
+				return redirect()->back()->withErrors(['error'=>'REQUEST_ERROR_OUT_OF_BOUND !', 'processId'=>$uuid])->withInput();
 			}
         }
     }
