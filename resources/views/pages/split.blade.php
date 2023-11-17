@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 @extends('layouts.default')
 @section('content')
     <div class="px-4 md:px-12">
@@ -7,14 +8,13 @@
                 <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Separate one page or a whole page into independent PDF files</p>
             </div>
         </section>
-        @include('includes.modal')
         <form action="/split/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
                     <div>
-                        <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload PDF file</label>
-                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onClick="changeButtonColor()">
+                        <label for="file_input" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload PDF file</label>
+                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/pdf" onclick="changeButtonColor('kaoA')">
                         <p class="mt-1 font-poppins text-sm text-gray-500" id="file_input_help">PDF (Max. 25 MB)</p>
                         @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-4 mb-2 text-green-800 border border-green-300 rounded-lg bg-green-50" role="alert">
@@ -58,7 +58,7 @@
                                         <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
                                     @enderror
                                     <br>
-                                    @error('uuid')
+                                    @error('processId')
                                         <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
                                     @enderror
                                 </div>
@@ -84,7 +84,7 @@
                                         <span class="text-xs"><b>Error Reason: {{ $message }}</b></span>
                                     @enderror
                                     <br>
-                                    @error('uuid')
+                                    @error('processId')
                                         <span class="text-xs"><b>Process ID: {{ $message }}</b></span>
                                     @enderror
                                     </div>
@@ -93,7 +93,7 @@
                         @endif
                     </div>
                     <div>
-                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-8 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="upload">Upload PDF</button>
+                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-8 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="upload">Upload PDF</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 mt-6">
@@ -104,7 +104,7 @@
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfRealName = session('pdfOriName');
                                 echo '
-                                <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
+                                <label for="fileAlt" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
                                 <input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
                                 <div id="caption" class="" placeholder="" style="display: none;" value="'.$pdfRealName.'" ></div>
                                 <div id="adobe-dc-view" class="w-full h-80"></div>
@@ -124,40 +124,38 @@
                     </div>
                     <div id="pdfCompLayout" class="mt-4">
                         <div id="splitLayout1" style="display: none;">
-                            <label class="block mb-2 font-poppins text-base font-semibold text-slate-900">Split Or Extract Pages</label>
+                            <label for="SplitOpta" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Split Or Extract Pages</label>
                             <ul class="grid grid-cols-1 xl:grid-cols-3 gap-2 xl:gap-4 mt-4 mb-4">
                                 <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
                                     <div class="flex">
                                         <div class="flex items-center h-5">
-                                            <input id="" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_split()">
+                                            <input id="SplitOpta" value="split" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_split()">
                                         </div>
                                         <div class="ml-4">
-                                            <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Split Pages</label>
+                                            <label for="SplitOpta" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Split Pages</label>
                                         </div>
                                     </div>
                                 </li>
                                 <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
                                     <div class="flex">
                                         <div class="flex items-center h-5">
-                                            <input id="" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_extract()">
+                                            <input id="SplitOptb" value="extract" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_extract()">
                                         </div>
                                         <div class="ml-4">
-                                            <label for="helper-radio" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Extract pages</label>
+                                            <label for="SplitOptb" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Extract pages</label>
                                         </div>
                                     </div>
                                 </li>
                             </ul>
                             <div id="splitLayout2"></div>
                             <div dir="ltr">
-                                <button type="submit" id="submitBtn_2" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-white bg-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="split" style="display: none;">Split PDF</button>
-                                <button type="submit" id="submitBtn_3" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-white bg-sky-400 border border-sky-400 rounded-lg cursor-pointer font-medium w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="extract" style="display: none;">Extract PDF</button>
+                                <button type="submit" id="submitBtn_2" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-white bg-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="split" style="display: none;">Split PDF</button>
+                                <button type="submit" id="submitBtn_3" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-white bg-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="extract" style="display: none;">Extract PDF</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-        <script src="/ext-js/split.js"></script>
-        <script src="/ext-js/spinner.js"></script>
        @stop
     </div>
