@@ -1,4 +1,6 @@
-@extends('layouts.default') @section('content')
+<!DOCTYPE html>
+@extends('layouts.default')
+@section('content')
 <div class="px-4 md:px-12">
   <section>
     <div class="py-8 px-4 mt-20 max-w-screen-xl z-0">
