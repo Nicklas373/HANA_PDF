@@ -73,7 +73,7 @@ class compressController extends Controller
                             $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                             $ilovepdfTask->setCompressionLevel($compMethod);
                             $ilovepdfTask->execute();
-                            $ilovepdfTask->download($pdfProcessed_Location);
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
                             DB::table('pdf_compress')->insert([
                                 'processId' => $uuid,
@@ -184,8 +184,8 @@ class compressController extends Controller
                             unlink($pdfNewPath);
                         }
 
-                        if (file_exists($pdfProcessed_Location.'/'.$pdfName)) {
-                            $compFileSize = filesize($pdfProcessed_Location.'/'.$pdfName);
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+                            $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName));
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
                             DB::table('pdf_compress')->insert([
                                 'processId' => $uuid,
