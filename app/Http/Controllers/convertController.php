@@ -133,16 +133,6 @@ class convertController extends Controller
                                     //throw new ProcessFailedException($asposeAPI);
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } else {
-                                    DB::table('pdf_convert')->insert([
-                                        'processId' => $uuid,
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $newFileSize,
-                                        'container' => $convertType,
-                                        'result' => true,
-                                        'err_reason' => null,
-                                        'err_api_reason' => $asposeAPI->getOutput(),
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                    ]);
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx'), $pdfNameWithoutExtension.".xlsx") == true) {
                                         $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx');
                                         DB::table('pdf_convert')->insert([
@@ -241,16 +231,6 @@ class convertController extends Controller
                                     //throw new ProcessFailedException($asposeAPI);
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } else {
-                                    DB::table('pdf_convert')->insert([
-                                        'processId' => $uuid,
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $newFileSize,
-                                        'container' => $convertType,
-                                        'result' => true,
-                                        'err_reason' => null,
-                                        'err_api_reason' => $asposeAPI->getOutput(),
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                    ]);
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx'), $pdfNameWithoutExtension.".pptx") == true) {
                                         $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx');
                                         DB::table('pdf_convert')->insert([
