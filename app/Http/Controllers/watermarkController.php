@@ -115,7 +115,12 @@ class watermarkController extends Controller
 						}
 						if(isset($_POST['watermarkPage']))
 						{
-							$watermarkPage = $request->post('watermarkPage');
+							$watermarkInputPage = $request->post('watermarkPage');
+                            if (is_string($a)) {
+                                $watermarkPage = strtolower($a);
+                            } else {
+                                $watermarkPage = $watermarkInputPage;
+                            }
 						} else {
 							$watermarkPage = 'all';
 						}
