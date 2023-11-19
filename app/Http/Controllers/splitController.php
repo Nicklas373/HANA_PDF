@@ -94,7 +94,12 @@ class splitController extends Controller
 						}
 						if(isset($_POST['customPage']))
 						{
-							$customPage = $request->post('customPage');
+							$customInputPage = $request->post('customPage');
+                            if (is_string($customInputPage)) {
+                                $customPage = strtolower($customInputPage);
+                            } else {
+                                $customPage = $customInputPage;
+                            }
 						} else {
 							$customPage = '';
 						}
@@ -394,7 +399,12 @@ class splitController extends Controller
 
                         if(isset($_POST['customPage']))
 						{
-							$customPage = $request->post('customPage');
+							$customInputPage = $request->post('customPage');
+                            if (is_string($customInputPage)) {
+                                $customPage = strtolower($customInputPage);
+                            } else {
+                                $customPage = $customInputPage;
+                            }
 						} else {
 							$customPage = '';
 						}
