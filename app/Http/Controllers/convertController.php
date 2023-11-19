@@ -75,7 +75,7 @@ class convertController extends Controller
 						        $fileSize = filesize($pdfNewPath);
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                                 $asposeAPI = new Process([
-                                                'python',
+                                                'python3',
                                                 public_path().'/ext-python/asposeAPI.py',
                                                 env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'),
                                                 "xlsx"
@@ -184,7 +184,7 @@ class convertController extends Controller
 						        $fileSize = filesize($pdfNewPath);
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                                 $asposeAPI = new Process([
-                                                'python',
+                                                'python3',
                                                 public_path().'/ext-python/asposeAPI.py',
                                                 env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'),
                                                 "pptx"

@@ -12,10 +12,7 @@ asposeContainer=str(sys.argv[3])
 asposeFile=str(sys.argv[4])
 asposeOut=str(sys.argv[5])
 asposeFileDirFix = asposeFile.replace("/upload-pdf/","/app/public/upload-pdf/")
-WinSemanticCnv = asposeFileDirFix.replace("/", "\\\\")
-WinSemanticDir = r"C:\\Users\\Nickl\\Documents\\GitHub\\emsitpro-pdftools-tailwind"+WinSemanticCnv
-
-os.chdir('..')
+linuxSemanticDir = r"/var/www/html/hanaci-pdf"+asposeFileDirFix
 
 def getAsposeToken():
     asposeCloudAPI = http.client.HTTPSConnection("api.aspose.cloud")
@@ -43,8 +40,8 @@ def convAsposeAPI(token, container):
     params = {
         'outPath': asposeOut,
     }
-    if os.path.isfile(WinSemanticDir):
-        with open(WinSemanticDir, 'rb') as f:
+    if os.path.isfile(linuxSemanticDir):
+        with open(linuxSemanticDir, 'rb') as f:
             data = f.read()
         if len(container) != 0:
             asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data)
@@ -56,7 +53,7 @@ def convAsposeAPI(token, container):
         else:
             print("Invalid Container")
     else:
-        print('File source not found! :'+WinSemanticDir)
+        print('File source not found! :'+linuxSemanticDir)
 
 getAsposeToken()
 
