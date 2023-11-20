@@ -768,10 +768,10 @@ function wmLayout_image(){
         <li id="lowestChk3" class="mt-2 rounded border border-slate-200 p-2">
           <div class="flex">
             <div class="flex h-5 items-center">
-              <input id="watermarkRotationA" name="watermarkRotation" value="45" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit3Click()" />
+              <input id="watermarkRotationA" name="watermarkRotation" value="0" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit3Click()" />
             </div>
             <div class="ml-4">
-              <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt3">45°</label>
+              <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt3">0°</label>
             </div>
           </div>
         </li>
@@ -976,10 +976,10 @@ function wmLayout_text(){
       <li id="lowestChk7" class="mt-2 rounded border border-slate-200 p-2">
         <div class="flex">
           <div class="flex h-5 items-center">
-            <input id="watermarkRotationA" name="watermarkRotation" value="45" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit7Click()" />
+            <input id="watermarkRotationA" name="watermarkRotation" value="0" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit7Click()" />
           </div>
           <div class="ml-4">
-            <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt7">45°</label>
+            <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt7">0°</label>
           </div>
         </div>
       </li>
