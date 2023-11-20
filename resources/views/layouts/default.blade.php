@@ -4,9 +4,9 @@
     @include('includes.head')
     <header>@include('includes.header')</header>
   </head>
-  <body class="bg-cover bg-fixed bg-center bg-no-repeat" style="background-image: url('../assets/whitebg.png');">
+  <body class="bg-cover bg-fixed bg-center bg-no-repeat " style="background-image: url('../assets/whitebg.png');">
     <div>
-      <div id="content">
+      <div id="content" class="flex flex-col min-h-screen justify-between">
         @include('includes.modal') @yield('content')
         <script src="/build/assets/kao-logic-f8ab9501.js" type="module"></script>
         <script src="/ext-js/kao-main.js"></script>
