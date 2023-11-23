@@ -320,7 +320,7 @@ function submit(event) {
                                             errListTitleMessage.innerHTML = "Error message"
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
-                                            generateMesssage("First page can not more than last page");
+                                            generateMesssage("First page can't be more than last page");
                                             firstPage.style.borderColor = '#dc2626'
                                             newModal.show();
                                         } else {

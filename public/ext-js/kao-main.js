@@ -382,14 +382,14 @@ function LowChkSplitClick() {
     document.getElementById("lowestChk").style.borderColor = '#38bdf8'
     document.getElementById("lowest-txt").style.color = '#38bdf8'
     document.getElementById("recChk").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt").style.color = '#1e293b'
+    document.getElementById("rec-txt").style.color = '#6b7280'
 }
 
 function LowChkSplit2Click() {
     document.getElementById("lowestChk2").style.borderColor = '#38bdf8'
     document.getElementById("lowest-txt2").style.color = '#38bdf8'
     document.getElementById("recChk2").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt2").style.color = '#1e293b'
+    document.getElementById("rec-txt2").style.color = '#6b7280'
 }
 
 function LowChkSplit3Click() {
@@ -447,16 +447,16 @@ function LowChkSplit7Click() {
 
 function RecChkSplitClick() {
     document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt").style.color = '#1e293b'
+    document.getElementById("lowest-txt").style.color = '#6b7280'
     document.getElementById("recChk").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt").style.color = '#38bdf8'
+    document.getElementById("rec-txt").style.color = '#6b7280'
 }
 
 function RecChkSplit2Click() {
     document.getElementById("lowestChk2").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt2").style.color = '#1e293b'
+    document.getElementById("lowest-txt2").style.color = '#6b7280'
     document.getElementById("recChk2").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt2").style.color = '#38bdf8'
+    document.getElementById("rec-txt2").style.color = '#6b7280'
 }
 
 function RecChkSplit3Click() {
@@ -633,7 +633,7 @@ function splitLayout2_split(){
               <input id="SplitOpt2a" value="selPages" name="SplitOpt2" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="splitLayout3_wthn()" />
             </div>
             <div class="ml-4">
-              <label for="SplitOpt2a" class="font-poppins text-sm font-semibold text-slate-800" id="lowest-txt2">Selected Pages</label>
+              <label for="SplitOpt2a" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt2">Selected Pages</label>
             </div>
           </div>
         </li>
@@ -643,7 +643,7 @@ function splitLayout2_split(){
               <input id="SplitOpt2b" value="cusPages" name="SplitOpt2" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="splitLayout3_cstm()" />
             </div>
             <div class="ml-4">
-              <label for="SplitOpt2b" class="font-poppins text-sm font-semibold text-slate-800" id="rec-txt2">Custom Pages</label>
+              <label for="SplitOpt2b" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt2">Custom Pages</label>
             </div>
           </div>
         </li>
