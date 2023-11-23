@@ -4,8 +4,8 @@
     <div class="px-4 md:px-12">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Split</h1>
-                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Separate one page or a whole page into independent PDF files</p>
+                <h1 class="mb-4 mt-6 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 sm:mt-0 lg:text-6xl">PDF Split</h1>
+                <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Separate one page or a whole page into independent PDF files</p>
             </div>
         </section>
         <form action="/split/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
@@ -132,7 +132,7 @@
                                             <input id="SplitOpta" value="split" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_split()">
                                         </div>
                                         <div class="ml-4">
-                                            <label for="SplitOpta" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Split Pages</label>
+                                            <label for="SplitOpta" class="font-semibold text-sm text-gray-500 font-poppins" id="lowest-txt">Split Pages</label>
                                         </div>
                                     </div>
                                 </li>
@@ -142,7 +142,7 @@
                                             <input id="SplitOptb" value="extract" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="splitLayout2_extract()">
                                         </div>
                                         <div class="ml-4">
-                                            <label for="SplitOptb" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Extract pages</label>
+                                            <label for="SplitOptb" class="font-semibold text-sm text-gray-500 font-poppins" id="rec-txt">Extract pages</label>
                                         </div>
                                     </div>
                                 </li>

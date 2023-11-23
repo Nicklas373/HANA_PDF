@@ -3,8 +3,8 @@
 <div class="px-4 md:px-12">
   <section>
     <div class="z-0 mt-24 max-w-screen-xl px-4 py-8">
-      <h1 class="font-poppins mb-4 text-4xl font-semibold leading-none tracking-tight text-sky-400 md:text-5xl lg:text-6xl">PDF Merge</h1>
-      <p class="font-poppins mb-4 text-lg font-thin text-gray-500 lg:text-2xl">Combine several PDF into one merged PDF file</p>
+      <h1 class="mb-4 mt-6 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 sm:mt-0 lg:text-6xl">PDF Merge</h1>
+      <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Combine several PDF into one merged PDF file</p>
     </div>
   </section>
   <form action="/merge/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
