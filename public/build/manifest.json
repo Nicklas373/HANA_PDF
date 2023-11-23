@@ -3,7 +3,7 @@
     "file": "assets/index-f475cd16.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-86b5075b.css",
+    "file": "assets/app-17ddd97f.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -16,7 +16,7 @@
     "src": "resources/js/app.js"
   },
   "resources/js/kao-logic.js": {
-    "file": "assets/kao-logic-f8ab9501.js",
+    "file": "assets/kao-logic-9cf303a4.js",
     "imports": [
       "_index-f475cd16.js"
     ],
