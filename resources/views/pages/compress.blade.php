@@ -124,38 +124,41 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label for="comp-low" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Compression Quality</label>
+                        <label for="firstRadio" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Compression Quality</label>
                         <ul class="grid grid-cols-1 xl:grid-cols-3 gap-2 xl:gap-4 mt-4 mb-4">
-                            <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="firstCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('comp')">
+                                <input type="text" id="firstInput" class="" style="display: none;" value="comp">
+                                <div class="flex" id="firstChk">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-low" name="compMethod" value="low" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
+                                        <input id="firstRadio" name="compMethod" value="low" aria-describedby="helper-firstRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="comp-low" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Lowest</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">High quality, less compression</p>
+                                        <label for="firstRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="firstRadioText">Lowest</label>
+                                        <p id="helper-firstRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">High quality, less compression</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="secondCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('comp')">
+                                <input type="text" id="secondInput" class="" style="display: none;" value="comp">
+                                <div class="flex" id="secondChk">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-rec" name="compMethod" value="recommended" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
+                                        <input id="secondRadio" name="compMethod" value="recommended" aria-describedby="helper-secondRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="comp-rec" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Recommended</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Good quality, good compression</p>
+                                        <label for="secondRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="secondRadioText">Recommended</label>
+                                        <p id="helper-secondRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">Good quality, good compression</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="highestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="thirdCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('comp')">
+                                <input type="text" id="thirdInput" class="" style="display: none;" value="comp">
+                                <div class="flex" id="thirdChk">
                                     <div class="flex items-center h-5">
-                                        <input id="comp-high" name="compMethod" value="extreme" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('compMethod')">
+                                        <input id="thirdRadio" name="compMethod" value="extreme" aria-describedby="helper-thirdRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="comp-high" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">High</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">Less quality, high compression</p>
+                                        <label for="thirdRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="thirdRadioText">High</label>
+                                        <p id="helper-thirdRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">Less quality, high compression</p>
                                     </div>
                                 </div>
                             </li>
