@@ -304,6 +304,7 @@ function submit(event) {
                     var customPage = document.getElementById('customPage')
                     var firstPage = document.getElementById('fromPage')
                     var lastPage = document.getElementById('toPage')
+                    var totalPage = document.getElementById('totalPage')
                     if (document.getElementById("firstRadio").value == "split") {
                         if (document.getElementById("splitRadio")) {
                            if (document.getElementById("thirdRadio").checked) {
@@ -345,6 +346,15 @@ function submit(event) {
                                             resetErrListMessage();
                                             generateMesssage("First page can't be more than last page");
                                             firstPage.style.borderColor = '#dc2626'
+                                            newModal.show();
+                                        } else if (parseInt(document.getElementById("toPage").value) >= parseInt(totalPage.value)) {
+                                            event.preventDefault();
+                                            errMessage.innerHTML  = "Invalid page number range!";
+                                            errListTitleMessage.innerHTML = "Error message"
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage("Last page can't be more than total page ("+totalPage.value+")");
+                                            lastPage.style.borderColor = '#dc2626'
                                             newModal.show();
                                         } else {
                                             procTitleMessageModal.innerHTML = "Processing PDF..."
