@@ -14,7 +14,6 @@ class merge_pdf extends Model
         'fileSize',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }
