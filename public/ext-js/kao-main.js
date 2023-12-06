@@ -48,6 +48,8 @@ if (firstArea) {
             if (thirdAreaInput.checked !== true && fourthAreaInput.checked !== true) {
                 splitLayout2_splitClean();
             }
+        } else if (firstAreaAltInput.value == "cnvFrPDF") {
+            extImageChkBox.style.display = null
         } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_ImageInputRestore()
             wmLayout_image()
@@ -62,6 +64,10 @@ if (secondArea) {
         secondAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
             firstAreaText.style.color = '#1e293b'
+            if (firstAreaAltInput.value == "cnvFrPDF") {
+                extImageChkBox.style.display = 'none'
+                extImageSwitch.checked = false
+            }
         } else {
             firstAreaText.style.color = '#6b7280'
         }
@@ -98,6 +104,10 @@ if (thirdArea) {
         thirdAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
             firstAreaText.style.color = '#1e293b'
+            if (firstAreaAltInput.value == "cnvFrPDF") {
+                extImageChkBox.style.display = 'none'
+                extImageSwitch.checked = false
+            }
         } else {
             firstAreaText.style.color = '#6b7280'
         }
@@ -133,6 +143,10 @@ if (fourthArea) {
         fourthAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
             firstAreaText.style.color = '#1e293b'
+            if (firstAreaAltInput.value == "cnvFrPDF") {
+                extImageChkBox.style.display = 'none'
+                extImageSwitch.checked = false
+            }
         } else {
             firstAreaText.style.color = '#6b7280'
         }

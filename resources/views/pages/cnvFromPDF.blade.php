@@ -176,6 +176,11 @@
                                 </div>
                             </li>
                         </ul>
+                        <label id="extImageLayout" class="relative inline-flex items-center cursor-pointer mt-4" style="display: none;">
+                            <input type="checkbox" id="extImage" name="extImage" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-sky-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-blue-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-400"></div>
+                            <span class="ms-3 font-semibold text-sm text-slate-800 font-poppins">Extract Image only</span>
+                        </label>
                         <div dir="ltl">
                             <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="convert" style="">Convert PDF</button>
                         </div>
