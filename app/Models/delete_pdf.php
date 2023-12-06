@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class extract_pdf extends Model
+class delete_pdf extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'fileName',
         'fileSize',
-        'customPage',
+        'deletePage',
         'mergePDF',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }
