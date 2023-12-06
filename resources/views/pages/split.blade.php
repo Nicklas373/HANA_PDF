@@ -107,9 +107,11 @@
                                 $pdfFileName = basename(session('pdfOriName'), '.png');
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfRealName = session('pdfOriName');
+                                $pdfPages = session('pdfTotalPages');
                                 echo '
                                 <label for="fileAlt" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Preview</label>
                                 <input type="text" id="fileAlt" name="fileAlt" class="" placeholder="" style="display: none;" value="'.$pdfFileAppend.'">
+                                <input type="text" id="totalPage" name="totalPage" class="" placeholder="" style="display: none;" value="'.$pdfPages.'">
                                 <div id="caption" class="" placeholder="" style="display: none;" value="'.$pdfRealName.'" ></div>
                                 <div id="adobe-dc-view" class="w-full h-80"></div>
                                 <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
