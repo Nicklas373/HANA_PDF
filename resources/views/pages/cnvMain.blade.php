@@ -15,7 +15,7 @@
         </div>
         <div class="mx-8 py-2 md:mx-4 lg:mx-0 lg:p-2 mt-8 lg:mt-6 lg:mb-4">
           <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">Convert To PDF</h5>
-          <p class="font-poppins mt-4 mb-4 text-xs lg:text-sm text-gray-700">Convert Document files into specified document format</p>
+          <p class="font-poppins mt-4 mb-4 text-xs lg:text-sm text-gray-700">Convert document or image files into specified document format</p>
         </div>
       </a>
     </div>
