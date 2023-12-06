@@ -20,7 +20,6 @@ class split_pdf extends Model
         'mergePDF',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }

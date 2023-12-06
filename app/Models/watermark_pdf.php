@@ -25,7 +25,6 @@ class watermark_pdf extends Model
         'watermarkPage',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }

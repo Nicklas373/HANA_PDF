@@ -15,7 +15,6 @@ class pdf_cnv extends Model
         'container',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }

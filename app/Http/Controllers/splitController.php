@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
-use App\Models\extract_pdf;
+use App\Models\delete_pdf;
+use App\Models\init_pdf;
 use App\Models\split_pdf;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -25,16 +27,30 @@ class splitController extends Controller
         $uuid = AppHelper::Instance()->get_guid();
 
 		if($validator->fails()) {
-            return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
+            try {
+                DB::table('pdf_init')->insert([
+                    'processId' => $uuid,
+                    'err_reason' => $validator->messages(),
+                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                ]);
+                return redirect()->back()->withErrors([
+                    'error'=>$validator->messages(),
+                    'processId'=>$uuid,
+                    'titleMessage'=>'PDF page has failed to split !',
+                ])->withInput();
+            } catch (QueryException $ex) {
+                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+            }
         } else {
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
 					if($request->hasfile('file')) {
-						$str = rand();
+						$str = rand(1000,10000000);
 						$pdfUpload_Location = env('PDF_UPLOAD');
                         $file = $request->file('file');
-                        $randomizePdfFileName = md5($str);
+                        $fileSize = filesize($file);
+                        $randomizePdfFileName = 'pdf_split_'.substr(md5(uniqid($str)), 0, 8);
                         $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
 						$pdfFileName = $file->getClientOriginalName();
                         $pdfTotalPages = AppHelper::instance()->count($file);
@@ -47,10 +63,56 @@ class splitController extends Controller
                                 'pdfTotalPages' => $pdfTotalPages
                             ]);
 						} else {
-                            return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
+                                    'fromPage' => 'null',
+                                    'toPage' => 'null',
+                                    'customPage' => 'null',
+                                    'fixedPage' => 'null',
+                                    'fixedPageRange' => 'null',
+                                    'mergePDF' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'PDF file not found on the server !',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF file not found on the server !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
 						}
 					} else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                        try {
+                            DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
+                                'fileName' => 'null',
+                                'fileSize' => 'null',
+                                'fromPage' => 'null',
+                                'toPage' => 'null',
+                                'customPage' => 'null',
+                                'fixedPage' => 'null',
+                                'fixedPageRange' => 'null',
+                                'mergePDF' => 'null',
+                                'result' => false,
+                                'err_reason' => 'PDF failed to upload !',
+                                'err_api_reason' => 'null',
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->withErrors([
+                                'error'=>'PDF failed to upload !',
+                                'processId'=>$uuid,
+                                'titleMessage'=>'PDF page has failed to split !'
+                            ])->withInput();
+                        } catch (QueryException $ex) {
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        }
 					}
 				} else if ($request->post('formAction') == "split") {
 					if(isset($_POST['fileAlt'])) {
@@ -58,11 +120,7 @@ class splitController extends Controller
 
                         $pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
-						$pdfName = basename($file);
-                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
-                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
-						$fileSize = filesize($pdfNewPath);
-						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                        $pdfEncKey = bin2hex(random_bytes(16));
 						if(isset($_POST['fromPage']))
 						{
 							$fromPage = $request->post('fromPage');
@@ -103,23 +161,92 @@ class splitController extends Controller
 						} else {
 							$customPage = '';
 						}
+                        $pdfName = basename($file);
+                        $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
+                        if ($mergePDF) {
+                            $pdfNameWithoutExtension = basename($file, '.pdf');
+                        } else {
+                            $pdfNameWithoutExtension = basename($pdfName, '.pdf').'_page';
+                        }
+                        $fileSize = filesize($pdfNewPath);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 						if ($fromPage != ''){
 							$pdfTotalPages = AppHelper::instance()->count($pdfNewPath);
 							if ($toPage > $pdfTotalPages) {
-								return redirect()->back()->withErrors([
-                                    'error'=>'Last page has more pages than total PDF pages ! (total pages: '.$pdfTotalPages.')',
-                                    'processId'=>$uuid
+                                try {
+                                    DB::table('pdf_split')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $fileSize,
+                                        'fromPage' => $fromPage,
+                                        'toPage' => $toPage,
+                                        'customPage' => 'null',
+                                        'fixedPage' => 'null',
+                                        'fixedPageRange' => 'null',
+                                        'mergePDF' => $mergeDBpdf,
+                                        'result' => false,
+                                        'err_reason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors([
+                                        'error'=>'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                        'processId'=>$uuid,
+                                        'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                }
                             } else if ($fromPage > $pdfTotalPages) {
-                                return redirect()->back()->withErrors([
-                                    'error'=>'First page has more pages than total PDF pages ! (total pages: '.$pdfTotalPages.')',
-                                    'processId'=>$uuid
+                                try {
+                                    DB::table('pdf_split')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $fileSize,
+                                        'fromPage' => $fromPage,
+                                        'toPage' => $toPage,
+                                        'customPage' => 'null',
+                                        'fixedPage' => 'null',
+                                        'fixedPageRange' => 'null',
+                                        'mergePDF' => $mergeDBpdf,
+                                        'result' => false,
+                                        'err_reason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors([
+                                        'error'=>'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                        'processId'=>$uuid,
+                                        'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                }
                             } else if ($fromPage > $toPage) {
-								return redirect()->back()->withErrors([
-                                    'error'=>'First Page has more pages than last page !',
-                                    'processId'=>$uuid
+                                try {
+                                    DB::table('pdf_split')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $fileSize,
+                                        'fromPage' => $fromPage,
+                                        'toPage' => $toPage,
+                                        'customPage' => 'null',
+                                        'fixedPage' => 'null',
+                                        'fixedPageRange' => 'null',
+                                        'mergePDF' => $mergeDBpdf,
+                                        'result' => false,
+                                        'err_reason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors([
+                                        'error'=>'First Page has more page than last page !',
+                                        'processId'=>$uuid,
+                                        'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                }
 							} else {
 								if ($mergeDBpdf == "true") {
 									$fixedPageRanges = $fromPage.'-'.$toPage;
@@ -140,260 +267,409 @@ class splitController extends Controller
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('split');
-                            $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+                            $ilovepdfTask->setFileEncryption($pdfEncKey);
+                            $ilovepdfTask->setEncryptKey($pdfEncKey);
+                            $ilovepdfTask->setEncryption(true);
                             $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                             $ilovepdfTask->setRanges($fixedPageRanges);
                             $ilovepdfTask->setMergeAfter($mergePDF);
-                            $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
-                            $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                            if ($mergePDF) {
+                                $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
+                                $ilovepdfTask->setOutputFileName($pdfName);
+                            } else {
+                                $altPdfNameWithoutExtension = basename($pdfName, '.pdf');
+                                $ilovepdfTask->setPackagedFilename($altPdfNameWithoutExtension);
+                                $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                            }
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on StartException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on PathException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Exception $e) {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on Exception',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         }
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully splitted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully splitted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully splitted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
-                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
-                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
-                         } else {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
-                                'result' => false,
-                                'err_reason' => 'Failed to download file from iLovePDF API !',
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully splitted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully splitted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else {
+                            try {
+                                DB::table('pdf_split')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'fromPage' => $fromPage,
+                                    'toPage' => $toPage,
+                                    'customPage' => $customPage,
+                                    'fixedPage' => $fixedPage,
+                                    'fixedPageRange' => $fixedPageRanges,
+                                    'mergePDF' => $mergeDBpdf,
+                                    'result' => false,
+                                    'err_reason' => 'Failed to download file from iLovePDF API !',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF split fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to split !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         }
 					} else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                        try {
+                            DB::table('pdf_split')->insert([
+                                'processId' => $uuid,
+                                'fileName' => 'null',
+                                'fileSize' => 'null',
+                                'fromPage' => 'null',
+                                'toPage' => 'null',
+                                'customPage' => 'null',
+                                'fixedPage' => 'null',
+                                'fixedPageRange' => 'null',
+                                'mergePDF' => 'null',
+                                'result' => false,
+                                'err_reason' => 'PDF page has failed to split !',
+                                'err_api_reason' => 'null',
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->withErrors([
+                                'error'=>'PDF failed to upload !',
+                                'processId'=>$uuid,
+                                'titleMessage'=>'PDF page has failed to split !'
+                            ])->withInput();
+                        } catch (QueryException $ex) {
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        }
 					}
-				} else if ($request->post('formAction') == "extract") {
+				} else if ($request->post('formAction') == "delete") {
                     if(isset($_POST['fileAlt'])) {
                         $file = $request->post('fileAlt');
 
@@ -410,193 +686,377 @@ class splitController extends Controller
 						}
                         $pdfUpload_Location = env('PDF_UPLOAD');
                         $pdfProcessed_Location = env('PDF_DOWNLOAD');
+                        $pdfEncKey = bin2hex(random_bytes(16));
                         $pdfNewRanges = $customPage;
                         $pdfName = basename($file);
-                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
                         $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
-						$fileSize = filesize($pdfNewPath);
-						$hostName = AppHelper::instance()->getUserIpAddr();
-						$newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                        $pdfNameWithoutExtension = basename($pdfName, '.pdf');
+                        $fileSize = filesize($pdfNewPath);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('split');
-                            $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+                            $ilovepdfTask->setFileEncryption($pdfEncKey);
+                            $ilovepdfTask->setEncryptKey($pdfEncKey);
+                            $ilovepdfTask->setEncryption(true);
                             $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
-                            $ilovepdfTask->setRanges($pdfNewRanges);
-                            $ilovepdfTask->setMergeAfter(false);
+                            $ilovepdfTask->setRemovePages($pdfNewRanges);
                             $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
-                            $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
+                            $ilovepdfTask->setOutputFileName($pdfName);
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (\Ilovepdf\Exceptions\StartException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on StartException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                                try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                                try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error !, Catch on PathException',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } catch (\Exception $e) {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'iLovePDF API Error ! Catch on Exception',
-                                'err_api_reason' => $e->getMessage(),
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'iLovePDF API Error ! Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         }
                         if (file_exists($pdfNewPath)) {
                             unlink($pdfNewPath);
                         }
-                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully deleted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully deleted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully deleted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
-                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf'))) {
-                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-'.$customPage.'.pdf');
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => true,
-                                'err_reason' => null,
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->with([
-                                "stats" => "scs",
-                                "res"=>$download_pdf,
-                            ]);
-                         } else {
-                            DB::table('pdf_extract')->insert([
-                                'processId' => $uuid,
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'customPage' => $customPage,
-                                'result' => false,
-                                'err_reason' => 'Failed to download file from iLovePDF API !',
-                                'err_api_reason' => null,
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Split failed !', 'processId'=>$uuid])->withInput();
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully deleted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
+                            $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => true,
+                                    'err_reason' => 'null',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->with([
+                                    "stats" => "scs",
+                                    "res"=>$download_pdf,
+                                    "titleMessage"=>"PDF page has successfully deleted !"
+                                ]);
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
+                        } else {
+                            try {
+                                DB::table('pdf_delete')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => $pdfName,
+                                    'fileSize' => $newFileSize,
+                                    'deletePage' => $customPage,
+                                    'result' => false,
+                                    'err_reason' => 'Failed to download file from iLovePDF API !',
+                                    'err_api_reason' => 'null',
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors([
+                                    'error'=>'PDF delete fail !',
+                                    'processId'=>$uuid,
+                                    'titleMessage'=>'PDF page has failed to delete !'
+                                ])->withInput();
+                            } catch (QueryException $ex) {
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            }
                         }
                     } else {
-                        return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                        try {
+                            DB::table('pdf_delete')->insert([
+                                'processId' => $uuid,
+                                'fileName' => 'null',
+                                'fileSize' => 'null',
+                                'deletePage' => 'null',
+                                'result' => false,
+                                'err_reason' => 'PDF page has failed to delete !',
+                                'err_api_reason' => 'null',
+                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                            ]);
+                            return redirect()->back()->withErrors([
+                                'error'=>'PDF failed to upload !',
+                                'processId'=>$uuid,
+                                'titleMessage'=>'PDF page has failed to delete !'
+                            ])->withInput();
+                        } catch (QueryException $ex) {
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        }
                     }
 				} else {
-                    return redirect()->back()->withErrors(['error'=>'INVALID_REQUEST_ERROR !', 'processId'=>$uuid])->withInput();
+                    try {
+                        DB::table('pdf_delete')->insert([
+                            'processId' => $uuid,
+                            'fileName' => 'null',
+                            'fileSize' => 'null',
+                            'deletePage' => 'null',
+                            'result' => false,
+                            'err_reason' => 'INVALID_REQUEST_ERROR !',
+                            'err_api_reason' => 'null',
+                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        ]);
+                        return redirect()->back()->withErrors([
+                            'error'=>'INVALID_REQUEST_ERROR !',
+                            'processId'=>$uuid,
+                            'titleMessage'=>'PDF process unknown error !'
+                        ])->withInput();
+                    } catch (QueryException $ex) {
+                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                    }
                 }
 			} else {
-				return redirect()->back()->withErrors(['error'=>'ERROR_OUT_OF_BOUND !', 'processId'=>$uuid])->withInput();
+                try {
+                    DB::table('pdf_delete')->insert([
+                        'processId' => $uuid,
+                        'fileName' => 'null',
+                        'fileSize' => 'null',
+                        'deletePage' => 'null',
+                        'result' => false,
+                        'err_reason' => 'ERROR_OUT_BOUND !',
+                        'err_api_reason' => 'null',
+                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                    ]);
+                    return redirect()->back()->withErrors([
+                        'error'=>'ERROR_OUT_BOUND !',
+                        'processId'=>$uuid,
+                        'titleMessage'=>'PDF process unknown error !'
+                    ])->withInput();
+                } catch (QueryException $ex) {
+                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                }
 			}
 		}
     }
