@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('fileName');
             $table->string('fileSize', 25);
             $table->string('container', 25);
+            $table->boolean('img_extract');
             $table->boolean('result');
             $table->text('err_reason')->nullable();
             $table->text('err_api_reason')->nullable();

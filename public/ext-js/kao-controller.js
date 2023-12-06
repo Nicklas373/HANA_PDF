@@ -19,6 +19,8 @@ var firstAreaAltInput = document.getElementById('firstInput')
 var secondAreaAltInput = document.getElementById('secondInput')
 var thirdAreaAltInput = document.getElementById('thirdInput')
 var fourthAreaAltInput = document.getElementById('fourthInput')
+var extImageChkBox = document.getElementById('extImageLayout')
+var extImageSwitch = document.getElementById('extImage')
 var timerId = setInterval("reloadIFrame();", 2000)
 
 // Watermark image separate controller

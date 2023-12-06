@@ -13,6 +13,7 @@ class pdf_cnv extends Model
         'fileName',
         'fileSize',
         'container',
+        'img_extract',
         'result',
         'err_reason',
         'err_api_reason'
