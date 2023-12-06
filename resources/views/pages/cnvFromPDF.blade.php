@@ -125,49 +125,53 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label for="lowestChkA" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
+                        <label for="firstRadio" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
                         <ul class="grid grid-cols-1 xl:grid-cols-4 gap-2 xl:gap-4 mt-4 mb-4">
-                            <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="firstCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="firstInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="firstChk">
                                     <div class="flex items-center h-5">
-                                        <input id="lowestChkA" name="convertType" value="jpg" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="firstRadio" name="convertType" value="jpg" aria-describedby="helper-firstRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="lowestChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Image</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.jpg)</p>
+                                        <label for="firstRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="firstRadioText">Image</label>
+                                        <p id="helper-firstRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.jpg)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="ulChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="secondCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="secondInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="secondChk">
                                     <div class="flex items-center h-5">
-                                        <input id="ulChkA" name="convertType" value="pptx" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="secondRadio" name="convertType" value="pptx" aria-describedby="helper-secondRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="ulChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="ul-txt">Powerpoint Presentation</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.pptx)</p>
+                                        <label for="secondRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="secondRadioText">Powerpoint Presentation</label>
+                                        <p id="helper-secondRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.pptx)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="thirdCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="thirdInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="thirdChk" value="cnvFrPDF">
                                     <div class="flex items-center h-5">
-                                        <input id="recChkA" name="convertType" value="excel" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="thirdRadio" name="convertType" value="excel" aria-describedby="helper-thirdRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="recChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Spreadsheet</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.xlsx)</p>
+                                        <label for="thirdRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="thirdRadioText">Spreadsheet</label>
+                                        <p id="helper-thirdRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.xlsx)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="highestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="fourthCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="fourthInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="fourthChk" value="cnvFrPDF">
                                     <div class="flex items-center h-5">
-                                        <input id="highestChkA" name="convertType" value="docx" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="fourthRadio" name="convertType" value="docx" aria-describedby="helper-fourthRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="highestChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">Word Document</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.docx)</p>
+                                        <label for="fourthRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="fourthRadioText">Word Document</label>
+                                        <p id="helper-fourthRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.docx)</p>
                                     </div>
                                 </div>
                             </li>

@@ -149,10 +149,10 @@ function submit(event) {
                     newModal.show();
             } else if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
                 if (document.getElementById('compPDF') !== null) {
-                    if (!document.getElementById('comp-low').checked && !document.getElementById('comp-rec').checked && !document.getElementById('comp-high').checked) {
-                        var compLow = document.getElementById('lowestChk')
-                        var compMed = document.getElementById('recChk')
-                        var compHigh = document.getElementById('highestChk')
+                    if (!document.getElementById('firstRadio').checked && !document.getElementById('secondRadio').checked && !document.getElementById('thirdRadio').checked) {
+                        var compLow = document.getElementById('firstRadio')
+                        var compMed = document.getElementById('secondRadio')
+                        var compHigh = document.getElementById('thirdRadio')
                         event.preventDefault();
                         errMessage.innerHTML  = "Please fill out these fields!";
                         errSubMessage.innerHTML = "";
@@ -173,11 +173,11 @@ function submit(event) {
                         modal.show();
                     }
                 } else  if (document.getElementById('cnvFrPDF') !== null) {
-                    if (!document.getElementById('lowestChkA').checked && !document.getElementById('ulChkA').checked && !document.getElementById('recChkA').checked && !document.getElementById('highestChkA').checked) {
-                        var cnvToImg = document.getElementById('lowestChk')
-                        var cnvToPPTX = document.getElementById('ulChk')
-                        var cnvToXLSX = document.getElementById('recChk')
-                        var cnvToDOCX = document.getElementById('highestChk')
+                    if (!document.getElementById('firstRadio').checked && !document.getElementById('secondRadio').checked && !document.getElementById('thirdRadio').checked && !document.getElementById('fourthRadio').checked) {
+                        var cnvToImg = document.getElementById('firstRadio')
+                        var cnvToPPTX = document.getElementById('secondRadio')
+                        var cnvToXLSX = document.getElementById('thirdRadio')
+                        var cnvToDOCX = document.getElementById('fourthRadio')
                         event.preventDefault();
                         errMessage.innerHTML  = "Please fill out these fields!";
                         errSubMessage.innerHTML = "";
@@ -258,9 +258,14 @@ function submit(event) {
             } else {
                 var file = document.getElementById("file_input");
                 let fileSize = file.files[0].size;
-                if (file.files[0].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                || file.files[0].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-                file.files[0].type == "application/vnd.openxmlformats-officedocument.presentationml.presentation")
+                if (file.files[0].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+                    file.files[0].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                    file.files[0].type == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                    file.files[0].type == "image/jpg" ||
+                    file.files[0].type == "image/jpeg" ||
+                    file.files[0].type == "image/png" ||
+                    file.files[0].type == "image/tif" ||
+                    file.files[0].type == "image/tiff")
                 {
                     if (fileSize >= 26214400) {
                         event.preventDefault();
@@ -292,17 +297,17 @@ function submit(event) {
             }
         } else if (document.getElementById('splitLayout1')) {
             if (!document.getElementById("file_input").value && uploadBtn == false) {
-                if (document.getElementById("SplitOpta").checked) {
+                if (document.getElementById("firstRadio").checked) {
                     let cusPage = false;
                     let fromPage = false;
                     let toPage = false;
                     var customPage = document.getElementById('customPage')
                     var firstPage = document.getElementById('fromPage')
                     var lastPage = document.getElementById('toPage')
-                    if (document.getElementById("SplitOpta").value == "split") {
+                    if (document.getElementById("firstRadio").value == "split") {
                         if (document.getElementById("splitRadio")) {
-                           if (document.getElementById("SplitOpt2a").checked) {
-                                if (document.getElementById("SplitOpt2a").value == "selPages") {
+                           if (document.getElementById("thirdRadio").checked) {
+                                if (document.getElementById("thirdRadio").value == "selPages") {
                                     if (document.getElementById("fromPage").value) {
                                         fromPage = true;
                                     } else {
@@ -314,7 +319,25 @@ function submit(event) {
                                         toPage = false;
                                     }
                                     if (fromPage && toPage) {
-                                        if (parseInt(document.getElementById("fromPage").value) >= parseInt(document.getElementById("toPage").value)) {
+                                        if (document.getElementById("fromPage").value.charAt(0) == "-") {
+                                            event.preventDefault();
+                                            errMessage.innerHTML  = "Invalid page number range!";
+                                            errListTitleMessage.innerHTML = "Error message"
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage("Page number can't use negative number");
+                                            firstPage.style.borderColor = '#dc2626'
+                                            newModal.show();
+                                        } else if (document.getElementById("toPage").value.charAt(0) == "-") {
+                                            event.preventDefault();
+                                            errMessage.innerHTML  = "Invalid page number range!";
+                                            errListTitleMessage.innerHTML = "Error message"
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage("Page number can't use negative number");
+                                            lastPage.style.borderColor = '#dc2626'
+                                            newModal.show();
+                                        } else if (parseInt(document.getElementById("fromPage").value) >= parseInt(document.getElementById("toPage").value)) {
                                             event.preventDefault();
                                             errMessage.innerHTML  = "Invalid page number range!";
                                             errListTitleMessage.innerHTML = "Error message"
@@ -382,8 +405,8 @@ function submit(event) {
                                     errAltSubMessageModal.style = null;
                                     newModal.show();
                                 }
-                            } else if (document.getElementById("SplitOpt2b").checked) {
-                                if (document.getElementById("SplitOpt2b").value == "cusPages") {
+                            } else if (document.getElementById("fourthRadio").checked) {
+                                if (document.getElementById("fourthRadio").value == "cusPages") {
                                     if (document.getElementById("customPage").value) {
                                          cusPage = true;
                                     } else {
@@ -444,10 +467,10 @@ function submit(event) {
                         errAltSubMessageModal.style = null;
                         newModal.show();
                     }
-                } else if (document.getElementById("SplitOptb").checked) {
+                } else if (document.getElementById("secondRadio").checked) {
                     let cusPage = false;
                     var customPage = document.getElementById('customPage')
-                    if (document.getElementById("SplitOptb").value == "extract") {
+                    if (document.getElementById("secondRadio").value == "delete") {
                             if (document.getElementById("customPage").value) {
                                  cusPage = true;
                             } else {
@@ -478,7 +501,7 @@ function submit(event) {
                             errSubMessage.innerHTML = "";
                             errListTitleMessage.innerHTML = "Error message"
                             resetErrListMessage();
-                            generateMesssage("Extract options decision logic error");
+                            generateMesssage("Delete options decision logic error");
                             errAltSubMessageModal.style = null;
                             newModal.show();
                         }
@@ -532,7 +555,7 @@ function submit(event) {
                 errAltSubMessageModal.style.display = "none";
                 newModal.show();
             }
-        } else if (document.getElementById('wmLayout1')) {
+        } else if (document.getElementById('wmColImageLayoutStyleA')) {
             if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
                 if (document.getElementById('wmType') != null) {
                     if (document.getElementById('wmType').value == 'text') {

@@ -1,3 +1,521 @@
+if (firstArea) {
+    firstArea.onclick = function() {
+        firstColumnArea.style.borderColor = '#38bdf8'
+        firstAreaText.style.color = '#38bdf8'
+        firstAreaInput.checked = true
+        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
+            secondAreaText.style.color = '#1e293b'
+        } else {
+            secondAreaText.style.color = '#6b7280'
+        }
+        secondColumnArea.style = null
+        if (thirdArea) {
+            if (firstAreaAltInput.value !== "split") {
+                if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
+                    thirdAreaText.style.color = '#1e293b'
+                } else {
+                    thirdAreaText.style.color = '#6b7280'
+                }
+                thirdAreaInput.checked = false
+                thirdColumnArea.style = null
+            } else {
+                if (thirdAreaInput.checked == true) {
+                    thirdColumnArea.style.borderColor = '#38bdf8'
+                    thirdAreaText.style.color = '#38bdf8'
+                    splitLayout3_wthn()
+                }
+            }
+        }
+        if (fourthArea) {
+            if (firstAreaAltInput.value !== "split") {
+                if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
+                    fourthAreaText.style.color = '#1e293b'
+                } else {
+                    fourthAreaText.style.color = '#6b7280'
+                }
+                fourthAreaInput.checked = false
+                fourthColumnArea.style = null
+            }  else {
+                if (fourthAreaInput.checked == true) {
+                    fourthColumnArea.style.borderColor = '#38bdf8'
+                    fourthAreaText.style.color = '#38bdf8'
+                    splitLayout3_cstm()
+                }
+            }
+        }
+        if (firstAreaAltInput.value == "split") {
+            splitLayout2_split();
+            if (thirdAreaInput.checked !== true && fourthAreaInput.checked !== true) {
+                splitLayout2_splitClean();
+            }
+        } else if (firstAreaAltInput.value == "watermark") {
+            wmLayout_ImageInputRestore()
+            wmLayout_image()
+        }
+    }
+}
+
+if (secondArea) {
+    secondArea.onclick = function() {
+        secondColumnArea.style.borderColor = '#38bdf8'
+        secondAreaText.style.color = '#38bdf8'
+        secondAreaInput.checked = true
+        if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
+            firstAreaText.style.color = '#1e293b'
+        } else {
+            firstAreaText.style.color = '#6b7280'
+        }
+        firstColumnArea.style = null
+        if (thirdArea) {
+            if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
+                thirdAreaText.style.color = '#1e293b'
+            } else {
+                thirdAreaText.style.color = '#6b7280'
+            }
+            thirdColumnArea.style = null
+        }
+        if (fourthArea) {
+            if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
+                fourthAreaText.style.color = '#1e293b'
+            } else {
+                fourthAreaText.style.color = '#6b7280'
+            }
+            fourthColumnArea.style = null
+        }
+        if (secondAreaAltInput.value == "split") {
+            splitLayout2_delete();
+        }  else if (firstAreaAltInput.value == "watermark") {
+            wmLayout_TextInputRestore()
+            wmLayout_text()
+        }
+    }
+}
+
+if (thirdArea) {
+    thirdArea.onclick = function() {
+        thirdColumnArea.style.borderColor = '#38bdf8'
+        thirdAreaText.style.color = '#38bdf8'
+        thirdAreaInput.checked = true
+        if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
+            firstAreaText.style.color = '#1e293b'
+        } else {
+            firstAreaText.style.color = '#6b7280'
+        }
+        firstColumnArea.style = null
+        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
+            secondAreaText.style.color = '#1e293b'
+        } else {
+            secondAreaText.style.color = '#6b7280'
+        }
+        secondColumnArea.style = null
+        if (fourthArea) {
+            if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
+                fourthAreaText.style.color = '#1e293b'
+            } else {
+                fourthAreaText.style.color = '#6b7280'
+            }
+            fourthColumnArea.style = null
+        }
+        if (thirdAreaAltInput.value == "split") {
+            splitLayout3_wthn()
+            if (firstAreaInput.checked == true) {
+                firstColumnArea.style.borderColor = '#38bdf8'
+                firstAreaText.style.color = '#38bdf8'
+            }
+        }
+    }
+}
+
+if (fourthArea) {
+    fourthArea.onclick = function() {
+        fourthColumnArea.style.borderColor = '#38bdf8'
+        fourthAreaText.style.color = '#38bdf8'
+        fourthAreaInput.checked = true
+        if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
+            firstAreaText.style.color = '#1e293b'
+        } else {
+            firstAreaText.style.color = '#6b7280'
+        }
+        firstColumnArea.style = null
+        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
+            secondAreaText.style.color = '#1e293b'
+        } else {
+            secondAreaText.style.color = '#6b7280'
+        }
+        secondColumnArea.style = null
+        if (thirdArea) {
+            if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
+                thirdAreaText.style.color = '#1e293b'
+            } else {
+                thirdAreaText.style.color = '#6b7280'
+            }
+            thirdColumnArea.style = null
+        }
+        if (fourthAreaAltInput.value == "split") {
+            splitLayout3_cstm()
+            if (firstAreaInput.checked == true) {
+                firstColumnArea.style.borderColor = '#38bdf8'
+                firstAreaText.style.color = '#38bdf8'
+            }
+        }
+    }
+}
+
+if (wmLayoutImageStyleAreaA) {
+    wmLayoutImageStyleAreaA.onclick = function() {
+        reuseOnClickWmLayoutImageStyleAreaA()
+        if (firstAreaInput.checked == true) {
+            firstColumnArea.style.borderColor = '#38bdf8'
+            firstAreaText.style.color = '#38bdf8'
+            firstAreaInput.checked = true
+        } else if (secondAreaInput.checked == true) {
+            secondColumnArea.style.borderColor = '#38bdf8'
+            secondAreaText.style.color = '#38bdf8'
+            secondAreaInput.checked = true
+        }
+    }
+}
+
+if (wmLayoutImageStyleAreaB) {
+    wmLayoutImageStyleAreaB.onclick = function() {
+        reuseOnClickWmLayoutImageStyleAreaB()
+        if (firstAreaInput.checked == true) {
+            firstColumnArea.style.borderColor = '#38bdf8'
+            firstAreaText.style.color = '#38bdf8'
+            firstAreaInput.checked = true
+        } else if (secondAreaInput.checked == true) {
+            secondColumnArea.style.borderColor = '#38bdf8'
+            secondAreaText.style.color = '#38bdf8'
+            secondAreaInput.checked = true
+        }
+    }
+}
+
+if (wmImageRotationAreaA) {
+    wmImageRotationAreaA.onclick = function() {
+        wmImageRotationColumnAreaA.style.borderColor = '#38bdf8'
+        wmImageRotationRadioAreaTextA.style.color = '#38bdf8'
+        wmImageRotationRadioAreaInputA.checked = true
+        wmImageRotationColumnAreaB.style = null
+        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationColumnAreaC.style = null
+        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        wmImageRotationColumnAreaD.style = null
+        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        if (wmLayoutImageRadioAreaInputA.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaA()
+        } else if (wmLayoutImageRadioAreaInputB.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaB()
+        }
+    }
+}
+
+if (wmImageRotationAreaB) {
+    wmImageRotationAreaB.onclick = function() {
+        wmImageRotationColumnAreaB.style.borderColor = '#38bdf8'
+        wmImageRotationRadioAreaTextB.style.color = '#38bdf8'
+        wmImageRotationRadioAreaInputB.checked = true
+        wmImageRotationColumnAreaA.style = null
+        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationColumnAreaC.style = null
+        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        wmImageRotationColumnAreaD.style = null
+        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        if (wmLayoutImageRadioAreaInputA.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaA()
+        } else if (wmLayoutImageRadioAreaInputB.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaB()
+        }
+    }
+}
+
+if (wmImageRotationAreaC) {
+    wmImageRotationAreaC.onclick = function() {
+        wmImageRotationColumnAreaC.style.borderColor = '#38bdf8'
+        wmImageRotationRadioAreaTextC.style.color = '#38bdf8'
+        wmImageRotationRadioAreaInputC.checked = true
+        wmImageRotationColumnAreaA.style = null
+        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationColumnAreaB.style = null
+        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationColumnAreaD.style = null
+        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        if (wmLayoutImageRadioAreaInputA.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaA()
+        } else if (wmLayoutImageRadioAreaInputB.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaB()
+        }
+    }
+}
+
+if (wmImageRotationAreaD) {
+    wmImageRotationAreaD.onclick = function() {
+        wmImageRotationColumnAreaD.style.borderColor = '#38bdf8'
+        wmImageRotationRadioAreaTextD.style.color = '#38bdf8'
+        wmImageRotationRadioAreaInputD.checked = true
+        wmImageRotationColumnAreaA.style = null
+        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationColumnAreaB.style = null
+        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationColumnAreaC.style = null
+        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        if (wmLayoutImageRadioAreaInputA.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaA()
+        } else if (wmLayoutImageRadioAreaInputB.checked == true) {
+            reuseOnClickWmLayoutImageStyleAreaB()
+        }
+    }
+}
+
+if (wmChkFontFamilyA) {
+    wmChkFontFamilyA.onclick = function() {
+        wmColFontFamilyA.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextA.style.color = '#38bdf8'
+        wmRadioFontFamilyA.checked = true
+        wmColFontFamilyB.style = null
+        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmColFontFamilyC.style = null
+        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmColFontFamilyD.style = null
+        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmColFontFamilyE.style = null
+        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmColFontFamilyF.style = null
+        wmRadioFontFamilyTextF.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontFamilyB) {
+    wmChkFontFamilyB.onclick = function() {
+        wmColFontFamilyB.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextB.style.color = '#38bdf8'
+        wmRadioFontFamilyB.checked = true
+        wmColFontFamilyA.style = null
+        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmColFontFamilyC.style = null
+        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmColFontFamilyD.style = null
+        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmColFontFamilyE.style = null
+        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmColFontFamilyF.style = null
+        wmRadioFontFamilyTextF.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontFamilyC) {
+    wmChkFontFamilyC.onclick = function() {
+        wmColFontFamilyC.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextC.style.color = '#38bdf8'
+        wmRadioFontFamilyC.checked = true
+        wmColFontFamilyB.style = null
+        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmColFontFamilyA.style = null
+        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmColFontFamilyD.style = null
+        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmColFontFamilyE.style = null
+        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmColFontFamilyF.style = null
+        wmRadioFontFamilyTextF.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontFamilyD) {
+    wmChkFontFamilyD.onclick = function() {
+        wmColFontFamilyD.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextD.style.color = '#38bdf8'
+        wmRadioFontFamilyD.checked = true
+        wmColFontFamilyB.style = null
+        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmColFontFamilyC.style = null
+        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmColFontFamilyA.style = null
+        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmColFontFamilyE.style = null
+        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmColFontFamilyF.style = null
+        wmRadioFontFamilyTextF.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontFamilyE) {
+    wmChkFontFamilyE.onclick = function() {
+        wmColFontFamilyE.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextE.style.color = '#38bdf8'
+        wmRadioFontFamilyE.checked = true
+        wmColFontFamilyB.style = null
+        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmColFontFamilyC.style = null
+        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmColFontFamilyD.style = null
+        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmColFontFamilyA.style = null
+        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmColFontFamilyF.style = null
+        wmRadioFontFamilyTextF.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontFamilyF) {
+    wmChkFontFamilyF.onclick = function() {
+        wmColFontFamilyF.style.borderColor = '#38bdf8'
+        wmRadioFontFamilyTextF.style.color = '#38bdf8'
+        wmRadioFontFamilyF.checked = true
+        wmColFontFamilyB.style = null
+        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmColFontFamilyC.style = null
+        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmColFontFamilyD.style = null
+        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmColFontFamilyE.style = null
+        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmColFontFamilyA.style = null
+        wmRadioFontFamilyTextA.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontStyleA) {
+    wmChkFontStyleA.onclick = function() {
+        wmColFontStyleA.style.borderColor = '#38bdf8'
+        wmRadioFontStyleTextA.style.color = '#38bdf8'
+        wmRadioFontStyleA.checked = true
+        wmColFontStyleB.style = null
+        wmRadioFontStyleTextB.style.color = '#6b7280'
+        wmColFontStyleC.style = null
+        wmRadioFontStyleTextC.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontStyleB) {
+    wmChkFontStyleB.onclick = function() {
+        wmColFontStyleB.style.borderColor = '#38bdf8'
+        wmRadioFontStyleTextB.style.color = '#38bdf8'
+        wmRadioFontStyleB.checked = true
+        wmColFontStyleA.style = null
+        wmRadioFontStyleTextA.style.color = '#6b7280'
+        wmColFontStyleC.style = null
+        wmRadioFontStyleTextC.style.color = '#6b7280'
+    }
+}
+
+if (wmChkFontStyleC) {
+    wmChkFontStyleC.onclick = function() {
+        wmColFontStyleC.style.borderColor = '#38bdf8'
+        wmRadioFontStyleTextC.style.color = '#38bdf8'
+        wmRadioFontStyleC.checked = true
+        wmColFontStyleB.style = null
+        wmRadioFontStyleTextB.style.color = '#6b7280'
+        wmColFontStyleA.style = null
+        wmRadioFontStyleTextA.style.color = '#6b7280'
+    }
+}
+
+if (wmChkLayoutStyleA) {
+    wmChkLayoutStyleA.onclick = function() {
+        wmColLayoutStyleA.style.borderColor = '#38bdf8'
+        wmRadioLayoutStyleTextA.style.color = '#38bdf8'
+        wmRadioLayoutStyleA.checked = true
+        wmColLayoutStyleB.style = null
+        wmRadioLayoutStyleTextB.style.color = '#6b7280'
+
+    }
+}
+
+if (wmChkLayoutStyleB) {
+    wmChkLayoutStyleB.onclick = function() {
+
+        wmColLayoutStyleB.style.borderColor = '#38bdf8'
+        wmRadioLayoutStyleTextB.style.color = '#38bdf8'
+        wmRadioLayoutStyleB.checked = true
+        wmColLayoutStyleA.style = null
+        wmRadioLayoutStyleTextA.style.color = '#6b7280'
+    }
+}
+
+if (wmChkRotationA) {
+    wmChkRotationA.onclick = function() {
+        wmColRotationA.style.borderColor = '#38bdf8'
+        wmRadioRotationTextA.style.color = '#38bdf8'
+        wmRadioRotationA.checked = true
+        wmColRotationB.style = null
+        wmRadioRotationTextB.style.color = '#6b7280'
+        wmColRotationC.style = null
+        wmRadioRotationTextC.style.color = '#6b7280'
+        wmColRotationD.style = null
+        wmRadioRotationTextD.style.color = '#6b7280'
+    }
+}
+
+if (wmChkRotationB) {
+    wmChkRotationB.onclick = function() {
+        wmColRotationB.style.borderColor = '#38bdf8'
+        wmRadioRotationTextB.style.color = '#38bdf8'
+        wmRadioRotationB.checked = true
+        wmColRotationA.style = null
+        wmRadioRotationTextA.style.color = '#6b7280'
+        wmColRotationC.style = null
+        wmRadioRotationTextC.style.color = '#6b7280'
+        wmColRotationD.style = null
+        wmRadioRotationTextD.style.color = '#6b7280'
+    }
+}
+
+if (wmChkRotationC) {
+    wmChkRotationC.onclick = function() {
+        wmColRotationC.style.borderColor = '#38bdf8'
+        wmRadioRotationTextC.style.color = '#38bdf8'
+        wmRadioRotationC.checked = true
+        wmColRotationB.style = null
+        wmRadioRotationTextB.style.color = '#6b7280'
+        wmColRotationA.style = null
+        wmRadioRotationTextA.style.color = '#6b7280'
+        wmColRotationD.style = null
+        wmRadioRotationTextD.style.color = '#6b7280'
+    }
+}
+
+if (wmChkRotationD) {
+    wmChkRotationD.onclick = function() {
+        wmColRotationD.style.borderColor = '#38bdf8'
+        wmRadioRotationTextD.style.color = '#38bdf8'
+        wmRadioRotationD.checked = true
+        wmColRotationB.style = null
+        wmRadioRotationTextB.style.color = '#6b7280'
+        wmColRotationC.style = null
+        wmRadioRotationTextC.style.color = '#6b7280'
+        wmColRotationA.style = null
+        wmRadioRotationTextA.style.color = '#6b7280'
+    }
+}
+
+if (document.getElementById('multiple_files')) {
+    document.getElementById('multiple_files').addEventListener('change', function(e) {
+        var list = document.getElementById('filelist');
+        var newList = document.getElementById('pre-title');
+        if (document.getElementById('multiple_files').value !== '') {
+            if (newList.innerHTML !== '') {
+                newList.innerHTML = ``;
+                for (var i = 0; i < this.files.length; i++) {
+                    generateMesssage(this.files[i].name)
+                }
+            } else {
+                for (var i = 0; i < this.files.length; i++) {
+                    generateMesssage(this.files[i].name)
+                }
+            }
+            if (newList.innerHTML == '') {
+                list.style.display = 'none';
+            } else {
+                list.style.display = 'block';
+            }
+        } else {
+                list.style.display = 'none';
+                newList.innerHTML = ``;
+        }
+    });
+}
+
 function changeButtonColor(kaoInput) {
     if (kaoInput == 'kaoA') {
         document.getElementById('file_input').addEventListener('change', function(e) {
@@ -57,85 +575,13 @@ function changeButtonColor(kaoInput) {
 }
 
 function checkValidation(validation) {
-    if (validation == 'compMethod') {
-        if (!document.getElementById('comp-low').checked && !document.getElementById('comp-rec').checked && !document.getElementById('comp-high').checked) {
-            document.getElementById('lowestChk').style.borderColor = '#dc2626'
-            document.getElementById('recChk').style.borderColor = '#dc2626'
-            document.getElementById('highestChk').style.borderColor = '#dc2626'
-        } else {
-            if (document.getElementById('comp-low').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#38bdf8'
-                document.getElementById("lowest-txt").style.color = '#38bdf8'
-                document.getElementById("recChk").style.borderColor = '#e2e8f0'
-                document.getElementById("rec-txt").style.color = '#1e293b'
-                document.getElementById("highestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("highest-txt").style.color = '#1e293b'
-            } else if (document.getElementById('comp-rec').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("lowest-txt").style.color = '#1e293b'
-                document.getElementById("recChk").style.borderColor = '#38bdf8'
-                document.getElementById("rec-txt").style.color = '#38bdf8'
-                document.getElementById("highestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("highest-txt").style.color = '#1e293b'
-            } else if (document.getElementById('comp-high').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("lowest-txt").style.color = '#1e293b'
-                document.getElementById("recChk").style.borderColor = '#e2e8f0'
-                document.getElementById("rec-txt").style.color = '#1e293b'
-                document.getElementById("highestChk").style.borderColor = '#38bdf8'
-                document.getElementById("highest-txt").style.color = '#38bdf8'
-            }
-            document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
-            document.getElementById("submitBtn_1").style.color = "white"
-        }
+    if (validation == 'comp') {
+        document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+        document.getElementById("submitBtn_1").style.color = "white"
     }
     if (validation == 'cnvFrPDF') {
-        if (!document.getElementById('lowestChkA').checked && !document.getElementById('ulChkA').checked && !document.getElementById('recChkA').checked && !document.getElementById('highestChkA').checked) {
-            document.getElementById('lowestChkA').style.borderColor = '#dc2626'
-            document.getElementById('recChkA').style.borderColor = '#dc2626'
-            document.getElementById('highestChkA').style.borderColor = '#dc2626'
-            document.getElementById('ulChkA').style.borderColor = '#dc2626'
-        } else {
-            if (document.getElementById('lowestChkA').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#38bdf8'
-                document.getElementById("lowest-txt").style.color = '#38bdf8'
-                document.getElementById("recChk").style.borderColor = '#e2e8f0'
-                document.getElementById("rec-txt").style.color = '#1e293b'
-                document.getElementById("highestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("highest-txt").style.color = '#1e293b'
-                document.getElementById("ulChk").style.borderColor = '#e2e8f0'
-                document.getElementById("ul-txt").style.color = '#1e293b'
-            } else if (document.getElementById('recChkA').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("lowest-txt").style.color = '#1e293b'
-                document.getElementById("recChk").style.borderColor = '#38bdf8'
-                document.getElementById("rec-txt").style.color = '#38bdf8'
-                document.getElementById("highestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("highest-txt").style.color = '#1e293b'
-                document.getElementById("ulChk").style.borderColor = '#e2e8f0'
-                document.getElementById("ul-txt").style.color = '#1e293b'
-            } else if (document.getElementById('highestChkA').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("lowest-txt").style.color = '#1e293b'
-                document.getElementById("recChk").style.borderColor = '#e2e8f0'
-                document.getElementById("rec-txt").style.color = '#1e293b'
-                document.getElementById("highestChk").style.borderColor = '#38bdf8'
-                document.getElementById("highest-txt").style.color = '#38bdf8'
-                document.getElementById("ulChk").style.borderColor = '#e2e8f0'
-                document.getElementById("ul-txt").style.color = '#1e293b'
-            } else if (document.getElementById('ulChkA').checked) {
-                document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("lowest-txt").style.color = '#1e293b'
-                document.getElementById("recChk").style.borderColor = '#e2e8f0'
-                document.getElementById("rec-txt").style.color = '#1e293b'
-                document.getElementById("highestChk").style.borderColor = '#e2e8f0'
-                document.getElementById("highest-txt").style.color = '#1e293b'
-                document.getElementById("ulChk").style.borderColor = '#38bdf8'
-                document.getElementById("ul-txt").style.color = '#38bdf8'
-            }
-            document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
-            document.getElementById("submitBtn_1").style.color = "white"
-        }
+        document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
+        document.getElementById("submitBtn_1").style.color = "white"
     }
     if (validation == 'extCustomPage' || validation == 'splitCustomPage') {
         if (document.getElementById("customPage").value != '') {
@@ -179,24 +625,6 @@ function checkValidation(validation) {
             document.getElementById("wm_file_input").style.borderColor = "#dc2626"
         }
     }
-    if (validation == 'urlToPDF') {
-        if (document.getElementById("urlToPDF").value != '') {
-            document.getElementById("urlToPDF").style.borderColor = "#d1d5db"
-        } else {
-            document.getElementById("urlToPDF").style.borderColor = "#dc2626"
-        }
-    }
-}
-
-function dropdownManage() {
-    if (document.getElementById('dropdownNavbarLink').value == "1") {
-        document.getElementById('dropdownNavbarImage').style.transform = 'rotate(-90deg)';
-        document.getElementById('dropdownNavbarLink').value = "0";
-    } else {
-        document.getElementById('dropdownNavbarImage').style.transform = 'rotate(0deg)';
-        document.getElementById('dropdownNavbarLink').value = "1";
-
-    }
 }
 
 function dropdownCnvToPDF() {
@@ -226,6 +654,37 @@ function dropdownCnvFromPDF() {
         document.getElementById('cnvFromPDFdropdownImage').style.transform = 'rotate(0deg)';
         document.getElementById('cnvFromPDFdropdown').value = "1";
     }
+}
+
+function dropdownManage() {
+    if (document.getElementById('dropdownNavbarLink').value == "1") {
+        document.getElementById('dropdownNavbarImage').style.transform = 'rotate(-90deg)';
+        document.getElementById('dropdownNavbarLink').value = "0";
+    } else {
+        document.getElementById('dropdownNavbarImage').style.transform = 'rotate(0deg)';
+        document.getElementById('dropdownNavbarLink').value = "1";
+
+    }
+}
+
+function formatBytes(bytes, decimals = 2) {
+    if (!+bytes) return '0 Bytes'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
+function generateMesssage(subMessage) {
+    var ul = document.getElementById("pre-title");
+    var li = document.createElement("li");
+    li.id = "pre-list_"+ul.childElementCount;
+    li.appendChild(document.createTextNode(subMessage));
+    ul.appendChild(li);
 }
 
 function init() {
@@ -282,7 +741,7 @@ function init() {
                 splitLayout.style.display="none"
             }
         }
-    } else if (document.getElementById("wmLayout1") !== null) {
+    } else if (document.getElementById("wmColImageLayoutStyleA") !== null) {
         var fullPath = document.getElementById('caption')
         var btnLayout = document.getElementById('submitBtn')
         var mergeLayout = document.getElementById('submitBtn_1')
@@ -312,273 +771,6 @@ function init() {
     }
 }
 
-function formatBytes(bytes, decimals = 2) {
-    if (!+bytes) return '0 Bytes'
-
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
-}
-
-function generateMesssage(subMessage) {
-    var ul = document.getElementById("pre-title");
-    var li = document.createElement("li");
-    li.id = "pre-list_"+ul.childElementCount;
-    li.appendChild(document.createTextNode(subMessage));
-    ul.appendChild(li);
-}
-
-function HiChkSplit3Click() {
-    document.getElementById("lowestChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt3").style.color = '#6b7280'
-    document.getElementById("recChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt3").style.color = '#6b7280'
-    document.getElementById("hiChk3").style.borderColor = '#38bdf8'
-    document.getElementById("hi-txt3").style.color = '#38bdf8'
-    document.getElementById("ulChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt3").style.color = '#6b7280'
-}
-
-function HiChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt4").style.color = '#6b7280'
-    document.getElementById("recChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt4").style.color = '#6b7280'
-    document.getElementById("hiChk4").style.borderColor = '#38bdf8'
-    document.getElementById("hi-txt4").style.color = '#38bdf8'
-    document.getElementById("ulChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt4").style.color = '#6b7280'
-    document.getElementById("srChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("sr-txt4").style.color = '#6b7280'
-    document.getElementById("ssrChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ssr-txt4").style.color = '#6b7280'
-}
-
-function HiChkSplit5Click() {
-    document.getElementById("lowestChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt5").style.color = '#6b7280'
-    document.getElementById("recChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt5").style.color = '#6b7280'
-    document.getElementById("hiChk5").style.borderColor = '#38bdf8'
-    document.getElementById("hi-txt5").style.color = '#38bdf8'
-}
-
-function HiChkSplit7Click() {
-    document.getElementById("lowestChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt7").style.color = '#6b7280'
-    document.getElementById("recChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt7").style.color = '#6b7280'
-    document.getElementById("hiChk7").style.borderColor = '#38bdf8'
-    document.getElementById("hi-txt7").style.color = '#38bdf8'
-    document.getElementById("ulChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt7").style.color = '#6b7280'
-}
-
-function LowChkSplitClick() {
-    document.getElementById("lowestChk").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt").style.color = '#38bdf8'
-    document.getElementById("recChk").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt").style.color = '#6b7280'
-}
-
-function LowChkSplit2Click() {
-    document.getElementById("lowestChk2").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt2").style.color = '#38bdf8'
-    document.getElementById("recChk2").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt2").style.color = '#6b7280'
-}
-
-function LowChkSplit3Click() {
-    document.getElementById("lowestChk3").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt3").style.color = '#38bdf8'
-    document.getElementById("recChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt3").style.color = '#6b7280'
-    document.getElementById("hiChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt3").style.color = '#6b7280'
-    document.getElementById("ulChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt3").style.color = '#6b7280'
-}
-
-function LowChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt4").style.color = '#38bdf8'
-    document.getElementById("recChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt4").style.color = '#6b7280'
-    document.getElementById("hiChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt4").style.color = '#6b7280'
-    document.getElementById("ulChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt4").style.color = '#6b7280'
-    document.getElementById("srChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("sr-txt4").style.color = '#6b7280'
-    document.getElementById("ssrChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ssr-txt4").style.color = '#6b7280'
-}
-
-function LowChkSplit5Click() {
-    document.getElementById("lowestChk5").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt5").style.color = '#38bdf8'
-    document.getElementById("recChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt5").style.color = '#6b7280'
-    document.getElementById("hiChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt5").style.color = '#6b7280'
-}
-
-function LowChkSplit6Click() {
-    document.getElementById("lowestChk6").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt6").style.color = '#38bdf8'
-    document.getElementById("recChk6").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt6").style.color = '#6b7280'
-}
-
-function LowChkSplit7Click() {
-    document.getElementById("lowestChk7").style.borderColor = '#38bdf8'
-    document.getElementById("lowest-txt7").style.color = '#38bdf8'
-    document.getElementById("recChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt7").style.color = '#6b7280'
-    document.getElementById("hiChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt7").style.color = '#6b7280'
-    document.getElementById("ulChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt7").style.color = '#6b7280'
-}
-
-function RecChkSplitClick() {
-    document.getElementById("lowestChk").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt").style.color = '#6b7280'
-    document.getElementById("recChk").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt").style.color = '#6b7280'
-}
-
-function RecChkSplit2Click() {
-    document.getElementById("lowestChk2").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt2").style.color = '#6b7280'
-    document.getElementById("recChk2").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt2").style.color = '#6b7280'
-}
-
-function RecChkSplit3Click() {
-    document.getElementById("lowestChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt3").style.color = '#6b7280'
-    document.getElementById("recChk3").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt3").style.color = '#38bdf8'
-    document.getElementById("hiChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt3").style.color = '#6b7280'
-    document.getElementById("ulChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt3").style.color = '#6b7280'
-}
-
-function RecChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt4").style.color = '#6b7280'
-    document.getElementById("recChk4").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt4").style.color = '#38bdf8'
-    document.getElementById("hiChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt4").style.color = '#6b7280'
-    document.getElementById("ulChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt4").style.color = '#6b7280'
-    document.getElementById("srChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("sr-txt4").style.color = '#6b7280'
-    document.getElementById("ssrChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ssr-txt4").style.color = '#6b7280'
-}
-
-function RecChkSplit5Click() {
-    document.getElementById("lowestChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt5").style.color = '#6b7280'
-    document.getElementById("recChk5").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt5").style.color = '#38bdf8'
-    document.getElementById("hiChk5").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt5").style.color = '#6b7280'
-}
-
-function RecChkSplit6Click() {
-    document.getElementById("lowestChk6").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt6").style.color = '#6b7280'
-    document.getElementById("recChk6").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt6").style.color = '#38bdf8'
-}
-
-function RecChkSplit7Click() {
-    document.getElementById("lowestChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt7").style.color = '#6b7280'
-    document.getElementById("recChk7").style.borderColor = '#38bdf8'
-    document.getElementById("rec-txt7").style.color = '#38bdf8'
-    document.getElementById("hiChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt7").style.color = '#6b7280'
-    document.getElementById("ulChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt7").style.color = '#6b7280'
-}
-
-function SRChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt4").style.color = '#6b7280'
-    document.getElementById("recChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt4").style.color = '#6b7280'
-    document.getElementById("hiChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt4").style.color = '#6b7280'
-    document.getElementById("ulChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt4").style.color = '#6b7280'
-    document.getElementById("srChk4").style.borderColor = '#38bdf8'
-    document.getElementById("sr-txt4").style.color = '#38bdf8'
-    document.getElementById("ssrChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ssr-txt4").style.color = '#6b7280'
-}
-
-function SSRChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt4").style.color = '#6b7280'
-    document.getElementById("recChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt4").style.color = '#6b7280'
-    document.getElementById("hiChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt4").style.color = '#6b7280'
-    document.getElementById("ulChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ul-txt4").style.color = '#6b7280'
-    document.getElementById("srChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("sr-txt4").style.color = '#6b7280'
-    document.getElementById("ssrChk4").style.borderColor = '#38bdf8'
-    document.getElementById("ssr-txt4").style.color = '#38bdf8'
-}
-
-function UlChkSplit3Click() {
-    document.getElementById("lowestChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt3").style.color = '#6b7280'
-    document.getElementById("recChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt3").style.color = '#6b7280'
-    document.getElementById("hiChk3").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt3").style.color = '#6b7280'
-    document.getElementById("ulChk3").style.borderColor = '#38bdf8'
-    document.getElementById("ul-txt3").style.color = '#38bdf8'
-}
-
-function UlChkSplit4Click() {
-    document.getElementById("lowestChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt4").style.color = '#6b7280'
-    document.getElementById("recChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt4").style.color = '#6b7280'
-    document.getElementById("hiChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt4").style.color = '#6b7280'
-    document.getElementById("ulChk4").style.borderColor = '#38bdf8'
-    document.getElementById("ul-txt4").style.color = '#38bdf8'
-    document.getElementById("srChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("sr-txt4").style.color = '#6b7280'
-    document.getElementById("ssrChk4").style.borderColor = '#e2e8f0'
-    document.getElementById("ssr-txt4").style.color = '#6b7280'
-}
-
-function UlChkSplit7Click() {
-    document.getElementById("lowestChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("lowest-txt7").style.color = '#6b7280'
-    document.getElementById("recChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("rec-txt7").style.color = '#6b7280'
-    document.getElementById("hiChk7").style.borderColor = '#e2e8f0'
-    document.getElementById("hi-txt7").style.color = '#6b7280'
-    document.getElementById("ulChk7").style.borderColor = '#38bdf8'
-    document.getElementById("ul-txt7").style.color = '#38bdf8'
-}
-
 function reloadIFrame() {
     var iframe = document.getElementById("iFrame");
     if (iframe !== null) {
@@ -598,6 +790,142 @@ function reloadIFrame() {
 
 }
 
+function reuseOnClickWmLayoutImageStyleAreaA() {
+    wmLayoutImageStyleColumnAreaA.style.borderColor = '#38bdf8'
+    wmLayoutImageStyleAreaTextA.style.color = '#38bdf8'
+    wmLayoutImageRadioAreaInputA.checked = true
+    firstColumnArea.style = null
+    firstAreaText.color = '#6b7280'
+    secondColumnArea.style = null
+    secondAreaText.color = '#6b7280'
+    wmLayoutImageStyleColumnAreaB.style = null
+    wmLayoutImageStyleAreaTextB.style.color = '#6b7280'
+    if (firstAreaInput.checked == true) {
+        firstColumnArea.style.borderColor = '#38bdf8'
+        firstAreaText.style.color = '#38bdf8'
+        firstAreaInput.checked = true
+    } else if (secondAreaInput.checked == true) {
+        secondColumnArea.style.borderColor = '#38bdf8'
+        secondAreaText.style.color = '#38bdf8'
+        secondAreaInput.checked = true
+    }
+}
+
+function reuseOnClickWmLayoutImageStyleAreaB() {
+    wmLayoutImageStyleColumnAreaB.style.borderColor = '#38bdf8'
+    wmLayoutImageStyleAreaTextB.style.color = '#38bdf8'
+    wmLayoutImageRadioAreaInputB.checked = true
+    firstColumnArea.style = null
+    firstAreaText.color = '#6b7280'
+    secondColumnArea.style = null
+    secondAreaText.color = '#6b7280'
+    wmLayoutImageStyleColumnAreaA.style = null
+    wmLayoutImageStyleAreaTextA.style.color = '#6b7280'
+    if (firstAreaInput.checked == true) {
+        firstColumnArea.style.borderColor = '#38bdf8'
+        firstAreaText.style.color = '#38bdf8'
+        firstAreaInput.checked = true
+    } else if (secondAreaInput.checked == true) {
+        secondColumnArea.style.borderColor = '#38bdf8'
+        secondAreaText.style.color = '#38bdf8'
+        secondAreaInput.checked = true
+    }
+}
+
+function showVal(newVal){
+    document.getElementById("TransparencyValue").innerHTML=newVal+" %";
+}
+
+function splitLayout2_split(){
+    document.getElementById("splitLayout2_split").style.display = null;
+    document.getElementById("splitLayout2_delete").style.display = "none";
+    document.getElementById("submitBtn_2").style.display= "none";
+    document.getElementById("submitBtn_3").style.display= "none";
+};
+
+function splitLayout2_splitClean() {
+    document.getElementById("splitLayout3Cstm").style.display = "none";
+    document.getElementById("splitLayout3Wthn").style.display = "none";
+    document.getElementById("submitBtn_2").style.display = "none";
+    document.getElementById("submitBtn_3").style.display= "none";
+};
+
+function splitLayout2_delete(){
+    document.getElementById("splitLayout2_split").style.display = "none";
+    document.getElementById("splitLayout2_delete").style.display = null;
+    document.getElementById("splitLayout3Cstm").style.display = "none";
+    document.getElementById("splitLayout3Wthn").style.display = "none";
+    document.getElementById("submitBtn_2").style.display = "none";
+    document.getElementById("submitBtn_3").style.display = null;
+};
+
+function splitLayout3_cstm(){
+    document.getElementById("splitLayout3Cstm").style.display = null;
+    document.getElementById("splitLayout3Wthn").style.display = "none";
+    document.getElementById("submitBtn_2").style.display = null;
+    document.getElementById("submitBtn_3").style.display = "none";
+};
+
+function splitLayout3_wthn(){
+    document.getElementById("splitLayout3Cstm").style.display = "none";
+    document.getElementById("splitLayout3Wthn").style.display = null;
+    document.getElementById("submitBtn_2").style.display= null;
+    document.getElementById("submitBtn_3").style.display= "none";
+};
+
+function wmLayout_image(){
+    document.getElementById("wmLayoutImage").style.display = null
+    document.getElementById("wmLayoutText").style.display = "none"
+};
+
+function wmLayout_ImageInputRestore() {
+    if (wmLayoutImageStyleColumnAreaA.style.borderColor == "rgb(56, 189, 248)") {
+        wmLayoutImageRadioAreaInputA.checked = true
+    }
+    if (wmLayoutImageStyleColumnAreaB.style.borderColor == "rgb(56, 189, 248)") {
+        wmLayoutImageRadioAreaInputB.checked = true
+    }
+    if (wmImageRotationColumnAreaA.style.borderColor == "rgb(56, 189, 248)") {
+        wmImageRotationRadioAreaInputA.checked = true
+    }
+    if (wmImageRotationColumnAreaB.style.borderColor == "rgb(56, 189, 248)") {
+        wmImageRotationRadioAreaInputB.checked = true
+    }
+    if (wmImageRotationColumnAreaC.style.borderColor == "rgb(56, 189, 248)") {
+        wmImageRotationRadioAreaInputC.checked = true
+    }
+    if (wmImageRotationColumnAreaD.style.borderColor == "rgb(56, 189, 248)") {
+        wmImageRotationRadioAreaInputD.checked = true
+    }
+}
+
+function wmLayout_text(){
+    document.getElementById("wmLayoutImage").style.display = "none"
+    document.getElementById("wmLayoutText").style.display = null
+}
+
+function wmLayout_TextInputRestore() {
+    if (wmColLayoutStyleA.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioLayoutStyleA.checked = true
+    }
+    if (wmColLayoutStyleB.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioLayoutStyleB.checked = true
+    }
+    if (wmColRotationA.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioRotationA.checked = true
+    }
+    if (wmColRotationB.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioRotationB.checked = true
+    }
+    if (wmColRotationC.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioRotationC.checked = true
+    }
+    if (wmColRotationD.style.borderColor == "rgb(56, 189, 248)") {
+        wmRadioRotationD.checked = true
+    }
+}
+
+/*
 function remove_wm() {
     var pdfComp = document.getElementById('pdfCompLayout');
     var pdfImage = document.getElementById('pdfPreview');
@@ -606,467 +934,6 @@ function remove_wm() {
     pdfWMlayout.style.display="none";
     pdfImage.style.display="none";
 }
-
-function showLayout() {
-    var layout = document.getElementById('wmLayout1');
-    layout.style = null
-}
-
-function showLayout3() {
-    var layout = document.getElementById('splitLayout3');
-    layout.style = null
-}
-
-function showVal(newVal){
-    document.getElementById("TransparencyValue").innerHTML=newVal+" %";
-}
-
-function splitLayout2_split(){
-    document.getElementById("splitLayout2").innerHTML = `
-    <div class="mb-4 mt-6" id="splitLayout2">
-    <div>
-      <label for="SplitOpt2a" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Split Options</label>
-      <ul id="splitRadio" class="mb-4 mt-4 grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
-        <li id="lowestChk2" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="SplitOpt2a" value="selPages" name="SplitOpt2" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="splitLayout3_wthn()" />
-            </div>
-            <div class="ml-4">
-              <label for="SplitOpt2a" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt2">Selected Pages</label>
-            </div>
-          </div>
-        </li>
-        <li id="recChk2" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="SplitOpt2b" value="cusPages" name="SplitOpt2" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="splitLayout3_cstm()" />
-            </div>
-            <div class="ml-4">
-              <label for="SplitOpt2b" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt2">Custom Pages</label>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div id="splitLayout3"></div>
-    `;
-    LowChkSplitClick();
-    document.getElementById("submitBtn_2").style.display= "none";
-    document.getElementById("submitBtn_3").style.display= "none";
-};
-
-function splitLayout2_extract(){
-    document.getElementById("splitLayout2").innerHTML = `
-    <div class="mt-6">
-     <div class="mb-4 grid gap-2 md:grid-cols-1">
-      <div>
-        <label for="customPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Custom Pages</label>
-        <input type="text" id="customPage" name="customPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusIn="checkValidation('extCustomPage')" onFocusOut="checkValidation('extCustomPage')" />
-      </div>
-      <div class="mt-2 flex items-center">
-        <input id="mergePDF" name="mergePDF" type="checkbox" value="true" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
-        <label for="mergePDF" class="font-poppins ml-2 text-xs text-gray-900">Merge all pages into one PDF file.</label>
-      </div>
-     </div>
-    </div>
-    `;
-    RecChkSplitClick();
-    document.getElementById("submitBtn_2").style.display= "none";
-    document.getElementById("submitBtn_3").style.display= null;
-};
-
-function splitLayout3_cstm(){
-    showLayout3();
-    document.getElementById("splitLayout3").innerHTML = `
-    <div class="mt-6">
-  <div class="mb-4 grid gap-2 md:grid-cols-1">
-    <div>
-      <label for="customPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Custom Pages</label>
-      <input type="text" id="customPage" name="customPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusIn="checkValidation('splitCustomPage')" onFocusOut="checkValidation('splitCustomPage')" />
-    </div>
-    <div class="mt-2 flex items-center">
-      <input id="mergePDF" name="mergePDF" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
-      <label for="mergePDF" class="font-poppins ml-2 text-xs text-gray-900">Merge all pages into one PDF file.</label>
-    </div>
-  </div>
-</div>
-    `;
-    RecChkSplit2Click();
-    document.getElementById("submitBtn_2").style.display= "none";
-    document.getElementById("submitBtn_3").style.display= null;
-};
-
-function splitLayout3_wthn(){
-    showLayout3();
-    document.getElementById("splitLayout3").innerHTML = `
-    <div class="mt-6">
-    <div class="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-3 xl:gap-8">
-      <div>
-        <label for="fromPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">First Pages</label>
-        <input type="number" id="fromPage" name="fromPage" class="font-poppins mt-4 block w-fit rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" placeholder="1" onFocusIn="checkValidation('splitFirstPage')" onFocusOut="checkValidation('splitFirstPage')" />
-      </div>
-      <div>
-        <label for="toPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Last Pages</label>
-        <input type="number" id="toPage" name="toPage" class="font-poppins mt-4 block w-fit rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" placeholder="10" onFocusIn="checkValidation('splitLastPage')" onFocusOut="checkValidation('splitLastPage')" />
-      </div>
-    </div>
-    <div class="mt-2 flex items-center">
-      <input id="mergePDF" name="mergePDF" type="checkbox" value="true" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
-      <label for="mergePDF" class="font-poppins ml-2 text-xs text-gray-900">Merge all pages into one PDF file.</label>
-    </div>
-  </div>
-    `;
-    LowChkSplit2Click();
-    document.getElementById("submitBtn_2").style.display= null;
-    document.getElementById("submitBtn_3").style.display= "none";
-};
-
-function wmLayout_image(){
-    showLayout();
-    document.getElementById("wmLayout1").innerHTML = `
-    <div class="mb-4 mt-6" id="wmLayout1" style="">
-    <input type="text" id="wmType" name="wmType" class="" placeholder="" style="display:none;" value="image" />
-    <div class="mb-8 mt-4">
-      <label for="wm_file_input" class="font-poppins mb-4 block text-base font-semibold text-slate-900" for="wm_file_input">Image</label>
-      <input class="font-poppins block w-5/6 cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner" aria-describedby="wm_file_input_help" id="wm_file_input" name="wmfile" type="file" accept="image/*" onFocusIn="checkValidation('wm_file_input')" onFocusOut="checkValidation('wm_file_input')" />
-      <p class="font-poppins mt-1 text-sm text-gray-500" id="file_input_help">Image (Max. 25 MB)</p>
-    </div>
-    <div class="mb-8 mt-4">
-      <label for="watermarkLayoutStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
-      <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
-        <li id="lowestChk2" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit2Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkLayoutStyleA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt2">Above content</label>
-            </div>
-          </div>
-        </li>
-        <li id="recChk2" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit2Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkLayoutStyleB" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt2">Below content</label>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="mb-8 mt-4">
-      <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Pages</label>
-      <input type="text" id="watermarkPage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="1,2,3 or 1-5 or 1,2-5 or all" onfocusin="checkValidation('watermarkPage')" onfocusout="checkValidation('watermarkPage')" />
-    </div>
-    <div class="mb-8 mt-4">
-      <label for="watermarkRotationA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Orientation</label>
-      <ul class="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-4">
-        <li id="lowestChk3" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkRotationA" name="watermarkRotation" value="0" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit3Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt3">0°</label>
-            </div>
-          </div>
-        </li>
-        <li id="recChk3" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkRotationB" name="watermarkRotation" value="90" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit3Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkRotationB" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt3">90°</label>
-            </div>
-          </div>
-        </li>
-        <li id="hiChk3" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkRotationC" name="watermarkRotation" value="180" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="HiChkSplit3Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkRotationC" class="font-poppins text-sm font-semibold text-gray-500" id="hi-txt3">180°</label>
-            </div>
-          </div>
-        </li>
-        <li id="ulChk3" class="mt-2 rounded border border-slate-200 p-2">
-          <div class="flex">
-            <div class="flex h-5 items-center">
-              <input id="watermarkRotationD" name="watermarkRotation" value="270" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="UlChkSplit3Click()" />
-            </div>
-            <div class="ml-4">
-              <label for="watermarkRotationD" class="font-poppins text-sm font-semibold text-gray-500" id="ul-txt3">270°</label>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="mb-8 grid grid-cols-1 gap-2">
-      <div>
-        <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
-        <div class="grid w-full grid-cols-2 gap-4">
-          <input id="watermarkFontTransparency" name="watermarkFontTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer oninput="showVal(this.value)" onchange="showVal(this.value)">
-          <label id="TransparencyValue" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
-        </div>
-      </div>
-    </div>
-    <div class="mt-6">
-      <div class="flex">
-        <div class="flex h-5 items-center">
-          <input id="isMosaic" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
-        </div>
-        <div class="ml-2 text-sm">
-          <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
-          <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
-        </div>
-      </div>
-    </div>
-  </div>
-    `;
-    LowChkSplitClick();
-}
-
-function wmLayout_text(){
-    showLayout();
-    document.getElementById("wmLayout1").innerHTML = `
-    <div class="mb-4 mt-6">
-  <input type="text" id="wmType" name="wmType" class="" placeholder="" style="display:none;" value="text" />
-  <div class="mb-8 mt-4">
-    <label for="wmType" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Family</label>
-    <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3">
-      <li id="lowestChk4" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyA" name="watermarkFontFamily" value="Arial" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt4">Arial</label>
-          </div>
-        </div>
-      </li>
-      <li id="recChk4" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyB" name="watermarkFontFamily" value="Arial Unicode MS" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyB" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt4">Arial Unicode MS</label>
-          </div>
-        </div>
-      </li>
-      <li id="hiChk4" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyC" name="watermarkFontFamily" value="Comic Sans MS" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="HiChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyC" class="font-poppins text-sm font-semibold text-gray-500" id="hi-txt4">Comic Sans MS</label>
-          </div>
-        </div>
-      </li>
-      <li id="ulChk4" class="rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyD" name="watermarkFontFamily" value="Courier" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="UlChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyD" class="font-poppins text-sm font-semibold text-gray-500" id="ul-txt4">Courier</label>
-          </div>
-        </div>
-      </li>
-      <li id="srChk4" class="rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyE" name="watermarkFontFamily" value="Times New Roman" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="SRChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyE" class="font-poppins text-sm font-semibold text-gray-500" id="sr-txt4">Times New Roman</label>
-          </div>
-        </div>
-      </li>
-      <li id="ssrChk4" class="rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontFamilyF" name="watermarkFontFamily" value="Verdana" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="SSRChkSplit4Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontFamilyF" class="font-poppins text-sm font-semibold text-gray-500" id="ssr-txt4">Verdana</label>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="mb-8">
-    <label for="watermarkText" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Text</label>
-    <input type="text" id="watermarkText" name="watermarkText" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit" onfocusin="checkValidation('watermarkText')" onfocusout="checkValidation('watermarkText')" />
-  </div>
-  <div class="mb-8 mt-4">
-    <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Pages</label>
-    <input type="text" id="watermarkPage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="1,2,3 or 1-5 or 1,2-5 or all" onfocusin="checkValidation('watermarkPage')" onfocusout="checkValidation('watermarkPage')" />
-  </div>
-  <div class="mb-8 mt-4">
-    <label for="watermarkFontStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Style</label>
-    <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
-      <li id="lowestChk5" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontStyleA" name="watermarkFontStyle" value="Regular" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit5Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontStyleA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt5">Regular</label>
-          </div>
-        </div>
-      </li>
-      <li id="recChk5" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontStyleB" name="watermarkFontStyle" value="Bold" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit5Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontStyleB" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt5">Bold</label>
-          </div>
-        </div>
-      </li>
-      <li id="hiChk5" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkFontStyleC" name="watermarkFontStyle" value="Italic" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="HiChkSplit5Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkFontStyleC" class="font-poppins text-sm font-semibold text-gray-500" id="hi-txt5">Italic</label>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="mb-8 mt-4">
-    <label for="watermarkLayoutSyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
-    <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
-      <li id="lowestChk6" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkLayoutSyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit6Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkLayoutSyleA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt6">Above content</label>
-          </div>
-        </div>
-      </li>
-      <li id="recChk6" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkLayoutStyleb" name="watermarkLayoutStyle" value="below" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit6Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkLayoutStyleb" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt6">Below content</label>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="mb-8 mt-4">
-    <label for="watermarkRotationA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Orientation</label>
-    <ul class="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-4">
-      <li id="lowestChk7" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkRotationA" name="watermarkRotation" value="0" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="LowChkSplit7Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="lowest-txt7">0°</label>
-          </div>
-        </div>
-      </li>
-      <li id="recChk7" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkRotationB" name="watermarkRotation" value="90" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="RecChkSplit7Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkRotationB" class="font-poppins text-sm font-semibold text-gray-500" id="rec-txt7">90°</label>
-          </div>
-        </div>
-      </li>
-      <li id="hiChk7" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkRotationC" name="watermarkRotation" value="180" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="HiChkSplit7Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkRotationC" class="font-poppins text-sm font-semibold text-gray-500" id="hi-txt7">180°</label>
-          </div>
-        </div>
-      </li>
-      <li id="ulChk7" class="mt-2 rounded border border-slate-200 p-2">
-        <div class="flex">
-          <div class="flex h-5 items-center">
-            <input id="watermarkRotationD" name="watermarkRotation" value="270" aria-describedby="helper-radio-text" type="radio" class="h-4 w-4 border-sky-400 text-sky-400 ring-sky-400 focus:ring-2 focus:ring-sky-400" onclick="UlChkSplit7Click()" />
-          </div>
-          <div class="ml-4">
-            <label for="watermarkRotationD" class="font-poppins text-sm font-semibold text-gray-500" id="ul-txt7">270°</label>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="mb-8 grid grid-cols-1 gap-2">
-    <div>
-      <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
-      <div class="grid w-full grid-cols-2 gap-x-4">
-        <input id="watermarkFontTransparency" name="watermarkFontTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer oninput="showVal(this.value)" onchange="showVal(this.value)">
-        <label id="TransparencyValue" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
-      </div>
-    </div>
-  </div>
-  <div class="mt-6">
-    <div class="flex">
-      <div class="flex h-5 items-center">
-        <input id="isMosaic" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
-      </div>
-      <div class="ml-2 text-sm">
-        <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
-        <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
-      </div>
-    </div>
-  </div>
-</div>
-    `;
-    RecChkSplitClick();
-};
-
-var timerId = setInterval("reloadIFrame();", 2000);
-
-if (document.getElementById('multiple_files')) {
-    document.getElementById('multiple_files').addEventListener('change', function(e) {
-        var list = document.getElementById('filelist');
-        var newList = document.getElementById('pre-title');
-        if (document.getElementById('multiple_files').value !== '') {
-            if (newList.innerHTML !== '') {
-                newList.innerHTML = ``;
-                for (var i = 0; i < this.files.length; i++) {
-                    generateMesssage(this.files[i].name)
-                }
-            } else {
-                for (var i = 0; i < this.files.length; i++) {
-                    generateMesssage(this.files[i].name)
-                }
-            }
-            if (newList.innerHTML == '') {
-                list.style.display = 'none';
-            } else {
-                list.style.display = 'block';
-            }
-        } else {
-                list.style.display = 'none';
-                newList.innerHTML = ``;
-        }
-    });
-}
+*/
 
 init();
