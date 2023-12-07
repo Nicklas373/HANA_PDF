@@ -186,7 +186,7 @@
                                 <div class="grid gap-2 md:grid-cols-1">
                                     <div>
                                         <label for="customPageDelete" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Custom Page</label>
-                                        <input type="text" id="customPageDelete" name="customPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('extCustomPage')" />
+                                        <input type="text" id="customPageDelete" name="customPageDelete" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('extCustomPage')" />
                                     </div>
                                 </div>
                             </div>
@@ -194,7 +194,7 @@
                                 <div class="grid gap-2 md:grid-cols-1">
                                     <div>
                                         <label for="customPageSplit" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Custom Page</label>
-                                        <input type="text" id="customPageSplit" name="customPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('splitCustomPage')" />
+                                        <input type="text" id="customPageSplit" name="customPageSplit" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('splitCustomPage')" />
                                     </div>
                                     <div class="mt-2 flex items-center">
                                         <input id="mergePDFSplit" name="mergePDF" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
