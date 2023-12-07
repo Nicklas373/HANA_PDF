@@ -566,117 +566,115 @@ function submit(event) {
                 newModal.show();
             }
         } else if (document.getElementById('wmColImageLayoutStyleA')) {
+            var wmImageSwitcher = document.getElementById("wmTypeImage");
+            var wmTextSwitcher = document.getElementById("wmTypeText");
             if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
-                if (document.getElementById('wmType') != null) {
-                    if (document.getElementById('wmType').value == 'text') {
-                        var wmText = document.getElementById("watermarkText");
-                        if (!document.getElementById('watermarkText').value && !document.getElementById('watermarkPage').value) {
-                            var wmPage = document.getElementById("watermarkPage");
+                if (document.getElementById('firstRadio').checked == true) {
+                    var wmImage = document.getElementById("wm_file_input");
+                    wmImageSwitcher.checked = true;
+                    wmTextSwitcher.checked = false;
+                    if (document.getElementById("wm_file_input").value) {
+                        var imgFile = document.getElementById("wm_file_input");
+                        let fileSize = imgFile.files[0].size;
+                        if (imgFile.files[0].type == "image/jpeg" || imgFile.files[0].type == "image/png"
+                            || imgFile.files[0].type == "image/jpg") {
+                            if (fileSize >= 5242880) {
+                                event.preventDefault();
+                                errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
+                                errSubMessage.innerHTML = ""
+                                errListTitleMessage.innerHTML = "Error message"
+                                resetErrListMessage();
+                                generateMesssage("Maximum file size 5 MB");
+                                errAltSubMessageModal.style = null;
+                                newModal.show();
+                            } else {
+                                if (document.getElementById('watermarkPageImage').value) {
+                                    procTitleMessageModal.innerHTML = "Processing PDF..."
+                                    errMessage.style.visibility = null;
+                                    errSubMessage.style.visibility = null;
+                                    errAltSubMessageModal.style.display = "none";
+                                    newModal.hide();
+                                    modal.show();
+                                } else {
+                                    var wmPage = document.getElementById("watermarkPageImage");
+                                    event.preventDefault();
+                                    errMessage.innerHTML  = "Please fill out these fields!";
+                                    errSubMessage.innerHTML = "";
+                                    errListTitleMessage.innerHTML = "Required fields:"
+                                    resetErrListMessage();
+                                    generateMesssage("Pages");
+                                    errAltSubMessageModal.style = null;
+                                    wmPage.style.borderColor = '#dc2626'
+                                    newModal.show();
+                                }
+                            }
+                        } else {
+                            event.preventDefault();
+                            errMessage.innerHTML  = "Unsupported file format!";
+                            errSubMessage.innerHTML = "";
+                            errListTitleMessage.innerHTML = "Error message"
+                            resetErrListMessage();
+                            generateMesssage("Supported file format: JPG, PNG");
+                            errAltSubMessageModal.style = null;
+                            newModal.show();
+                        }
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Please fill out these fields!";
+                        errSubMessage.innerHTML = "";
+                        errListTitleMessage.innerHTML = "Required fields:"
+                        resetErrListMessage();
+                        generateMesssage("Image");
+                        errAltSubMessageModal.style = null;
+                        wmImage.style.borderColor = '#dc2626'
+                        newModal.show();
+                    }
+                } else if (document.getElementById('secondRadio').checked == true) {
+                    var wmText = document.getElementById("watermarkText");
+                    wmImageSwitcher.checked = false;
+                    wmTextSwitcher.checked = true;
+                    if (!document.getElementById('watermarkText').value && !document.getElementById('watermarkPageText').value) {
+                        var wmPage = document.getElementById("watermarkPageText");
+                        event.preventDefault();
+                        errMessage.innerHTML  = "Please fill out these fields!";
+                        errSubMessage.innerHTML = "";
+                        errListTitleMessage.innerHTML = "Required fields:"
+                        resetErrListMessage();
+                        generateMesssage("Pages");
+                        generateMesssage("Text");
+                        errAltSubMessageModal.style = null;
+                        wmText.style.borderColor = '#dc2626'
+                        wmPage.style.borderColor = '#dc2626'
+                        newModal.show();
+                    } else if (document.getElementById('watermarkText').value) {
+                        if (document.getElementById('watermarkPageText').value) {
+                            errMessage.style.visibility = null;
+                            procTitleMessageModal.innerHTML = "Processing PDF..."
+                            errSubMessage.style.visibility = null;
+                            errAltSubMessageModal.style.display = "none";
+                            newModal.hide();
+                            modal.show();
+                        } else {
+                            var wmPage = document.getElementById("watermarkPageText");
                             event.preventDefault();
                             errMessage.innerHTML  = "Please fill out these fields!";
                             errSubMessage.innerHTML = "";
                             errListTitleMessage.innerHTML = "Required fields:"
                             resetErrListMessage();
                             generateMesssage("Pages");
-                            generateMesssage("Text");
                             errAltSubMessageModal.style = null;
-                            wmText.style.borderColor = '#dc2626'
                             wmPage.style.borderColor = '#dc2626'
-                            newModal.show();
-                        } else if (document.getElementById('watermarkText').value) {
-                            if (document.getElementById('watermarkPage').value) {
-                                errMessage.style.visibility = null;
-                                procTitleMessageModal.innerHTML = "Processing PDF..."
-                                errSubMessage.style.visibility = null;
-                                errAltSubMessageModal.style.display = "none";
-                                newModal.hide();
-                                modal.show();
-                            } else {
-                                var wmPage = document.getElementById("watermarkPage");
-                                event.preventDefault();
-                                errMessage.innerHTML  = "Please fill out these fields!";
-                                errSubMessage.innerHTML = "";
-                                errListTitleMessage.innerHTML = "Required fields:"
-                                resetErrListMessage();
-                                generateMesssage("Pages");
-                                errAltSubMessageModal.style = null;
-                                wmPage.style.borderColor = '#dc2626'
-                                newModal.show();
-                            }
-                        } else {
-                            event.preventDefault();
-                            errMessage.innerHTML  = "Please fill out these fields!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Required fields:"
-                            resetErrListMessage();
-                            generateMesssage("Text");
-                            errAltSubMessageModal.style = null;
-                            wmText.style.borderColor = '#dc2626'
-                            newModal.show();
-                        }
-                    } else if (document.getElementById('wmType').value == 'image') {
-                        var wmImage = document.getElementById("wm_file_input");
-                        if (document.getElementById("wm_file_input").value) {
-                            var imgFile = document.getElementById("wm_file_input");
-                            let fileSize = imgFile.files[0].size;
-                            if (imgFile.files[0].type == "image/jpeg" || imgFile.files[0].type == "image/png") {
-                                if (fileSize >= 5242880) {
-                                    event.preventDefault();
-                                    errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                                    errSubMessage.innerHTML = ""
-                                    errListTitleMessage.innerHTML = "Error message"
-                                    resetErrListMessage();
-                                    generateMesssage("Maximum file size 5 MB");
-                                    errAltSubMessageModal.style = null;
-                                    newModal.show();
-                                } else {
-                                    if (document.getElementById('watermarkPage').value) {
-                                        procTitleMessageModal.innerHTML = "Processing PDF..."
-                                        errMessage.style.visibility = null;
-                                        errSubMessage.style.visibility = null;
-                                        errAltSubMessageModal.style.display = "none";
-                                        newModal.hide();
-                                        modal.show();
-                                    } else {
-                                        var wmPage = document.getElementById("watermarkPage");
-                                        event.preventDefault();
-                                        errMessage.innerHTML  = "Please fill out these fields!";
-                                        errSubMessage.innerHTML = "";
-                                        errListTitleMessage.innerHTML = "Required fields:"
-                                        resetErrListMessage();
-                                        generateMesssage("Pages");
-                                        errAltSubMessageModal.style = null;
-                                        wmPage.style.borderColor = '#dc2626'
-                                        newModal.show();
-                                    }
-                                }
-                            } else {
-                                event.preventDefault();
-                                errMessage.innerHTML  = "Unsupported file format!";
-                                errSubMessage.innerHTML = "";
-                                errListTitleMessage.innerHTML = "Error message"
-                                resetErrListMessage();
-                                generateMesssage("Supported file format: JPG, PNG");
-                                errAltSubMessageModal.style = null;
-                                newModal.show();
-                            }
-                        } else {
-                            event.preventDefault();
-                            errMessage.innerHTML  = "Please fill out these fields!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Required fields:"
-                            resetErrListMessage();
-                            generateMesssage("Image");
-                            errAltSubMessageModal.style = null;
-                            wmImage.style.borderColor = '#dc2626'
                             newModal.show();
                         }
                     } else {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please choose watermark options!";
-                        errSubMessage.innerHTML = ""
-                        errSubMessage.style.visibility = null;
-                        errAltSubMessageModal.style.display = "none";
+                        errMessage.innerHTML  = "Please fill out these fields!";
+                        errSubMessage.innerHTML = "";
+                        errListTitleMessage.innerHTML = "Required fields:"
+                        resetErrListMessage();
+                        generateMesssage("Text");
+                        errAltSubMessageModal.style = null;
+                        wmText.style.borderColor = '#dc2626'
                         newModal.show();
                     }
                 } else {

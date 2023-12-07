@@ -23,9 +23,6 @@ class watermarkController extends Controller
 			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => '',
 			'wmfile' => 'mimes:jpg,png,jpeg|max:5120',
-			'watermarkText' => '',
-			'watermarkPage' => '',
-			'wmType' => '',
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();
@@ -155,13 +152,6 @@ class watermarkController extends Controller
 						} else {
 							$watermarkFontStyle = 'Regular';
 						}
-						if(isset($_POST['watermarkFontTransparency']))
-						{
-							$watermarkFontTransparencyTemp = $request->post('watermarkFontTransparency');
-							$watermarkFontTransparency = intval($watermarkFontTransparencyTemp);
-						} else {
-							$watermarkFontTransparency = '100';
-						}
 						if(isset($_POST['watermarkLayoutStyle']))
 						{
 							$watermarkLayoutFetch = $request->post('watermarkLayoutStyle');
@@ -172,17 +162,6 @@ class watermarkController extends Controller
                             }
 						} else {
 							$watermarkLayoutStyle = 'above';
-						}
-						if(isset($_POST['watermarkPage']))
-						{
-							$watermarkInputPage = $request->post('watermarkPage');
-                            if (is_string($watermarkInputPage)) {
-                                $watermarkPage = strtolower($watermarkInputPage);
-                            } else {
-                                $watermarkPage = $watermarkInputPage;
-                            }
-						} else {
-							$watermarkPage = 'all';
 						}
 						if(isset($_POST['watermarkRotation']))
 						{
@@ -228,13 +207,29 @@ class watermarkController extends Controller
                             $randomizeImageFileName = 'null';
                         }
 						if($watermarkStyle == "image") {
+                            if(isset($_POST['watermarkPageImage']))
+                            {
+                                $watermarkInputPage = $request->post('watermarkPageImage');
+                                if (is_string($watermarkInputPage)) {
+                                    $watermarkPage = strtolower($watermarkInputPage);
+                                } else {
+                                    $watermarkPage = $watermarkInputPage;
+                                }
+                            } else {
+                                $watermarkPage = 'all';
+                            }
+                            if(isset($_POST['watermarkFontImageTransparency']))
+                            {
+                                $watermarkFontTransparencyTemp = $request->post('watermarkFontImageTransparency');
+                                $watermarkFontTransparency = intval($watermarkFontTransparencyTemp);
+                            } else {
+                                $watermarkFontTransparency = '100';
+                            }
 							if($request->hasfile('wmfile')) {
                                 try {
                                     $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
                                     $watermarkImage->storeAs('public/upload-pdf', $randomizeImageFileName.'.'.$randomizeImageExtension);
                                     $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                                    $ilovepdfTask->setFileEncryption($pdfEncKey);
-                                    $ilovepdfTask->setEncryptKey($pdfEncKey);
                                     $ilovepdfTask->setEncryption(true);
                                     $pdfFile = $ilovepdfTask->addFile($pdfNewPath);
                                     $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$randomizeImageFileName.'.'.$randomizeImageExtension));
@@ -257,7 +252,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -283,7 +278,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -309,7 +304,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -335,7 +330,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -361,7 +356,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -387,7 +382,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -413,7 +408,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -439,7 +434,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -466,7 +461,7 @@ class watermarkController extends Controller
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
                                         'watermarkFontTransparency' => $watermarkFontTransparency,
-                                        'watermarkImage' => $randomizeImageFileName,
+                                        'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                         'watermarkLayout' => $watermarkLayoutStyle,
                                         'watermarkMosaic' => $isMosaicDB,
                                         'watermarkRotation' => $watermarkRotation,
@@ -484,6 +479,24 @@ class watermarkController extends Controller
                                 }
 							}
 						} else if ($watermarkStyle == "text") {
+                            if(isset($_POST['watermarkPageText']))
+                            {
+                                $watermarkInputPage = $request->post('watermarkPageText');
+                                if (is_string($watermarkInputPage)) {
+                                    $watermarkPage = strtolower($watermarkInputPage);
+                                } else {
+                                    $watermarkPage = $watermarkInputPage;
+                                }
+                            } else {
+                                $watermarkPage = 'all';
+                            }
+                            if(isset($_POST['watermarkFontTextTransparency']))
+                            {
+                                $watermarkFontTransparencyTemp = $request->post('watermarkFontTextTransparency');
+                                $watermarkFontTransparency = intval($watermarkFontTransparencyTemp);
+                            } else {
+                                $watermarkFontTransparency = '100';
+                            }
                             if ($watermarkText != '') {
                                 try {
                                     $ilovepdfTask = new WatermarkTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
@@ -516,7 +529,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -542,7 +555,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -568,7 +581,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -594,7 +607,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -620,7 +633,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -646,7 +659,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -672,7 +685,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -698,7 +711,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName,
+                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -725,7 +738,7 @@ class watermarkController extends Controller
                                         'watermarkFontStyle' => $watermarkFontStyle,
                                         'watermarkFontSize' => $watermarkFontSize,
                                         'watermarkFontTransparency' => $watermarkFontTransparency,
-                                        'watermarkImage' => $randomizeImageFileName,
+                                        'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                         'watermarkLayout' => $watermarkLayoutStyle,
                                         'watermarkMosaic' => $isMosaicDB,
                                         'watermarkRotation' => $watermarkRotation,
@@ -757,7 +770,7 @@ class watermarkController extends Controller
                                     'watermarkFontStyle' => $watermarkFontStyle,
                                     'watermarkFontSize' => $watermarkFontSize,
                                     'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => $randomizeImageFileName,
+                                    'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                     'watermarkLayout' => $watermarkLayoutStyle,
                                     'watermarkMosaic' => $isMosaicDB,
                                     'watermarkRotation' => $watermarkRotation,
@@ -786,7 +799,7 @@ class watermarkController extends Controller
                                     'watermarkFontStyle' => $watermarkFontStyle,
                                     'watermarkFontSize' => $watermarkFontSize,
                                     'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => $randomizeImageFileName,
+                                    'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
                                     'watermarkLayout' => $watermarkLayoutStyle,
                                     'watermarkMosaic' => $isMosaicDB,
                                     'watermarkRotation' => $watermarkRotation,
