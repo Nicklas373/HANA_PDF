@@ -8,7 +8,7 @@
     <div>
       <div id="content" class="flex flex-col min-h-screen justify-between">
         @include('includes.modal') @yield('content')
-        <script src="/build/assets/kao-logic-9cf303a4.js" type="module"></script>
+        <script src="/build/assets/kao-logic-e0110c97.js" type="module"></script>
         <script src="/ext-js/kao-controller.js"></script>
         <script src="/ext-js/kao-main.js"></script>
         <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
