@@ -441,7 +441,6 @@ if (wmChkLayoutStyleA) {
 
 if (wmChkLayoutStyleB) {
     wmChkLayoutStyleB.onclick = function() {
-
         wmColLayoutStyleB.style.borderColor = '#38bdf8'
         wmRadioLayoutStyleTextB.style.color = '#38bdf8'
         wmRadioLayoutStyleB.checked = true
@@ -503,6 +502,26 @@ if (wmChkRotationD) {
         wmRadioRotationTextC.style.color = '#6b7280'
         wmColRotationA.style = null
         wmRadioRotationTextA.style.color = '#6b7280'
+    }
+}
+
+if (isImageMosaicArea) {
+    isImageMosaicArea.onclick = function() {
+        if (isImageMosaicCheck.checked == true) {
+            isImageMosaicCheck.checked = false
+        } else {
+            isImageMosaicCheck.checked = true
+        }
+    }
+}
+
+if (isTextMosaicArea) {
+    isTextMosaicArea.onclick = function() {
+        if (isTextMosaicCheck.checked == true) {
+            isTextMosaicCheck.checked = false
+        } else {
+            isTextMosaicCheck.checked = true
+        }
     }
 }
 
@@ -629,10 +648,18 @@ function checkValidation(validation) {
         }
     }
     if (validation == 'watermarkPage') {
-        if (document.getElementById("watermarkPage").value != '') {
-            document.getElementById("watermarkPage").style.borderColor = "#d1d5db"
-        } else {
-            document.getElementById("watermarkPage").style.borderColor = "#dc2626"
+        if (firstAreaInput.checked == true) {
+            if (document.getElementById("watermarkPageImage").value != '') {
+                document.getElementById("watermarkPageImage").style.borderColor = "#d1d5db"
+            } else {
+                document.getElementById("watermarkPageImage").style.borderColor = "#dc2626"
+            }
+        } else if (secondAreaInput.checked == true) {
+            if (document.getElementById("watermarkPageText").value != '') {
+                document.getElementById("watermarkPageText").style.borderColor = "#d1d5db"
+            } else {
+                document.getElementById("watermarkPageText").style.borderColor = "#dc2626"
+            }
         }
     }
     if (validation == 'wm_file_input') {
@@ -857,8 +884,12 @@ function reuseOnClickWmLayoutImageStyleAreaB() {
     }
 }
 
-function showVal(newVal){
-    document.getElementById("TransparencyValue").innerHTML=newVal+" %";
+function showVal(newVal,state){
+    if (state == 'text') {
+        document.getElementById("TransparencyValueText").innerHTML=newVal+" %";
+    } else if (state == 'image') {
+        document.getElementById("TransparencyValueImage").innerHTML=newVal+" %";
+    }
 }
 
 function splitLayout2_split(){
