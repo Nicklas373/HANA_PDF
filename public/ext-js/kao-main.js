@@ -45,11 +45,11 @@ if (firstArea) {
         }
         if (firstAreaAltInput.value == "split") {
             splitLayout2_split();
-            if (thirdAreaInput.checked !== true && fourthAreaInput.checked !== true) {
-                splitLayout2_splitClean()
-            } else if (thirdAreaInput.checked == true || fourthAreaInput.checked == true) {
+            if (thirdColumnArea.style.borderColor == "rgb(56, 189, 248)" || fourthColumnArea.style.borderColor == "rgb(56, 189, 248)") {
                 document.getElementById("submitBtn_2").style.display = null;
                 document.getElementById("submitBtn_3").style.display = "none";
+            } else {
+                splitLayout2_splitClean()
             }
         } else if (firstAreaAltInput.value == "cnvFrPDF") {
             extImageChkBox.style.display = null
