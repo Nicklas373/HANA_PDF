@@ -18,15 +18,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_convert', function (Blueprint $table) {
+        Schema::create('pdf_init', function (Blueprint $table) {
             $table->uuid('processId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
-            $table->string('container', 25);
-            $table->boolean('img_extract');
-            $table->boolean('result');
             $table->text('err_reason')->nullable();
-            $table->text('err_api_reason')->nullable();
             $table->timestamp('procStartAt')->nullable();
 
             $table->primary('processId');
@@ -38,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_convert');
+        Schema::dropIfExists('pdf_init');
     }
 };

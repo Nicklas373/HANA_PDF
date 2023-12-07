@@ -13,7 +13,6 @@ class html_pdf extends Model
         'urlName',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }

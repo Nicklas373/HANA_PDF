@@ -16,7 +16,6 @@ class compression_pdf extends Model
         'compMethod',
         'result',
         'err_reason',
-        'err_api_reason',
-        'uuid'
+        'err_api_reason'
     ];
 }

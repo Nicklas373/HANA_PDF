@@ -4,8 +4,8 @@
     <div class="px-4 md:px-12" id="cnvFrPDF">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Convert</h1>
-                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Convert PDF files into specified document format</p>
+                <h1 class="mb-4 mt-6 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 sm:mt-0 lg:text-6xl">Convert from PDF</h1>
+                <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Convert PDF files into specified document format</p>
             </div>
         </section>
         <form action="/convert/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
@@ -29,7 +29,7 @@
                             <div class="flex">
                                 <button type="button" class="text-green-50 bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-100 text-xs font-poppins rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center">
                                     <svg class="ml-0.5 mr-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"> <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"></path> <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path> </svg>
-                                    <b><a href="{{ session('res') }}">Download PDF</a></b>
+                                    <b><a href="{{ session('res') }}">Download Document</a></b>
                                 </button>
                                 <button type="button" class="text-green-800 bg-green-50 hover:bg-green-100 border border-green-800 text-xs font-poppins rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center" data-dismiss-target="#alert-additional-content-3" aria-label="Close">
                                     <b>Dismiss</b>
@@ -125,53 +125,62 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label for="lowestChkA" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
+                        <label for="firstRadio" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
                         <ul class="grid grid-cols-1 xl:grid-cols-4 gap-2 xl:gap-4 mt-4 mb-4">
-                            <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="firstCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="firstInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="firstChk">
                                     <div class="flex items-center h-5">
-                                        <input id="lowestChkA" name="convertType" value="jpg" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="firstRadio" name="convertType" value="jpg" aria-describedby="helper-firstRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="lowestChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Image</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.jpg)</p>
+                                        <label for="firstRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="firstRadioText">Image</label>
+                                        <p id="helper-firstRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.jpg)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="ulChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="secondCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="secondInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="secondChk">
                                     <div class="flex items-center h-5">
-                                        <input id="ulChkA" name="convertType" value="pptx" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="secondRadio" name="convertType" value="pptx" aria-describedby="helper-secondRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="ulChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="ul-txt">Powerpoint Presentation</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.pptx)</p>
+                                        <label for="secondRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="secondRadioText">Powerpoint Presentation</label>
+                                        <p id="helper-secondRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.pptx)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="thirdCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="thirdInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="thirdChk" value="cnvFrPDF">
                                     <div class="flex items-center h-5">
-                                        <input id="recChkA" name="convertType" value="excel" aria-describedby="helper-radio-text" type="radio" value="recommended" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="thirdRadio" name="convertType" value="excel" aria-describedby="helper-thirdRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="recChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Spreadsheet</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.xlsx)</p>
+                                        <label for="thirdRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="thirdRadioText">Spreadsheet</label>
+                                        <p id="helper-thirdRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.xlsx)</p>
                                     </div>
                                 </div>
                             </li>
-                            <li id="highestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="fourthCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400" onclick="checkValidation('cnvFrPDF')">
+                                <input type="text" id="fourthInput" class="" style="display: none;" value="cnvFrPDF">
+                                <div class="flex" id="fourthChk" value="cnvFrPDF">
                                     <div class="flex items-center h-5">
-                                        <input id="highestChkA" name="convertType" value="docx" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="checkValidation('cnvFrPDF')">
+                                        <input id="fourthRadio" name="convertType" value="docx" aria-describedby="helper-fourthRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="highestChkA" class="font-semibold text-sm text-slate-800 font-poppins" id="highest-txt">Word Document</label>
-                                        <p id="helper-radio-text" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.docx)</p>
+                                        <label for="fourthRadio" class="font-semibold text-sm text-slate-800 font-poppins" id="fourthRadioText">Word Document</label>
+                                        <p id="helper-fourthRadioText" class="text-xs mt-1 font-normal font-poppins text-gray-500">(*.docx)</p>
                                     </div>
                                 </div>
                             </li>
                         </ul>
+                        <label id="extImageLayout" class="relative inline-flex items-center cursor-pointer mt-4" style="display: none;">
+                            <input type="checkbox" id="extImage" name="extImage" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-sky-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-blue-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-400"></div>
+                            <span class="ms-3 font-semibold text-sm text-slate-800 font-poppins">Extract Image only</span>
+                        </label>
                         <div dir="ltl">
                             <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold text-sky-400 border border-sky-400 rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5 hover:bg-sky-400 hover:text-white" value="convert" style="">Convert PDF</button>
                         </div>

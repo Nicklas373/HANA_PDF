@@ -4,8 +4,8 @@
     <div class="px-4 md:px-12" id="cnvToPDF">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Convert</h1>
-                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Convert Document files into PDF file format</p>
+                <h1 class="mb-4 mt-6 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 sm:mt-0 lg:text-6xl">Convert to PDF</h1>
+                <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Convert document or image files into PDF file format</p>
             </div>
         </section>
         <form action="/convert/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
@@ -14,8 +14,8 @@
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
                     <div>
                         <label for="file_input" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload Document file</label>
-                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation" onclick="changeButtonColor('kaoA')">
-                        <p class="mt-1 font-poppins text-sm text-gray-500" id="file_input_help">Document (Max. 25 MB)</p>
+                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpg,image/jpeg,image/png,image/tif,image/tiff" onclick="changeButtonColor('kaoA')">
+                        <p class="mt-1 font-poppins text-sm text-gray-500" id="file_input_help">Document or image (Max. 25 MB)</p>
                         @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-4 mb-2 text-green-800 border border-green-300 rounded-lg bg-green-50" role="alert">
                             <div class="flex items-center">
@@ -29,7 +29,7 @@
                             <div class="flex">
                                 <button type="button" class="text-green-50 bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-100 text-xs font-poppins rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center">
                                     <svg class="ml-0.5 mr-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"> <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"></path> <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path> </svg>
-                                    <b><a href="{{ session('res') }}">Download Document</a></b>
+                                    <b><a href="{{ session('res') }}">Download PDF</a></b>
                                 </button>
                                 <button type="button" class="text-green-800 bg-green-50 hover:bg-green-100 border border-green-800 text-xs font-poppins rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center" data-dismiss-target="#alert-additional-content-3" aria-label="Close">
                                     <b>Dismiss</b>
@@ -122,6 +122,17 @@
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
                         <label for="convertType" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Document Format</label>
                         <input id="convertType" name="convertType" value="pdf" style="display: none;">
+                        @if($message = Session::get('status'))
+                        <?php
+                            $pdfFileName = basename(session('pdfOriName'), '.png');
+                            $pdfFileAppend = session('pdfRndmName');
+                            $pdfThumbAppend = session('pdfThumbName');
+                            $pdfRealName = session('pdfOriName');
+                            echo '
+                                <label for="fileAlt" id="PreviewName" class="block mb-2 font-poppins text-base font-semibold text-slate-900" style="display: none;">Preview '.$pdfRealName.'</label>
+                            ';
+                        ?>
+                        @endif
                         <div dir="ltl">
                             <button type="submit" id="submitBtn_1" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-poppins font-semibold bg-sky-400 text-white rounded-lg cursor-pointer w-full h-10 sm:w-5/5 md:w-4/5 lg:w-3/5 xl:w-2/5" value="convert" style="">Convert To PDF</button>
                         </div>

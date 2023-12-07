@@ -4,8 +4,8 @@
     <div class ="px-4 md:px-12">
         <section>
             <div class="py-8 px-4 mt-24 max-w-screen-xl z-0">
-                <h1 class="mb-4 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 md:text-5xl lg:text-6xl">PDF Watermark</h1>
-                <p class="mb-4 text-lg font-poppins font-thin text-gray-500 lg:text-2xl">Insert an image or text over PDF to selected pages or all page</p>
+                <h1 class="mb-4 mt-6 text-4xl font-poppins font-semibold tracking-tight leading-none text-sky-400 sm:mt-0 lg:text-6xl">PDF Watermark</h1>
+                <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Insert an image or text over PDF to selected pages or all page</p>
             </div>
         </section>
         <form action="/watermark/pdf" method="POST" enctype="multipart/form-data">
@@ -124,30 +124,355 @@
                         @endif
                     </div>
                     <div id="pdfCompLayout" class="mt-4" style="display: none;">
-                        <label for="SplitOpta" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Watermark Options</label>
+                        <label for="firstRadio" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Watermark Options</label>
                         <ul class="grid grid-cols-1 xl:grid-cols-3 gap-2 xl:gap-4">
-                            <li id="lowestChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="firstCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                <input type="text" id="firstInput" class="" style="display: none;" value="watermark">
+                                <div class="flex" id="firstChk">
                                     <div class="flex items-center h-5">
-                                        <input id="SplitOpta" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="wmLayout_image()">
+                                        <input id="firstRadio" name="WatermarkOpt" aria-describedby="helper-firstRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="SplitOpta" class="font-semibold text-sm text-slate-800 font-poppins" id="lowest-txt">Image</label>
+                                        <label for="firstRadio" class="font-semibold text-sm text-gray-500 font-poppins" id="firstRadioText">Image</label>
                                     </div>
                                 </div>
                             </li>
-                            <li id="recChk" class="border border-slate-200 p-2 mt-2 rounded">
-                                <div class="flex">
+                            <li id="secondCol" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                <input type="text" id="secondInput" class="" style="display: none;" value="watermark">
+                                <div class="flex" id="secondChk">
                                     <div class="flex items-center h-5">
-                                        <input id="SplitOptb" name="SplitOpt" aria-describedby="helper-radio-text" type="radio" class="w-4 h-4 text-sky-400 border-sky-400 ring-sky-400 focus:ring-sky-400 focus:ring-2" onclick="wmLayout_text()">
+                                        <input id="secondRadio" name="WatermarkOpt" aria-describedby="helper-secondRadioText" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0">
                                     </div>
                                     <div class="ml-4">
-                                        <label for="SplitOptb" class="font-semibold text-sm text-slate-800 font-poppins" id="rec-txt">Text</label>
+                                        <label for="secondRadio" class="font-semibold text-sm text-gray-500 font-poppins" id="secondRadioText">Text</label>
                                     </div>
                                 </div>
                             </li>
                         </ul>
-                        <div id="wmLayout1"></div>
+                        <div class="mb-4 mt-6" id="wmLayoutImage" style="display: none;">
+                            <input type="text" id="wmTypeImage" name="wmType" class="" placeholder="" style="display:none;" value="image" />
+                            <div class="mb-8 mt-4">
+                              <label for="wm_file_input" class="font-poppins mb-4 block text-base font-semibold text-slate-900" for="wm_file_input">Image</label>
+                              <input class="font-poppins block w-5/6 cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner" aria-describedby="wm_file_input_help" id="wm_file_input" name="wmfile" type="file" accept="image/*" onFocusIn="checkValidation('wm_file_input')" onFocusOut="checkValidation('wm_file_input')" />
+                              <p class="font-poppins mt-1 text-sm text-gray-500" id="file_input_help">Image (Max. 25 MB)</p>
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioImageLayoutStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
+                                <li id="wmColImageLayoutStyleA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                <input type="text" id="wmColImageLayoutStyleInputA" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageLayoutStyleA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioImageLayoutStyleTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageLayoutStyleA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageLayoutStyleTextA">Above content</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColImageLayoutStyleB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColImageLayoutStyleInputB" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageLayoutStyleB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioImageLayoutStyleTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageLayoutStyleB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageLayoutStyleTextB">Below content</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="watermarkPageImage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
+                              <input type="text" id="watermarkPageImage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioImageRotationA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Orientation</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-4">
+                                <li id="wmColImageRotationA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColImageRotationInputA" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageRotationA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageRotationA" name="watermarkRotation" value="0" aria-describedby="helper-wmRadioImageRotationTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageRotationTextA">0°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColImageRotationB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColImageRotationInputB" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageRotationB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageRotationB" name="watermarkRotation" value="90" aria-describedby="helper-wmRadioImageRotationTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageRotationB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageRotationTextB">90°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColImageRotationC" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColImageRotationInputC" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageRotationC">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageRotationC" name="watermarkRotation" value="180" aria-describedby="helper-wmRadioImageRotationTextC" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageRotationC" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageRotationTextC">180°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColImageRotationD" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColImageRotationInputD" class="" style="display: none;" value="wmImage">
+                                  <div class="flex" id="wmChkImageRotationD">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioImageRotationD" name="watermarkRotation" value="270" aria-describedby="helper-wmRadioImageRotationTextD" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioImageRotationD" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioImageRotationTextD">270°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8 grid grid-cols-1 gap-2">
+                              <div>
+                                <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
+                                <div class="grid w-full grid-cols-2 gap-4">
+                                  <input id="watermarkFontTransparency" name="watermarkFontTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer" oninput="showVal(this.value)" onchange="showVal(this.value)">
+                                  <label id="TransparencyValue" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="mt-6">
+                              <div class="flex">
+                                <div class="flex h-5 items-center">
+                                  <input id="isMosaicImage" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
+                                </div>
+                                <div class="ml-2 text-sm">
+                                  <label for="isMosaicText" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
+                                  <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mb-4 mt-6" id="wmLayoutText" style="display: none;">
+                            <input type="text" id="wmTypeText" name="wmType" class="" placeholder="" style="display:none;" value="text" />
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioFontFamilyA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Family</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3">
+                                <li id="wmColFontFamilyA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                <input type="text" id="wmColFontFamilyInputA" class="" style="display: none;" value="wmText">
+                                <div class="flex" id="wmChkFontFamilyA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyA" name="watermarkFontFamily" value="Arial" aria-describedby="helper-wmRadioFontFamilyTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextA">Arial</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontFamilyB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColFontFamilyInputB" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkFontFamilyB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyB" name="watermarkFontFamily" value="Arial Unicode MS" aria-describedby="helper-wmRadioFontFamilyTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextB">Arial Unicode MS</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontFamilyC" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                   <input type="text" id="wmColFontFamilyInputC" class="" style="display: none;" value="wmText">
+                                   <div class="flex" id="wmChkFontFamilyC">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyC" name="watermarkFontFamily" value="Comic Sans MS" aria-describedby="helper-wmRadioFontFamilyTextC" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyC" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextC">Comic Sans MS</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontFamilyD" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                   <input type="text" id="wmColFontFamilyInputD" class="" style="display: none;" value="wmText">
+                                   <div class="flex" id="wmChkFontFamilyD">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyD" name="watermarkFontFamily" value="Courier" aria-describedby="helper-wmRadioFontFamilyTextD" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyD" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextD">Courier</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontFamilyE" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColFontFamilyInputE" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkFontFamilyE">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyE" name="watermarkFontFamily" value="Times New Roman" aria-describedby="helper-wmRadioFontFamilyTextE" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyE" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextE">Times New Roman</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontFamilyF" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                   <input type="text" id="wmColFontFamilyInputF" class="" style="display: none;" value="wmText">
+                                   <div class="flex" id="wmChkFontFamilyF">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontFamilyF" name="watermarkFontFamily" value="Verdana" aria-describedby="helper-wmRadioFontFamilyTextF" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontFamilyF" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontFamilyTextF">Verdana</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8">
+                              <label for="watermarkText" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Text</label>
+                              <input type="text" id="watermarkText" name="watermarkText" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: Lorem ipsum dolor sit amet" onfocusout="checkValidation('watermarkText')" />
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
+                              <input type="text" id="watermarkPageText" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioFontStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Style</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
+                                <li id="wmColFontStyleA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColFontStyleInputA" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkFontStyleA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontStyleA" name="watermarkFontStyle" value="Regular" aria-describedby="helper-wmRadioFontStyleTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontStyleA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontStyleTextA">Regular</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontStyleB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                   <input type="text" id="wmColFontStyleInputB" class="" style="display: none;" value="wmText">
+                                   <div class="flex" id="wmChkFontStyleB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontStyleB" name="watermarkFontStyle" value="Bold" aria-describedby="helper-wmRadioFontStyleTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontStyleB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontStyleTextB">Bold</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColFontStyleC" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmColFontStyleInputC" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkFontStyleC">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioFontStyleC" name="watermarkFontStyle" value="Italic" aria-describedby="helper-wmRadioFontStyleTextC" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioFontStyleC" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioFontStyleTextC">Italic</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioLayoutStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
+                                <li id="wmColLayoutStyleA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioLayoutStyleInputA" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkLayoutStyleA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioLayoutStyleTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioLayoutStyleA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioLayoutStyleTextA">Above content</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColLayoutStyleB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioLayoutSytleInputB" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkLayoutStyleB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioLayoutStyleTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioLayoutStyleB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioLayoutStyleTextB">Below content</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8 mt-4">
+                              <label for="wmRadioRotationA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Orientation</label>
+                              <ul class="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-4">
+                                <li id="wmColRotationA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioRotationInputA" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkRotationA">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioRotationA" name="watermarkRotation" value="0" aria-describedby="helper-wmRadioRotationTextA" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioRotationA" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioRotationTextA">0°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColRotationB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioRotationInputB" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkRotationB">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioRotationB" name="watermarkRotation" value="90" aria-describedby="helper-wmRadioRotationTextB" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioRotationB" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioRotationTextB">90°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColRotationC" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioRotationInputC" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkRotationC">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioRotationC" name="watermarkRotation" value="180" aria-describedby="helper-wmRadioRotationTextC" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioRotationC" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioRotationTextC">180°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                                <li id="wmColRotationD" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
+                                  <input type="text" id="wmRadioRotationInputD" class="" style="display: none;" value="wmText">
+                                  <div class="flex" id="wmChkRotationD">
+                                    <div class="flex h-5 items-center">
+                                      <input id="wmRadioRotationD" name="watermarkRotation" value="270" aria-describedby="helper-wmRadioRotationTextD" type="radio" class="w-4 h-4 text-sky-400 border-slate-300 ring-sky-400 ring-0 hover:ring-2 hover:ring-sky-400 focus:ring-0" />
+                                    </div>
+                                    <div class="ml-4">
+                                      <label for="wmRadioRotationD" class="font-poppins text-sm font-semibold text-gray-500" id="wmRadioRotationTextD">270°</label>
+                                    </div>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="mb-8 grid grid-cols-1 gap-2">
+                              <div>
+                                <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
+                                <div class="grid w-full grid-cols-2 gap-x-4">
+                                  <input id="watermarkFontTransparency" name="watermarkFontTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer oninput="showVal(this.value)" onchange="showVal(this.value)">
+                                  <label id="TransparencyValue" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="mt-6">
+                              <div class="flex">
+                                <div class="flex h-5 items-center">
+                                  <input id="isMosaicText" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
+                                </div>
+                                <div class="ml-2 text-sm">
+                                  <label for="isMosaicText" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
+                                  <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                     </div>
                 </div>
             </div>

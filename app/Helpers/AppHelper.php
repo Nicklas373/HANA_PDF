@@ -63,15 +63,18 @@ class AppHelper
         $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
         $login_pasv = ftp_pasv($ftp_conn, true) or die("Cannot switch to passive mode");
 
-        if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY) ) {
-            return true;
-        } else {
-            die("Cannot find specified file");
+        try {
+            if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
+                return true;
+            } else {
+                die("Cannot find specified file");
+                ftp_close($ftp_conn);
+                return false;
+            }
             ftp_close($ftp_conn);
+        } catch (Exception $e) {
             return false;
         }
-
-        ftp_close($ftp_conn);
     }
 
     function get_guid() {
