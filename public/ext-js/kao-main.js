@@ -642,6 +642,14 @@ function checkValidation(validation) {
             document.getElementById("wm_file_input").style.borderColor = "#dc2626"
         }
     }
+    if (validation == 'urlToPDF') {
+        changeButtonColor('kaoC')
+        if (document.getElementById("urlToPDF").value != '') {
+            document.getElementById("urlToPDF").style.borderColor = "#d1d5db"
+        } else {
+            document.getElementById("urlToPDF").style.borderColor = "#dc2626"
+        }
+    }
 }
 
 function dropdownCnvToPDF() {
