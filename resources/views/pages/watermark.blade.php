@@ -184,7 +184,7 @@
                               </ul>
                             </div>
                             <div class="mb-8 mt-4">
-                              <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
+                              <label for="watermarkPageImage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
                               <input type="text" id="watermarkPageImage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
                             </div>
                             <div class="mb-8 mt-4">
@@ -251,7 +251,7 @@
                                   <input id="isMosaicImage" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
                                 </div>
                                 <div class="ml-2 text-sm">
-                                  <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
+                                  <label for="isMosaicText" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
                                   <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
                                 </div>
                               </div>
@@ -467,7 +467,7 @@
                                   <input id="isMosaicText" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
                                 </div>
                                 <div class="ml-2 text-sm">
-                                  <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
+                                  <label for="isMosaicText" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
                                   <p id="isMosaicText" class="font-poppins mt-1 text-xs font-normal text-gray-500">It will stamp a 3x3 matrix mosaic of into your document</p>
                                 </div>
                               </div>

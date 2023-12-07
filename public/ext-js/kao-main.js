@@ -46,7 +46,10 @@ if (firstArea) {
         if (firstAreaAltInput.value == "split") {
             splitLayout2_split();
             if (thirdAreaInput.checked !== true && fourthAreaInput.checked !== true) {
-                splitLayout2_splitClean();
+                splitLayout2_splitClean()
+            } else if (thirdAreaInput.checked == true || fourthAreaInput.checked == true) {
+                document.getElementById("submitBtn_2").style.display = null;
+                document.getElementById("submitBtn_3").style.display = "none";
             }
         } else if (firstAreaAltInput.value == "cnvFrPDF") {
             extImageChkBox.style.display = null
@@ -853,8 +856,8 @@ function showVal(newVal){
 function splitLayout2_split(){
     document.getElementById("splitLayout2_split").style.display = null;
     document.getElementById("splitLayout2_delete").style.display = "none";
-    document.getElementById("submitBtn_2").style.display= "none";
-    document.getElementById("submitBtn_3").style.display= "none";
+    document.getElementById("submitBtn_2").style.display = "none";
+    document.getElementById("submitBtn_3").style.display = "none";
 };
 
 function splitLayout2_splitClean() {
