@@ -4,6 +4,6 @@
 <title>HANA PDF</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
-<link rel="stylesheet" href="{{ asset('build/assets/app-7ad646e0.css')}}" />
-<link rel="script" href="{{ asset('build/assets/app-c1194546.js') }}" />
-<link rel="script" href="{{ asset('build/assets/index-f475cd16.js')}}" />
+<link rel="stylesheet" href="{{ asset('build/assets/app-088b0bbd.css')}}" />
+<link rel="script" href="{{ asset('build/assets/app-6ceaad5c.js') }}" />
+<link rel="script" href="{{ asset('build/assets/index-ccf1ca32.js')}}" />
