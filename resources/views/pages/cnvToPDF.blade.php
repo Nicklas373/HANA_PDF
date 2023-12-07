@@ -130,7 +130,6 @@
                             $pdfRealName = session('pdfOriName');
                             echo '
                                 <label for="fileAlt" id="PreviewName" class="block mb-2 font-poppins text-base font-semibold text-slate-900" style="display: none;">Preview '.$pdfRealName.'</label>
-                                <input id="convertType" name="convertType" value="pdf" style="display: none;">
                             ';
                         ?>
                         @endif
