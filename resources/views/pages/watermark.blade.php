@@ -150,7 +150,7 @@
                             </li>
                         </ul>
                         <div class="mb-4 mt-6" id="wmLayoutImage" style="display: none;">
-                            <input type="text" id="wmType" name="wmType" class="" placeholder="" style="display:none;" value="image" />
+                            <input type="text" id="wmTypeImage" name="wmType" class="" placeholder="" style="display:none;" value="image" />
                             <div class="mb-8 mt-4">
                               <label for="wm_file_input" class="font-poppins mb-4 block text-base font-semibold text-slate-900" for="wm_file_input">Image</label>
                               <input class="font-poppins block w-5/6 cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner" aria-describedby="wm_file_input_help" id="wm_file_input" name="wmfile" type="file" accept="image/*" onFocusIn="checkValidation('wm_file_input')" onFocusOut="checkValidation('wm_file_input')" />
@@ -185,7 +185,7 @@
                             </div>
                             <div class="mb-8 mt-4">
                               <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
-                              <input type="text" id="watermarkPage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
+                              <input type="text" id="watermarkPageImage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
                             </div>
                             <div class="mb-8 mt-4">
                               <label for="wmRadioImageRotationA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Orientation</label>
@@ -248,7 +248,7 @@
                             <div class="mt-6">
                               <div class="flex">
                                 <div class="flex h-5 items-center">
-                                  <input id="isMosaic" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
+                                  <input id="isMosaicImage" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
                                 </div>
                                 <div class="ml-2 text-sm">
                                   <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
@@ -258,7 +258,7 @@
                             </div>
                           </div>
                           <div class="mb-4 mt-6" id="wmLayoutText" style="display: none;">
-                            <input type="text" id="wmType" name="wmType" class="" placeholder="" style="display:none;" value="text" />
+                            <input type="text" id="wmTypeText" name="wmType" class="" placeholder="" style="display:none;" value="text" />
                             <div class="mb-8 mt-4">
                               <label for="wmRadioFontFamilyA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Family</label>
                               <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3">
@@ -336,7 +336,7 @@
                             </div>
                             <div class="mb-8 mt-4">
                               <label for="watermarkPage" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Page</label>
-                              <input type="text" id="watermarkPage" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
+                              <input type="text" id="watermarkPageText" name="watermarkPage" class="font-poppins mt-4 block w-4/6 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-xs text-slate-700 focus:border-sky-400 focus:ring-sky-400" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')" />
                             </div>
                             <div class="mb-8 mt-4">
                               <label for="wmRadioFontStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Font Style</label>
@@ -377,7 +377,7 @@
                               </ul>
                             </div>
                             <div class="mb-8 mt-4">
-                              <label for="wmRadioLayoutSytleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
+                              <label for="wmRadioLayoutStyleA" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Layer</label>
                               <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
                                 <li id="wmColLayoutStyleA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
                                   <input type="text" id="wmRadioLayoutStyleInputA" class="" style="display: none;" value="wmText">
@@ -464,7 +464,7 @@
                             <div class="mt-6">
                               <div class="flex">
                                 <div class="flex h-5 items-center">
-                                  <input id="isMosaic" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
+                                  <input id="isMosaicText" aria-describedby="isMosaicText" name="isMosaic" type="checkbox" class="h-4 w-4 rounded border-sky-400 text-sky-400 focus:ring-2 focus:ring-sky-400" />
                                 </div>
                                 <div class="ml-2 text-sm">
                                   <label for="isMosaic" class="font-poppins text-sm font-semibold text-slate-800">Mosaic Effects</label>
