@@ -301,7 +301,7 @@ function submit(event) {
                     let cusPage = false;
                     let fromPage = false;
                     let toPage = false;
-                    var customPage = document.getElementById('customPage')
+                    var customPage = document.getElementById('customPageSplit')
                     var firstPage = document.getElementById('fromPage')
                     var lastPage = document.getElementById('toPage')
                     var totalPage = document.getElementById('totalPage')
@@ -345,6 +345,7 @@ function submit(event) {
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("First page can't be more than last page");
+                                            generateMesssage("First page can't have same value with last page");
                                             firstPage.style.borderColor = '#dc2626'
                                             newModal.show();
                                         } else if (parseInt(document.getElementById("toPage").value) >= parseInt(totalPage.value)) {
@@ -354,6 +355,7 @@ function submit(event) {
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("Last page can't be more than total page ("+totalPage.value+")");
+                                            generateMesssage("Last page can't have same value with total page ("+totalPage.value+")");
                                             lastPage.style.borderColor = '#dc2626'
                                             newModal.show();
                                         } else {
@@ -417,7 +419,7 @@ function submit(event) {
                                 }
                             } else if (document.getElementById("fourthRadio").checked) {
                                 if (document.getElementById("fourthRadio").value == "cusPages") {
-                                    if (document.getElementById("customPage").value) {
+                                    if (document.getElementById("customPageSplit").value) {
                                          cusPage = true;
                                     } else {
                                          cusPage = false;
@@ -479,9 +481,9 @@ function submit(event) {
                     }
                 } else if (document.getElementById("secondRadio").checked) {
                     let cusPage = false;
-                    var customPage = document.getElementById('customPage')
+                    var customPage = document.getElementById('customPageDelete')
                     if (document.getElementById("secondRadio").value == "delete") {
-                            if (document.getElementById("customPage").value) {
+                            if (document.getElementById("customPageDelete").value) {
                                  cusPage = true;
                             } else {
                                  cusPage = false;

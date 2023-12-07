@@ -150,9 +150,9 @@ class splitController extends Controller
 						} else {
 							$fixedPage = '';
 						}
-						if(isset($_POST['customPage']))
+						if(isset($_POST['customPageSplit']))
 						{
-							$customInputPage = $request->post('customPage');
+							$customInputPage = $request->post('customPageSplit');
                             if (is_string($customInputPage)) {
                                 $customPage = strtolower($customInputPage);
                             } else {
@@ -673,9 +673,9 @@ class splitController extends Controller
                     if(isset($_POST['fileAlt'])) {
                         $file = $request->post('fileAlt');
 
-                        if(isset($_POST['customPage']))
+                        if(isset($_POST['customPageDelete']))
 						{
-							$customInputPage = $request->post('customPage');
+							$customInputPage = $request->post('customPageDelete');
                             if (is_string($customInputPage)) {
                                 $customPage = strtolower($customInputPage);
                             } else {
