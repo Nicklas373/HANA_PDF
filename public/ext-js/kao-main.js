@@ -56,6 +56,7 @@ if (firstArea) {
         } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_ImageInputRestore()
             wmLayout_image()
+            showVal(document.getElementById('watermarkFontTransparency').value,'image')
         }
     }
 }
@@ -96,6 +97,7 @@ if (secondArea) {
         }  else if (firstAreaAltInput.value == "watermark") {
             wmLayout_TextInputRestore()
             wmLayout_text()
+            showVal(document.getElementById('watermarkFontTransparency').value,'text')
         }
     }
 }
