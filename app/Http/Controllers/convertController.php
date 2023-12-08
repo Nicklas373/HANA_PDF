@@ -724,7 +724,7 @@ class convertController extends Controller
 						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                                if ($pdfTotalPages = 1 && $extMode) {
+                                if ($pdfTotalPages == 1 && $extMode) {
                                     $files = glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*');
                                     foreach($files as $file) {
                                         if (is_file($file)){
@@ -742,7 +742,7 @@ class convertController extends Controller
                                     $ilovepdfTask->setOutputFileName($pdfNameWithoutExtension);
                                     $ilovepdfTask->setPackagedFilename($pdfNameWithoutExtension);
                                     $ilovepdfTask->execute();
-                                    if ($pdfTotalPages = 1 && $extMode) {
+                                    if ($pdfTotalPages == 1 && $extMode) {
                                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfExtImage_Location));
                                     } else {
                                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
@@ -988,7 +988,7 @@ class convertController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
-                                if ($pdfTotalPages = 1 && $extMode) {
+                                if ($pdfTotalPages == 1 && $extMode) {
                                     foreach (glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*.jpg') as $filename) {
                                         rename($filename, Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.jpg'));
                                     }
