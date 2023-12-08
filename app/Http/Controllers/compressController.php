@@ -32,7 +32,7 @@ class compressController extends Controller
                     'err_reason' => $validator->messages(),
                     'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
@@ -71,6 +71,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
 						}
 					} else {
@@ -137,6 +150,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\AuthException $e) {
                             try {
@@ -154,6 +180,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\UploadException $e) {
                             try {
@@ -171,6 +210,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                             try {
@@ -188,6 +240,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                             try {
@@ -205,6 +270,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\TaskException $e) {
                             try {
@@ -222,6 +300,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Ilovepdf\Exceptions\PathException $e) {
                             try {
@@ -239,6 +330,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Exception $e) {
                             try {
@@ -256,6 +360,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         }
 
@@ -287,6 +404,19 @@ class compressController extends Controller
                                 ]);
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         } else {
                             try {
@@ -304,6 +434,19 @@ class compressController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            } catch (\Exception $e) {
+                                DB::table('pdf_compress')->insert([
+                                    'processId' => $uuid,
+                                    'fileName' => 'null',
+                                    'fileSize' => 'null',
+                                    'compFileSize' => 'null',
+                                    'compMethod' => 'null',
+                                    'result' => false,
+                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                    'err_api_reason' => $e->getMessage(),
+                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                ]);
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             }
                         }
 					} else {

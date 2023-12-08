@@ -34,7 +34,7 @@ class watermarkController extends Controller
                     'err_reason' => $validator->messages(),
                     'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                 ]);
-                return redirect()->back()->withErrors(['error'=>$validator->messages(), 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
@@ -82,7 +82,29 @@ class watermarkController extends Controller
                                 return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                            }
+                            } catch (\Exception $e) {
+                                DB::table('pdf_watermark')->insert([
+                                   'processId' => $uuid,
+                                   'fileName' => 'null',
+                                   'fileSize' => 'null',
+                                   'watermarkFontFamily' => 'null',
+                                   'watermarkFontStyle' => 'null',
+                                   'watermarkFontSize' => 'null',
+                                   'watermarkFontTransparency' => 'null',
+                                   'watermarkImage' => 'null',
+                                   'watermarkLayout' => 'null',
+                                   'watermarkMosaic' => 'null',
+                                   'watermarkRotation' => 'null',
+                                   'watermarkStyle' => 'null',
+                                   'watermarkText' => 'null',
+                                   'watermarkPage' => 'null',
+                                   'result' => false,
+                                   'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                   'err_api_reason' => $e->getMessage(),
+                                   'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                               ]);
+                               return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                           }
 						}
 					} else {
                         try {
@@ -109,7 +131,29 @@ class watermarkController extends Controller
                             return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                        }
+                        } catch (\Exception $e) {
+                            DB::table('pdf_watermark')->insert([
+                               'processId' => $uuid,
+                               'fileName' => 'null',
+                               'fileSize' => 'null',
+                               'watermarkFontFamily' => 'null',
+                               'watermarkFontStyle' => 'null',
+                               'watermarkFontSize' => 'null',
+                               'watermarkFontTransparency' => 'null',
+                               'watermarkImage' => 'null',
+                               'watermarkLayout' => 'null',
+                               'watermarkMosaic' => 'null',
+                               'watermarkRotation' => 'null',
+                               'watermarkStyle' => 'null',
+                               'watermarkText' => 'null',
+                               'watermarkPage' => 'null',
+                               'result' => false,
+                               'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                               'err_api_reason' => $e->getMessage(),
+                               'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                           ]);
+                           return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                       }
 					}
 				} else if ($request->post('formAction') == "watermark") {
 					if(isset($_POST['fileAlt'])) {
@@ -267,7 +311,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\AuthException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -293,7 +359,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\UploadException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -319,7 +407,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -345,7 +455,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -371,7 +503,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\TaskException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -397,7 +551,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\PathException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -423,7 +599,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Exception $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -449,7 +647,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 }
 							} else {
                                 try {
@@ -476,7 +696,29 @@ class watermarkController extends Controller
                                     return redirect()->back()->withErrors(['error'=>'Image file not found on the server !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                }
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
 							}
 						} else if ($watermarkStyle == "text") {
                             if(isset($_POST['watermarkPageText']))
@@ -529,7 +771,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -544,7 +786,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\AuthException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -555,7 +819,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -570,7 +834,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\UploadException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -581,7 +867,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -596,7 +882,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\ProcessException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -607,7 +915,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -622,7 +930,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\DownloadException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -633,7 +963,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -648,7 +978,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\TaskException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -659,7 +1011,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -674,7 +1026,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Ilovepdf\Exceptions\PathException $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -685,7 +1059,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -700,7 +1074,29 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 } catch (\Exception $e) {
                                     try {
                                         DB::table('pdf_watermark')->insert([
@@ -711,7 +1107,7 @@ class watermarkController extends Controller
                                             'watermarkFontStyle' => $watermarkFontStyle,
                                             'watermarkFontSize' => $watermarkFontSize,
                                             'watermarkFontTransparency' => $watermarkFontTransparency,
-                                            'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                            'watermarkImage' => 'null',
                                             'watermarkLayout' => $watermarkLayoutStyle,
                                             'watermarkMosaic' => $isMosaicDB,
                                             'watermarkRotation' => $watermarkRotation,
@@ -726,8 +1122,136 @@ class watermarkController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    }
+                                    } catch (\Exception $e) {
+                                        DB::table('pdf_watermark')->insert([
+                                           'processId' => $uuid,
+                                           'fileName' => 'null',
+                                           'fileSize' => 'null',
+                                           'watermarkFontFamily' => 'null',
+                                           'watermarkFontStyle' => 'null',
+                                           'watermarkFontSize' => 'null',
+                                           'watermarkFontTransparency' => 'null',
+                                           'watermarkImage' => 'null',
+                                           'watermarkLayout' => 'null',
+                                           'watermarkMosaic' => 'null',
+                                           'watermarkRotation' => 'null',
+                                           'watermarkStyle' => 'null',
+                                           'watermarkText' => 'null',
+                                           'watermarkPage' => 'null',
+                                           'result' => false,
+                                           'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                           'err_api_reason' => $e->getMessage(),
+                                           'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                       ]);
+                                       return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                   }
                                 }
+                            } else {
+                                try {
+                                    DB::table('pdf_watermark')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => 'null',
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'Watermark text can not empty !',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'Watermark text can not empty !', 'processId'=>$uuid])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
+                            }
+						}
+                        if (file_exists($pdfNewPath)) {
+                            unlink($pdfNewPath);
+                        }
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
+						    $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
+                            if ($randomizeImageFileName == 'null') {
+                                try {
+                                    DB::table('pdf_watermark')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => $pdfName,
+                                        'fileSize' => $newFileSize,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => 'null',
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => true,
+                                        'err_reason' => 'null',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->with([
+                                        "stats" => "scs",
+                                        "res"=>$download_pdf,
+                                    ]);
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
                             } else {
                                 try {
                                     DB::table('pdf_watermark')->insert([
@@ -745,75 +1269,138 @@ class watermarkController extends Controller
                                         'watermarkStyle' => $watermarkStyle,
                                         'watermarkText' => $watermarkText,
                                         'watermarkPage' => $watermarkPage,
-                                        'result' => false,
-                                        'err_reason' => 'Watermark text can not empty !',
+                                        'result' => true,
+                                        'err_reason' => 'null',
                                         'err_api_reason' => 'null',
                                         'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'Watermark text can not empty !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->with([
+                                        "stats" => "scs",
+                                        "res"=>$download_pdf,
+                                    ]);
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                }
-                            }
-						}
-                        if (file_exists($pdfNewPath)) {
-                            unlink($pdfNewPath);
-                        }
-                        if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
-						    $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-                            try {
-                                DB::table('pdf_watermark')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->with([
-                                    "stats" => "scs",
-                                    "res"=>$download_pdf,
-                                ]);
-                            } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
                             }
                         } else {
-                            try {
-                                DB::table('pdf_watermark')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => basename($file),
-                                    'fileSize' => $newFileSize,
-                                    'watermarkFontFamily' => $watermarkFontFamily,
-                                    'watermarkFontStyle' => $watermarkFontStyle,
-                                    'watermarkFontSize' => $watermarkFontSize,
-                                    'watermarkFontTransparency' => $watermarkFontTransparency,
-                                    'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
-                                    'watermarkLayout' => $watermarkLayoutStyle,
-                                    'watermarkMosaic' => $isMosaicDB,
-                                    'watermarkRotation' => $watermarkRotation,
-                                    'watermarkStyle' => $watermarkStyle,
-                                    'watermarkText' => $watermarkText,
-                                    'watermarkPage' => $watermarkPage,
-                                    'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
-                            } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            if ($randomizeImageFileName == 'null') {
+                                try {
+                                    DB::table('pdf_watermark')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => basename($file),
+                                        'fileSize' => $newFileSize,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => 'null',
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'Failed to download file from iLovePDF API !',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
+                            } else {
+                                try {
+                                    DB::table('pdf_watermark')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => basename($file),
+                                        'fileSize' => $newFileSize,
+                                        'watermarkFontFamily' => $watermarkFontFamily,
+                                        'watermarkFontStyle' => $watermarkFontStyle,
+                                        'watermarkFontSize' => $watermarkFontSize,
+                                        'watermarkFontTransparency' => $watermarkFontTransparency,
+                                        'watermarkImage' => $randomizeImageFileName.'.'.$randomizeImageExtension,
+                                        'watermarkLayout' => $watermarkLayoutStyle,
+                                        'watermarkMosaic' => $isMosaicDB,
+                                        'watermarkRotation' => $watermarkRotation,
+                                        'watermarkStyle' => $watermarkStyle,
+                                        'watermarkText' => $watermarkText,
+                                        'watermarkPage' => $watermarkPage,
+                                        'result' => false,
+                                        'err_reason' => 'Failed to download file from iLovePDF API !',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                } catch (\Exception $e) {
+                                    DB::table('pdf_watermark')->insert([
+                                       'processId' => $uuid,
+                                       'fileName' => 'null',
+                                       'fileSize' => 'null',
+                                       'watermarkFontFamily' => 'null',
+                                       'watermarkFontStyle' => 'null',
+                                       'watermarkFontSize' => 'null',
+                                       'watermarkFontTransparency' => 'null',
+                                       'watermarkImage' => 'null',
+                                       'watermarkLayout' => 'null',
+                                       'watermarkMosaic' => 'null',
+                                       'watermarkRotation' => 'null',
+                                       'watermarkStyle' => 'null',
+                                       'watermarkText' => 'null',
+                                       'watermarkPage' => 'null',
+                                       'result' => false,
+                                       'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                       'err_api_reason' => $e->getMessage(),
+                                       'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                   ]);
+                                   return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
+                               }
                             }
                         }
 					} else {
