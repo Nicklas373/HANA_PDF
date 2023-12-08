@@ -13,7 +13,7 @@
       <div class="grid gap-4 md:grid-cols-2 md:gap-20">
         <div>
           <label for="urlToPDF" class="font-poppins mb-2 block text-base font-semibold text-slate-900">Enter the Website URL</label>
-          <input type="text" id="urlToPDF" name="urlToPDF" class="font-poppins block w-full cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner focus:ring-sky-400" onclick="changeButtonColor('kaoC')" onfocusin="checkValidation('urlToPDF')" onfocusout="checkValidation('urlToPDF')" placeholder="https://pdf.hana-ci.com" />
+          <input type="text" id="urlToPDF" name="urlToPDF" class="font-poppins block w-full cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner focus:ring-sky-400" onfocusin="checkValidation('urlToPDF')" onfocusout="checkValidation('urlToPDF')" placeholder="https://pdf.hana-ci.com" />
           @if ($message = Session::get('stats'))
           <div id="alert-additional-content-3" class="mb-2 mt-4 rounded-lg border border-green-300 bg-green-50 p-4 text-green-800" role="alert">
             <div class="flex items-center">
@@ -51,8 +51,7 @@
               <span class="text-sm">Errors may occur that may come from this factor:</span>
               <ul class="ml-4 mt-1.5 list-inside list-disc text-xs">
                 <li>Error due failure connection to API</li>
-                <li>Error while uploading URL to the server</li>
-                <li>Filename contain ambigous characters or symbols</li>
+                <li>URL contain ambigous characters or symbols</li>
               </ul>
               <br />
               @error('error')
@@ -71,13 +70,12 @@
             </svg>
             <span class="sr-only">Danger</span>
             <div>
-              <span class="text-sm"><b>PDF has failed to convert !</b></span>
+              <span class="text-sm"><b>URL has failed to convert !</b></span>
               <br />
               <span class="text-sm">Errors may occur that may come from this factor:</span>
               <ul class="ml-4 mt-1.5 list-inside list-disc text-xs">
                 <li>Error due failure connection to API</li>
-                <li>Error while uploading PDF to the server</li>
-                <li>Filename contain ambigous characters or symbols</li>
+                <li>URL contain ambigous characters or symbols</li>
               </ul>
               <br />
               @error('error')
