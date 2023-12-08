@@ -724,7 +724,7 @@ class convertController extends Controller
 						        $fileSize = filesize($pdfNewPath);
                                 $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                                if ($pdfTotalPages = 1) {
+                                if ($pdfTotalPages = 1 && $extMode) {
                                     $files = glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*');
                                     foreach($files as $file) {
                                         if (is_file($file)){
@@ -988,14 +988,13 @@ class convertController extends Controller
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
-                                if ($pdfTotalPages = 1) {
+                                if ($pdfTotalPages = 1 && $extMode) {
                                     foreach (glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*.jpg') as $filename) {
                                         rename($filename, Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.jpg'));
                                     }
-                                } else {
-                                    if (file_exists($pdfNewPath)) {
-                                        unlink($pdfNewPath);
-                                    }
+                                }
+                                if (file_exists($pdfNewPath)) {
+                                    unlink($pdfNewPath);
                                 }
                                 if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                                     try {
@@ -1030,107 +1029,128 @@ class convertController extends Controller
                                         ]);
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     }
-                                } else if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.jpg')) {
-                                    try {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'container' => $convertType,
-                                            'img_extract' => $extMode,
-                                            'result' => true,
-                                            'err_reason' => null,
-                                            'err_api_reason' => null,
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->with([
-                                            "stats" => "scs",
-                                            "res"=>Storage::disk('local')->url('temp/'.$pdfNameWithoutExtension.'.jpg'),
-                                            'processId'=>$uuid
-                                        ])->withInput();
-                                    } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    } catch (\Exception $e) {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => 'null',
-                                            'fileSize' => 'null',
-                                            'container' => 'null',
-                                            'img_extract' => false,
-                                            'result' => false,
-                                            'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                            'err_api_reason' => $e->getMessage(),
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
-                                    }
-                                }  else if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg')) {
-                                    try {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'container' => $convertType,
-                                            'img_extract' => $extMode,
-                                            'result' => true,
-                                            'err_reason' => null,
-                                            'err_api_reason' => null,
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->with([
-                                            "stats" => "scs",
-                                            "res"=>Storage::disk('local')->url('temp/'.$pdfNameWithoutExtension.'-0001.jpg'),
-                                            'processId'=>$uuid
-                                        ])->withInput();
-                                    } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    } catch (\Exception $e) {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => 'null',
-                                            'fileSize' => 'null',
-                                            'container' => 'null',
-                                            'img_extract' => false,
-                                            'result' => false,
-                                            'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                            'err_api_reason' => $e->getMessage(),
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
-                                    }
                                 } else {
-                                    try {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => $pdfName,
-                                            'fileSize' => $newFileSize,
-                                            'container' => $convertType,
-                                            'img_extract' => $extMode,
-                                            'result' => false,
-                                            'err_reason' => 'Failed to download converted file from iLovePDF API !',
-                                            'err_api_reason' => null,
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
-                                    } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
-                                    } catch (\Exception $e) {
-                                        DB::table('pdf_convert')->insert([
-                                            'processId' => $uuid,
-                                            'fileName' => 'null',
-                                            'fileSize' => 'null',
-                                            'container' => 'null',
-                                            'img_extract' => false,
-                                            'result' => false,
-                                            'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                            'err_api_reason' => $e->getMessage(),
-                                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                        ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
+                                    if ($pdfTotalPages = 1 && $extMode) {
+                                        if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.jpg')) {
+                                            try {
+                                                DB::table('pdf_convert')->insert([
+                                                    'processId' => $uuid,
+                                                    'fileName' => $pdfName,
+                                                    'fileSize' => $newFileSize,
+                                                    'container' => $convertType,
+                                                    'img_extract' => $extMode,
+                                                    'result' => true,
+                                                    'err_reason' => null,
+                                                    'err_api_reason' => null,
+                                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                                ]);
+                                                return redirect()->back()->with([
+                                                    "stats" => "scs",
+                                                    "res"=>Storage::disk('local')->url('temp/'.$pdfNameWithoutExtension.'.jpg'),
+                                                    'processId'=>$uuid
+                                                ])->withInput();
+                                            } catch (QueryException $ex) {
+                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            } catch (\Exception $e) {
+                                                DB::table('pdf_convert')->insert([
+                                                    'processId' => $uuid,
+                                                    'fileName' => 'null',
+                                                    'fileSize' => 'null',
+                                                    'container' => 'null',
+                                                    'img_extract' => false,
+                                                    'result' => false,
+                                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                                    'err_api_reason' => $e->getMessage(),
+                                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                                ]);
+                                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
+                                            }
+                                        }
+                                    } else if ($pdfTotalPages = 1 && !$extMode) {
+                                        if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg')) {
+                                            try {
+                                                DB::table('pdf_convert')->insert([
+                                                    'processId' => $uuid,
+                                                    'fileName' => $pdfName,
+                                                    'fileSize' => $newFileSize,
+                                                    'container' => $convertType,
+                                                    'img_extract' => $extMode,
+                                                    'result' => true,
+                                                    'err_reason' => null,
+                                                    'err_api_reason' => null,
+                                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                                ]);
+                                                return redirect()->back()->with([
+                                                    "stats" => "scs",
+                                                    "res"=>Storage::disk('local')->url('temp/'.$pdfNameWithoutExtension.'-0001.jpg'),
+                                                    'processId'=>$uuid
+                                                ])->withInput();
+                                            } catch (QueryException $ex) {
+                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            } catch (\Exception $e) {
+                                                DB::table('pdf_convert')->insert([
+                                                    'processId' => $uuid,
+                                                    'fileName' => 'null',
+                                                    'fileSize' => 'null',
+                                                    'container' => 'null',
+                                                    'img_extract' => false,
+                                                    'result' => false,
+                                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                                    'err_api_reason' => $e->getMessage(),
+                                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                                ]);
+                                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
+                                            }
+                                        }
+                                    } else {
+                                        try {
+                                            DB::table('pdf_convert')->insert([
+                                                'processId' => $uuid,
+                                                'fileName' => $pdfName,
+                                                'fileSize' => $newFileSize,
+                                                'container' => $convertType,
+                                                'img_extract' => $extMode,
+                                                'result' => false,
+                                                'err_reason' => 'Failed to download converted file from iLovePDF API !',
+                                                'err_api_reason' => null,
+                                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                            ]);
+                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
+                                        } catch (QueryException $ex) {
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        } catch (\Exception $e) {
+                                            DB::table('pdf_convert')->insert([
+                                                'processId' => $uuid,
+                                                'fileName' => 'null',
+                                                'fileSize' => 'null',
+                                                'container' => 'null',
+                                                'img_extract' => false,
+                                                'result' => false,
+                                                'err_reason' => 'Eloquent transaction error !, Catch on Exception',
+                                                'err_api_reason' => $e->getMessage(),
+                                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                            ]);
+                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
+                                        }
                                     }
                                 }
                             } else {
-                                return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                                try {
+                                    DB::table('pdf_convert')->insert([
+                                        'processId' => $uuid,
+                                        'fileName' => 'null',
+                                        'fileSize' => 'null',
+                                        'container' => 'null',
+                                        'img_extract' => false,
+                                        'result' => false,
+                                        'err_reason' => 'PDF failed to upload !',
+                                        'err_api_reason' => 'null',
+                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    ]);
+                                    return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                                } catch (QueryException $ex) {
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                }
                             }
                         }  else if ($convertType == 'pdf') {
                             if(isset($_POST['fileAlt'])) {
