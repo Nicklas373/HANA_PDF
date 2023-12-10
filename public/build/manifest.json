@@ -1,26 +1,26 @@
 {
-  "_index-f475cd16.js": {
-    "file": "assets/index-f475cd16.js"
+  "_index-ccf1ca32.js": {
+    "file": "assets/index-ccf1ca32.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-93b9d882.css",
+    "file": "assets/app-088b0bbd.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.js": {
-    "file": "assets/app-c1194546.js",
+    "file": "assets/app-6ceaad5c.js",
     "imports": [
-      "_index-f475cd16.js"
+      "_index-ccf1ca32.js"
     ],
     "isEntry": true,
     "src": "resources/js/app.js"
   },
-  "resources/js/flowbite.js": {
-    "file": "assets/flowbite-5fb3e959.js",
+  "resources/js/kao-logic.js": {
+    "file": "assets/kao-logic-aadc2f23.js",
     "imports": [
-      "_index-f475cd16.js"
+      "_index-ccf1ca32.js"
     ],
     "isEntry": true,
-    "src": "resources/js/flowbite.js"
+    "src": "resources/js/kao-logic.js"
   }
 }
