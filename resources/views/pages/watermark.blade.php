@@ -239,9 +239,9 @@
                                 </div>
                                 <div class="mb-8 grid grid-cols-1 gap-2">
                                   <div>
-                                    <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
+                                    <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Opacity</label>
                                     <div class="grid w-full grid-cols-2 gap-4">
-                                      <input id="watermarkFontTransparency" name="watermarkFontImageTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer" oninput="showVal(this.value,'image')" onchange="showVal(this.value,'image')">
+                                      <input id="watermarkFontTransparency" name="watermarkFontImageTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer" oninput="showVal(this.value,'image')" onchange="showVal(this.value,'image')">
                                       <label id="TransparencyValueImage" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
                                     </div>
                                   </div>
@@ -455,9 +455,9 @@
                                 </div>
                                 <div class="mb-8 grid grid-cols-1 gap-2">
                                   <div>
-                                    <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Transparency</label>
+                                    <label id="Transparency" class="font-poppins mb-2 block text-base font-semibold text-slate-900" for="watermarkFontTransparency">Opacity</label>
                                     <div class="grid w-full grid-cols-2 gap-x-4">
-                                      <input id="watermarkFontTransparency" name="watermarkFontTextTransparency" type="range" min="0" max="100" value="0" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer" oninput="showVal(this.value,'text')" onchange="showVal(this.value,'text')">
+                                      <input id="watermarkFontTransparency" name="watermarkFontTextTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full h-2 mt-4 accent-sky-600 rounded-lg cursor-pointer" oninput="showVal(this.value,'text')" onchange="showVal(this.value,'text')">
                                       <label id="TransparencyValueText" class="font-poppins mt-2.5 block text-sm font-semibold text-gray-500" for="watermarkFontTransparency"></label>
                                     </div>
                                   </div>
