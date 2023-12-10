@@ -67,7 +67,7 @@ function submit(event) {
         var trueCount = 0;
 
        if (document.getElementById("multiple_files").value == '' && document.getElementById("fileAlt") != null && uploadBtn == false) {
-            procTitleMessageModal.innerHTML = "Processing PDF..."
+            procTitleMessageModal.innerText = "Processing PDF..."
             errMessage.style.visibility = null;
             errSubMessage.style.visibility = null;
             errAltSubMessageModal.style.display = "none";
@@ -93,25 +93,25 @@ function submit(event) {
             if (falseCount > 0) {
                 if (extErr) {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Unsupported file format!";
-                    errSubMessage.innerHTML = "";
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Unsupported file format!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Supported file format: PDF");
                     errAltSubMessageModal.style = null;
                     newModal.show();
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                    errSubMessage.innerHTML = ""
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                    errSubMessage.innerText = ""
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Maximum file size 25 MB");
                     errAltSubMessageModal.style = null;
                     newModal.show();
                 }
             } else {
-                procTitleMessageModal.innerHTML = "Uploading PDF..."
+                procTitleMessageModal.innerText = "Uploading PDF..."
                 errMessage.style.visibility = null;
                 errSubMessage.style.visibility = null;
                 errAltSubMessageModal.style.display = "none";
@@ -121,16 +121,16 @@ function submit(event) {
         } else if (document.getElementById("multiple_files").value == '' && document.getElementById("fileAlt") == null && uploadBtn == true ||
                     document.getElementById("multiple_files").value == '' && document.getElementById("fileAlt") != null && uploadBtn == true) {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please choose PDF file!";
-                        errSubMessage.innerHTML = ""
+                        errMessage.innerText  = "Please choose PDF file!";
+                        errSubMessage.innerText = ""
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
                         newModal.show();
         } else {
             event.preventDefault();
-            errMessage.innerHTML  = "Index out of bound!";
-            errSubMessage.innerHTML = "";
-            errListTitleMessage.innerHTML = "Error message"
+            errMessage.innerText  = "Index out of bound!";
+            errSubMessage.innerText = "";
+            errListTitleMessage.innerText = "Error message"
             resetErrListMessage();
             generateMesssage("Merge decision logic error");
             errAltSubMessageModal.style = null;
@@ -142,8 +142,8 @@ function submit(event) {
             if (!document.getElementById("file_input").value && document.getElementById("fileAlt") == null && uploadBtn == true ||
                 !document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == true) {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Please choose PDF file!";
-                    errSubMessage.innerHTML = ""
+                    errMessage.innerText  = "Please choose PDF file!";
+                    errSubMessage.innerText = ""
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     newModal.show();
@@ -154,9 +154,9 @@ function submit(event) {
                         var compMed = document.getElementById('secondRadio')
                         var compHigh = document.getElementById('thirdRadio')
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please fill out these fields!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Required fields:"
+                        errMessage.innerText  = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:"
                         errAltSubMessageModal.style = null;
                         resetErrListMessage();
                         generateMesssage("Compression Quality");
@@ -165,7 +165,7 @@ function submit(event) {
                         compHigh.style.borderColor = '#dc2626'
                         newModal.show();
                     } else {
-                        procTitleMessageModal.innerHTML = "Processing PDF..."
+                        procTitleMessageModal.innerText = "Processing PDF..."
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -179,9 +179,9 @@ function submit(event) {
                         var cnvToXLSX = document.getElementById('thirdRadio')
                         var cnvToDOCX = document.getElementById('fourthRadio')
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please fill out these fields!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Required fields:"
+                        errMessage.innerText  = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:"
                         errAltSubMessageModal.style = null;
                         resetErrListMessage();
                         generateMesssage("Document Format");
@@ -191,7 +191,7 @@ function submit(event) {
                         cnvToDOCX.style.borderColor = '#dc2626'
                         newModal.show();
                     } else {
-                        procTitleMessageModal.innerHTML = "Processing PDF..."
+                        procTitleMessageModal.innerText = "Processing PDF..."
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -199,7 +199,7 @@ function submit(event) {
                         modal.show();
                     }
                 } else {
-                    procTitleMessageModal.innerHTML = "Processing PDF..."
+                    procTitleMessageModal.innerText = "Processing PDF..."
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
@@ -213,15 +213,15 @@ function submit(event) {
                 {
                     if (fileSize >= 26214400) {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                        errSubMessage.innerHTML = ""
-                        errListTitleMessage.innerHTML = "Error message"
+                        errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
                         resetErrListMessage();
                         generateMesssage("Maximum file size 25 MB");
                         errAltSubMessageModal.style = null;
                         newModal.show();
                     } else {
-                        procTitleMessageModal.innerHTML = "Uploading PDF..."
+                        procTitleMessageModal.innerText = "Uploading PDF..."
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -230,9 +230,9 @@ function submit(event) {
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Unsupported file format!";
-                    errSubMessage.innerHTML = "";
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Unsupported file format!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Supported file format: PDF");
                     errAltSubMessageModal.style = null;
@@ -243,13 +243,13 @@ function submit(event) {
             if (!document.getElementById("file_input").value && document.getElementById("fileAlt") == null && uploadBtn == true ||
                 !document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == true) {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Please choose document file!";
-                    errSubMessage.innerHTML = ""
+                    errMessage.innerText  = "Please choose document file!";
+                    errSubMessage.innerText = ""
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     newModal.show();
             } else if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
-                procTitleMessageModal.innerHTML = "Processing Document..."
+                procTitleMessageModal.innerText = "Processing Document..."
                 errMessage.style.visibility = null;
                 errSubMessage.style.visibility = null;
                 errAltSubMessageModal.style.display = "none";
@@ -269,15 +269,15 @@ function submit(event) {
                 {
                     if (fileSize >= 26214400) {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                        errSubMessage.innerHTML = ""
-                        errListTitleMessage.innerHTML = "Error message"
+                        errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
                         resetErrListMessage();
                         generateMesssage("Maximum file size 25 MB");
                         errAltSubMessageModal.style = null;
                         newModal.show();
                     } else {
-                        procTitleMessageModal.innerHTML = "Upload Document"
+                        procTitleMessageModal.innerText = "Upload Document"
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -286,9 +286,9 @@ function submit(event) {
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Unsupported file format!";
-                    errSubMessage.innerHTML = "";
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Unsupported file format!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Supported file format: DOCX, XLSX, PPTX");
                     errAltSubMessageModal.style = null;
@@ -322,8 +322,8 @@ function submit(event) {
                                     if (fromPage && toPage) {
                                         if (document.getElementById("fromPage").value.charAt(0) == "-") {
                                             event.preventDefault();
-                                            errMessage.innerHTML  = "Invalid page number range!";
-                                            errListTitleMessage.innerHTML = "Error message"
+                                            errMessage.innerText  = "Invalid page number range!";
+                                            errListTitleMessage.innerText = "Error message"
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("Page number can't use negative number");
@@ -331,8 +331,8 @@ function submit(event) {
                                             newModal.show();
                                         } else if (document.getElementById("toPage").value.charAt(0) == "-") {
                                             event.preventDefault();
-                                            errMessage.innerHTML  = "Invalid page number range!";
-                                            errListTitleMessage.innerHTML = "Error message"
+                                            errMessage.innerText  = "Invalid page number range!";
+                                            errListTitleMessage.innerText = "Error message"
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("Page number can't use negative number");
@@ -340,8 +340,8 @@ function submit(event) {
                                             newModal.show();
                                         } else if (parseInt(document.getElementById("fromPage").value) >= parseInt(document.getElementById("toPage").value)) {
                                             event.preventDefault();
-                                            errMessage.innerHTML  = "Invalid page number range!";
-                                            errListTitleMessage.innerHTML = "Error message"
+                                            errMessage.innerText  = "Invalid page number range!";
+                                            errListTitleMessage.innerText = "Error message"
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("First page can't be more than last page");
@@ -350,8 +350,8 @@ function submit(event) {
                                             newModal.show();
                                         } else if (parseInt(document.getElementById("toPage").value) >= parseInt(totalPage.value)) {
                                             event.preventDefault();
-                                            errMessage.innerHTML  = "Invalid page number range!";
-                                            errListTitleMessage.innerHTML = "Error message"
+                                            errMessage.innerText  = "Invalid page number range!";
+                                            errListTitleMessage.innerText = "Error message"
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage("Last page can't be more than total page ("+totalPage.value+")");
@@ -359,7 +359,7 @@ function submit(event) {
                                             lastPage.style.borderColor = '#dc2626'
                                             newModal.show();
                                         } else {
-                                            procTitleMessageModal.innerHTML = "Processing PDF..."
+                                            procTitleMessageModal.innerText = "Processing PDF..."
                                             errMessage.style.visibility = null;
                                             errSubMessage.style.visibility = null;
                                             errAltSubMessageModal.style.display = "none";
@@ -368,9 +368,9 @@ function submit(event) {
                                         }
                                     } else if (!fromPage && !toPage) {
                                         event.preventDefault();
-                                        errMessage.innerHTML  = "Please fill out these fields!";
-                                        errSubMessage.innerHTML = "";
-                                        errListTitleMessage.innerHTML = "Required fields:"
+                                        errMessage.innerText  = "Please fill out these fields!";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText = "Required fields:"
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage("First Pages");
@@ -380,9 +380,9 @@ function submit(event) {
                                         newModal.show();
                                     } else if (!fromPage && toPage) {
                                         event.preventDefault();
-                                        errMessage.innerHTML  = "Please fill out these fields!";
-                                        errSubMessage.innerHTML = "";
-                                        errListTitleMessage.innerHTML = "Required fields:"
+                                        errMessage.innerText  = "Please fill out these fields!";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText = "Required fields:"
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage("First Pages");
@@ -390,16 +390,16 @@ function submit(event) {
                                         newModal.show();
                                     } else if (fromPage && !toPage) {
                                         event.preventDefault();
-                                        errMessage.innerHTML  = "Please fill out these fields!";
-                                        errSubMessage.innerHTML = "";
-                                        errListTitleMessage.innerHTML = "Required fields:"
+                                        errMessage.innerText  = "Please fill out these fields!";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText = "Required fields:"
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage("Last Pages");
                                         lastPage.style.borderColor = '#dc2626'
                                         newModal.show();
                                     } else {
-                                        procTitleMessageModal.innerHTML = "Processing PDF..."
+                                        procTitleMessageModal.innerText = "Processing PDF..."
                                         errMessage.style = null;
                                         errSubMessage.style = null;
                                         errAltSubMessageModal.style.display = "none";
@@ -408,10 +408,10 @@ function submit(event) {
                                     }
                                 } else {
                                     event.preventDefault();
-                                    errMessage.innerHTML  = "Index out of bound!";
-                                    errSubMessage.innerHTML = "";
+                                    errMessage.innerText  = "Index out of bound!";
+                                    errSubMessage.innerText = "";
                                     errAltSubMessageModal.style = null;
-                                    errListTitleMessage.innerHTML = "Error message"
+                                    errListTitleMessage.innerText = "Error message"
                                     resetErrListMessage();
                                     generateMesssage("Split selected page logic error");
                                     errAltSubMessageModal.style = null;
@@ -425,7 +425,7 @@ function submit(event) {
                                          cusPage = false;
                                     }
                                     if (cusPage) {
-                                        procTitleMessageModal.innerHTML = "Processing PDF..."
+                                        procTitleMessageModal.innerText = "Processing PDF..."
                                          errMessage.style.visibility = null;
                                          errSubMessage.style.visibility = null;
                                          errAltSubMessageModal.style.display = "none";
@@ -433,9 +433,9 @@ function submit(event) {
                                          modal.show();
                                     } else {
                                         event.preventDefault();
-                                        errMessage.innerHTML  = "Please fill out these fields!";
-                                        errSubMessage.innerHTML = "";
-                                        errListTitleMessage.innerHTML = "Required fields:"
+                                        errMessage.innerText  = "Please fill out these fields!";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText = "Required fields:"
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage("Custom Pages");
@@ -444,9 +444,9 @@ function submit(event) {
                                     }
                                 } else {
                                     event.preventDefault();
-                                    errMessage.innerHTML  = "Index out of bound!";
-                                    errSubMessage.innerHTML = "";
-                                    errListTitleMessage.innerHTML = "Error message"
+                                    errMessage.innerText  = "Index out of bound!";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText = "Error message"
                                     resetErrListMessage();
                                     generateMesssage("Split custom page logic error");
                                     errAltSubMessageModal.style = null;
@@ -454,9 +454,9 @@ function submit(event) {
                                 }
                              } else {
                                 event.preventDefault();
-                                errMessage.innerHTML  = "Index out of bound!";
-                                errSubMessage.innerHTML = "";
-                                errListTitleMessage.innerHTML = "Error message"
+                                errMessage.innerText  = "Index out of bound!";
+                                errSubMessage.innerText = "";
+                                errListTitleMessage.innerText = "Error message"
                                 resetErrListMessage();
                                 generateMesssage("Cannot define selected or custom page");
                                 errAltSubMessageModal.style = null;
@@ -464,16 +464,16 @@ function submit(event) {
                             }
                         } else {
                             event.preventDefault();
-                            errMessage.innerHTML  = "Kaori";
+                            errMessage.innerText  = "Kaori";
                             errSubMessage.style.visibility = null;
                             errAltSubMessageModal.style.display = "none";
                             newModal.show();
                         }
                     } else {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Index out of bound!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Error message"
+                        errMessage.innerText  = "Index out of bound!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerinnerTextHTML = "Error message"
                         resetErrListMessage();
                         generateMesssage("Split options decision logic error");
                         errAltSubMessageModal.style = null;
@@ -489,7 +489,7 @@ function submit(event) {
                                  cusPage = false;
                             }
                             if (cusPage) {
-                                procTitleMessageModal.innerHTML = "Processing PDF..."
+                                procTitleMessageModal.innerText = "Processing PDF..."
                                 errMessage.style.visibility = null;
                                 errSubMessage.style.visibility = null;
                                 errAltSubMessageModal.style.display = "none";
@@ -497,9 +497,9 @@ function submit(event) {
                                 modal.show();
                             } else {
                                 event.preventDefault();
-                                errMessage.innerHTML  = "Please fill out these fields!";
-                                errSubMessage.innerHTML = "";
-                                errListTitleMessage.innerHTML = "Required fields:"
+                                errMessage.innerText  = "Please fill out these fields!";
+                                errSubMessage.innerText = "";
+                                errListTitleMessage.innerText = "Required fields:"
                                 errAltSubMessageModal.style = null;
                                 resetErrListMessage();
                                 generateMesssage("Custom Pages");
@@ -509,9 +509,9 @@ function submit(event) {
                             }
                         } else {
                             event.preventDefault();
-                            errMessage.innerHTML  = "Index out of bound!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Error message"
+                            errMessage.innerText  = "Index out of bound!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message"
                             resetErrListMessage();
                             generateMesssage("Delete options decision logic error");
                             errAltSubMessageModal.style = null;
@@ -519,9 +519,9 @@ function submit(event) {
                         }
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Index out of bound!";
-                    errSubMessage.innerHTML = "";
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Index out of bound!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Split decision logic error");
                     errAltSubMessageModal.style = null;
@@ -534,15 +534,15 @@ function submit(event) {
                 {
                     if (fileSize >= 26214400) {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                        errSubMessage.innerHTML = ""
-                        errListTitleMessage.innerHTML = "Error message"
+                        errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
                         resetErrListMessage();
                         generateMesssage("Maximum file size 25 MB");
                         errAltSubMessageModal.style = null;
                         newModal.show();
                     } else {
-                        procTitleMessageModal.innerHTML = "Uploading PDF..."
+                        procTitleMessageModal.innerText = "Uploading PDF..."
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -551,9 +551,9 @@ function submit(event) {
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Unsupported file format!";
-                    errSubMessage.innerHTML = "";
-                    errListTitleMessage.innerHTML = "Error message"
+                    errMessage.innerText  = "Unsupported file format!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message"
                     resetErrListMessage();
                     generateMesssage("Supported file format: PDF");
                     errAltSubMessageModal.style = null;
@@ -561,8 +561,8 @@ function submit(event) {
                 }
             } else {
                 event.preventDefault();
-                errMessage.innerHTML  = "Please choose PDF file!";
-                errSubMessage.innerHTML = ""
+                errMessage.innerText  = "Please choose PDF file!";
+                errSubMessage.innerText = ""
                 errSubMessage.style.visibility = null;
                 errAltSubMessageModal.style.display = "none";
                 newModal.show();
@@ -582,16 +582,16 @@ function submit(event) {
                             || imgFile.files[0].type == "image/jpg") {
                             if (fileSize >= 5242880) {
                                 event.preventDefault();
-                                errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                                errSubMessage.innerHTML = ""
-                                errListTitleMessage.innerHTML = "Error message"
+                                errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                                errSubMessage.innerText = ""
+                                errListTitleMessage.innerText = "Error message"
                                 resetErrListMessage();
                                 generateMesssage("Maximum file size 5 MB");
                                 errAltSubMessageModal.style = null;
                                 newModal.show();
                             } else {
                                 if (document.getElementById('watermarkPageImage').value) {
-                                    procTitleMessageModal.innerHTML = "Processing PDF..."
+                                    procTitleMessageModal.innerText = "Processing PDF..."
                                     errMessage.style.visibility = null;
                                     errSubMessage.style.visibility = null;
                                     errAltSubMessageModal.style.display = "none";
@@ -600,9 +600,9 @@ function submit(event) {
                                 } else {
                                     var wmPage = document.getElementById("watermarkPageImage");
                                     event.preventDefault();
-                                    errMessage.innerHTML  = "Please fill out these fields!";
-                                    errSubMessage.innerHTML = "";
-                                    errListTitleMessage.innerHTML = "Required fields:"
+                                    errMessage.innerText  = "Please fill out these fields!";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText = "Required fields:"
                                     resetErrListMessage();
                                     generateMesssage("Pages");
                                     errAltSubMessageModal.style = null;
@@ -612,9 +612,9 @@ function submit(event) {
                             }
                         } else {
                             event.preventDefault();
-                            errMessage.innerHTML  = "Unsupported file format!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Error message"
+                            errMessage.innerText  = "Unsupported file format!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message"
                             resetErrListMessage();
                             generateMesssage("Supported file format: JPG, PNG");
                             errAltSubMessageModal.style = null;
@@ -622,9 +622,9 @@ function submit(event) {
                         }
                     } else {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please fill out these fields!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Required fields:"
+                        errMessage.innerText  = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:"
                         resetErrListMessage();
                         generateMesssage("Image");
                         errAltSubMessageModal.style = null;
@@ -638,9 +638,9 @@ function submit(event) {
                     if (!document.getElementById('watermarkText').value && !document.getElementById('watermarkPageText').value) {
                         var wmPage = document.getElementById("watermarkPageText");
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please fill out these fields!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Required fields:"
+                        errMessage.innerText  = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:"
                         resetErrListMessage();
                         generateMesssage("Pages");
                         generateMesssage("Text");
@@ -651,7 +651,7 @@ function submit(event) {
                     } else if (document.getElementById('watermarkText').value) {
                         if (document.getElementById('watermarkPageText').value) {
                             errMessage.style.visibility = null;
-                            procTitleMessageModal.innerHTML = "Processing PDF..."
+                            procTitleMessageModal.innerText = "Processing PDF..."
                             errSubMessage.style.visibility = null;
                             errAltSubMessageModal.style.display = "none";
                             newModal.hide();
@@ -659,9 +659,9 @@ function submit(event) {
                         } else {
                             var wmPage = document.getElementById("watermarkPageText");
                             event.preventDefault();
-                            errMessage.innerHTML  = "Please fill out these fields!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Required fields:"
+                            errMessage.innerText  = "Please fill out these fields!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Required fields:"
                             resetErrListMessage();
                             generateMesssage("Pages");
                             errAltSubMessageModal.style = null;
@@ -670,9 +670,9 @@ function submit(event) {
                         }
                     } else {
                         event.preventDefault();
-                        errMessage.innerHTML  = "Please fill out these fields!";
-                        errSubMessage.innerHTML = "";
-                        errListTitleMessage.innerHTML = "Required fields:"
+                        errMessage.innerText  = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:"
                         resetErrListMessage();
                         generateMesssage("Text");
                         errAltSubMessageModal.style = null;
@@ -681,8 +681,8 @@ function submit(event) {
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerHTML  = "Please choose watermark options!";
-                    errSubMessage.innerHTML = ""
+                    errMessage.innerText  = "Please choose watermark options!";
+                    errSubMessage.innerText = ""
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     newModal.show();
@@ -695,15 +695,15 @@ function submit(event) {
                         {
                             if (fileSize >= 26214400) {
                                 event.preventDefault();
-                                errMessage.innerHTML  = "Uploaded file has exceeds the limit!";
-                                errSubMessage.innerHTML = ""
-                                errListTitleMessage.innerHTML = "Error message"
+                                errMessage.innerText  = "Uploaded file has exceeds the limit!";
+                                errSubMessage.innerText = ""
+                                errListTitleMessage.innerText = "Error message"
                                 resetErrListMessage();
                                 generateMesssage("Maximum file size 25 MB");
                                 errAltSubMessageModal.style = null;
                                 newModal.show();
                             } else {
-                                procTitleMessageModal.innerHTML = "Uploading PDF..."
+                                procTitleMessageModal.innerText = "Uploading PDF..."
                                 errMessage.style.visibility = null;
                                 errSubMessage.style.visibility = null;
                                 errAltSubMessageModal.style.display = "none";
@@ -712,9 +712,9 @@ function submit(event) {
                             }
                         } else {
                             event.preventDefault();
-                            errMessage.innerHTML  = "Unsupported file format!";
-                            errSubMessage.innerHTML = "";
-                            errListTitleMessage.innerHTML = "Error message"
+                            errMessage.innerText  = "Unsupported file format!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message"
                             resetErrListMessage();
                             generateMesssage("Supported file format: PDF");
                             errAltSubMessageModal.style = null;
@@ -723,16 +723,16 @@ function submit(event) {
             } else if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == true ||
                         !document.getElementById("file_input").value && document.getElementById("fileAlt") == null && uploadBtn == true) {
                             event.preventDefault();
-                            errMessage.innerHTML  = "Please choose PDF file!";
-                            errSubMessage.innerHTML = ""
+                            errMessage.innerText  = "Please choose PDF file!";
+                            errSubMessage.innerText = ""
                             errSubMessage.style.visibility = null;
                             errAltSubMessageModal.style.display = "none";
                             newModal.show();
             } else {
                 event.preventDefault();
-                errMessage.innerHTML  = "Index out of bound!";
-                errSubMessage.innerHTML = "";
-                errListTitleMessage.innerHTML = "Error message"
+                errMessage.innerText  = "Index out of bound!";
+                errSubMessage.innerText = "";
+                errListTitleMessage.innerText = "Error message"
                 resetErrListMessage();
                 generateMesssage("Watermark decision logic error");
                 errAltSubMessageModal.style = null;
@@ -740,9 +740,9 @@ function submit(event) {
             }
         } else {
             event.preventDefault();
-            errMessage.innerHTML  = "Index out of bound!";
-            errSubMessage.innerHTML = "";
-            errListTitleMessage.innerHTML = "Error message"
+            errMessage.innerText  = "Index out of bound!";
+            errSubMessage.innerText = "";
+            errListTitleMessage.innerText = "Error message"
             resetErrListMessage();
             generateMesssage("PDF decision logic error");
             errAltSubMessageModal.style = null;
@@ -752,7 +752,7 @@ function submit(event) {
     if (document.getElementById('urlToPDF') !== null) {
         var urlAddr = document.getElementById('urlToPDF')
         if (document.getElementById('urlToPDF').value) {
-            procTitleMessageModal.innerHTML = "Processing URL..."
+            procTitleMessageModal.innerText = "Processing URL..."
             errMessage.style.visibility = null;
             errSubMessage.style.visibility = null;
             errAltSubMessageModal.style.display = "none";
@@ -760,9 +760,9 @@ function submit(event) {
             modal.show();
         } else {
             event.preventDefault();
-            errMessage.innerHTML  = "Please fill out these fields!";
-            errSubMessage.innerHTML = "";
-            errListTitleMessage.innerHTML = "Required fields:"
+            errMessage.innerText  = "Please fill out these fields!";
+            errSubMessage.innerText = "";
+            errListTitleMessage.innerText = "Required fields:"
             resetErrListMessage();
             generateMesssage("URL Address");
             errAltSubMessageModal.style = null;

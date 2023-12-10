@@ -535,11 +535,11 @@ if (document.getElementById('multiple_files')) {
             if (newList.innerHTML !== '') {
                 newList.innerHTML = ``;
                 for (var i = 0; i < this.files.length; i++) {
-                    generateMesssage(this.files[i].name)
+                    generateMessage(this.files[i].name)
                 }
             } else {
                 for (var i = 0; i < this.files.length; i++) {
-                    generateMesssage(this.files[i].name)
+                    generateMessage(this.files[i].name)
                 }
             }
             if (newList.innerHTML == '') {
@@ -733,7 +733,7 @@ function formatBytes(bytes, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-function generateMesssage(subMessage) {
+function generateMessage(subMessage) {
     var ul = document.getElementById("pre-title");
     var li = document.createElement("li");
     li.id = "pre-list_"+ul.childElementCount;
@@ -888,9 +888,9 @@ function reuseOnClickWmLayoutImageStyleAreaB() {
 
 function showVal(newVal,state){
     if (state == 'text') {
-        document.getElementById("TransparencyValueText").innerHTML=newVal+" %";
+        document.getElementById("TransparencyValueText").innerText=newVal+" %";
     } else if (state == 'image') {
-        document.getElementById("TransparencyValueImage").innerHTML=newVal+" %";
+        document.getElementById("TransparencyValueImage").innerText=newVal+" %";
     }
 }
 
