@@ -8,7 +8,9 @@
     <div>
       <div id="content" class="flex flex-col min-h-screen justify-between">
         @include('includes.modal') @yield('content')
-        <!--<script src="/build/assets/flowbite-5fb3e959.js" type="module"></script>-->
+        <!-- Only use kao-logic static asset on live server !
+            comment it on development server -->
+        <script src="/build/assets/kao-logic-aadc2f23.js" type="module"></script>
         <script src="/ext-js/kao-controller.js"></script>
         <script src="/ext-js/kao-main.js"></script>
         <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
