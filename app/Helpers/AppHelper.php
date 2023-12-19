@@ -59,39 +59,39 @@ class AppHelper
 
     function getFtpResponse($download_file, $proc_file){
         $ftp_server = env('FTP_SERVER');
-        $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+        $ftp_conn = ftp_connect($ftp_server);
         $login = ftp_login($ftp_conn, env('FTP_USERNAME'), env('FTP_USERPASS'));
-        $login_pasv = ftp_pasv($ftp_conn, true) or die("Cannot switch to passive mode");
+        $login_pasv = ftp_pasv($ftp_conn, true);
 
-        try {
+        if (ftp_size($ftp_conn, $proc_file) != -1) {
             if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
                 return true;
             } else {
-                die("Cannot find specified file");
-                ftp_close($ftp_conn);
                 return false;
             }
-            ftp_close($ftp_conn);
-        } catch (Exception $e) {
+        } else {
             return false;
         }
+
+        ftp_close($ftp_conn);
     }
 
     function get_guid() {
-        if (function_exists('com_create_guid') === true)
+        if (function_exists('com_create_guid') === true) {
             return trim(com_create_guid(), '{}');
+        }
         $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // Set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // Set bits 6-7 to 10
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
     function getUserIpAddr(){
-        if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+        if( !empty($_SERVER['HTTP_CLIENT_IP'])){
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        }else{
+        } else {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
         return $ip;
