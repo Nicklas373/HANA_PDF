@@ -4,6 +4,7 @@ import sys
 import requests
 import os
 import os.path
+from requests import Timeout
 
 asposeToken=""
 asposeClientID=str(sys.argv[1])
@@ -28,8 +29,11 @@ def getAsposeToken():
     global asposeToken
     if asposeJsonObject != "":
         asposeToken = str(asposeJsonObject["access_token"])
+        return True
     else:
         asposeToken = "ERROR GETTING TOKEN"
+        print("ERROR GETTING TOKEN")
+        return False
 
 def convAsposeAPI(token, container):
     headers = {
@@ -44,16 +48,29 @@ def convAsposeAPI(token, container):
         with open(linuxSemanticDir, 'rb') as f:
             data = f.read()
         if len(container) != 0:
-            asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data)
-            values = asposeResponse.status_code
-            if values == 200:
-                print('File conversion success!')
-            else:
-                print('File conversion failed!')
+            try:
+                asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data, timeout=(90,92))
+                values = asposeResponse.status_code
+                if values == 200:
+                    print('File conversion success!')
+                    return True
+                else:
+                    print('File conversion failed!')
+                    return False
+            except Timeout:
+                print("Request time out!")
+                return False
+            except requests.exceptions.RequestException as e:
+                print(f"An error occurred: {e}")
+            except Exception as e:
+                print(f"An unindentified error occured: {e}")
+                return False
         else:
             print("Invalid Container")
+            return False
     else:
         print('File source not found! :'+linuxSemanticDir)
+        return False
 
 getAsposeToken()
 
