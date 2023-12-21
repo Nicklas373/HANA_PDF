@@ -14,7 +14,13 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use Ilovepdf\Exceptions;
+use Ilovepdf\Exceptions\StartException;
+use Ilovepdf\Exceptions\AuthException;
+use Ilovepdf\Exceptions\UploadException;
+use Ilovepdf\Exceptions\ProcessException;
+use Ilovepdf\Exceptions\DownloadException;
+use Ilovepdf\Exceptions\TaskException;
+use Ilovepdf\Exceptions\PathException;
 
 class mergeController extends Controller
 {
@@ -106,7 +112,7 @@ class mergeController extends Controller
                             }
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                        } catch (\Ilovepdf\Exceptions\StartException $e) {
+                        } catch (StartException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -132,7 +138,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\AuthException $e) {
+                        } catch (AuthException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -158,7 +164,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\UploadException $e) {
+                        } catch (UploadException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -184,7 +190,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\ProcessException $e) {
+                        } catch (ProcessException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -210,7 +216,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\DownloadException $e) {
+                        } catch (DownloadException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -236,7 +242,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\TaskException $e) {
+                        } catch (TaskException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
@@ -262,7 +268,7 @@ class mergeController extends Controller
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             }
-                        } catch (\Ilovepdf\Exceptions\PathException $e) {
+                        } catch (PathException $e) {
                             try {
                                 DB::table('pdf_merge')->insert([
                                     'processId' => $uuid,
