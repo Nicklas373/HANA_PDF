@@ -1,0 +1,75 @@
+version: '3.8'
+services:
+    hanaci-app-pdf:
+        build:
+            context: .
+            dockerfile: Dockerfile/Dockerfile.hana-app-pdf.sit
+        container_name: hanaci-app-pdf
+        cpus: 1.0
+        mem_limit: 256m
+        mem_reservation: 128M
+        restart: unless-stopped
+        environment:
+            - APP_NAME=pdf.hana-ci.com
+        env_file:
+            - module/.env
+        volumes:
+            - hanaci-app-pdf:/var/www/html/hanaci-pdf
+        networks:
+            - hanaci-network
+        depends_on:
+            - hanaci-instance
+    hanaci-db:
+        image: postgres:16.1
+        container_name: 'hanaci-db'
+        restart: on-failure
+        cpus: 1.0
+        mem_limit: 256M
+        mem_reservation: 128M
+        ports:
+            - '5432:5432'
+        env_file:
+            - .env-docker
+        environment:
+            PGPASSWORD: '${DB_PASSWORD}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD}'
+            PGDATA: /var/lib/postgresql/data/pgdata
+            POSTGRES_HOST_AUTH_METHOD: trust
+        volumes:
+            - 'hanaci-db:/var/lib/postgresql/data'
+            - './module/instance/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh'
+        networks:
+            - hanaci-network
+        depends_on:
+            - hanaci-instance
+    hanaci-instance:
+        build:
+            context: .
+            dockerfile: Dockerfile/Dockerfile.hana-instance.sit
+        container_name: 'hanaci-instance'
+        cpus: 2.0
+        mem_limit: 512M
+        mem_reservation: 256M
+        restart: always
+        ports:
+            - "80:80"
+            - "81:81"
+        volumes:
+            - ./module/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./module/nginx/sites-available/hanaci.conf:/etc/nginx/sites-available/hanaci.conf
+            - ./module/nginx/sites-available/pdf-hanaci.conf:/etc/nginx/sites-available/pdf-hanaci.conf
+            - ./module/php/php.ini:/etc/php/8.2/cli/conf.d/99-hana.ini
+            - ./module/php/php.ini:/etc/php/8.2/fpm/conf.d/99-hana.ini
+            - hanaci-app-pdf:/var/www/html/hanaci-pdf
+        networks:
+            - hanaci-network
+networks:
+    hanaci-network:
+        driver: bridge
+volumes:
+    hanaci-db:
+        driver: local
+    hanaci-app-pdf:
+        driver: local
