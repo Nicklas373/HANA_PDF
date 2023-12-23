@@ -49,7 +49,7 @@ def convAsposeAPI(token, container):
             data = f.read()
         if len(container) != 0:
             try:
-                asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data, timeout=(90,92))
+                asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data, timeout=(80,85))
                 values = asposeResponse.status_code
                 if values == 200:
                     print('File conversion success!')

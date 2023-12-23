@@ -148,8 +148,7 @@ class convertController extends Controller
                                                 'PATH' => getenv("PATH")
                                             ]);
                                 try {
-                                    ini_set('max_execution_time', 600);
-                                    $asposeAPI->setTimeout(600);
+                                    $asposeAPI->setTimeout(98);
                                     $asposeAPI->run();
                                 } catch (RuntimeException $message) {
                                     try {
@@ -381,8 +380,7 @@ class convertController extends Controller
                                                 'PATH' => getenv("PATH")
                                             ]);
                                 try {
-                                    ini_set('max_execution_time', 600);
-                                    $asposeAPI->setTimeout(600);
+                                    $asposeAPI->setTimeout(98);
                                     $asposeAPI->run();
                                 } catch (RuntimeException $message) {
                                     try {
