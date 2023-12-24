@@ -1,0 +1,39 @@
+name: HANA-CI PDF SIT Container
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure environments
+        run: |
+          export DOCKER_COMPOSE_PATH=./docker-compose.yml
+          export DB_USERNAME="${{ secrets.DB_USERNAME }}"
+          export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+          export ASPOSE_CLOUD_CLIENT_ID="${{ secrets.ASPOSE_CLOUD_CLIENT_ID }}"
+          export ASPOSE_CLOUD_TOKEN="${{ secrets.ASPOSE_CLOUD_TOKEN }}"
+          export ADOBE_CLIENT_ID="${{ secrets.ADOBE_CLIENT_ID }}"
+          export FTP_USERNAME="${{ secrets.FTP_USERNAME }}"
+          export FTP_USERPASS="${{ secrets.FTP_USERPASS }}"
+          export FTP_SERVER="${{ secrets.FTP_SERVER }}"
+          export FTP_ROOT="${{ secrets.FTP_ROOT }}"
+          export ILOVEPDF_PUBLIC_KEY="${{ secrets.ILOVEPDF_PUBLIC_KEY }}"
+          export ILOVEPDF_SECRET_KEY="${{ secrets.ILOVEPDF_SECRET_KEY }}"
+          docker-compose -f $DOCKER_COMPOSE_PATH up -d
+          docker-compose -f $DOCKER_COMPOSE_PATH ps
+
+      - name: Connect to Docker Hub
+        run: echo ${{ secrets.DOCKER_PAT }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build and Push Container Images
+        run: |
+          docker-compose -f $DOCKER_COMPOSE_PATH build
+          docker-compose -f $DOCKER_COMPOSE_PATH push
