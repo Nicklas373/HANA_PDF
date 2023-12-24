@@ -66,36 +66,31 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
     - upload-pdf
 6. Start to deploy
     ```bash
-    - npm run dev -- --host
     - php artisan serve --host=localhost --port=80
     ```
 ---
 
-## Deployment Method [Docker] [Access it on YOUR_LOCAL_IP_ADDRESS:81]
+## Deployment Method [Docker] [Access it on YOUR_LOCAL_IP_ADDRESS:80]
+- Deployment status
+    * [![HANA-CI PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
+
 ### Step to configure
 1. Clone the repository with __git clone__
-2. Configure additional environment inside __module/.env__
-````bash
-- ASPOSE_CLOUD_CLIENT_ID="Aspose cloud AppId, get it in [https://dashboard.aspose.cloud/]"
-- ASPOSE_CLOUD_TOKEN="Aspose Cloud storage token, get it in [https://dashboard.aspose.cloud/]"
-- ADOBE_CLIENT_ID="Adobe API key for PDF embed API, get it in [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]"
-- FTP_USERNAME="Used for 3rd party cloud storage for Aspose Cloud"
-- FTP_USERPASS="Used for 3rd party cloud storage for Aspose Cloud"
-- FTP_SERVER="Used for 3rd party cloud storage for Aspose Cloud"
-- ILOVEPDF_ENC_KEY="Generate your hash key (Max. 25 digits)"
-- ILOVEPDF_PUBLIC_KEY="iLovePDF public key, get it in [https://developer.ilovepdf.com/]"
-- ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in _[https://developer.ilovepdf.com/]"
-- PDF_MERGE_TEMP="temp-merge"
-- PDF_IMAGE_TEMP="temp-image"
-- PDF_UPLOAD="upload-pdf"
-- PDF_DOWNLOAD="temp"
-````
-3. Go to root directory from this project
-4. Start to deploy
-   ```bash
-    - sudo docker-compose build
-    - sudo docker-compose up -d
-    ```
+2. Go to root directory from this project
+3. Start to deploy
+    - Windows based [Using docker desktop]
+        ```bash
+        - docker compose up -d
+        - docker compose exec hanaci-instance php artisan migrate
+        - docker compose stats
+        ```
+    
+    - Linux based [Using docker.io & docker-compose]
+        ```bash
+        - sudo docker-compose up -d
+        - sudo docker-compose exec hanaci-instance php artisan migrate
+        - sudo docker-compose stats
+        ```
 ---
 
 ## Technology Stack
