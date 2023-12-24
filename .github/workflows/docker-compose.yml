@@ -15,7 +15,7 @@ jobs:
 
       - name: Check Secrets
         run: |
-          echo "Secrets: ${{ secrets.docker_sit_env_DB_USERNAME }}"
+          echo "Secrets: ${{ secrets.FTP_ROOT }}"
         env:
           DOCKER_SIT_ENVIRONMENT: ${{ secrets.docker_sit_env }}
-          DB_USERNAME: ${{ secrets.docker_sit_env_DB_USERNAME }}
+          DB_USERNAME: ${{ secrets.docker_sit_env_FTP_ROOT }}
