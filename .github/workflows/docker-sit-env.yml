@@ -7,7 +7,7 @@ on:
 
 jobs:
   app-build-sit:
-    runs-on: ubuntu-1.0
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -45,7 +45,7 @@ jobs:
           docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
       
   instance-build-sit:
-    runs-on: ubuntu-1.0
+    runs-on: ubuntu-22.04
     needs: app-build-sit
     steps:
       - name: Checkout Repository
