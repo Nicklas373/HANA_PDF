@@ -28,7 +28,7 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
         
@@ -47,12 +47,15 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-instance:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             .
 
+      - name: Verified Docker Image
+        run: docker images
+
       - name: Push Docker Image to Registry
         run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
-          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
-          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:latest
+          echo ${{ secrets.DOCKER_PAT }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
