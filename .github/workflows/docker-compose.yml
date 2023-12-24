@@ -32,7 +32,7 @@ jobs:
             .
     
       - name: Save HANA-CI App Docker Image
-        run: docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+        run: docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar hana-docker-sit-v2-hanaci-app-pdf:1.0
 
   instance-build:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
         
       - name: Save HANA-CI Instance Docker Image
         run: 
-          docker save -o hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+          docker save -o hana-docker-sit-v2-hanaci-instance.tar hana-docker-sit-v2-hanaci-instance:1.0
           
   load-and-verify:
     runs-on: ubuntu-latest
@@ -76,13 +76,13 @@ jobs:
       - name: Verified Docker Image
         run: |
           docker images
-          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0; then
+          if docker images | grep -q hana-docker-sit-v2-hanaci-app-pdf:1.0; then
             echo "HANA-CI PDF App image container verified !."
           else
             echo "HANA-CI PDF App image container not found !, cancelling workflow."
             exit 1
           fi
-          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-instance:1.0; then
+          if docker images | grep -q hana-docker-sit-v2-hanaci-instance:1.0; then
             echo "HANA-CI PDF Instance image container verified !."
           else
             echo "HANA-CI PDF Instance image container not found !, cancelling workflow."
