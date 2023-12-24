@@ -32,12 +32,15 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 
 ---
 
-## Deployment On Docker [YOUR_LOCAL_IP_ADDRESS:80]
-- Deployment status
-    * [![HANA-CI PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
-    * [![HANA-CI PDF PROD Container](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml/badge.svg)](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml)
+### Build Status
+- [![CodeQL](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql)
+- [![HANA-CI PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
+- [![HANA-CI PDF PROD Container](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml/badge.svg)](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml)
 
-### Step to configure
+---
+
+### Deployment On Docker [YOUR_LOCAL_IP_ADDRESS:80]
+## Step to configure
 1. Clone the repository with __git clone__
 2. Go to root directory from this project
 3. Start to deploy
@@ -56,8 +59,8 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
         ```
 ---
 
-## Deployment On Native OS Host
-### Step to configure
+### Deployment On Native OS Host
+## Step to configure
 1. Clone the repository with __git clone__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
 3. Add additional environment into __.env__ with this string (Add yourself value :p)
@@ -92,6 +95,7 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
     ```bash
     - php artisan serve --host=localhost --port=80
     ```
+    
 ---
 
 ## Technology Stack
@@ -104,9 +108,11 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite JS](https://vitejs.dev/)
 
+---
+
 ## License
 The HANA-CI PDF is a open source Laravel Project that has licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-<br>
+---
 
 ## HANA-CI Build Project 2016 - 2023
