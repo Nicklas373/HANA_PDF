@@ -1,0 +1,84 @@
+name: HANA-CI PDF SIT Container
+
+on:
+  push:
+    branches:
+      - dev/master-live
+
+jobs:
+  app-build-sit:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        
+      - name: Cleanup Unused Docker Images
+        run: docker rmi $(docker images -q)
+
+      - name: Build HANA-CI PDF SIT Docker Image
+        run: |
+          docker buildx create \
+          --name container \
+          --driver=docker-container \
+          --use
+          docker buildx build \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${{ secrets.ASPOSE_CLOUD_TOKEN }} \
+            --build-arg ADOBE_CLIENT_ID=${{ secrets.ADOBE_CLIENT_ID }} \
+            --build-arg FTP_USERNAME=${{ secrets.FTP_USERNAME }} \
+            --build-arg FTP_USERPASS=${{ secrets.FTP_USERPASS }} \
+            --build-arg FTP_SERVER=${{ secrets.FTP_SERVER }} \
+            --build-arg FTP_ROOT=/ \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
+            --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -f Dockerfile/Dockerfile.hana-app-pdf.sit \
+            --load -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            --builder=container \
+            .
+
+      - name: Deploy to SIT
+        run: |
+          echo ${{ secrets.DOCKER_PAT }} | docker login -u nicklas373 --password-stdin
+          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+      
+  instance-build-sit:
+    runs-on: ubuntu-22.04
+    needs: app-build-sit
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        
+      - name: Cleanup Unused Docker Images
+        run: docker rmi $(docker images -q)
+
+      - name: Build HANA-CI Instance SIT Docker Image
+        run: |
+          docker buildx create \
+          --name container \
+          --driver=docker-container \
+          --use
+          docker buildx build \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${{ secrets.ASPOSE_CLOUD_TOKEN }} \
+            --build-arg ADOBE_CLIENT_ID=${{ secrets.ADOBE_CLIENT_ID }} \
+            --build-arg FTP_USERNAME=${{ secrets.FTP_USERNAME }} \
+            --build-arg FTP_USERPASS=${{ secrets.FTP_USERPASS }} \
+            --build-arg FTP_SERVER=${{ secrets.FTP_SERVER }} \
+            --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
+            --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
+            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            -f Dockerfile/Dockerfile.hana-instance.sit \
+            --load -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            --builder=container \
+            .
+          
+      - name: Deploy to SIT
+        run: |
+          echo ${{ secrets.DOCKER_PAT }} | docker login -u nicklas373 --password-stdin
+          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
