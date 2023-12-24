@@ -1,13 +1,37 @@
-# Configure php fpm as base image 
+# Configure php fpm as base image
 FROM php:8.2-fpm
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.1"
+LABEL version="1.2"
 LABEL description="Docker application image for HANA-CI"
 
 # Configure ARG
-ARG WWWGROUP
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG ASPOSE_CLOUD_CLIENT_ID
+ARG ASPOSE_CLOUD_CLIENT_ID
+ARG ASPOSE_CLOUD_TOKEN
+ARG ADOBE_CLIENT_ID
+ARG FTP_USERNAME
+ARG FTP_USERPASS
+ARG FTP_SERVER
+ARG FTP_ROOT
+ARG ILOVEPDF_PUBLIC_KEY
+ARG ILOVEPDF_SECRET_KEY
+
+# Configure github actions secret
+ENV DB_USERNAME=${DB_USERNAME}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID}
+ENV ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN}
+ENV ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID}
+ENV FTP_USERNAME=${FTP_USERNAME}
+ENV FTP_USERPASS=${FTP_USERPASS}
+ENV FTP_SERVER=${FTP_SERVER}
+ENV FTP_ROOT=${FTP_ROOT}
+ENV ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
+ENV ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY}
 
 # Configure work directory
 WORKDIR /var/www/html
@@ -19,7 +43,7 @@ RUN apt-get update && apt-get install -y \
     git
 
 # Clone App Services
-RUN git clone -b dev/master-live https://github.com/Nicklas373/Hana-PDF hanaci-pdf
+RUN git clone -b master https://github.com/Nicklas373/Hana-PDF hanaci-pdf
 RUN chown -R www-data:www-data hanaci-pdf
 
 # Configure Composer
@@ -31,9 +55,27 @@ RUN mkdir hanaci-pdf/storage/app/public/temp
 RUN mkdir hanaci-pdf/storage/app/public/temp-merge
 RUN mkdir hanaci-pdf/storage/app/public/temp-image
 RUN mkdir hanaci-pdf/storage/app/public/upload-pdf
-COPY module/.env hanaci-pdf/.env
+COPY hanaci-pdf/.env.example hanaci-pdf/.env
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 RUN cd hanaci-pdf && php artisan key:generate
 RUN cd hanaci-pdf && php artisan storage:link
 RUN cd hanaci-pdf && php artisan config:cache
 RUN cd hanaci-pdf && php artisan config:clear
+
+# Configure secret env
+RUN cd hanaci-pdf && echo "" >> .env
+RUN sed -i "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
+RUN sed -i "s/DB_HOST=127.0.0.1/DB_HOST=pgsql/" .env
+RUN sed -i "s/DB_PORT=3306/DB_PORT=5432/" .env
+RUN sed -i "s/DB_DATABASE=laravel/DB_DATABASE=postgres/" .env
+RUN sed -i "s/DB_USERNAME=placeholder_value/DB_USERNAME=$DB_USERNAME/" .env
+RUN sed -i "s/DB_PASSWORD=placeholder_value/DB_PASSWORD=$DB_PASSWORD/" .env
+RUN cd hanaci-pdf && echo "ASPOSE_CLOUD_CLIENT_ID=$ASPOSE_CLOUD_CLIENT_ID" >> .env
+RUN cd hanaci-pdf && echo "ASPOSE_CLOUD_TOKEN=$ASPOSE_CLOUD_TOKEN" >> .env
+RUN cd hanaci-pdf && echo "ADOBE_CLIENT_ID=$ADOBE_CLIENT_ID" >> .env
+RUN cd hanaci-pdf && echo "FTP_USERNAME=$FTP_USERNAME" >> .env
+RUN cd hanaci-pdf && echo "FTP_USERPASS=$FTP_USERPASS" >> .env
+RUN cd hanaci-pdf && echo "FTP_SERVER=$FTP_SERVER" >> .env
+RUN cd hanaci-pdf && echo "FTP_ROOT=$FTP_ROOT" >> .env
+RUN cd hanaci-pdf && echo "ILOVEPDF_PUBLIC_KEY=$ILOVEPDF_PUBLIC_KEY" >> .env
+RUN cd hanaci-pdf && echo "ILOVEPDF_SECRET_KEY=$ILOVEPDF_SECRET_KEY" >> .env
