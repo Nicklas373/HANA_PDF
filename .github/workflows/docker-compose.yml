@@ -3,7 +3,7 @@ name: HANA-CI PDF SIT Container
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   publish:
