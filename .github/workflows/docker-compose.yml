@@ -28,9 +28,9 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            --push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
+            --push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
         
       - name: Build HANA-CI Instance Docker Image
         run: |
@@ -47,9 +47,9 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-instance:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
-            --push nicklas373/hana-docker-sit-v2-hanaci-instance:latest
+            --push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
   
   verify:
     runs-on: ubuntu-latest
@@ -60,13 +60,13 @@ jobs:
       - name: Verified Docker Image
         run: |
           docker images
-          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest; then
+          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0; then
             echo "HANA-CI PDF App image container verified !."
           else
             echo "HANA-CI PDF App image container not found !, cancelling workflow."
             exit 1
           fi
-          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-instance:latest; then
+          if docker images | grep -q nicklas373/hana-docker-sit-v2-hanaci-instance:1.0; then
             echo "HANA-CI PDF Instance image container verified !."
           else
             echo "HANA-CI PDF Instance image container not found !, cancelling workflow."
@@ -82,5 +82,5 @@ jobs:
       - name: Push Docker Image to Registry
         run: |
           echo ${{ secrets.DOCKER_PAT }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
-          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:latest
+          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
