@@ -33,6 +33,7 @@ jobs:
             -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             --push .
+            
       - name: Build HANA-CI Instance Docker Image
         run: |
           docker buildx create --use
@@ -51,10 +52,21 @@ jobs:
             -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             --push .
-  verify:
+        
+      - name: Save HANA-CI Docker Image
+        run: |
+          docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+          docker save -o hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+          
+  load-and-verify:
     runs-on: ubuntu-latest
     needs: build
     steps: 
+      - name: Load Local HANA-CI Docker Image
+        run: |
+          docker load -i hana-docker-sit-v2-hanaci-app-pdf.tar
+          docker load -i hana-docker-sit-v2-hanaci-instance.tar
+          
       - name: Verified Docker Image
         run: |
           docker images
@@ -70,10 +82,10 @@ jobs:
             echo "HANA-CI PDF Instance image container not found !, cancelling workflow."
             exit 1
           fi
-
+          
   push:
     runs-on: ubuntu-latest
-    needs: verify
+    needs: load-and-verify
     steps:
       - name: Deploy to SIT
         run: |
