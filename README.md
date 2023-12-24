@@ -32,7 +32,31 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 
 ---
 
-## Deployment Method [Native]
+## Deployment On Docker [YOUR_LOCAL_IP_ADDRESS:80]
+- Deployment status
+    * [![HANA-CI PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
+    * [![HANA-CI PDF PROD Container](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml/badge.svg)](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml)
+
+### Step to configure
+1. Clone the repository with __git clone__
+2. Go to root directory from this project
+3. Start to deploy
+    - Windows based [Using docker desktop]
+        ```bash
+        - docker compose up -d
+        - docker compose exec hanaci-instance php artisan migrate
+        - docker compose stats
+        ```
+    
+    - Linux based [Using docker.io & docker-compose]
+        ```bash
+        - sudo docker-compose up -d
+        - sudo docker-compose exec hanaci-instance php artisan migrate
+        - sudo docker-compose stats
+        ```
+---
+
+## Deployment On Native OS Host
 ### Step to configure
 1. Clone the repository with __git clone__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
@@ -68,29 +92,6 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
     ```bash
     - php artisan serve --host=localhost --port=80
     ```
----
-
-## Deployment Method [Docker] [Access it on YOUR_LOCAL_IP_ADDRESS:80]
-- Deployment status
-    * [![HANA-CI PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
-
-### Step to configure
-1. Clone the repository with __git clone__
-2. Go to root directory from this project
-3. Start to deploy
-    - Windows based [Using docker desktop]
-        ```bash
-        - docker compose up -d
-        - docker compose exec hanaci-instance php artisan migrate
-        - docker compose stats
-        ```
-    
-    - Linux based [Using docker.io & docker-compose]
-        ```bash
-        - sudo docker-compose up -d
-        - sudo docker-compose exec hanaci-instance php artisan migrate
-        - sudo docker-compose stats
-        ```
 ---
 
 ## Technology Stack
