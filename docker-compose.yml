@@ -1,9 +1,7 @@
 version: '3.8'
 services:
     hanaci-app-pdf:
-        build:
-            context: .
-            dockerfile: Dockerfile/Dockerfile.hana-app-pdf.sit
+        image: nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
         container_name: hanaci-app-pdf
         cpus: 1.0
         mem_limit: 256m
@@ -50,9 +48,7 @@ services:
         depends_on:
             - hanaci-instance
     hanaci-instance:
-        build:
-            context: .
-            dockerfile: Dockerfile/Dockerfile.hana-instance.sit
+        image: nicklas373/hana-docker-sit-hanaci-instance:latest
         container_name: 'hanaci-instance'
         cpus: 2.0
         mem_limit: 512M
@@ -60,10 +56,8 @@ services:
         restart: always
         ports:
             - "80:80"
-            - "81:81"
         volumes:
             - ./module/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./module/nginx/sites-available/hanaci.conf:/etc/nginx/sites-available/hanaci.conf
             - ./module/nginx/sites-available/pdf-hanaci.conf:/etc/nginx/sites-available/pdf-hanaci.conf
             - ./module/php/php.ini:/etc/php/8.2/cli/conf.d/99-hana.ini
             - ./module/php/php.ini:/etc/php/8.2/fpm/conf.d/99-hana.ini
