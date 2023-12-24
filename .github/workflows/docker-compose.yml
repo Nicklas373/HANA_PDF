@@ -15,7 +15,7 @@ jobs:
 
       - name: Build HANA-CI PDF Docker Image
         run: |
-          docker buildx build \
+          docker buildx build
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
@@ -27,13 +27,13 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t hanaci-app-pdf:latest nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
         
       - name: Build HANA-CI Instance Docker Image
         run: |
-          docker buildx build \
+          docker buildx build
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
@@ -45,12 +45,12 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t hanaci-instance:latest nicklas373/hana-docker-sit-v2-hanaci-instance:latest \
+            -t nicklas373/hana-docker-sit-v2-hanaci-instance:latest \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             .
 
       - name: Push Docker Image to Registry
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
-          docker push nicklas373/hanaci-app-pdf-sit:latest
-          docker push nicklas373/hanaci-instance-sit:latest
+          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
+          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:latest
