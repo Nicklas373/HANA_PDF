@@ -13,40 +13,39 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Run Docker Compose
-        run: |
-          export DOCKER_COMPOSE_PATH=./docker-compose.yml
-          docker-compose -f $DOCKER_COMPOSE_PATH up -d
-          docker-compose -f $DOCKER_COMPOSE_PATH ps
-        env:
-          DOCKER_SIT_ENVIRONMENT: ${{ secrets.docker_sit_env }}
-          DB_USERNAME: ${{ secrets.docker_sit_env_DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.docker_sit_env_DB_PASSWORD }}
-          ASPOSE_CLOUD_CLIENT_ID: ${{ secrets.docker_sit_env_ASPOSE_CLOUD_CLIENT_ID }}
-          ASPOSE_CLOUD_TOKEN: ${{ secrets.docker_sit_env_ASPOSE_CLOUD_TOKEN }}
-          ADOBE_CLIENT_ID: ${{ secrets.docker_sit_env_ADOBE_CLIENT_ID }}
-          FTP_USERNAME: ${{ secrets.docker_sit_env_FTP_USERNAME }}
-          FTP_USERPASS: ${{ secrets.docker_sit_env_FTP_USERPASS }}
-          FTP_SERVER: ${{ secrets.docker_sit_env_FTP_SERVER }}
-          FTP_ROOT: ${{ secrets.docker_sit_env_FTP_ROOT }}
-          ILOVEPDF_PUBLIC_KEY: ${{ secrets.docker_sit_env_ILOVEPDF_PUBLIC_KEY }}
-          ILOVEPDF_SECRET_KEY: ${{ secrets.docker_sit_env_ILOVEPDF_SECRET_KEY }}
-
       - name: Build Docker Image
         run: |
           export DOCKER_COMPOSE_PATH=./docker-compose.yml
           docker buildx build \
-            --build-arg DB_USERNAME=${DB_USERNAME}
-            --build-arg DB_PASSWORD=${DB_PASSWORD}
-            --build-arg ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID}
-            --build-arg ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN}
-            --build-arg ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID}
-            --build-arg FTP_USERNAME=${FTP_USERNAME}
-            --build-arg FTP_USERPASS=${FTP_USERPASS}
-            --build-arg FTP_SERVER=${FTP_SERVER}
-            --build-arg FTP_ROOT=${FTP_ROOT}
-            --build-arg ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
-            --build-arg ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY}
+            --build-arg DB_USERNAME=${DB_USERNAME} \
+            --build-arg DB_PASSWORD=${DB_PASSWORD} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN} \
+            --build-arg ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID} \
+            --build-arg FTP_USERNAME=${FTP_USERNAME} \
+            --build-arg FTP_USERPASS=${FTP_USERPASS} \
+            --build-arg FTP_SERVER=${FTP_SERVER} \
+            --build-arg FTP_ROOT=${FTP_ROOT} \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY} \
+            --build-arg ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY} \
+            -t hanaci-app-pdf:latest \
+            -f Dockerfile/Dockerfile.hana-app-pdf.sit \
+            .
+          docker buildx build \
+            --build-arg DB_USERNAME=${DB_USERNAME} \
+            --build-arg DB_PASSWORD=${DB_PASSWORD} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN} \
+            --build-arg ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID} \
+            --build-arg FTP_USERNAME=${FTP_USERNAME} \
+            --build-arg FTP_USERPASS=${FTP_USERPASS} \
+            --build-arg FTP_SERVER=${FTP_SERVER} \
+            --build-arg FTP_ROOT=${FTP_ROOT} \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY} \
+            --build-arg ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY} \
+            -t hanaci-app-pdf:latest \
+            -f Dockerfile/Dockerfile.hana-instance.sit \
+            .
         env:
           DOCKER_SIT_ENVIRONMENT: ${{ secrets.docker_sit_env }}
           DB_USERNAME: ${{ secrets.docker_sit_env_DB_USERNAME }}
@@ -74,7 +73,6 @@ jobs:
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
           docker push hanaci-app-pdf:latest
-          docker push hanaci-db:latest
           docker push hanaci-instance:latest
         env:
           DOCKER_SIT_ENVIRONMENT: ${{ secrets.docker_sit_env }}
