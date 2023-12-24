@@ -26,7 +26,8 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t hana-docker-sit-v2-hanaci-app-pdf:1.0 nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -t hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
       - name: Build HANA-CI Instance Docker Image
@@ -44,7 +45,8 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t hana-docker-sit-v2-hanaci-instance:1.0 nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            -t hana-docker-sit-v2-hanaci-instance:1.0 \
+            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             .
   verify:
