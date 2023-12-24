@@ -15,8 +15,6 @@ jobs:
 
       - name: Check Secrets
         run: |
-          echo "Secrets: ${{ secrets.DB_USERNAME }}"
-          echo "Secrets: ${{ DB_USERNAME }}"
           echo "Secrets: ${{ secrets.docker_sit_env_DB_USERNAME }}"
         env:
           DOCKER_SIT_ENVIRONMENT: ${{ secrets.docker_sit_env }}
