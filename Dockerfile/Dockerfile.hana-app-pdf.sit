@@ -55,7 +55,7 @@ RUN mkdir hanaci-pdf/storage/app/public/temp
 RUN mkdir hanaci-pdf/storage/app/public/temp-merge
 RUN mkdir hanaci-pdf/storage/app/public/temp-image
 RUN mkdir hanaci-pdf/storage/app/public/upload-pdf
-RUN cd hanaci-pdf && cp .env.example hanaci-pdf/.env
+RUN cd hanaci-pdf && cp .env.example .env
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 RUN cd hanaci-pdf && php artisan key:generate
 RUN cd hanaci-pdf && php artisan storage:link
