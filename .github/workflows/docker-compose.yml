@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Build HANA-CI PDF Docker Image
         run: |
-          docker buildx create --use
-          docker buildx build \
+          export DOCKER_COMPOSE_PATH=./docker-compose.yml
+          docker-compose build hanaci-app-pdf \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
@@ -26,14 +26,12 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t hana-docker-sit-v2-hanaci-app-pdf:1.0 \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             --push .
       - name: Build HANA-CI Instance Docker Image
         run: |
-          docker buildx create --use
-          docker buildx build \
+          export DOCKER_COMPOSE_PATH=./docker-compose.yml
+          docker-compose build hanaci-instance \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
