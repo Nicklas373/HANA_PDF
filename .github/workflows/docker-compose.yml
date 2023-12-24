@@ -6,14 +6,11 @@ on:
       - master
 
 jobs:
-  build:
+  app-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      - name: Login to Docker Hub
-        run: echo ${{ secrets.DOCKER_PAT }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         
       - name: Build HANA-CI PDF Docker Image
         run: |
@@ -33,7 +30,16 @@ jobs:
             -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             --push .
-            
+    
+      - name: Save HANA-CI App Docker Image
+        run: docker save -o nicklas373/hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+
+  instance-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
       - name: Build HANA-CI Instance Docker Image
         run: |
           docker buildx create --use
@@ -53,10 +59,9 @@ jobs:
             -f Dockerfile/Dockerfile.hana-instance.sit \
             --push .
         
-      - name: Save HANA-CI Docker Image
-        run: |
-          docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
-          docker save -o hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+      - name: Save HANA-CI Instance Docker Image
+        run: 
+          docker save -o nicklas373/hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
           
   load-and-verify:
     runs-on: ubuntu-latest
