@@ -3,7 +3,7 @@ FROM nginx:latest
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
 LABEL version="1.0"
-LABEL description="Docker instance image for HANA-CI"
+LABEL description="Docker instance image for HANA-CI SIT"
 
 # Configure timezone
 ENV DEBIAN_FRONTEND noninteractive

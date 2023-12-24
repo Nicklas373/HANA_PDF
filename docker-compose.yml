@@ -1,7 +1,7 @@
 version: '3.8'
 services:
     hanaci-app-pdf:
-        image: nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest
+        image: nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
         container_name: hanaci-app-pdf
         cpus: 1.0
         mem_limit: 256m
@@ -47,7 +47,7 @@ services:
         depends_on:
             - hanaci-instance
     hanaci-instance:
-        image: nicklas373/hana-docker-sit-hanaci-instance:latest
+        image: nicklas373/hana-docker-sit-hanaci-instance:1.0
         container_name: 'hanaci-instance'
         cpus: 2.0
         mem_limit: 512M
