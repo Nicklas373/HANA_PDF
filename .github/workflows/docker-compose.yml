@@ -29,7 +29,7 @@ jobs:
             -t hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            .
+            --push .
       - name: Build HANA-CI Instance Docker Image
         run: |
           docker buildx create --use
@@ -48,7 +48,7 @@ jobs:
             -t hana-docker-sit-v2-hanaci-instance:1.0 \
             -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
-            .
+            --push .
   verify:
     runs-on: ubuntu-latest
     needs: build
