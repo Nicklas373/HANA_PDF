@@ -93,6 +93,7 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 3. Go to root directory from this project
 4. Start to deploy
    ```bash
+    - sudo docker-compose build
     - sudo docker-compose up -d
     ```
 ---
