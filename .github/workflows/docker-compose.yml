@@ -28,8 +28,7 @@ jobs:
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t hana-docker-sit-v2-hanaci-app-pdf:1.0 \
-            -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            .
+            -f Dockerfile/Dockerfile.hana-app-pdf.sit
     
       - name: Save HANA-CI App Docker Image
         run: docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
@@ -57,8 +56,7 @@ jobs:
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t hana-docker-sit-v2-hanaci-instance:1.0 \
-            -f Dockerfile/Dockerfile.hana-instance.sit \
-            .
+            -f Dockerfile/Dockerfile.hana-instance.sit
         
       - name: Save HANA-CI Instance Docker Image
         run: 
