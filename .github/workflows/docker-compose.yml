@@ -15,7 +15,8 @@ jobs:
 
       - name: Build HANA-CI PDF Docker Image
         run: |
-          docker buildx build
+          docker buildx create --use
+          docker buildx build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
@@ -33,7 +34,8 @@ jobs:
         
       - name: Build HANA-CI Instance Docker Image
         run: |
-          docker buildx build
+          docker buildx create --use
+          docker buildx build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg ASPOSE_CLOUD_CLIENT_ID=${{ secrets.ASPOSE_CLOUD_CLIENT_ID }} \
