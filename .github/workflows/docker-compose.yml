@@ -30,7 +30,7 @@ jobs:
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            --push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+            --push .
         
       - name: Build HANA-CI Instance Docker Image
         run: |
@@ -49,7 +49,7 @@ jobs:
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
-            --push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+            --push .
   
   verify:
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
     needs: verify
 
     steps:
-      - name: Push Docker Image to Registry
+      - name: Deploy to SIT
         run: |
           echo ${{ secrets.DOCKER_PAT }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
