@@ -7,15 +7,14 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Build Docker Image
+      - name: Build HANA-CI PDF Docker Image
         run: |
-          export DOCKER_COMPOSE_PATH=./docker-compose.yml
           docker buildx build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
@@ -31,6 +30,9 @@ jobs:
             -t hanaci-app-pdf:latest nicklas373/hana-docker-sit-v2-hanaci-app-pdf:latest \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
+        
+      - name: Build HANA-CI Instance Docker Image
+        run: |
           docker buildx build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
