@@ -8,11 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
       - name: Build HANA-CI PDF Docker Image
         run: |
           docker buildx create --use
@@ -28,10 +26,9 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -t hana-docker-sit-v2-hanaci-app-pdf:1.0 nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            --push .
-        
+            .
       - name: Build HANA-CI Instance Docker Image
         run: |
           docker buildx create --use
@@ -47,15 +44,12 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            -t hana-docker-sit-v2-hanaci-instance:1.0 nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
-            --push .
-  
+            .
   verify:
     runs-on: ubuntu-latest
-
     needs: build
-
     steps: 
       - name: Verified Docker Image
         run: |
@@ -75,9 +69,7 @@ jobs:
 
   push:
     runs-on: ubuntu-latest
-
     needs: verify
-
     steps:
       - name: Deploy to SIT
         run: |
