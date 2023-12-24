@@ -27,12 +27,12 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -t hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
     
       - name: Save HANA-CI App Docker Image
-        run: docker save -o nicklas373/hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+        run: docker save -o hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
 
   instance-build:
     runs-on: ubuntu-latest
@@ -56,13 +56,13 @@ jobs:
             --build-arg FTP_ROOT=${{ secrets.FTP_ROOT }} \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            -t hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             .
         
       - name: Save HANA-CI Instance Docker Image
         run: 
-          docker save -o nicklas373/hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+          docker save -o hana-docker-sit-v2-hanaci-instance.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
           
   load-and-verify:
     runs-on: ubuntu-latest
