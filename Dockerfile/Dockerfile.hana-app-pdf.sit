@@ -63,23 +63,24 @@ RUN cd hanaci-pdf && php artisan config:cache
 RUN cd hanaci-pdf && php artisan config:clear
 
 # Configure Laravel Env
+RUN cd hanaci-pdf && sed -i 's/APP_NAME=Laravel/APP_NAME="HANA PDF"/' .env
 RUN cd hanaci-pdf && sed -i "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
-RUN cd hanaci-pdf && sed -i "s/DB_HOST=127.0.0.1/DB_HOST=pgsql/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_HOST=127.0.0.1/DB_HOST=hanaci-db/" .env
 RUN cd hanaci-pdf && sed -i "s/DB_PORT=3306/DB_PORT=5432/" .env
 RUN cd hanaci-pdf && sed -i "s/DB_DATABASE=laravel/DB_DATABASE=postgres/" .env
 RUN cd hanaci-pdf && sed -i "s/DB_USERNAME=root/DB_USERNAME=$DB_USERNAME/" .env
 RUN cd hanaci-pdf && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
 RUN cd hanaci-pdf && echo "" >> .env
-RUN cd hanaci-pdf && echo 'ASPOSE_CLOUD_CLIENT_ID="$ASPOSE_CLOUD_CLIENT_ID"' >> .env
-RUN cd hanaci-pdf && echo 'ASPOSE_CLOUD_TOKEN="$ASPOSE_CLOUD_TOKEN"' >> .env
-RUN cd hanaci-pdf && echo 'ADOBE_CLIENT_ID="$ADOBE_CLIENT_ID"' >> .env
-RUN cd hanaci-pdf && echo 'FTP_USERNAME="$FTP_USERNAME"' >> .env
-RUN cd hanaci-pdf && echo 'FTP_USERPASS="$FTP_USERPASS"' >> .env
-RUN cd hanaci-pdf && echo 'FTP_SERVER="$FTP_SERVER"' >> .env
-RUN cd hanaci-pdf && echo 'FTP_ROOT="$FTP_ROOT"' >> .env
-RUN cd hanaci-pdf && echo 'ILOVEPDF_PUBLIC_KEY="$ILOVEPDF_PUBLIC_KEY"' >> .env
-RUN cd hanaci-pdf && echo 'ILOVEPDF_SECRET_KEY="$ILOVEPDF_SECRET_KEY"' >> .env
-RUN cd hanaci-pdf && echo 'ILOVEPDF_EXT_IMG_DIR="temp-image"' >> .env
-RUN cd hanaci-pdf && echo 'PDF_MERGE_TEMP="temp-merge"' >> .env
-RUN cd hanaci-pdf && echo 'PDF_UPLOAD="upload-pdf"' >> .env
-RUN cd hanaci-pdf && echo 'PDF_DOWNLOAD="temp"' >> .env
+RUN cd hanaci-pdf && echo "ASPOSE_CLOUD_CLIENT_ID=$ASPOSE_CLOUD_CLIENT_ID" >> .env
+RUN cd hanaci-pdf && echo "ASPOSE_CLOUD_TOKEN=$ASPOSE_CLOUD_TOKEN" >> .env
+RUN cd hanaci-pdf && echo "ADOBE_CLIENT_ID=$ADOBE_CLIENT_ID" >> .env
+RUN cd hanaci-pdf && echo "FTP_USERNAME=$FTP_USERNAME" >> .env
+RUN cd hanaci-pdf && echo "FTP_USERPASS=$FTP_USERPASS" >> .env
+RUN cd hanaci-pdf && echo "FTP_SERVER=$FTP_SERVER" >> .env
+RUN cd hanaci-pdf && echo "FTP_ROOT=$FTP_ROOT" >> .env
+RUN cd hanaci-pdf && echo "ILOVEPDF_PUBLIC_KEY=$ILOVEPDF_PUBLIC_KEY" >> .env
+RUN cd hanaci-pdf && echo "ILOVEPDF_SECRET_KEY=$ILOVEPDF_SECRET_KEY" >> .env
+RUN cd hanaci-pdf && echo "ILOVEPDF_EXT_IMG_DIR=temp-image" >> .env
+RUN cd hanaci-pdf && echo "PDF_MERGE_TEMP=temp-merge" >> .env
+RUN cd hanaci-pdf && echo "PDF_UPLOAD=upload-pdf" >> .env
+RUN cd hanaci-pdf && echo "PDF_DOWNLOAD=temp" >> .env

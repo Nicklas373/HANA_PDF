@@ -9,15 +9,6 @@ services:
         restart: unless-stopped
         environment:
             - APP_NAME=pdf.hana-ci.com
-            - ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID}
-            - ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN}
-            - ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID}
-            - FTP_USERNAME=${FTP_USERNAME}
-            - FTP_USERPASS=${FTP_USERPASS}
-            - FTP_SERVER=${FTP_SERVER}
-            - FTP_ROOT=${FTP_ROOT}
-            - ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
-            - ILOVEPDF_SECRET_KEY${ILOVEPDF_SECRET_KEY}
         volumes:
             - hanaci-app-pdf:/var/www/html/hanaci-pdf
         networks:
@@ -33,6 +24,8 @@ services:
         mem_reservation: 128M
         ports:
             - '5432:5432'
+        env_file:
+            - module/.env-db
         environment:
             PGPASSWORD: '${DB_PASSWORD}'
             POSTGRES_DB: '${DB_DATABASE}'
