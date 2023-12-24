@@ -13,6 +13,50 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Check Secrets
+      - name: Build Docker Image
         run: |
-          echo "Secrets: ${{ secrets.DOCKER_USERNAME }}"
+          export DOCKER_COMPOSE_PATH=./docker-compose.yml
+          docker buildx build \
+            --build-arg DB_USERNAME=${DB_USERNAME} \
+            --build-arg DB_PASSWORD=${DB_PASSWORD} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN} \
+            --build-arg ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID} \
+            --build-arg FTP_USERNAME=${FTP_USERNAME} \
+            --build-arg FTP_USERPASS=${FTP_USERPASS} \
+            --build-arg FTP_SERVER=${FTP_SERVER} \
+            --build-arg FTP_ROOT=${FTP_ROOT} \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY} \
+            --build-arg ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY} \
+            -t hanaci-app-pdf:latest \
+            -f Dockerfile/Dockerfile.hana-app-pdf.sit \
+            .
+          docker buildx build \
+            --build-arg DB_USERNAME=${DB_USERNAME} \
+            --build-arg DB_PASSWORD=${DB_PASSWORD} \
+            --build-arg ASPOSE_CLOUD_CLIENT_ID=${ASPOSE_CLOUD_CLIENT_ID} \
+            --build-arg ASPOSE_CLOUD_TOKEN=${ASPOSE_CLOUD_TOKEN} \
+            --build-arg ADOBE_CLIENT_ID=${ADOBE_CLIENT_ID} \
+            --build-arg FTP_USERNAME=${FTP_USERNAME} \
+            --build-arg FTP_USERPASS=${FTP_USERPASS} \
+            --build-arg FTP_SERVER=${FTP_SERVER} \
+            --build-arg FTP_ROOT=${FTP_ROOT} \
+            --build-arg ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY} \
+            --build-arg ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY} \
+            -t hanaci-app-pdf:latest \
+            -f Dockerfile/Dockerfile.hana-instance.sit \
+            .
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: build 
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Push Docker Image to Registry
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
+          docker push hanaci-app-pdf:latest
+          docker push hanaci-instance:latest
