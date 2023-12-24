@@ -29,7 +29,7 @@ jobs:
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
-            --push .
+            .
     
       - name: Save HANA-CI App Docker Image
         run: docker save -o nicklas373/hana-docker-sit-v2-hanaci-app-pdf.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
@@ -58,7 +58,7 @@ jobs:
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
             -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
-            --push .
+            .
         
       - name: Save HANA-CI Instance Docker Image
         run: 
