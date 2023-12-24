@@ -36,6 +36,7 @@ jobs:
 
   instance-build:
     runs-on: ubuntu-latest
+    needs: app-build
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -65,7 +66,7 @@ jobs:
           
   load-and-verify:
     runs-on: ubuntu-latest
-    needs: build
+    needs: instance-build
     steps: 
       - name: Load Local HANA-CI Docker Image
         run: |
