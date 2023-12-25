@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pdf_image
-          path: pdf_image.tar
+          path: pdf_image
 
   instance_build_image:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: instance_image
-          path: instance_image.tar
+          path: instance_image
           
   deploy_to_sit:
     needs: [pdf_build_image, instance_build_image]
