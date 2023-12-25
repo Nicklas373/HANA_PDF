@@ -104,7 +104,7 @@
                     <div id="pdfPreview" class="mt-4 mb-4 xl:mb-0" name="pdfPreview">
                         @if($message = Session::get('status'))
                             <?php
-                                $pdfFileName = basename(session('pdfOriName'), '.png');
+                                $pdfFileName = basename(session('pdfOriName'), '.avif');
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfRealName = session('pdfOriName');
                                 $pdfPages = session('pdfTotalPages');
