@@ -14,7 +14,7 @@
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
                     <div>
                         <label for="file_input" class="block mb-2 font-poppins text-base font-semibold text-slate-900">Upload Document file</label>
-                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpg,image/jpeg,image/png,image/tif,image/tiff" onclick="changeButtonColor('kaoA')">
+                        <input class="block w-full font-poppins text-sm text-slate-900 border border-gray-300 rounded-lg shadow-inner cursor-pointer" aria-describedby="file_input_help" id="file_input" name="file" type="file" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpg,image/jpeg,image/avif,image/tif,image/tiff" onclick="changeButtonColor('kaoA')">
                         <p class="mt-1 font-poppins text-sm text-gray-500" id="file_input_help">Document or image (Max. 25 MB)</p>
                         @if ($message = Session::get('stats'))
                         <div id="alert-additional-content-3" class="p-4 mt-4 mb-2 text-green-800 border border-green-300 rounded-lg bg-green-50" role="alert">
@@ -100,7 +100,7 @@
                     <div id="pdfPreview" class="mt-4 mb-4 xl:mb-0" name="pdfPreview">
                         @if($message = Session::get('status'))
                             <?php
-                                $pdfFileName = basename(session('pdfOriName'), '.png');
+                                $pdfFileName = basename(session('pdfOriName'), '.avif');
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfThumbAppend = session('pdfThumbName');
                                 $pdfRealName = session('pdfOriName');
@@ -125,7 +125,7 @@
                         <input id="convertType" name="convertType" value="pdf" style="display: none;">
                         @if($message = Session::get('status'))
                         <?php
-                            $pdfFileName = basename(session('pdfOriName'), '.png');
+                            $pdfFileName = basename(session('pdfOriName'), '.avif');
                             $pdfFileAppend = session('pdfRndmName');
                             $pdfThumbAppend = session('pdfThumbName');
                             $pdfRealName = session('pdfOriName');

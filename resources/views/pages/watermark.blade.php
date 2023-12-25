@@ -101,7 +101,7 @@
                     <div id="pdfPreview" class="mt-4 mb-4 xl:mb-0" name="pdfPreview">
                         @if($message = Session::get('status'))
                             <?php
-                                $pdfFileName = basename(session('pdfOriName'), '.png');
+                                $pdfFileName = basename(session('pdfOriName'), '.avif');
                                 $pdfFileAppend = session('pdfRndmName');
                                 $pdfRealName = session('pdfOriName');
                                 echo '
@@ -154,7 +154,7 @@
                                 <input id="wmTypeImage" type="radio" name="wmType" value="image" class="" style="display:none;" />
                                 <div class="mb-8 mt-4">
                                   <label for="wm_file_input" class="font-poppins mb-4 block text-base font-semibold text-slate-900" for="wm_file_input">Image</label>
-                                  <input class="font-poppins block w-5/6 cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner" aria-describedby="wm_file_input_help" id="wm_file_input" name="wmfile" type="file" accept="image/jpg,image/jpeg,image/png" onFocusIn="checkValidation('wm_file_input')" onFocusOut="checkValidation('wm_file_input')" />
+                                  <input class="font-poppins block w-5/6 cursor-pointer rounded-lg border border-gray-300 text-sm text-slate-900 shadow-inner" aria-describedby="wm_file_input_help" id="wm_file_input" name="wmfile" type="file" accept="image/jpg,image/jpeg,image/avif" onFocusIn="checkValidation('wm_file_input')" onFocusOut="checkValidation('wm_file_input')" />
                                   <p class="font-poppins mt-1 text-sm text-gray-500" id="file_input_help">Image (Max. 5 MB)</p>
                                 </div>
                                 <div class="mb-8 mt-4">
