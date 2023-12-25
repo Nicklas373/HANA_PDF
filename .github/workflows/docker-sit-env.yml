@@ -16,7 +16,7 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
 
-      - name: Build PDF Image
+      - name: Build PDF Docker Image
         run: |
           docker build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -36,6 +36,12 @@ jobs:
           mkdir -p pdf_image
           docker save -o pdf_image/pdf_image.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
 
+      - name: Upload PDF Docker Image as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf_image
+          path: pdf_image.tar
+
   instance_build_image:
     runs-on: ubuntu-latest
     needs: pdf_build_image
@@ -47,7 +53,7 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
 
-      - name: Build Instance Image
+      - name: Build Instance Docker Image
         run: |
           docker build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -66,6 +72,12 @@ jobs:
             .
           mkdir -p instance_image
           docker save -o instance_image/instance_image.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+
+      - name: Upload Instance Docker Image as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: instance_image
+          path: instance_image.tar
           
   deploy_to_sit:
     needs: [pdf_build_image, instance_build_image]
@@ -78,24 +90,24 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
         
-      - name: Pull PDF Image
+      - name: Pull PDF Docker Image
         uses: actions/download-artifact@v4
         with:
           name: pdf_image
           path: pdf_image
 
-      - name: Pull Instance Image
+      - name: Pull Instance Docker Image
         uses: actions/download-artifact@v4
         with:
           name: instance_image
           path: instance_image
 
-      - name: Load Container Image
+      - name: Load Docker Images
         run: |
           docker load -i pdf_image/pdf_image.tar
           docker load -i instance_image/instance_image.tar
 
-      - name: Verify Container Image
+      - name: Verify Docker Images
         run: |
           if docker images | grep -q "nicklas373/hana-docker-sit-v2-hanaci-app-pdf"; then
             echo "PDF Image is already loaded."
@@ -111,7 +123,7 @@ jobs:
             exit 1
           fi
           
-      - name: Deploy Container Image to SIT
+      - name: Deploy Docker Image to SIT
         run: |
           echo ${{ secrets.DOCKER_PAT }} | docker login -u nicklas373 --password-stdin
           docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
