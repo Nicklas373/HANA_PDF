@@ -30,11 +30,11 @@ jobs:
             --build-arg FTP_ROOT=/ \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0 \
+            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
           mkdir -p pdf_image
-          docker save -o pdf_image/pdf_image.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+          docker save -o pdf_image/pdf_image.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1
 
       - name: Upload PDF Docker Image as Artifact
         uses: actions/upload-artifact@v4
@@ -78,7 +78,7 @@ jobs:
         with:
           name: instance_image
           path: instance_image
-          
+
   deploy_to_sit:
     needs: [pdf_build_image, instance_build_image]
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
 
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
-        
+
       - name: Pull PDF Docker Image
         uses: actions/download-artifact@v4
         with:
@@ -115,16 +115,16 @@ jobs:
             echo "PDF Image is not loaded."
             exit 1
           fi
-          
+
           if docker images | grep -q "nicklas373/hana-docker-sit-v2-hanaci-instance"; then
             echo "Instance Image is already loaded."
           else
             echo "Instance Image is not loaded."
             exit 1
           fi
-          
+
       - name: Deploy Docker Image to SIT
         run: |
           echo ${{ secrets.DOCKER_PAT }} | docker login -u nicklas373 --password-stdin
-          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.0
+          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1
           docker push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0

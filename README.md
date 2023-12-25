@@ -8,15 +8,15 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 ---
 
 ### Requirements
-- [Apache 2.4](https://httpd.apache.org/download.cgi) (Use [XAMPP](https://www.apachefriends.org/download.html) if windows)
+- [Apache 2.4](https://httpd.apache.org) or [Nginx](https://www.nginx.com)
 - [Composer](http://getcomposer.org/)
-- [PostgreSQL 16.2](https://www.postgresql.org/)
-- [Node JS 18.18](https://nodejs.org/en)
-- [PHP 8.2.12](https://www.php.net/downloads.php)
-- [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
 - [Docker](https://www.docker.com/)
     * On Windows use Docker Desktop
     * On Linux use docker-compose and docker.io
+- [Node JS 18.18](https://nodejs.org/en)
+- [PHP 8.2.12](https://www.php.net/downloads.php)
+- [PostgreSQL 16.2](https://www.postgresql.org/)
+- [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
 
 ---
 
@@ -48,14 +48,14 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
         ```bash
         - docker compose up -d
         - docker compose exec hanaci-instance php artisan migrate
-        - docker compose stats
+        - docker stats
         ```
     
     - Linux based [Using docker.io & docker-compose]
         ```bash
         - sudo docker-compose up -d
         - sudo docker-compose exec hanaci-instance php artisan migrate
-        - sudo docker-compose stats
+        - sudo docker stats
         ```
 ---
 
@@ -74,8 +74,8 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 - ILOVEPDF_ENC_KEY="Generate your hash key (Max. 25 digits)"
 - ILOVEPDF_PUBLIC_KEY="iLovePDF public key, get it in [https://developer.ilovepdf.com/]"
 - ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in _[https://developer.ilovepdf.com/]"
+- ILOVEPDF_EXT_IMG_DIR="temp-image"
 - PDF_MERGE_TEMP="temp-merge"
-- PDF_IMAGE_TEMP="temp-image"
 - PDF_UPLOAD="upload-pdf"
 - PDF_DOWNLOAD="temp"
 ````
