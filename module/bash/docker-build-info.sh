@@ -23,7 +23,7 @@ function bot_message() {
 			"<b>Workflow Environment :</b><code> Production </code>" \
 			"<b>Workflow Step :</b><code> $5 </code>" \
 			"<b>Workflow Start At :</b><code> ${curdate} </code>" \
-			"" \
+			""
 }
 
 bot_message
