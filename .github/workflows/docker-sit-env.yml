@@ -16,7 +16,12 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
 
-      - name: Build PDF Docker Image
+      - name: Docker Notifications
+        run: |
+            chmod +x ./module/bash/docker-build-info.sh
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_pdf_build_image
+
+      - name: Build HANA PDF Docker Image
         run: |
           docker build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -53,7 +58,12 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
 
-      - name: Build Instance Docker Image
+      - name: Docker Notifications
+        run: |
+            chmod +x ./module/bash/docker-build-info.sh
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_instance_build_image
+
+      - name: Build HANA Instance Docker Image
         run: |
           docker build \
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -122,6 +132,11 @@ jobs:
             echo "Instance Image is not loaded."
             exit 1
           fi
+
+      - name: Docker Notifications
+        run: |
+            chmod +x ./module/bash/docker-build-info.sh
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deploy_to_sit
 
       - name: Deploy Docker Image to SIT
         run: |
