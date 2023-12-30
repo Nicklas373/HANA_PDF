@@ -26,7 +26,7 @@ function bot_message() {
 			"============= Job Information ================" \
 			"<b>Workflow :</b><code> $CONTAINER_NAME </code>" \
 			"<b>Workflow Detail :</b><code> <a href='$WORKFLOW_URL'>$WORKFLOW_URL</a> </code>" \
-			"<b>Workflow Environment :</b><code> Production </code>" \
+			"<b>Workflow Environment :</b><code> SIT </code>" \
 			"<b>Workflow Status :</b><code> $STATUS </code>" \
 			"<b>Workflow Step :</b><code> $IMAGE_NAME </code>" \
 			"<b>Workflow Start At :</b><code> ${curdate} </code>" \
