@@ -16,11 +16,6 @@ jobs:
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
 
-      - name: Docker Notifications
-        run: |
-            chmod +x ./module/bash/docker-build-info.sh
-            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_pdf_build_image
-
       - name: Build HANA PDF Docker Image
         run: |
           docker build \
@@ -35,17 +30,22 @@ jobs:
             --build-arg FTP_ROOT=/ \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1 \
+            -t nicklas373/hana-container-app-pdf-sit:1.0 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
           mkdir -p pdf_image
-          docker save -o pdf_image/pdf_image.tar nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1
+          docker save -o pdf_image/pdf_image.tar nicklas373/hana-container-app-pdf-sit:1.0
 
       - name: Upload PDF Docker Image as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: pdf_image
           path: pdf_image
+
+      - name: Docker Success Notifications
+        run: |
+            chmod +x ./module/bash/docker-build-info.sh
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_pdf_build_image Done
 
   instance_build_image:
     runs-on: ubuntu-latest
@@ -57,11 +57,6 @@ jobs:
 
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
-
-      - name: Docker Notifications
-        run: |
-            chmod +x ./module/bash/docker-build-info.sh
-            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_instance_build_image
 
       - name: Build HANA Instance Docker Image
         run: |
@@ -77,17 +72,22 @@ jobs:
             --build-arg FTP_ROOT=/ \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-docker-sit-v2-hanaci-instance:1.0 \
+            -t nicklas373/hana-container-instance-sit:1.0 \
             -f Dockerfile/Dockerfile.hana-instance.sit \
             .
           mkdir -p instance_image
-          docker save -o instance_image/instance_image.tar nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+          docker save -o instance_image/instance_image.tar nicklas373/hana-container-instance-sit:1.0
 
       - name: Upload Instance Docker Image as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: instance_image
           path: instance_image
+
+      - name: Docker Success Notifications
+        run: |
+            chmod +x ./module/bash/docker-build-info.sh
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml hana_instance_build_image Done
 
   deploy_to_sit:
     needs: [pdf_build_image, instance_build_image]
@@ -96,6 +96,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: nicklas373
+          password: ${{ secrets.DOCKER_PAT }}
 
       - name: Cleanup Unused Docker Images
         run: docker rmi $(docker images -q) || true
@@ -119,27 +130,31 @@ jobs:
 
       - name: Verify Docker Images
         run: |
-          if docker images | grep -q "nicklas373/hana-docker-sit-v2-hanaci-app-pdf"; then
+          if docker images | grep -q "nicklas373/hana-container-app-pdf-sit"; then
             echo "PDF Image is already loaded."
           else
             echo "PDF Image is not loaded."
             exit 1
           fi
 
-          if docker images | grep -q "nicklas373/hana-docker-sit-v2-hanaci-instance"; then
+          if docker images | grep -q "nicklas373/hana-container-instance-sit"; then
             echo "Instance Image is already loaded."
           else
             echo "Instance Image is not loaded."
             exit 1
           fi
 
-      - name: Docker Notifications
+      - name: Deploy Docker Image to Docker Hub
+        env:
+          IMAGE_NAMES: |
+            nicklas373/hana-container-app-pdf-sit:1.0
+            nicklas373/hana-container-instance-sit:1.0
+        run: |
+          for image_name in $IMAGE_NAMES; do
+            docker push $image_name
+          done
+
+      - name: Docker Deploy Notifications
         run: |
             chmod +x ./module/bash/docker-build-info.sh
-            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deploy_to_sit
-
-      - name: Deploy Docker Image to SIT
-        run: |
-          echo ${{ secrets.DOCKER_PAT }} | docker login -u nicklas373 --password-stdin
-          docker push nicklas373/hana-docker-sit-v2-hanaci-app-pdf:1.1
-          docker push nicklas373/hana-docker-sit-v2-hanaci-instance:1.0
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deplot_to_sit Deployed
