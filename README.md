@@ -7,21 +7,17 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 
 ---
 
-### Requirements
+### Requirements [For development with local environment]
 - [Apache 2.4](https://httpd.apache.org) or [Nginx](https://www.nginx.com)
 - [Composer](http://getcomposer.org/)
 - [Docker](https://www.docker.com/)
     * On Windows use Docker Desktop
     * On Linux use docker-compose and docker.io
 - [Node JS 18.18](https://nodejs.org/en)
+- [Flowbite](https://flowbite.com/)
 - [PHP 8.2.12](https://www.php.net/downloads.php)
 - [PostgreSQL 16.2](https://www.postgresql.org/)
 - [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
-
----
-
-### Node JS Module Requirements
-- [Flowbite](https://flowbite.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite JS](https://vitejs.dev/)
 
@@ -34,8 +30,8 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 
 ### Build Status
 - [![CodeQL](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql)
-- [![HANA PDF SIT Container](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
-- [![HANA PDF PROD Container](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml/badge.svg)](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml)
+- [![HANA Container SIT](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml)
+- [![HANA Container Production](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml/badge.svg)](https://github.com/Nicklas373/hana-ci-docker-prod/actions/workflows/docker-prod-env.yml)
 
 ---
 
