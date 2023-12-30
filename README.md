@@ -43,14 +43,14 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
     - Windows based [Using docker desktop]
         ```bash
         - docker compose up -d
-        - docker compose exec hanaci-instance php artisan migrate
+        - docker compose exec hana-container-instance php artisan migrate
         - docker stats
         ```
     
     - Linux based [Using docker.io & docker-compose]
         ```bash
         - sudo docker-compose up -d
-        - sudo docker-compose exec hanaci-instance php artisan migrate
+        - sudo docker-compose exec hana-container-instance php artisan migrate
         - sudo docker stats
         ```
 ---
