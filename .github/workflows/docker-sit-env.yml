@@ -30,11 +30,11 @@ jobs:
             --build-arg FTP_ROOT=/ \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-container-app-pdf-sit:1.0 \
+            -t nicklas373/hana-container-app-pdf-sit:1.1 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
           mkdir -p pdf_image
-          docker save -o pdf_image/pdf_image.tar nicklas373/hana-container-app-pdf-sit:1.0
+          docker save -o pdf_image/pdf_image.tar nicklas373/hana-container-app-pdf-sit:1.1
 
       - name: Upload PDF Docker Image as Artifact
         uses: actions/upload-artifact@v4
@@ -147,7 +147,7 @@ jobs:
       - name: Deploy Docker Image to Docker Hub
         env:
           IMAGE_NAMES: |
-            nicklas373/hana-container-app-pdf-sit:1.0
+            nicklas373/hana-container-app-pdf-sit:1.1
             nicklas373/hana-container-instance-sit:1.0
         run: |
           for image_name in $IMAGE_NAMES; do
