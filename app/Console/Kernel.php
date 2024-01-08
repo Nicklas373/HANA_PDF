@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Helpers\AppHelper;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
@@ -25,145 +26,261 @@ class Kernel extends ConsoleKernel
         $viewClearGUID = AppHelper::instance()->get_guid();
         $viewCacheGUID = AppHelper::instance()->get_guid();
         $hanaClearGUID = AppHelper::instance()->get_guid();
+
+		// Carbon timezone
+        date_default_timezone_set('Asia/Jakarta');
+        $now = Carbon::now('Asia/Jakarta');
+        $startProc = $now->format('Y-m-d H:i:s');
+
         $schedule
             ->command('cache:clear')
             ->weekly()
             ->environments(['production'])
             ->timezone('Asia/Jakarta')
             ->before(function(AppHelper $helper) use($cacheClearGUID) {
-                DB::table('datalogs')->insert([
-                    'jobsId' => $cacheClearGUID,
+				DB::table('appLogs')
+					->insert([
+						'processId' => $cacheClearGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
                     'jobsName' => 'cache:clear',
                     'jobsEnv' => 'production',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
-                    'jobsErrMessage' => null,
-                    'jobsStart' => $helper::instance()->getCurrentTimeZone(),
-                    'jobsEnd' => null
+                    'processId' => $cacheClearGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
                 ]);
             })
-            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $cacheClearGUID)
+            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $cacheClearGUID)
                     ->update([
-                        'jobsErrMessage' => $output,
                         'jobsResult' => true,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
+                        'procEndAt' => $end
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+
+                }
             });
         $schedule
             ->command('optimize:clear')
             ->weekly()
             ->environments(['production'])
             ->timezone('Asia/Jakarta')
-            ->before(function(AppHelper $helper) use($optimizeClearGUID) {
-                DB::table('datalogs')->insert([
-                    'jobsId' => $optimizeClearGUID,
+            ->before(function(AppHelper $helper) use($cacheClearGUID) {
+				DB::table('appLogs')
+					->insert([
+						'processId' => $cacheClearGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
                     'jobsName' => 'optimize:clear',
                     'jobsEnv' => 'production',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
-                    'jobsErrMessage' => null,
-                    'jobsStart' => $helper::instance()->getCurrentTimeZone(),
-                    'jobsEnd' => null
+                    'processId' => $cacheClearGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
                 ]);
             })
-            ->after(function(AppHelper $helper, Stringable $output) use($optimizeClearGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $optimizeClearGUID)
+            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $cacheClearGUID)
                     ->update([
-                        'jobsErrMessage' => $output,
                         'jobsResult' => true,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
+                        'procEndAt' => $end
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+
+                }
             });
         $schedule
             ->command('view:clear')
             ->weekly()
             ->environments(['production'])
             ->timezone('Asia/Jakarta')
-            ->before(function(AppHelper $helper) use($viewClearGUID) {
-                DB::table('datalogs')->insert([
-                    'jobsId' => $viewClearGUID,
+            ->before(function(AppHelper $helper) use($cacheClearGUID) {
+				DB::table('appLogs')
+					->insert([
+						'processId' => $cacheClearGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
                     'jobsName' => 'view:clear',
                     'jobsEnv' => 'production',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
-                    'jobsErrMessage' => null,
-                    'jobsStart' => $helper::instance()->getCurrentTimeZone(),
-                    'jobsEnd' => null
+                    'processId' => $cacheClearGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
                 ]);
             })
-            ->after(function(AppHelper $helper, Stringable $output) use($viewClearGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $viewClearGUID)
+            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $cacheClearGUID)
                     ->update([
-                        'jobsErrMessage' => $output,
                         'jobsResult' => true,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
+                        'procEndAt' => $end
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+
+                }
             });
         $schedule
             ->command('view:cache')
             ->weekly()
             ->environments(['production'])
             ->timezone('Asia/Jakarta')
-            ->before(function(AppHelper $helper) use($viewCacheGUID) {
-                DB::table('datalogs')->insert([
-                    'jobsId' => $viewCacheGUID,
+            ->before(function(AppHelper $helper) use($cacheClearGUID) {
+				DB::table('appLogs')
+					->insert([
+						'processId' => $cacheClearGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
                     'jobsName' => 'view:cache',
                     'jobsEnv' => 'production',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
-                    'jobsErrMessage' => null,
-                    'jobsStart' => $helper::instance()->getCurrentTimeZone(),
-                    'jobsEnd' => null
+                    'processId' => $cacheClearGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
                 ]);
             })
-            ->after(function(AppHelper $helper, Stringable $output) use($viewCacheGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $viewCacheGUID)
+            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $cacheClearGUID)
                     ->update([
-                        'jobsErrMessage' => $output,
                         'jobsResult' => true,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
+                        'procEndAt' => $end
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+
+                }
             });
         $schedule
             ->command('hana:clear-storage')
             ->hourly()
             ->timezone('Asia/Jakarta')
             ->environments(['production'])
-            ->before(function(AppHelper $helper) use($hanaClearGUID) {
-                DB::table('datalogs')->insert([
-                    'jobsId' => $hanaClearGUID,
+            ->before(function(AppHelper $helper) use($cacheClearGUID) {
+				DB::table('appLogs')
+					->insert([
+						'processId' => $cacheClearGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:clear-storage',
                     'jobsEnv' => 'production',
-                    'jobsRuntime' => 'hourly',
+                    'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
-                    'jobsErrMessage' => null,
-                    'jobsStart' => $helper::instance()->getCurrentTimeZone(),
-                    'jobsEnd' => null
+                    'processId' => $cacheClearGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
                 ]);
             })
-            ->onFailure(function(Stringable $output, AppHelper $helper) use($hanaClearGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $hanaClearGUID)
-                    ->update([
-                        'jobsErrMessage' => $output,
-                        'jobsResult' => false,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
-            })
-            ->onSuccess(function(AppHelper $helper) use($hanaClearGUID) {
-                DB::table('datalogs')
-                    ->where('jobsId', '=', $hanaClearGUID)
-                    ->where('jobsName', 'like', 'hana%')
-                    ->where('jobsResult', '=', false)
+            ->after(function(AppHelper $helper, Stringable $output) use($cacheClearGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'jobsEnd' => $helper::instance()->getCurrentTimeZone()
-                ]);
+                        'procEndAt' => $end
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $cacheClearGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+
+                }
             });
     }
 

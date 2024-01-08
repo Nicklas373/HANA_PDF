@@ -24,7 +24,8 @@ class watermark_pdf extends Model
         'watermarkText',
         'watermarkPage',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

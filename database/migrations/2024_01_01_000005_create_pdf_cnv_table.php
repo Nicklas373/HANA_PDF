@@ -18,18 +18,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_delete', function (Blueprint $table) {
-            $table->uuid('processId');
+        Schema::create('pdfConvert', function (Blueprint $table) {
+            $table->id('cnvId');
             $table->text('fileName');
             $table->string('fileSize', 25);
-            $table->text('deletePage')->nullable();
-            $table->string('mergePDF')->nullable();
+            $table->string('container', 25);
+            $table->boolean('imgExtract');
             $table->boolean('result');
-            $table->text('err_reason')->nullable();
-            $table->text('err_api_reason')->nullable();
+            $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();
+            $table->timestamp('procEndAt')->nullable();
+            $table->text('procDuration')->nullable();
 
-            $table->primary('processId');
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 
@@ -38,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_delete');
+        Schema::dropIfExists('pdfConvert');
     }
 };

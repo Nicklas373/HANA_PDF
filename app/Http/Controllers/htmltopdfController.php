@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
-use App\Models\html_pdf;
-use App\Models\init_pdf;
+use App\Models\htmlModel;
+use App\Models\appLogsModel;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -31,18 +32,24 @@ class htmltopdfController extends Controller
 
         $uuid = AppHelper::Instance()->get_guid();
 
+        // Carbon timezone
+        date_default_timezone_set('Asia/Jakarta');
+        $now = Carbon::now('Asia/Jakarta');
+        $startProc = $now->format('Y-m-d H:i:s');
+
         if($validator->fails()) {
             try {
-                DB::table('pdf_init')->insert([
+                DB::table('appLogs')->insert([
                     'processId' => $uuid,
-                    'err_reason' => $validator->messages(),
-                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                    'errReason' => $validator->messages(),
+                    'errApiReason' => null
                 ]);
-                return redirect()->back()->withErrors(['error'=>'URL validation failed !', 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
         } else {
+            $start = Carbon::parse($startProc);
             $str = rand(1000,10000000);
             $pdfEncKey = bin2hex(random_bytes(16));
             $pdfDefaultFileName ='pdf_convert_'.substr(md5(uniqid($str)), 0, 8);
@@ -60,28 +67,34 @@ class htmltopdfController extends Controller
                 } else if (AppHelper::Instance()->checkWebAvailable('www.'.$pdfUrl)) {
                     $newUrl = 'www.'.$pdfUrl;
                 } else {
+                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
                     try {
-                        DB::table('pdf_html')->insert([
+                        DB::table('appLogs')->insert([
                             'processId' => $uuid,
+                            'errReason' => null,
+                            'errApiReason' => null
+                        ]);
+                        DB::table('pdfHtml')->insert([
                             'urlName' => $request->post('urlToPDF'),
                             'result' => false,
-                            'err_reason' => 'URL not valid or not found !',
-                            'err_api_reason' => '404',
-                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                            'processId' => $uuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        DB::table('appLogs')
+                            ->where('processId', '=', $uuid)
+                            ->update([
+                                'processId' => $uuid,
+                                'errReason' => '404',
+                                'errApiReason' => null
                         ]);
                         return redirect()->back()->withErrors(['error'=>'URL not valid or not found !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                     } catch (\Exception $e) {
-                        DB::table('pdf_html')->insert([
-                            'processId' => $uuid,
-                            'urlName' => 'null',
-                            'result' => false,
-                            'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                            'err_api_reason' => $e->getMessage(),
-                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                        ]);
-                        return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                     }
                 }
             }
@@ -94,246 +107,306 @@ class htmltopdfController extends Controller
                 $ilovepdfTask->execute();
                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
             } catch (StartException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on StartException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (AuthException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on AuthException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (UploadException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on UploadException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (ProcessException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (DownloadException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (TaskException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on TaskException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (PathException $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on PathException',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } catch (\Exception $e) {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'iLovePDF API Error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                            'errApiReason' => $e->getMessage()
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             }
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
                 $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => true,
-                        'err_reason' => 'null',
-                        'err_api_reason' => 'null',
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => null,
+                            'errApiReason' => null
                     ]);
                     return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             } else {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_html')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'urlName' => $newUrl,
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfHtml')->insert([
+                        'urlName' => $request->post('urlToPDF'),
                         'result' => false,
-                        'err_reason' => 'Failed to download converted file from iLovePDF API !',
-                        'err_api_reason' => 'null',
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'Failed to download converted file from iLovePDF API !',
+                            'errApiReason' => null
                     ]);
                     return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    DB::table('pdf_html')->insert([
-                        'processId' => $uuid,
-                        'urlName' => 'null',
-                        'result' => false,
-                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                        'err_api_reason' => $e->getMessage(),
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                    ]);
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
             }
         }

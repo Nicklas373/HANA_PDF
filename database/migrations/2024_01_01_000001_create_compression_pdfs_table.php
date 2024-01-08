@@ -18,15 +18,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_html', function (Blueprint $table) {
-            $table->uuid('processId');
-            $table->text('urlName');
+        Schema::create('pdfCompress', function (Blueprint $table) {
+            $table->id('compressId');
+            $table->text('fileName');
+            $table->string('fileSize', 25);
+            $table->string('compFileSize', 25)->nullable();
+            $table->string('compMethod', 25);
             $table->boolean('result');
-            $table->text('err_reason')->nullable();
-            $table->text('err_api_reason')->nullable();
+            $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();
+            $table->timestamp('procEndAt')->nullable();
+            $table->text('procDuration')->nullable();
 
-            $table->primary('processId');
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 
@@ -35,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_html');
+        Schema::dropIfExists('pdfCompress');
     }
 };

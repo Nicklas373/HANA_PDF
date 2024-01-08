@@ -18,12 +18,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_init', function (Blueprint $table) {
+        Schema::create('pdfMerge', function (Blueprint $table) {
+            $table->id('mergeId');
+            $table->text('fileName');
+            $table->string('fileSize', 25);
+            $table->boolean('result');
             $table->uuid('processId');
-            $table->text('err_reason')->nullable();
             $table->timestamp('procStartAt')->nullable();
+            $table->timestamp('procEndAt')->nullable();
+            $table->text('procDuration')->nullable();
 
-            $table->primary('processId');
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 
@@ -32,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_init');
+        Schema::dropIfExists('pdfMerge');
     }
 };

@@ -5,17 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class delete_pdf extends Model
+class compressModel extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'fileName',
         'fileSize',
-        'deletePage',
-        'mergePDF',
+        'compFileSize',
+        'compMethod',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

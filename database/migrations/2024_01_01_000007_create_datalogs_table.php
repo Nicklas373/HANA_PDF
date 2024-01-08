@@ -12,23 +12,25 @@ return new class extends Migration
      * @var string
      */
     protected $connection = 'pgsql';
-    
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('datalogs', function (Blueprint $table) {
-            $table->uuid('jobsId');
+        Schema::create('jobLogs', function (Blueprint $table) {
+            $table->id('jobsId');
             $table->string('jobsName', 25);
             $table->string('jobsEnv', 25);
             $table->string('jobsRuntime', 25);
             $table->boolean('jobsResult');
-            $table->longText('jobsErrMessage')->nullable();
-            $table->timestamp('jobsStart')->nullable();
-            $table->timestamp('jobsEnd')->nullable();
+            $table->timestamp('procStartAt')->nullable();
+            $table->timestamp('procEndAt')->nullable();
+            $table->text('procDuration')->nullable();
+            $table->uuid('processId');
 
-            $table->primary('jobsId');
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 
@@ -37,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('datalogs');
+        Schema::dropIfExists('jobLogs');
     }
 };
