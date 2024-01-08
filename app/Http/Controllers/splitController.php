@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
-use App\Models\delete_pdf;
-use App\Models\init_pdf;
-use App\Models\split_pdf;
+use App\Models\appLogsModel;
+use App\Models\deleteModel;
+use App\Models\splitModel;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -32,22 +33,24 @@ class splitController extends Controller
 
         $uuid = AppHelper::Instance()->get_guid();
 
+        // Carbon timezone
+        date_default_timezone_set('Asia/Jakarta');
+        $now = Carbon::now('Asia/Jakarta');
+        $startProc = $now->format('Y-m-d H:i:s');
+
 		if($validator->fails()) {
             try {
-                DB::table('pdf_init')->insert([
+                DB::table('appLogs')->insert([
                     'processId' => $uuid,
-                    'err_reason' => $validator->messages(),
-                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                    'errReason' => $validator->messages(),
+                    'errApiReason' => null
                 ]);
-                return redirect()->back()->withErrors([
-                    'error'=>'File validation failed !',
-                    'processId'=>$uuid,
-                    'titleMessage'=>'PDF page has failed to split !',
-                ])->withInput();
+                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
         } else {
+            $start = Carbon::parse($startProc);
 			if(isset($_POST['formAction']))
 			{
 				if($request->post('formAction') == "upload") {
@@ -69,21 +72,35 @@ class splitController extends Controller
                                 'pdfTotalPages' => $pdfTotalPages
                             ]);
 						} else {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $randomizePdfFileName.'.pdf',
                                     'fileSize' => $fileSize,
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
+                                    'fromPage' => null,
+                                    'toPage' => null,
+                                    'customPage' => null,
+                                    'fixedPage' => null,
+                                    'fixedPageRange' => null,
+                                    'mergePDF' => null,
                                     'result' => false,
-                                    'err_reason' => 'PDF file not found on the server !',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'PDF file not found on the server !',
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF file not found on the server !',
@@ -93,48 +110,8 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
-						}
-					} else {
-                        try {
-                            DB::table('pdf_split')->insert([
-                                'processId' => $uuid,
-                                'fileName' => 'null',
-                                'fileSize' => 'null',
-                                'fromPage' => 'null',
-                                'toPage' => 'null',
-                                'customPage' => 'null',
-                                'fixedPage' => 'null',
-                                'fixedPageRange' => 'null',
-                                'mergePDF' => 'null',
-                                'result' => false,
-                                'err_reason' => 'PDF failed to upload !',
-                                'err_api_reason' => 'null',
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                            ]);
-                            return redirect()->back()->withErrors([
-                                'error'=>'PDF failed to upload !',
-                                'processId'=>$uuid,
-                                'titleMessage'=>'PDF page has failed to split !'
-                            ])->withInput();
-                        } catch (QueryException $ex) {
-                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "split") {
@@ -196,21 +173,35 @@ class splitController extends Controller
 						if ($fromPage != ''){
 							$pdfTotalPages = AppHelper::instance()->count($pdfNewPath);
 							if ($toPage > $pdfTotalPages) {
+                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
                                 try {
-                                    DB::table('pdf_split')->insert([
+                                    DB::table('appLogs')->insert([
                                         'processId' => $uuid,
-                                        'fileName' => $pdfName,
+                                        'errReason' => null,
+                                        'errApiReason' => null
+                                    ]);
+                                    DB::table('pdfSplit')->insert([
+                                        'fileName' => $randomizePdfFileName.'.pdf',
                                         'fileSize' => $fileSize,
                                         'fromPage' => $fromPage,
                                         'toPage' => $toPage,
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => $mergeDBpdf,
+                                        'customPage' => null,
+                                        'fixedPage' => null,
+                                        'fixedPageRange' => null,
+                                        'mergePDF' => null,
                                         'result' => false,
-                                        'err_reason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                        'err_api_reason' => 'null',
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                        'processId' => $uuid,
+                                        'procStartAt' => $startProc,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                    DB::table('appLogs')
+                                        ->where('processId', '=', $uuid)
+                                        ->update([
+                                            'processId' => $uuid,
+                                            'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                            'errApiReason' => null
                                     ]);
                                     return redirect()->back()->withErrors([
                                         'error'=>'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
@@ -220,39 +211,38 @@ class splitController extends Controller
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    DB::table('pdf_split')->insert([
-                                        'processId' => $uuid,
-                                        'fileName' => 'null',
-                                        'fileSize' => 'null',
-                                        'fromPage' => 'null',
-                                        'toPage' => 'null',
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => 'null',
-                                        'result' => false,
-                                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                        'err_api_reason' => $e->getMessage(),
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                    ]);
-                                    return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             } else if ($fromPage > $pdfTotalPages) {
+                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
                                 try {
-                                    DB::table('pdf_split')->insert([
+                                    DB::table('appLogs')->insert([
                                         'processId' => $uuid,
-                                        'fileName' => $pdfName,
+                                        'errReason' => null,
+                                        'errApiReason' => null
+                                    ]);
+                                    DB::table('pdfSplit')->insert([
+                                        'fileName' => $randomizePdfFileName.'.pdf',
                                         'fileSize' => $fileSize,
                                         'fromPage' => $fromPage,
                                         'toPage' => $toPage,
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => $mergeDBpdf,
+                                        'customPage' => null,
+                                        'fixedPage' => null,
+                                        'fixedPageRange' => null,
+                                        'mergePDF' => null,
                                         'result' => false,
-                                        'err_reason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                        'err_api_reason' => 'null',
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                        'processId' => $uuid,
+                                        'procStartAt' => $startProc,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                    DB::table('appLogs')
+                                        ->where('processId', '=', $uuid)
+                                        ->update([
+                                            'processId' => $uuid,
+                                            'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                            'errApiReason' => null
                                     ]);
                                     return redirect()->back()->withErrors([
                                         'error'=>'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
@@ -262,64 +252,48 @@ class splitController extends Controller
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    DB::table('pdf_split')->insert([
-                                        'processId' => $uuid,
-                                        'fileName' => 'null',
-                                        'fileSize' => 'null',
-                                        'fromPage' => 'null',
-                                        'toPage' => 'null',
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => 'null',
-                                        'result' => false,
-                                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                        'err_api_reason' => $e->getMessage(),
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                    ]);
-                                    return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             } else if ($fromPage > $toPage) {
+                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
                                 try {
-                                    DB::table('pdf_split')->insert([
+                                    DB::table('appLogs')->insert([
                                         'processId' => $uuid,
-                                        'fileName' => $pdfName,
+                                        'errReason' => null,
+                                        'errApiReason' => null
+                                    ]);
+                                    DB::table('pdfSplit')->insert([
+                                        'fileName' => $randomizePdfFileName.'.pdf',
                                         'fileSize' => $fileSize,
                                         'fromPage' => $fromPage,
                                         'toPage' => $toPage,
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => $mergeDBpdf,
+                                        'customPage' => null,
+                                        'fixedPage' => null,
+                                        'fixedPageRange' => null,
+                                        'mergePDF' => null,
                                         'result' => false,
-                                        'err_reason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                        'err_api_reason' => 'null',
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                        'processId' => $uuid,
+                                        'procStartAt' => $startProc,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                    DB::table('appLogs')
+                                        ->where('processId', '=', $uuid)
+                                        ->update([
+                                            'processId' => $uuid,
+                                            'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                            'errApiReason' => null
                                     ]);
                                     return redirect()->back()->withErrors([
-                                        'error'=>'First Page has more page than last page !',
+                                        'error'=>'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
                                         'processId'=>$uuid,
                                         'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    DB::table('pdf_split')->insert([
-                                        'processId' => $uuid,
-                                        'fileName' => 'null',
-                                        'fileSize' => 'null',
-                                        'fromPage' => 'null',
-                                        'toPage' => 'null',
-                                        'customPage' => 'null',
-                                        'fixedPage' => 'null',
-                                        'fixedPageRange' => 'null',
-                                        'mergePDF' => 'null',
-                                        'result' => false,
-                                        'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                        'err_api_reason' => $e->getMessage(),
-                                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                    ]);
-                                    return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
 							} else {
 								if ($mergeDBpdf == "true") {
@@ -358,11 +332,17 @@ class splitController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (StartException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -370,9 +350,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on StartException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -382,29 +370,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (AuthException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -412,9 +391,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on AuthException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -424,29 +411,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (UploadException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -454,9 +432,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on UploadException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -466,29 +452,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (ProcessException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -496,9 +473,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -508,29 +493,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (DownloadException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -538,9 +514,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -550,29 +534,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (TaskException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -580,9 +555,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on TaskException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -592,29 +575,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (PathException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -622,9 +596,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on PathException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -634,29 +616,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Exception $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -664,9 +637,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -676,22 +657,7 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
                         if (file_exists($pdfNewPath)) {
@@ -699,11 +665,17 @@ class splitController extends Controller
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -711,9 +683,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -723,30 +703,21 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -754,9 +725,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -766,30 +745,21 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -797,9 +767,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -809,30 +787,21 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -840,9 +809,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -852,30 +829,21 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -883,9 +851,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -895,29 +871,20 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_split')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
-                                    'fileName' => $pdfName,
-                                    'fileSize' => $newFileSize,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
+                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileSize' => $fileSize,
                                     'fromPage' => $fromPage,
                                     'toPage' => $toPage,
                                     'customPage' => $customPage,
@@ -925,9 +892,17 @@ class splitController extends Controller
                                     'fixedPageRange' => $fixedPageRanges,
                                     'mergePDF' => $mergeDBpdf,
                                     'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'Failed to download file from iLovePDF API !',
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split fail !',
@@ -937,48 +912,49 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
 					} else {
+                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
                         try {
-                            DB::table('pdf_split')->insert([
+                            DB::table('appLogs')->insert([
                                 'processId' => $uuid,
-                                'fileName' => 'null',
-                                'fileSize' => 'null',
-                                'fromPage' => 'null',
-                                'toPage' => 'null',
-                                'customPage' => 'null',
-                                'fixedPage' => 'null',
-                                'fixedPageRange' => 'null',
-                                'mergePDF' => 'null',
+                                'errReason' => null,
+                                'errApiReason' => null
+                            ]);
+                            DB::table('pdfSplit')->insert([
+                                'fileName' => $randomizePdfFileName.'.pdf',
+                                'fileSize' => $fileSize,
+                                'fromPage' => $fromPage,
+                                'toPage' => $toPage,
+                                'customPage' => $customPage,
+                                'fixedPage' => $fixedPage,
+                                'fixedPageRange' => $fixedPageRanges,
+                                'mergePDF' => $mergeDBpdf,
                                 'result' => false,
-                                'err_reason' => 'PDF page has failed to split !',
-                                'err_api_reason' => 'null',
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                'processId' => $uuid,
+                                'procStartAt' => $startProc,
+                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                'procDuration' =>  $duration->s.' seconds'
+                            ]);
+                            DB::table('appLogs')
+                                ->where('processId', '=', $uuid)
+                                ->update([
+                                    'processId' => $uuid,
+                                    'errReason' => 'PDF page has failed to split !',
+                                    'errApiReason' => null
                             ]);
                             return redirect()->back()->withErrors([
-                                'error'=>'PDF failed to upload !',
+                                'error'=>'PDF split fail !',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to split !'
                             ])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        } catch (\Exception $e) {
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "delete") {
@@ -1018,300 +994,292 @@ class splitController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (StartException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on StartException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on StartException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (AuthException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on AuthException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on AuthException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (UploadException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on UploadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on UploadException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (ProcessException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (DownloadException $e) {
-                                try {
-                                DB::table('pdf_delete')->insert([
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            try {
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (TaskException $e) {
-                                try {
-                                DB::table('pdf_delete')->insert([
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            try {
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on TaskException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on TaskException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (PathException $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error !, Catch on PathException',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on PathException',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Exception $e) {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'iLovePDF API Error ! Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors([
-                                    'error'=>'PDF delete fail !',
+                                    'error'=>'PDF split fail !',
                                     'processId'=>$uuid,
-                                    'titleMessage'=>'PDF page has failed to delete !'
+                                    'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
                         if (file_exists($pdfNewPath)) {
@@ -1319,16 +1287,30 @@ class splitController extends Controller
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -1338,35 +1320,34 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -1376,35 +1357,34 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -1414,35 +1394,34 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -1452,35 +1431,34 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfSplit')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => true,
-                                    'err_reason' => 'null',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with([
                                     "stats" => "scs",
@@ -1490,34 +1468,33 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else {
+                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             try {
-                                DB::table('pdf_delete')->insert([
+                                DB::table('appLogs')->insert([
                                     'processId' => $uuid,
+                                    'errReason' => null,
+                                    'errApiReason' => null
+                                ]);
+                                DB::table('pdfDelete')->insert([
                                     'fileName' => $pdfName,
                                     'fileSize' => $newFileSize,
                                     'deletePage' => $customPage,
                                     'result' => false,
-                                    'err_reason' => 'Failed to download file from iLovePDF API !',
-                                    'err_api_reason' => 'null',
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                    'processId' => $uuid,
+                                    'procStartAt' => $startProc,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' =>  $duration->s.' seconds'
+                                ]);
+                                DB::table('appLogs')
+                                    ->where('processId', '=', $uuid)
+                                    ->update([
+                                        'processId' => $uuid,
+                                        'errReason' => 'Failed to download file from iLovePDF API !',
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete fail !',
@@ -1527,85 +1504,118 @@ class splitController extends Controller
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                DB::table('pdf_split')->insert([
-                                    'processId' => $uuid,
-                                    'fileName' => 'null',
-                                    'fileSize' => 'null',
-                                    'fromPage' => 'null',
-                                    'toPage' => 'null',
-                                    'customPage' => 'null',
-                                    'fixedPage' => 'null',
-                                    'fixedPageRange' => 'null',
-                                    'mergePDF' => 'null',
-                                    'result' => false,
-                                    'err_reason' => 'Eloquent transaction error !, Catch on Exception',
-                                    'err_api_reason' => $e->getMessage(),
-                                    'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
-                                ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF split fail !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
                     } else {
+                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
                         try {
-                            DB::table('pdf_delete')->insert([
+                            DB::table('appLogs')->insert([
                                 'processId' => $uuid,
-                                'fileName' => 'null',
-                                'fileSize' => 'null',
-                                'deletePage' => 'null',
+                                'errReason' => null,
+                                'errApiReason' => null
+                            ]);
+                            DB::table('pdfDelete')->insert([
+                                'fileName' => $pdfName,
+                                'fileSize' => $newFileSize,
+                                'deletePage' => $customPage,
                                 'result' => false,
-                                'err_reason' => 'PDF page has failed to delete !',
-                                'err_api_reason' => 'null',
-                                'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                                'processId' => $uuid,
+                                'procStartAt' => $startProc,
+                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                'procDuration' =>  $duration->s.' seconds'
+                            ]);
+                            DB::table('appLogs')
+                                ->where('processId', '=', $uuid)
+                                ->update([
+                                    'processId' => $uuid,
+                                    'errReason' => 'PDF page has failed to delete !',
+                                    'errApiReason' => null
                             ]);
                             return redirect()->back()->withErrors([
-                                'error'=>'PDF failed to upload !',
+                                'error'=>'PDF delete fail !',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to delete !'
                             ])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        } catch (\Exception $e) {
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
                     }
 				} else {
+                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
                     try {
-                        DB::table('pdf_delete')->insert([
+                        DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'fileName' => 'null',
-                            'fileSize' => 'null',
-                            'deletePage' => 'null',
+                            'errReason' => null,
+                            'errApiReason' => null
+                        ]);
+                        DB::table('pdfDelete')->insert([
+                            'fileName' => $pdfName,
+                            'fileSize' => $newFileSize,
+                            'deletePage' => $customPage,
                             'result' => false,
-                            'err_reason' => 'INVALID_REQUEST_ERROR !',
-                            'err_api_reason' => 'null',
-                            'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                            'processId' => $uuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        DB::table('appLogs')
+                            ->where('processId', '=', $uuid)
+                            ->update([
+                                'processId' => $uuid,
+                                'errReason' => 'INVALID_REQUEST_ERROR !',
+                                'errApiReason' => null
                         ]);
                         return redirect()->back()->withErrors([
                             'error'=>'INVALID_REQUEST_ERROR !',
                             'processId'=>$uuid,
-                            'titleMessage'=>'PDF process unknown error !'
+                            'titleMessage'=>'PDF page has failed to delete !'
                         ])->withInput();
                     } catch (QueryException $ex) {
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                    } catch (\Exception $e) {
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                     }
                 }
 			} else {
+                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
                 try {
-                    DB::table('pdf_delete')->insert([
+                    DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'fileName' => 'null',
-                        'fileSize' => 'null',
-                        'deletePage' => 'null',
+                        'errReason' => null,
+                        'errApiReason' => null
+                    ]);
+                    DB::table('pdfDelete')->insert([
+                        'fileName' => $pdfName,
+                        'fileSize' => $newFileSize,
+                        'deletePage' => $customPage,
                         'result' => false,
-                        'err_reason' => 'ERROR_OUT_BOUND !',
-                        'err_api_reason' => 'null',
-                        'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
+                        'processId' => $uuid,
+                        'procStartAt' => $startProc,
+                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                        'procDuration' =>  $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $uuid)
+                        ->update([
+                            'processId' => $uuid,
+                            'errReason' => 'ERROR_OUT_BOUND !',
+                            'errApiReason' => null
                     ]);
                     return redirect()->back()->withErrors([
                         'error'=>'ERROR_OUT_BOUND !',
                         'processId'=>$uuid,
-                        'titleMessage'=>'PDF process unknown error !'
+                        'titleMessage'=>'PDF page has failed to delete !'
                     ])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                } catch (\Exception $e) {
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
 			}
 		}

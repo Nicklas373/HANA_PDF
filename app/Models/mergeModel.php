@@ -5,17 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class pdf_cnv extends Model
+class mergeModel extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'fileName',
         'fileSize',
-        'container',
-        'img_extract',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }
