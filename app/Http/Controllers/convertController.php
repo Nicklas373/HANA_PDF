@@ -53,7 +53,7 @@ class convertController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
-                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
@@ -87,11 +87,11 @@ class convertController extends Controller
                                     'errReason' => null,
                                     'errApiReason' => null
                                 ]);
-                                DB::table('pdfCnv')->insert([
+                                DB::table('pdfConvert')->insert([
                                     'fileName' => $randomizePdfFileName.'.pdf',
                                     'fileSize' => $fileSize,
                                     'container' => null,
-                                    'img_extract' => false,
+                                    'imgExtract' => false,
                                     'result' => false,
                                     'processId' => $uuid,
                                     'procStartAt' => $startProc,
@@ -105,11 +105,11 @@ class convertController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF file not found on the server !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
 						}
 					} else {
@@ -121,11 +121,11 @@ class convertController extends Controller
                                 'errReason' => null,
                                 'errApiReason' => null
                             ]);
-                            DB::table('pdfCnv')->insert([
+                            DB::table('pdfConvert')->insert([
                                 'fileName' => $randomizePdfFileName.'.pdf',
                                 'fileSize' => $fileSize,
                                 'container' => null,
-                                'img_extract' => false,
+                                'imgExtract' => false,
                                 'result' => false,
                                 'processId' => $uuid,
                                 'procStartAt' => $startProc,
@@ -139,11 +139,11 @@ class convertController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "convert") {
@@ -185,11 +185,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -203,11 +203,11 @@ class convertController extends Controller
                                                 'errReason' => 'PDF Conversion running out of time !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion running out of time !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -218,11 +218,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -240,7 +240,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                                 if (!$asposeAPI->isSuccessful()) {
@@ -254,11 +254,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => true,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -276,7 +276,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } else {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -287,11 +287,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -309,7 +309,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 } else {
@@ -323,11 +323,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => true,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -345,7 +345,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } else {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -356,11 +356,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -374,11 +374,11 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput()
                                             ]);
-                                            return redirect()->back()->withErrors(['error'=>'Converted file not found on the server !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 }
@@ -391,11 +391,11 @@ class convertController extends Controller
                                         'errReason' => null,
                                         'errApiReason' => null
                                     ]);
-                                    DB::table('pdfCnv')->insert([
+                                    DB::table('pdfConvert')->insert([
                                         'fileName' => null,
                                         'fileSize' => null,
                                         'container' => null,
-                                        'img_extract' => false,
+                                        'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -409,11 +409,11 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'Converted file not found on the server !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                 }
                             }
                         } else if ($convertType == 'pptx') {
@@ -451,11 +451,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfNameWithoutExtension.'.pdf',
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -469,11 +469,11 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process out of time exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion running out of time !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -484,11 +484,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -502,11 +502,11 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process fail exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion running out of time !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                                 if (!$asposeAPI->isSuccessful()) {
@@ -520,11 +520,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => true,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -540,9 +540,9 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pptx]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } else {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -553,11 +553,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -575,7 +575,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 } else {
@@ -589,11 +589,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => true,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -611,7 +611,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } else {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -622,11 +622,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -640,11 +640,11 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => null,
                                             ]);
-                                            return redirect()->back()->withErrors(['error'=>'Converted file not found on the server !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 }
@@ -657,11 +657,11 @@ class convertController extends Controller
                                         'errReason' => null,
                                         'errApiReason' => null
                                     ]);
-                                    DB::table('pdfCnv')->insert([
-                                        'fileName' => $randomizePdfFileName.'.pdf',
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $pdfName,
                                         'fileSize' => $fileSize,
                                         'container' => $convertType,
-                                        'img_extract' => false,
+                                        'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -675,11 +675,11 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null,
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                 }
                             }
                         } else if ($convertType == 'docx') {
@@ -720,11 +720,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -742,7 +742,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                                 if (file_exists($pdfNewPath)) {
@@ -759,11 +759,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => true,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -781,7 +781,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } else {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -792,11 +792,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -814,7 +814,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 } else {
@@ -826,11 +826,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -848,7 +848,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                             } else {
@@ -860,11 +860,11 @@ class convertController extends Controller
                                         'errReason' => null,
                                         'errApiReason' => null
                                     ]);
-                                    DB::table('pdfCnv')->insert([
-                                        'fileName' => $randomizePdfFileName.'.pdf',
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $pdfName,
                                         'fileSize' => $fileSize,
                                         'container' => $convertType,
-                                        'img_extract' => false,
+                                        'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -878,11 +878,11 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                 }
                             }
                         } else if ($convertType == 'jpg') {
@@ -945,11 +945,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -967,7 +967,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (AuthException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -978,11 +978,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1000,7 +1000,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (UploadException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1011,11 +1011,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1033,7 +1033,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (ProcessException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1044,11 +1044,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1066,7 +1066,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (DownloadException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1077,11 +1077,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1099,7 +1099,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (TaskException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1110,11 +1110,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1132,7 +1132,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (PathException $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1143,11 +1143,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1165,7 +1165,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } catch (\Exception $e) {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1176,11 +1176,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1198,7 +1198,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                                 if ($pdfTotalPages == 1 && $extMode) {
@@ -1218,11 +1218,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => $extMode,
+                                            'imgExtract' => $extMode,
                                             'result' => true,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1243,7 +1243,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } else {
                                     if ($pdfTotalPages = 1 && $extMode) {
@@ -1256,11 +1256,11 @@ class convertController extends Controller
                                                     'errReason' => null,
                                                     'errApiReason' => null
                                                 ]);
-                                                DB::table('pdfCnv')->insert([
-                                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                                DB::table('pdfConvert')->insert([
+                                                    'fileName' => $pdfName,
                                                     'fileSize' => $fileSize,
                                                     'container' => $convertType,
-                                                    'img_extract' => $extMode,
+                                                    'imgExtract' => $extMode,
                                                     'result' => true,
                                                     'processId' => $uuid,
                                                     'procStartAt' => $startProc,
@@ -1282,7 +1282,7 @@ class convertController extends Controller
                                             } catch (QueryException $ex) {
                                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                             } catch (\Exception $e) {
-                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                             }
                                         }
                                     } else if ($pdfTotalPages = 1 && !$extMode) {
@@ -1295,11 +1295,11 @@ class convertController extends Controller
                                                     'errReason' => null,
                                                     'errApiReason' => null
                                                 ]);
-                                                DB::table('pdfCnv')->insert([
-                                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                                DB::table('pdfConvert')->insert([
+                                                    'fileName' => $pdfName,
                                                     'fileSize' => $fileSize,
                                                     'container' => $convertType,
-                                                    'img_extract' => $extMode,
+                                                    'imgExtract' => $extMode,
                                                     'result' => true,
                                                     'processId' => $uuid,
                                                     'procStartAt' => $startProc,
@@ -1321,7 +1321,7 @@ class convertController extends Controller
                                             } catch (QueryException $ex) {
                                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                             } catch (\Exception $e) {
-                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                             }
                                         }
                                     } else {
@@ -1333,11 +1333,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => $extMode,
+                                                'imgExtract' => $extMode,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1355,7 +1355,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 }
@@ -1368,11 +1368,11 @@ class convertController extends Controller
                                         'errReason' => null,
                                         'errApiReason' => null
                                     ]);
-                                    DB::table('pdfCnv')->insert([
-                                        'fileName' => $randomizePdfFileName.'.pdf',
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $pdfName,
                                         'fileSize' => $fileSize,
                                         'container' => $convertType,
-                                        'img_extract' => $extMode,
+                                        'imgExtract' => $extMode,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -1390,10 +1390,10 @@ class convertController extends Controller
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                 }
                             }
-                        }  else if ($convertType == 'pdf') {
+                        } else if ($convertType == 'pdf') {
                             if(isset($_POST['fileAlt'])) {
                                 $pdfUpload_Location = env('PDF_UPLOAD');
                                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
@@ -1426,11 +1426,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1448,7 +1448,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (AuthException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1459,11 +1459,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1481,7 +1481,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (UploadException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1492,11 +1492,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1514,7 +1514,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (ProcessException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1525,11 +1525,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1547,7 +1547,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (DownloadException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1558,11 +1558,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1580,7 +1580,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (TaskException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1591,11 +1591,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1613,7 +1613,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (PathException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1624,11 +1624,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1646,7 +1646,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (\Exception $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1657,11 +1657,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1679,7 +1679,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 } else {
@@ -1699,11 +1699,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1721,7 +1721,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (AuthException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1732,11 +1732,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1754,7 +1754,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (UploadException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1765,11 +1765,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1787,7 +1787,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (ProcessException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1798,11 +1798,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1820,7 +1820,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (DownloadException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1831,11 +1831,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1853,7 +1853,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (TaskException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1864,11 +1864,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1886,7 +1886,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (PathException $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1897,11 +1897,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1919,7 +1919,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     } catch (\Exception $e) {
                                         $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -1930,11 +1930,11 @@ class convertController extends Controller
                                                 'errReason' => null,
                                                 'errApiReason' => null
                                             ]);
-                                            DB::table('pdfCnv')->insert([
-                                                'fileName' => $randomizePdfFileName.'.pdf',
+                                            DB::table('pdfConvert')->insert([
+                                                'fileName' => $pdfName,
                                                 'fileSize' => $fileSize,
                                                 'container' => $convertType,
-                                                'img_extract' => false,
+                                                'imgExtract' => false,
                                                 'result' => false,
                                                 'processId' => $uuid,
                                                 'procStartAt' => $startProc,
@@ -1952,7 +1952,7 @@ class convertController extends Controller
                                         } catch (QueryException $ex) {
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                         }
                                     }
                                 }
@@ -1968,11 +1968,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => true,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -1983,7 +1983,7 @@ class convertController extends Controller
                                             ->where('processId', '=', $uuid)
                                             ->update([
                                                 'processId' => $uuid,
-                                                'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                                                'errReason' => null,
                                                 'errApiReason' => null
                                         ]);
                                         return redirect()->back()->with([
@@ -1993,7 +1993,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 } else {
                                     $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -2004,11 +2004,11 @@ class convertController extends Controller
                                             'errReason' => null,
                                             'errApiReason' => null
                                         ]);
-                                        DB::table('pdfCnv')->insert([
-                                            'fileName' => $randomizePdfFileName.'.pdf',
+                                        DB::table('pdfConvert')->insert([
+                                            'fileName' => $pdfName,
                                             'fileSize' => $fileSize,
                                             'container' => $convertType,
-                                            'img_extract' => false,
+                                            'imgExtract' => false,
                                             'result' => false,
                                             'processId' => $uuid,
                                             'procStartAt' => $startProc,
@@ -2026,7 +2026,7 @@ class convertController extends Controller
                                     } catch (QueryException $ex) {
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                     }
                                 }
                             } else {
@@ -2038,11 +2038,11 @@ class convertController extends Controller
                                         'errReason' => null,
                                         'errApiReason' => null
                                     ]);
-                                    DB::table('pdfCnv')->insert([
-                                        'fileName' => $randomizePdfFileName.'.pdf',
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $pdfName,
                                         'fileSize' => $fileSize,
                                         'container' => $convertType,
-                                        'img_extract' => false,
+                                        'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -2060,7 +2060,7 @@ class convertController extends Controller
                                 } catch (QueryException $ex) {
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                                 }
                             }
                         } else {
@@ -2072,11 +2072,11 @@ class convertController extends Controller
                                     'errReason' => null,
                                     'errApiReason' => null
                                 ]);
-                                DB::table('pdfCnv')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
-                                    'fileSize' => $fileSize,
-                                    'container' => $convertType,
-                                    'img_extract' => false,
+                                DB::table('pdfConvert')->insert([
+                                    'fileName' => null,
+                                    'fileSize' => null,
+                                    'container' => null,
+                                    'imgExtract' => false,
                                     'result' => false,
                                     'processId' => $uuid,
                                     'procStartAt' => $startProc,
@@ -2090,11 +2090,11 @@ class convertController extends Controller
                                         'errReason' => 'REQUEST_ERROR_OUT_OF_BOUND !',
                                         'errApiReason' => null
                                 ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF process unknown error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         }
                     } else {
@@ -2106,11 +2106,11 @@ class convertController extends Controller
                                 'errReason' => null,
                                 'errApiReason' => null
                             ]);
-                            DB::table('pdfCnv')->insert([
-                                'fileName' => $randomizePdfFileName.'.pdf',
-                                'fileSize' => $fileSize,
-                                'container' => $convertType,
-                                'img_extract' => false,
+                            DB::table('pdfConvert')->insert([
+                                'fileName' => null,
+                                'fileSize' => null,
+                                'container' => null,
+                                'imgExtract' => false,
                                 'result' => false,
                                 'processId' => $uuid,
                                 'procStartAt' => $startProc,
@@ -2124,11 +2124,11 @@ class convertController extends Controller
                                     'errReason' => 'REQUEST_TYPE_NOT_FOUND !',
                                     'errApiReason' => null
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF process unknown error !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                         }
                     }
 				} else {
@@ -2138,13 +2138,13 @@ class convertController extends Controller
                             'fileName' => null,
                             'fileSize' => null,
                             'container' => null,
-                            'img_extract' => false,
+                            'imgExtract' => false,
                             'result' => false,
                             'err_reason' => '000',
                             'err_api_reason' => null,
                             'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                         ]);
-                        return redirect()->back()->withErrors(['error'=>'PDF process unknown error !', 'processId'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
                     } catch (QueryException $ex) {
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                     }
@@ -2156,11 +2156,11 @@ class convertController extends Controller
                         'errReason' => null,
                         'errApiReason' => null
                     ]);
-                    DB::table('pdfCnv')->insert([
+                    DB::table('pdfConvert')->insert([
                         'fileName' => null,
                         'fileSize' => null,
                         'container' => null,
-                        'img_extract' => false,
+                        'imgExtract' => false,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
@@ -2174,11 +2174,11 @@ class convertController extends Controller
                             'errReason' => '0x0',
                             'errApiReason' => $e->getMessage(),
                     ]);
-                    return redirect()->back()->withErrors(['error'=>'PDF process unknown error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
 			}
 		}
