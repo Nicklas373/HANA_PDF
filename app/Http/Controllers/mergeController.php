@@ -46,7 +46,7 @@ class mergeController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
-                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
@@ -94,11 +94,11 @@ class mergeController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF failed to upload !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                         }
                     }
                 } else if ($request->post('formAction') == "merge") {
@@ -158,13 +158,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (AuthException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -189,13 +189,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (UploadException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -220,13 +220,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (ProcessException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -251,13 +251,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (DownloadException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -282,13 +282,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (TaskException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -313,13 +313,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (PathException $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -344,13 +344,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } catch (\Exception $e) {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -375,13 +375,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'err_api_reason' => $e->getMessage()
+                                        'errApiReason' => $e->getMessage()
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         }
                         $tempPDFfiles = glob(Storage::disk('local')->path('public/'.$pdfPreProcessed_Location.'/*'));
@@ -415,13 +415,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'err_api_reason' => null
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         } else {
                             $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -446,13 +446,13 @@ class mergeController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'Failed to download file from iLovePDF API !',
-                                        'err_api_reason' => null
+                                        'errApiReason' => null
                                 ]);
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                             }
                         }
 					} else {
@@ -478,13 +478,13 @@ class mergeController extends Controller
                                 ->update([
                                     'processId' => $uuid,
                                     'errReason' => 'PDF failed to upload !',
-                                    'err_api_reason' => null
+                                    'errApiReason' => null
                             ]);
                             return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                         }
 					}
 				} else {
@@ -497,8 +497,8 @@ class mergeController extends Controller
                             'errApiReason' => null
                         ]);
                         DB::table('pdfMerge')->insert([
-                            'fileName' => $fileNameArray,
-                            'fileSize' => $fileSizeInMB,
+                            'fileName' => null,
+                            'fileSize' => null,
                             'result' => false,
                             'processId' => $uuid,
                             'procStartAt' => $startProc,
@@ -510,13 +510,13 @@ class mergeController extends Controller
                             ->update([
                                 'processId' => $uuid,
                                 'errReason' => 'INVALID_REQUEST_ERROR !',
-                                'err_api_reason' => null
+                                'errApiReason' => null
                         ]);
                         return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                     } catch (\Exception $e) {
-                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                     }
 				}
 			} else {
@@ -529,8 +529,8 @@ class mergeController extends Controller
                         'errApiReason' => null
                     ]);
                     DB::table('pdfMerge')->insert([
-                        'fileName' => $fileNameArray,
-                        'fileSize' => $fileSizeInMB,
+                        'fileName' => null,
+                        'fileSize' => null,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
@@ -542,13 +542,13 @@ class mergeController extends Controller
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'REQUEST_ERROR_OUT_OF_BOUND !',
-                            'err_api_reason' => null
+                            'errApiReason' => null
                     ]);
                     return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
 			}
         }

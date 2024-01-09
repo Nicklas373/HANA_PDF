@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('watermarkStyle', 25)->nullable();
             $table->text('watermarkText')->nullable();
             $table->string('watermarkPage', 25)->nullable();
+            $table->boolean('result');
             $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();

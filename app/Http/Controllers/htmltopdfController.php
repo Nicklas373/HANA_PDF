@@ -44,7 +44,7 @@ class htmltopdfController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
-                return redirect()->back()->withErrors(['error'=>'File validation failed !', 'processId'=>$uuid])->withInput();
+                return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
@@ -90,11 +90,11 @@ class htmltopdfController extends Controller
                                 'errReason' => '404',
                                 'errApiReason' => null
                         ]);
-                        return redirect()->back()->withErrors(['error'=>'URL not valid or not found !', 'processId'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                     } catch (\Exception $e) {
-                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                     }
                 }
             }
@@ -134,7 +134,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (AuthException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -164,7 +164,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (UploadException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -194,7 +194,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (ProcessException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -224,7 +224,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (DownloadException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -254,7 +254,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (TaskException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -284,7 +284,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (PathException $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -314,7 +314,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } catch (\Exception $e) {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -344,7 +344,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             }
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
@@ -376,7 +376,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             } else {
                 $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -406,7 +406,7 @@ class htmltopdfController extends Controller
                 } catch (QueryException $ex) {
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
                 }
             }
         }
