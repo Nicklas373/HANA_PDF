@@ -9,6 +9,8 @@ class jobLogsModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'jobLogs';
+
     protected $fillable = [
         'jobsName',
         'jobsEnv',

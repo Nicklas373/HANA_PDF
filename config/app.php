@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'HANA-CI PDF'),
+    'name' => env('APP_NAME', 'HANA PDF'),
 
     /*
     |--------------------------------------------------------------------------
@@ -185,4 +185,5 @@ return [
                     // 'Example' => App\Facades\Example::class,
                 ])->toArray(),
                 'AppHelper' => App\Helpers\AppHelper::class,
+                'NotificationHelper' => App\Helper\NotificationHelper::class,
     ];

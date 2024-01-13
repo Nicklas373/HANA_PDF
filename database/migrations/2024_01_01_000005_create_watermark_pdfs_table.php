@@ -20,8 +20,8 @@ return new class extends Migration
     {
         Schema::create('pdfWatermark', function (Blueprint $table) {
             $table->id('watermarkId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
+            $table->text('fileName')->nullable();
+            $table->string('fileSize', 25)->nullable();
             $table->string('watermarkFontFamily', 25)->nullable();
             $table->string('watermarkFontStyle', 25)->nullable();
             $table->string('watermarkFontSize', 5)->nullable();

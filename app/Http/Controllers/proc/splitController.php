@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
-use App\Models\appLogsModel;
-use App\Models\deleteModel;
-use App\Models\splitModel;
+use App\Helpers\NotificationHelper;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -25,7 +24,7 @@ use Ilovepdf\Exceptions\PathException;
 
 class splitController extends Controller
 {
-    public function pdf_split(Request $request): RedirectResponse{
+    public function split(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => ''
@@ -45,12 +44,14 @@ class splitController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','PDF Conversion failed !',$validator->messages());
                 return redirect()->back()->withErrors([
                     'error'=>'PDF split failed!',
                     'processId'=>$uuid,
                     'titleMessage'=>'PDF page has failed to split !',
                 ])->withInput();
             } catch (QueryException $ex) {
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->messages());
                 return redirect()->back()->withErrors([
                     'error'=>'Database connection error !',
                     'processId'=>'null',
@@ -80,7 +81,7 @@ class splitController extends Controller
                                 'pdfTotalPages' => $pdfTotalPages
                             ]);
 						} else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -110,18 +111,21 @@ class splitController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', 'null');
 								return redirect()->back()->withErrors([
 									'error'=>'Database connection error !',
 									'processId'=>'null',
 									'titleMessage'=>'PDF page has failed to split !',
 								])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
 								return redirect()->back()->withErrors([
 									'error'=>'Eloquent transaction error !',
 									'processId'=>'null',
@@ -189,7 +193,7 @@ class splitController extends Controller
 						if ($fromPage != ''){
 							$pdfTotalPages = AppHelper::instance()->count($pdfNewPath);
 							if ($toPage > $pdfTotalPages) {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -219,18 +223,21 @@ class splitController extends Controller
                                             'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')', 'null');
                                     return redirect()->back()->withErrors([
                                         'error'=>'PDF split failed!',
                                         'processId'=>$uuid,
                                         'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
                                 } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Database transaction error !',
 										'processId'=>'null',
 										'titleMessage'=>'PDF page has failed to split !',
 									])->withInput();
                                 } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Eloquent transaction error !',
 										'processId'=>'null',
@@ -238,7 +245,7 @@ class splitController extends Controller
 									])->withInput();
                                 }
                             } else if ($fromPage > $pdfTotalPages) {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -268,18 +275,21 @@ class splitController extends Controller
                                             'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')', 'null');
                                     return redirect()->back()->withErrors([
                                         'error'=>'PDF split failed!',
                                         'processId'=>$uuid,
                                         'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
                                 } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Database transaction error !',
 										'processId'=>'null',
 										'titleMessage'=>'PDF page has failed to split !',
 									])->withInput();
                                 } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Eloquent transaction error !',
 										'processId'=>'null',
@@ -287,7 +297,7 @@ class splitController extends Controller
 									])->withInput();
                                 }
                             } else if ($fromPage > $toPage) {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -317,18 +327,21 @@ class splitController extends Controller
                                             'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')', 'null');
                                     return redirect()->back()->withErrors([
                                         'error'=>'PDF split failed!',
                                         'processId'=>$uuid,
                                         'titleMessage'=>'PDF page has failed to split !'
                                     ])->withInput();
                                 } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Database transaction error !',
 										'processId'=>'null',
 										'titleMessage'=>'PDF page has failed to split !',
 									])->withInput();
                                 } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
 									return redirect()->back()->withErrors([
 										'error'=>'Eloquent transaction error !',
 										'processId'=>'null',
@@ -372,7 +385,7 @@ class splitController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (StartException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -402,26 +415,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (AuthException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -451,26 +467,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (UploadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -500,26 +519,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (ProcessException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -549,26 +571,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (DownloadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -598,26 +623,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (TaskException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -647,26 +675,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (PathException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -696,26 +727,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } catch (\Exception $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -745,23 +779,26 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on CatchException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         }
                         if (file_exists($pdfNewPath)) {
@@ -769,7 +806,7 @@ class splitController extends Controller
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -805,21 +842,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully splitted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -855,21 +894,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully splitted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -905,21 +946,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully splitted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -955,21 +998,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully splitted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1005,20 +1050,22 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully splitted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         } else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1048,27 +1095,30 @@ class splitController extends Controller
                                         'errReason' => 'Failed to download file from iLovePDF API !',
                                         'errApiReason' => null
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Failed to download file from iLovePDF API !', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to split !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to split !',
+                                ])->withInput();
                             }
                         }
 					} else {
-                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         try {
                             DB::table('appLogs')->insert([
@@ -1098,23 +1148,26 @@ class splitController extends Controller
                                     'errReason' => 'PDF page has failed to split !',
                                     'errApiReason' => null
                             ]);
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF page has failed to split !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'PDF split failed!',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to split !'
                             ])->withInput();
                         } catch (QueryException $ex) {
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                             return redirect()->back()->withErrors([
-								'error'=>'Database transaction error !',
-								'processId'=>'null',
-								'titleMessage'=>'PDF page has failed to split !',
-							])->withInput();
+                                'error'=>'Database transaction error !',
+                                'processId'=>'null',
+                                'titleMessage'=>'PDF page has failed to split !',
+                            ])->withInput();
                         } catch (\Exception $e) {
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                             return redirect()->back()->withErrors([
-								'error'=>'Eloquent transaction error !',
-								'processId'=>'null',
-								'titleMessage'=>'PDF page has failed to split !',
-							])->withInput();
+                                'error'=>'Eloquent transaction error !',
+                                'processId'=>'null',
+                                'titleMessage'=>'PDF page has failed to split !',
+                            ])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "delete") {
@@ -1154,7 +1207,7 @@ class splitController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                         } catch (StartException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1179,26 +1232,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (AuthException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1223,26 +1279,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (UploadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1267,26 +1326,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (ProcessException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1311,26 +1373,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (DownloadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1355,26 +1420,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (TaskException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1399,26 +1467,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (PathException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1443,26 +1514,29 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } catch (\Exception $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1487,23 +1561,26 @@ class splitController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         }
                         if (file_exists($pdfNewPath)) {
@@ -1511,7 +1588,7 @@ class splitController extends Controller
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1542,21 +1619,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully deleted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfName);
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1587,21 +1666,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully deleted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1632,21 +1713,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully deleted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1677,21 +1760,23 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully deleted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } else if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip'))) {
                             $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$altPdfNameWithoutExtension.'.zip');
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1722,20 +1807,22 @@ class splitController extends Controller
                                     "titleMessage"=>"PDF page has successfully deleted !"
                                 ]);
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         } else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -1760,27 +1847,30 @@ class splitController extends Controller
                                         'errReason' => 'Failed to download file from iLovePDF API !',
                                         'errApiReason' => null
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF delete failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to delete !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Database transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Database transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             } catch (\Exception $e) {
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                                 return redirect()->back()->withErrors([
-									'error'=>'Eloquent transaction error !',
-									'processId'=>'null',
-									'titleMessage'=>'PDF page has failed to delete !',
-								])->withInput();
+                                    'error'=>'Eloquent transaction error !',
+                                    'processId'=>'null',
+                                    'titleMessage'=>'PDF page has failed to delete !',
+                                ])->withInput();
                             }
                         }
                     } else {
-                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         try {
                             DB::table('appLogs')->insert([
@@ -1805,27 +1895,30 @@ class splitController extends Controller
                                     'errReason' => 'PDF page has failed to delete !',
                                     'errApiReason' => null
                             ]);
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF page has failed to delete !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'PDF delete failed!',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to delete !'
                             ])->withInput();
                         } catch (QueryException $ex) {
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                             return redirect()->back()->withErrors([
-								'error'=>'Database transaction error !',
-								'processId'=>'null',
-								'titleMessage'=>'PDF page has failed to delete !',
-							])->withInput();
+                                'error'=>'Database transaction error !',
+                                'processId'=>'null',
+                                'titleMessage'=>'PDF page has failed to delete !',
+                            ])->withInput();
                         } catch (\Exception $e) {
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                             return redirect()->back()->withErrors([
-								'error'=>'Eloquent transaction error !',
-								'processId'=>'null',
-								'titleMessage'=>'PDF page has failed to delete !',
-							])->withInput();
+                                'error'=>'Eloquent transaction error !',
+                                'processId'=>'null',
+                                'titleMessage'=>'PDF page has failed to delete !',
+                            ])->withInput();
                         }
                     }
 				} else {
-                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                     $duration = $end->diff($startProc);
                     try {
                         DB::table('appLogs')->insert([
@@ -1850,27 +1943,30 @@ class splitController extends Controller
                                 'errReason' => 'INVALID_REQUEST_ERROR !',
                                 'errApiReason' => null
                         ]);
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'INVALID_REQUEST_ERROR !', 'null');
                         return redirect()->back()->withErrors([
                             'error'=>'PDF split failed!',
                             'processId'=>$uuid,
                             'titleMessage'=>'PDF page has failed to split !'
                         ])->withInput();
                     } catch (QueryException $ex) {
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                         return redirect()->back()->withErrors([
-							'error'=>'Eloquent transaction error !',
-							'processId'=>'null',
-							'titleMessage'=>'PDF page has failed to split !',
-						])->withInput();
+                            'error'=>'Database transaction error !',
+                            'processId'=>'null',
+                            'titleMessage'=>'PDF page has failed to split !',
+                        ])->withInput();
                     } catch (\Exception $e) {
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                         return redirect()->back()->withErrors([
-							'error'=>'Eloquent transaction error !',
-							'processId'=>'null',
-							'titleMessage'=>'PDF page has failed to split !',
-						])->withInput();
+                            'error'=>'Eloquent transaction error !',
+                            'processId'=>'null',
+                            'titleMessage'=>'PDF page has failed to split !',
+                        ])->withInput();
                     }
                 }
 			} else {
-                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);
                 try {
                     DB::table('appLogs')->insert([
@@ -1895,23 +1991,26 @@ class splitController extends Controller
                             'errReason' => 'ERROR_OUT_BOUND !',
                             'errApiReason' => null
                     ]);
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'ERROR_OUT_BOUND !', 'null');
                     return redirect()->back()->withErrors([
                         'error'=>'PDF split failed!',
                         'processId'=>$uuid,
                         'titleMessage'=>'PDF page has failed to split !'
                     ])->withInput();
                 } catch (QueryException $ex) {
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
                     return redirect()->back()->withErrors([
-						'error'=>'Eloquent transaction error !',
-						'processId'=>'null',
-						'titleMessage'=>'PDF page has failed to split !',
-					])->withInput();
+                        'error'=>'Database transaction error !',
+                        'processId'=>'null',
+                        'titleMessage'=>'PDF page has failed to split !',
+                    ])->withInput();
                 } catch (\Exception $e) {
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                     return redirect()->back()->withErrors([
-						'error'=>'Eloquent transaction error !',
-						'processId'=>'null',
-						'titleMessage'=>'PDF page has failed to split !',
-					])->withInput();
+                        'error'=>'Eloquent transaction error !',
+                        'processId'=>'null',
+                        'titleMessage'=>'PDF page has failed to split !',
+                    ])->withInput();
                 }
 			}
 		}

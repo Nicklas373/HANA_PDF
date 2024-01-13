@@ -9,6 +9,8 @@ class mergeModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfMerge';
+
     protected $fillable = [
         'fileName',
         'fileSize',

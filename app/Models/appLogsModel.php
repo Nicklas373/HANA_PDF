@@ -9,8 +9,11 @@ class appLogsModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'appLogs';
+
     protected $fillable = [
-        'err_reason',
-        'err_api_reason'
+        'processId',
+        'errReason',
+        'errApiReason'
     ];
 }

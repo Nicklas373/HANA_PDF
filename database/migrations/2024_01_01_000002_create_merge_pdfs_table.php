@@ -20,7 +20,7 @@ return new class extends Migration
     {
         Schema::create('pdfMerge', function (Blueprint $table) {
             $table->id('mergeId');
-            $table->text('fileName');
+            $table->text('fileName')->nullable();
             $table->string('fileSize', 25);
             $table->boolean('result');
             $table->uuid('processId');

@@ -9,6 +9,8 @@ class cnvModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfConvert';
+
     protected $fillable = [
         'fileName',
         'fileSize',

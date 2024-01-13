@@ -9,6 +9,8 @@ class compressModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfCompress';
+
     protected $fillable = [
         'fileName',
         'fileSize',

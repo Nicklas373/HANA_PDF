@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\proc;
 
 use App\Helpers\AppHelper;
-use App\Models\compressModel;
-use App\Models\appLogsModel;
+use App\Helpers\NotificationHelper;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -24,7 +24,8 @@ use Ilovepdf\Exceptions\PathException;
 
 class compressController extends Controller
 {
-	public function pdf_init(Request $request): RedirectResponse{
+
+	public function compress(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => ''
@@ -37,15 +38,17 @@ class compressController extends Controller
         $now = Carbon::now('Asia/Jakarta');
         $startProc = $now->format('Y-m-d H:i:s');
 
-		if($validator->fails()) {
+		if ($validator->fails()) {
             try {
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','PDF Compression failed !',$validator->messages());
                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->messages());
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
 		} else {
@@ -69,7 +72,7 @@ class compressController extends Controller
                                 'pdfOriName' => $pdfFileName,
                             ]);
 						} else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -95,15 +98,18 @@ class compressController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
 						}
 					} else {
-                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         try {
                             DB::table('appLogs')->insert([
@@ -112,8 +118,8 @@ class compressController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfCompress')->insert([
-                                'fileName' => $randomizePdfFileName.'.pdf',
-                                'fileSize' => $fileSize,
+                                'fileName' => null,
+                                'fileSize' => null,
                                 'compFileSize' => null,
                                 'compMethod' => null,
                                 'result' => false,
@@ -129,11 +135,14 @@ class compressController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
+                            NotificationHelper::Instance()->sendErrNotify('', $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify('', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify('', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "compress") {
@@ -167,7 +176,7 @@ class compressController extends Controller
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                             $ilovepdfTask->delete();
                         } catch (StartException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -176,7 +185,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -193,14 +202,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (AuthException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -209,7 +221,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -226,14 +238,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (UploadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -242,7 +257,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -259,14 +274,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (ProcessException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -275,7 +293,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -292,14 +310,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (DownloadException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -308,7 +329,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -325,14 +346,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (TaskException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -341,7 +365,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -358,14 +382,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (PathException $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -374,7 +401,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -391,14 +418,17 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } catch (\Exception $e) {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -407,7 +437,7 @@ class compressController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfCompress')->insert([
-                                    'fileName' => $randomizePdfFileName.'.pdf',
+                                    'fileName' => $pdfName,
                                     'fileSize' => $fileSize,
                                     'compFileSize' => null,
                                     'compMethod' => $compMethod,
@@ -424,11 +454,14 @@ class compressController extends Controller
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                         'errApiReason' => $e->getMessage()
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
 
@@ -439,7 +472,7 @@ class compressController extends Controller
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName))) {
                             $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfName));
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -466,9 +499,11 @@ class compressController extends Controller
                                     "compMethod" => $compMethod
                                 ]);
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         } else {
                             try {
@@ -493,13 +528,16 @@ class compressController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'Failed to download file from iLovePDF API !',
-                                        'errApiReason' => $e->getMessage()
+                                        'errApiReason' => null
                                 ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Failed to download file from iLovePDF API !', 'null');
+                                return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
 					} else {
@@ -527,11 +565,14 @@ class compressController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                            return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
 				} else {
@@ -559,11 +600,14 @@ class compressController extends Controller
                                 'errReason' => 'PDF process unknown error !',
                                 'errApiReason' => null
                         ]);
-                        return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>'null'])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'PDF process unknown error !', 'null');
+                        return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
-                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                     } catch (\Exception $e) {
-                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                     }
 				}
 			} else {
@@ -591,11 +635,14 @@ class compressController extends Controller
                             'errReason' => 'OUT_OF_BOUND_ERROR !',
                             'errApiReason' => null
                     ]);
-                    return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>'null'])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'OUT_OF_BOUND_ERROR !', 'null');
+                    return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify('null', '0', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
 			}
 		}

@@ -9,6 +9,8 @@ class deleteModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfDelete';
+
     protected $fillable = [
         'fileName',
         'fileSize',

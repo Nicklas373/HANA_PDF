@@ -20,10 +20,10 @@ return new class extends Migration
     {
         Schema::create('pdfCompress', function (Blueprint $table) {
             $table->id('compressId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
+            $table->text('fileName')->nullable();
+            $table->string('fileSize', 25)->nullable();
             $table->string('compFileSize', 25)->nullable();
-            $table->string('compMethod', 25);
+            $table->string('compMethod', 25)->nullable();
             $table->boolean('result');
             $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();

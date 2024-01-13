@@ -20,9 +20,9 @@ return new class extends Migration
     {
         Schema::create('pdfConvert', function (Blueprint $table) {
             $table->id('cnvId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
-            $table->string('container', 25);
+            $table->text('fileName')->nullable();
+            $table->string('fileSize', 25)->nullable();
+            $table->string('container', 25)->nullable();
             $table->boolean('imgExtract');
             $table->boolean('result');
             $table->uuid('processId');

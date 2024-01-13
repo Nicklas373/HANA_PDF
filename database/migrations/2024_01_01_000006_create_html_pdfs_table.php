@@ -20,7 +20,7 @@ return new class extends Migration
     {
         Schema::create('pdfHtml', function (Blueprint $table) {
             $table->id('htmlId');
-            $table->text('urlName');
+            $table->text('urlName')->nullable();
             $table->boolean('result');
             $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();

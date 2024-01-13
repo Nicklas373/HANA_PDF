@@ -20,8 +20,8 @@ return new class extends Migration
     {
         Schema::create('pdfDelete', function (Blueprint $table) {
             $table->id('deleteId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
+            $table->text('fileName')->nullable();
+            $table->string('fileSize', 25)->nullable();
             $table->text('deletePage')->nullable();
             $table->string('mergePDF')->nullable();
             $table->boolean('result');

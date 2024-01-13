@@ -9,6 +9,7 @@
         "aspose-cloud/aspose-words-cloud": "^23.7",
         "guzzlehttp/guzzle": "^7.2",
         "ilovepdf/ilovepdf-php": "^1.2",
+        "irazasyed/telegram-bot-sdk": "^3.13",
         "laravel/framework": "^10.29",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
