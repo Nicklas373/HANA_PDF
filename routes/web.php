@@ -21,6 +21,7 @@ use App\Http\Controller\proc\watermarkController;
 |
 */
 
+// Main Routes
 Route::get('/', function()
 {
    return View::make('pages.welcome');
@@ -85,7 +86,38 @@ Route::get('/api/v1/token', function (Request $request) {
     }
 });
 
-// API PDF Processing Route
+// A[I Redirect Route
+Route::get('/api/v1/proc/compress', function()
+{
+    return redirect()->back();
+});
+
+Route::get('/api/v1/proc/convert', function()
+{
+    return redirect()->back();
+});
+
+Route::get('/api/v1/proc/html', function()
+{
+    return redirect()->back();
+});
+
+Route::get('/api/v1/proc/merge', function()
+{
+    return redirect()->back();
+});
+
+Route::get('/api/v1/proc/split', function()
+{
+    return redirect()->back();
+});
+
+Route::get('/api/v1/proc/watermark', function()
+{
+    return redirect()->back();
+});
+
+// API Processing Route
 Route::post('/api/v1/proc/compress', 'App\Http\Controllers\proc\compressController@compress');
 Route::post('/api/v1/proc/convert', 'App\Http\Controllers\proc\convertController@convert');
 Route::post('/api/v1/proc/html', 'App\Http\Controllers\proc\htmltopdfController@html');
