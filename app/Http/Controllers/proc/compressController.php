@@ -24,8 +24,7 @@ use Ilovepdf\Exceptions\PathException;
 
 class compressController extends Controller
 {
-
-	public function compress(Request $request): RedirectResponse{
+ 	public function compress(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf|max:25600',
 			'fileAlt' => ''

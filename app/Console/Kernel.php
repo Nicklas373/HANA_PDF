@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Helpers\AppHelper;
+use App\Helpers\NotificationHelper;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -79,7 +80,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errApiReason' => $output,
                     ]);
-
+                    NotificationHelper::Instance()->sendSchedErrNotify('cache:clear','weekly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
         $schedule
@@ -129,7 +130,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errApiReason' => $output,
                     ]);
-
+                    NotificationHelper::Instance()->sendSchedErrNotify('optimize:clear','weekly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
         $schedule
@@ -179,7 +180,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errApiReason' => $output,
                     ]);
-
+                    NotificationHelper::Instance()->sendSchedErrNotify('view:clear','weekly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
         $schedule
@@ -229,7 +230,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errApiReason' => $output,
                     ]);
-
+                    NotificationHelper::Instance()->sendSchedErrNotify('view:cache','weekly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
         $schedule
@@ -247,7 +248,7 @@ class Kernel extends ConsoleKernel
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:clear-storage',
                     'jobsEnv' => 'production',
-                    'jobsRuntime' => 'weekly',
+                    'jobsRuntime' => 'hourly',
                     'jobsResult' => false,
                     'processId' => $cacheClearGUID,
                     'procStartAt' => $helper::instance()->getCurrentTimeZone(),
@@ -279,7 +280,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errApiReason' => $output,
                     ]);
-
+                    NotificationHelper::Instance()->sendSchedErrNotify('hana:clear-storage','hourly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
     }
