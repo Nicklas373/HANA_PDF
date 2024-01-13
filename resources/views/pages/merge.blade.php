@@ -7,7 +7,7 @@
       <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Combine several PDF into one merged PDF file</p>
     </div>
   </section>
-  <form action="/merge/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
+  <form action="/api/v1/proc/merge" id="splitForm" method="POST" enctype="multipart/form-data">
     {{ csrf_field() }}
     <div class="grid-columns-3 mx-auto mb-8 grid gap-4 p-4" id="grid-layout">
       <div class="grid gap-4 md:grid-cols-2 md:gap-20">

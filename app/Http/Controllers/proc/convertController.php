@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\proc;
 
 use App\Helpers\AppHelper;
-use App\Models\cnvModel;
-use App\Models\appLogsModel;
+use App\Helpers\NotificationHelper;
+use App\Http\Controllers\Controller;
 use Aspose\Words\WordsApi;
 use Aspose\Words\Model\Requests\{SaveAsRequest, UploadFileRequest};
 use Aspose\Words\Model\{DocxSaveOptionsData};
@@ -33,7 +33,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 
 class convertController extends Controller
 {
-	public function pdf_init(Request $request): RedirectResponse{
+	public function convert(Request $request): RedirectResponse{
 		$validator = Validator::make($request->all(),[
 			'file' => 'mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg,tiff|max:25600',
 			'fileAlt' => ''
@@ -53,8 +53,10 @@ class convertController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','PDF Conversion failed !',$validator->messages());
                 return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->messages());
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
 		} else {
@@ -79,7 +81,7 @@ class convertController extends Controller
                                 'pdfOriName' => $pdfFileName,
                             ]);
 						} else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -105,15 +107,18 @@ class convertController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
 						}
 					} else {
-                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         try {
                             DB::table('appLogs')->insert([
@@ -139,11 +144,14 @@ class convertController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
+                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
 				} else if ($request->post('formAction') == "convert") {
@@ -177,7 +185,7 @@ class convertController extends Controller
                                     $asposeAPI->setTimeout(98);
                                     $asposeAPI->run();
                                 } catch (RuntimeException $message) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -203,14 +211,17 @@ class convertController extends Controller
                                                 'errReason' => 'PDF Conversion running out of time !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF Conversion running out of time !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -236,17 +247,20 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process fail exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                                 if (!$asposeAPI->isSuccessful()) {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xslx'), $pdfNameWithoutExtension.".xlsx") == true) {
                                         $download_xlsx = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx');
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -274,12 +288,14 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_xlsx]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -305,17 +321,20 @@ class convertController extends Controller
                                                     'errReason' => 'Python process fail !',
                                                     'errApiReason' => $asposeAPI->getOutput(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Python process fail !', $asposeAPI->getOutput());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 } else {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx'), $pdfNameWithoutExtension.".xlsx") == true) {
                                         $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx');
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -343,12 +362,14 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_xlsx]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -374,16 +395,19 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput()
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 }
                             } else {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -409,11 +433,14 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
                         } else if ($convertType == 'pptx') {
@@ -443,7 +470,7 @@ class convertController extends Controller
                                     $asposeAPI->setTimeout(98);
                                     $asposeAPI->run();
                                 } catch (RuntimeException $message) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -469,14 +496,17 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process out of time exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -502,17 +532,20 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process fail exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                                 if (!$asposeAPI->isSuccessful()) {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx'), $pdfNameWithoutExtension.".pptx") == true) {
                                         $download_pptx = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx');
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -540,12 +573,14 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pptx]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -571,17 +606,20 @@ class convertController extends Controller
                                                     'errReason' => 'Python process fail !',
                                                     'errApiReason' => $asposeAPI->getOutput(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Python process fail !', $asposeAPI->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 } else {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx'), $pdfNameWithoutExtension.".pptx") == true) {
                                         $download_pptx = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pptx');
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -609,12 +647,14 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pptx]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -640,16 +680,19 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => null,
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Converted file not found on the server !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 }
                             } else {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -675,11 +718,14 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null,
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
                         } else if ($convertType == 'docx') {
@@ -712,7 +758,7 @@ class convertController extends Controller
                                     );
                                     $result = $wordsApi->saveAs($request);
                                 } catch (\Exception $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -738,11 +784,14 @@ class convertController extends Controller
                                                 'errReason' => 'Aspose PDF API Error !',
                                                 'errApiReason' => $e->getMessage()
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                                 if (file_exists($pdfNewPath)) {
@@ -751,7 +800,7 @@ class convertController extends Controller
                                 if (json_decode($result, true) !== NULL) {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx"), $pdfNameWithoutExtension.".docx") == true) {
                                         $download_word = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.".docx");
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -779,12 +828,14 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_word]);
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -810,15 +861,18 @@ class convertController extends Controller
                                                     'errReason' => 'FTP Server Connection Failed !',
                                                     'errApiReason' => null
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 } else {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -844,15 +898,18 @@ class convertController extends Controller
                                                 'errReason' => 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !',
                                                 'errApiReason' => null
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !', 'null');
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                             } else {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -878,11 +935,14 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
                         } else if ($convertType == 'jpg') {
@@ -937,7 +997,7 @@ class convertController extends Controller
                                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                                     }
                                 } catch (StartException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -963,14 +1023,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (AuthException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -996,14 +1059,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (UploadException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1029,14 +1095,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1062,14 +1131,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (DownloadException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1095,14 +1167,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (TaskException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1128,14 +1203,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (PathException $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1161,14 +1239,17 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (\Exception $e) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1194,11 +1275,14 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                                 if ($pdfTotalPages == 1 && $extMode) {
@@ -1210,7 +1294,7 @@ class convertController extends Controller
                                     unlink($pdfNewPath);
                                 }
                                 if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip'))) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1241,14 +1325,16 @@ class convertController extends Controller
                                             "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip')
                                         ]);
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } else {
                                     if ($pdfTotalPages = 1 && $extMode) {
                                         if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.jpg')) {
-                                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                             $duration = $end->diff($startProc);
                                             try {
                                                 DB::table('appLogs')->insert([
@@ -1280,14 +1366,16 @@ class convertController extends Controller
                                                     'processId'=>$uuid
                                                 ])->withInput();
                                             } catch (QueryException $ex) {
-                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                             } catch (\Exception $e) {
-                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                             }
                                         }
                                     } else if ($pdfTotalPages = 1 && !$extMode) {
                                         if (Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'-0001.jpg')) {
-                                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                             $duration = $end->diff($startProc);
                                             try {
                                                 DB::table('appLogs')->insert([
@@ -1319,13 +1407,15 @@ class convertController extends Controller
                                                     'processId'=>$uuid
                                                 ])->withInput();
                                             } catch (QueryException $ex) {
-                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                             } catch (\Exception $e) {
-                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                             }
                                         }
                                     } else {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1351,16 +1441,19 @@ class convertController extends Controller
                                                     'errReason' => 'Failed to download converted file from iLovePDF API !',
                                                     'errApiReason' => null
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 }
                             } else {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -1386,11 +1479,14 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
                         } else if ($convertType == 'pdf') {
@@ -1418,7 +1514,7 @@ class convertController extends Controller
                                         $ilovepdfTask->execute();
                                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                                     } catch (StartException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1444,14 +1540,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (AuthException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1477,14 +1576,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (UploadException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1510,14 +1612,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (ProcessException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1543,14 +1648,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (DownloadException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1576,14 +1684,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (TaskException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1609,14 +1720,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (PathException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1642,14 +1756,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (\Exception $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1675,11 +1792,14 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 } else {
@@ -1691,7 +1811,7 @@ class convertController extends Controller
                                         $ilovepdfTask->execute();
                                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
                                     } catch (StartException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1717,14 +1837,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (AuthException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1750,14 +1873,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (UploadException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1783,14 +1909,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (ProcessException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1816,14 +1945,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (DownloadException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1849,14 +1981,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (TaskException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1882,14 +2017,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (PathException $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1915,14 +2053,17 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (\Exception $e) {
-                                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
@@ -1948,11 +2089,14 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
                                 }
@@ -1960,7 +2104,7 @@ class convertController extends Controller
                                     unlink($pdfNewPath);
                                 }
                                 if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf'))) {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -1991,12 +2135,14 @@ class convertController extends Controller
                                             "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf')
                                         ]);
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } else {
-                                    $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
@@ -2022,15 +2168,18 @@ class convertController extends Controller
                                                 'errReason' => 'Failed to download converted file from iLovePDF API !',
                                                 'errApiReason' => null
                                         ]);
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
                             } else {
-                                $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
                                     DB::table('appLogs')->insert([
@@ -2056,15 +2205,18 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
                         } else {
-                            $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             try {
                                 DB::table('appLogs')->insert([
@@ -2090,15 +2242,18 @@ class convertController extends Controller
                                         'errReason' => 'REQUEST_ERROR_OUT_OF_BOUND !',
                                         'errApiReason' => null
                                 ]);
-                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'REQUEST_ERROR_OUT_OF_BOUND !', 'null');
+                                return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
                     } else {
-                        $end =  Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         try {
                             DB::table('appLogs')->insert([
@@ -2124,11 +2279,14 @@ class convertController extends Controller
                                     'errReason' => 'REQUEST_TYPE_NOT_FOUND !',
                                     'errApiReason' => null
                             ]);
-                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'REQUEST_TYPE_NOT_FOUND !', 'null');
+                            return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
                     }
 				} else {
@@ -2144,9 +2302,14 @@ class convertController extends Controller
                             'err_api_reason' => null,
                             'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                         ]);
-                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', '000', 'null');
+                        return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
-                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    } catch (\Exception $e) {
+                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                     }
 				}
 			} else {
@@ -2174,11 +2337,14 @@ class convertController extends Controller
                             'errReason' => '0x0',
                             'errApiReason' => $e->getMessage(),
                     ]);
-                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$e->getMessage()])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', '0x0', 'null');
+                    return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                 } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>'null'])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
 			}
 		}

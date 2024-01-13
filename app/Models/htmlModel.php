@@ -9,6 +9,8 @@ class htmlModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfHtml';
+
     protected $fillable = [
         'urlName',
         'result',

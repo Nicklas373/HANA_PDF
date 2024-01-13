@@ -9,6 +9,8 @@ class splitModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfSplit';
+
     protected $fillable = [
         'fileName',
         'fileSize',

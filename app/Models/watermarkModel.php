@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class watermark_pdf extends Model
+class watermarkModel extends Model
 {
     use HasFactory;
+
+    protected $table = 'pdfWatermark';
 
     protected $fillable = [
         'fileName',

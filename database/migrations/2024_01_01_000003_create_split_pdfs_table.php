@@ -20,8 +20,8 @@ return new class extends Migration
     {
         Schema::create('pdfSplit', function (Blueprint $table) {
             $table->id('splitId');
-            $table->text('fileName');
-            $table->string('fileSize', 25);
+            $table->text('fileName')->nullable();
+            $table->string('fileSize', 25)->nullable();
             $table->string('fromPage', 5)->nullable();
             $table->string('toPage', 5)->nullable();
             $table->text('customPage')->nullable();

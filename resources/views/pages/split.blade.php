@@ -8,7 +8,7 @@
                 <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Separate one page or a whole page into independent PDF files</p>
             </div>
         </section>
-        <form action="/split/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
+        <form action="/api/v1/proc/split" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">
