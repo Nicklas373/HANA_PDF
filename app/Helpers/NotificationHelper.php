@@ -32,4 +32,15 @@ class NotificationHelper
             'parse_mode' => 'HTML'
         ]);
     }
+
+    function sendSchedErrNotify($schedName, $schedRuntime, $status, $errReason, $errCode) {
+        $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $message = "<b>HANA PDF Error Notification</b>\n\nFilename: <b>".$newProcFile."</b>\nFileSize: <b>".$newFileSize."</b>\nEnvironment: <b>SIT</b>\nStatus: <b>".$status."</b>\nProcess Id: <b>".$processId."</b>\nStart At: <b>".$CurrentTime."</b>\nError Reason: <b>".$errReason."</b>\nError Log: <pre><code>".$errCode."</code></pre>";
+
+        return Telegram::sendMessage([
+            'chat_id' => env('TELEGRAM_CHAT_ID'),
+            'text' => $message,
+            'parse_mode' => 'HTML'
+        ]);
+    }
 }
