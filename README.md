@@ -13,7 +13,7 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 - [Docker](https://www.docker.com/)
     * On Windows use Docker Desktop
     * On Linux use docker-compose and docker.io
-- [Node JS 18.18](https://nodejs.org/en)
+- [Node JS 20.11](https://nodejs.org/en)
 - [PHP 8.2.12](https://www.php.net/downloads.php)
 - [PostgreSQL 16.2](https://www.postgresql.org/)
 - [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
@@ -39,27 +39,7 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 
 ---
 
-### Deployment On Docker [YOUR_LOCAL_IP_ADDRESS:80]
-## Step to configure
-1. Clone the repository with __git clone__
-2. Go to root directory from this project
-3. Start to deploy
-    - Windows based [Using docker desktop]
-        ```bash
-        - docker compose up -d
-        - docker compose exec hanaci-instance php artisan migrate
-        - docker stats
-        ```
-    
-    - Linux based [Using docker.io & docker-compose]
-        ```bash
-        - sudo docker-compose up -d
-        - sudo docker-compose exec hanaci-instance php artisan migrate
-        - sudo docker stats
-        ```
----
-
-### Deployment On Native OS Host
+### Deployment
 ## Step to configure
 1. Clone the repository with __git clone__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
@@ -116,4 +96,4 @@ The HANA-CI PDF is a open source Laravel Project that has licensed under the [MI
 
 ---
 
-## HANA-CI Build Project 2016 - 2023
+## HANA-CI Build Project 2016 - 2024
