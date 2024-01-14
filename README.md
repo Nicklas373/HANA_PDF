@@ -89,8 +89,8 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 - PDF_UPLOAD="upload-pdf"
 - PDF_DOWNLOAD="temp"
 - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
-- TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID [https://telegram-bot-sdk.com/docs/getting-started/installation]
-- TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN
+- TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+- TOKEN_GENERATE="YOUR_ENCODE_SHA512_TOKEN"
 ````
 4. Run the following command [Make sure to configure database connectivity before use migrate function]
 ```bash
