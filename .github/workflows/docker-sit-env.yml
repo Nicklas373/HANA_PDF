@@ -157,4 +157,4 @@ jobs:
       - name: Docker Deploy Notifications
         run: |
             chmod +x ./module/bash/docker-build-info.sh
-            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deplot_to_sit Deployed
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deploy_to_sit Deployed

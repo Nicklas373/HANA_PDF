@@ -3,12 +3,12 @@
     "file": "assets/index-Qkg2JGee.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-VwWTePit.css",
+    "file": "assets/app-l6JlhLPd.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.js": {
-    "file": "assets/app-kNoGxclM.js",
+    "file": "assets/app-DBpsIzgy.js",
     "imports": [
       "_index-Qkg2JGee.js"
     ],
