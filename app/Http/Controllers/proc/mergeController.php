@@ -95,13 +95,13 @@ class mergeController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify('null', 'null', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify('null', 'null', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify('null', 'null', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                     }
@@ -463,8 +463,8 @@ class mergeController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfMerge')->insert([
-                                    'fileName' => $fileNameArray,
-                                    'fileSize' => $fileSizeInMB,
+                                    'fileName' => null,
+                                    'fileSize' => null,
                                     'result' => false,
                                     'processId' => $uuid,
                                     'procStartAt' => $startProc,
@@ -478,13 +478,13 @@ class mergeController extends Controller
                                         'errReason' => 'Failed to download file from iLovePDF API !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'Failed to download file from iLovePDF API !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Failed to download file from iLovePDF API !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
@@ -498,8 +498,8 @@ class mergeController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfMerge')->insert([
-                                'fileName' => $fileNameArray,
-                                'fileSize' => $fileSizeInMB,
+                                'fileName' => null,
+                                'fileSize' => null,
                                 'result' => false,
                                 'processId' => $uuid,
                                 'procStartAt' => $startProc,
@@ -513,13 +513,13 @@ class mergeController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Merged failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($fileNameArray, $fileSizeInMB, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
