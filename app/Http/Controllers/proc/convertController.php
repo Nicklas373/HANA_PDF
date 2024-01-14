@@ -73,6 +73,7 @@ class convertController extends Controller
                         $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.'.$randomizePdfExtension;
 						$pdfFileName = $file->getClientOriginalName();
                         $fileSize = filesize($file);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.'.$randomizePdfExtension);
 						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
 							return redirect()->back()->with([
@@ -91,7 +92,7 @@ class convertController extends Controller
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $randomizePdfFileName.'.pdf',
-                                    'fileSize' => $fileSize,
+                                    'fileSize' => $newFileSize,
                                     'container' => null,
                                     'imgExtract' => false,
                                     'result' => false,
@@ -107,13 +108,13 @@ class convertController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
 						}
@@ -127,8 +128,8 @@ class convertController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfConvert')->insert([
-                                'fileName' => $randomizePdfFileName.'.pdf',
-                                'fileSize' => $fileSize,
+                                'fileName' => null,
+                                'fileSize' => null,
                                 'container' => null,
                                 'imgExtract' => false,
                                 'result' => false,
@@ -144,13 +145,13 @@ class convertController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
@@ -196,7 +197,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -212,13 +213,13 @@ class convertController extends Controller
                                                 'errReason' => 'PDF Conversion running out of time !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF Conversion running out of time !', $message->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF Conversion running out of time !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
@@ -232,7 +233,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -248,13 +249,13 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process fail exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -271,7 +272,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => true,
@@ -289,10 +290,10 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_xlsx]);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
@@ -306,7 +307,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -319,16 +320,16 @@ class convertController extends Controller
                                                 ->where('processId', '=', $uuid)
                                                 ->update([
                                                     'processId' => $uuid,
-                                                    'errReason' => 'Python process fail !',
+                                                    'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Python process fail !', $asposeAPI->getOutput());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -345,7 +346,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => true,
@@ -363,10 +364,10 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_xlsx]);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
@@ -380,7 +381,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -396,13 +397,13 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput()
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -434,13 +435,13 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
@@ -482,7 +483,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfNameWithoutExtension.'.pdf',
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -498,13 +499,13 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process out of time exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', $message->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF failed to upload !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessFailedException $message) {
@@ -518,7 +519,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -534,13 +535,13 @@ class convertController extends Controller
                                                 'errReason' => 'Symfony runtime process fail exception !',
                                                 'errApiReason' => $message->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -557,7 +558,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => true,
@@ -575,10 +576,10 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pptx]);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
@@ -592,7 +593,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -605,16 +606,16 @@ class convertController extends Controller
                                                 ->where('processId', '=', $uuid)
                                                 ->update([
                                                     'processId' => $uuid,
-                                                    'errReason' => 'Python process fail !',
+                                                    'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Python process fail !', $asposeAPI->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -631,7 +632,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => true,
@@ -649,10 +650,10 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_pptx]);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
@@ -666,7 +667,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -682,13 +683,13 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => null,
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Converted file not found on the server !', 'null');
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -703,9 +704,9 @@ class convertController extends Controller
                                         'errApiReason' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $fileSize,
-                                        'container' => $convertType,
+                                        'fileName' => null,
+                                        'fileSize' => null,
+                                        'container' => null,
                                         'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
@@ -720,13 +721,13 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null,
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
@@ -740,7 +741,6 @@ class convertController extends Controller
                                 $pdfNameWithoutExtension = $pdfNameInfo['filename'];
                                 $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
 						        $fileSize = filesize($pdfNewPath);
-                                $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                                 try {
                                     $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
@@ -770,7 +770,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -786,13 +786,13 @@ class convertController extends Controller
                                                 'errReason' => 'Aspose PDF API Error !',
                                                 'errApiReason' => $e->getMessage()
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -812,7 +812,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => true,
@@ -830,10 +830,10 @@ class convertController extends Controller
                                             ]);
                                             return redirect()->back()->with(["stats" => "scs", "res"=>$download_word]);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } else {
@@ -847,7 +847,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -863,13 +863,13 @@ class convertController extends Controller
                                                     'errReason' => 'FTP Server Connection Failed !',
                                                     'errApiReason' => null
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', 'null');
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Aspose PDF API Error !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -884,7 +884,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -900,13 +900,13 @@ class convertController extends Controller
                                                 'errReason' => 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !',
                                                 'errApiReason' => null
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !', 'null');
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !', 'null');
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -920,9 +920,9 @@ class convertController extends Controller
                                         'errApiReason' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $fileSize,
-                                        'container' => $convertType,
+                                        'fileName' => null,
+                                        'fileSize' => null,
+                                        'container' => null,
                                         'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
@@ -937,13 +937,13 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
@@ -973,7 +973,6 @@ class convertController extends Controller
                                 $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfName);
                                 $pdfTotalPages = AppHelper::instance()->count($pdfNewPath);
 						        $fileSize = filesize($pdfNewPath);
-                                $hostName = AppHelper::instance()->getUserIpAddr();
                                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                                 if ($pdfTotalPages == 1 && $extMode) {
                                     $files = glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*');
@@ -1009,7 +1008,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1025,13 +1024,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (AuthException $e) {
@@ -1045,7 +1044,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1061,13 +1060,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (UploadException $e) {
@@ -1081,7 +1080,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1097,13 +1096,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (ProcessException $e) {
@@ -1117,7 +1116,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1133,13 +1132,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (DownloadException $e) {
@@ -1153,7 +1152,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1169,13 +1168,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (TaskException $e) {
@@ -1189,7 +1188,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1205,13 +1204,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (PathException $e) {
@@ -1225,7 +1224,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1241,13 +1240,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } catch (\Exception $e) {
@@ -1261,7 +1260,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => false,
@@ -1277,13 +1276,13 @@ class convertController extends Controller
                                                 'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                 'errApiReason' => $e->getMessage(),
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -1306,7 +1305,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => $extMode,
                                             'result' => true,
@@ -1327,10 +1326,10 @@ class convertController extends Controller
                                             "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.zip')
                                         ]);
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } else {
@@ -1346,7 +1345,7 @@ class convertController extends Controller
                                                 ]);
                                                 DB::table('pdfConvert')->insert([
                                                     'fileName' => $pdfName,
-                                                    'fileSize' => $fileSize,
+                                                    'fileSize' => $newFileSize,
                                                     'container' => $convertType,
                                                     'imgExtract' => $extMode,
                                                     'result' => true,
@@ -1368,10 +1367,10 @@ class convertController extends Controller
                                                     'processId'=>$uuid
                                                 ])->withInput();
                                             } catch (QueryException $ex) {
-                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                             } catch (\Exception $e) {
-                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                             }
                                         }
@@ -1387,7 +1386,7 @@ class convertController extends Controller
                                                 ]);
                                                 DB::table('pdfConvert')->insert([
                                                     'fileName' => $pdfName,
-                                                    'fileSize' => $fileSize,
+                                                    'fileSize' => $newFileSize,
                                                     'container' => $convertType,
                                                     'imgExtract' => $extMode,
                                                     'result' => true,
@@ -1409,10 +1408,10 @@ class convertController extends Controller
                                                     'processId'=>$uuid
                                                 ])->withInput();
                                             } catch (QueryException $ex) {
-                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                             } catch (\Exception $e) {
-                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                                NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                             }
                                         }
@@ -1443,13 +1442,13 @@ class convertController extends Controller
                                                     'errReason' => 'Failed to download converted file from iLovePDF API !',
                                                     'errApiReason' => null
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -1464,10 +1463,10 @@ class convertController extends Controller
                                         'errApiReason' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $fileSize,
-                                        'container' => $convertType,
-                                        'imgExtract' => $extMode,
+                                        'fileName' => null,
+                                        'fileSize' => null,
+                                        'container' => null,
+                                        'imgExtract' => null,
                                         'result' => false,
                                         'processId' => $uuid,
                                         'procStartAt' => $startProc,
@@ -1481,13 +1480,13 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
@@ -1526,7 +1525,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1542,13 +1541,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (AuthException $e) {
@@ -1562,7 +1561,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1578,13 +1577,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (UploadException $e) {
@@ -1598,7 +1597,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1614,13 +1613,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (ProcessException $e) {
@@ -1634,7 +1633,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1650,13 +1649,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (DownloadException $e) {
@@ -1670,7 +1669,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1686,13 +1685,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (TaskException $e) {
@@ -1706,7 +1705,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1722,13 +1721,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (PathException $e) {
@@ -1742,7 +1741,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1758,13 +1757,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (\Exception $e) {
@@ -1778,7 +1777,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1794,13 +1793,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -1823,7 +1822,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1839,13 +1838,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (AuthException $e) {
@@ -1859,7 +1858,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1875,13 +1874,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (UploadException $e) {
@@ -1895,7 +1894,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1911,13 +1910,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (ProcessException $e) {
@@ -1947,13 +1946,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (DownloadException $e) {
@@ -1967,7 +1966,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -1983,13 +1982,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (TaskException $e) {
@@ -2003,7 +2002,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -2019,13 +2018,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (PathException $e) {
@@ -2039,7 +2038,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -2055,13 +2054,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     } catch (\Exception $e) {
@@ -2075,7 +2074,7 @@ class convertController extends Controller
                                             ]);
                                             DB::table('pdfConvert')->insert([
                                                 'fileName' => $pdfName,
-                                                'fileSize' => $fileSize,
+                                                'fileSize' => $newFileSize,
                                                 'container' => $convertType,
                                                 'imgExtract' => false,
                                                 'result' => false,
@@ -2091,13 +2090,13 @@ class convertController extends Controller
                                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
                                                     'errApiReason' => $e->getMessage(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                         }
                                     }
@@ -2116,7 +2115,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => true,
@@ -2137,10 +2136,10 @@ class convertController extends Controller
                                             "res"=>Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.pdf')
                                         ]);
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 } else {
@@ -2154,7 +2153,7 @@ class convertController extends Controller
                                         ]);
                                         DB::table('pdfConvert')->insert([
                                             'fileName' => $pdfName,
-                                            'fileSize' => $fileSize,
+                                            'fileSize' => $newFileSize,
                                             'container' => $convertType,
                                             'imgExtract' => false,
                                             'result' => false,
@@ -2170,13 +2169,13 @@ class convertController extends Controller
                                                 'errReason' => 'Failed to download converted file from iLovePDF API !',
                                                 'errApiReason' => null
                                         ]);
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Failed to download converted file from iLovePDF API !', 'null');
                                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                     } catch (QueryException $ex) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                        NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                     }
                                 }
@@ -2190,9 +2189,9 @@ class convertController extends Controller
                                         'errApiReason' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
-                                        'fileName' => $pdfName,
-                                        'fileSize' => $fileSize,
-                                        'container' => $convertType,
+                                        'fileName' => null,
+                                        'fileSize' => null,
+                                        'container' => null,
                                         'imgExtract' => false,
                                         'result' => false,
                                         'processId' => $uuid,
@@ -2207,13 +2206,13 @@ class convertController extends Controller
                                             'errReason' => 'PDF failed to upload !',
                                             'errApiReason' => null
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                                 }
                             }
@@ -2244,13 +2243,13 @@ class convertController extends Controller
                                         'errReason' => 'REQUEST_ERROR_OUT_OF_BOUND !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'REQUEST_ERROR_OUT_OF_BOUND !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'REQUEST_ERROR_OUT_OF_BOUND !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
                         }
@@ -2281,13 +2280,13 @@ class convertController extends Controller
                                     'errReason' => 'REQUEST_TYPE_NOT_FOUND !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'REQUEST_TYPE_NOT_FOUND !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'REQUEST_TYPE_NOT_FOUND !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
                     }
@@ -2304,13 +2303,13 @@ class convertController extends Controller
                             'err_api_reason' => null,
                             'procStartAt' => AppHelper::instance()->getCurrentTimeZone()
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', '000', 'null');
+                        NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', '000', 'null');
                         return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                     } catch (QueryException $ex) {
-                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                         return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                     } catch (\Exception $e) {
-                        NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                         return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                     }
 				}
@@ -2339,13 +2338,13 @@ class convertController extends Controller
                             'errReason' => '0x0',
                             'errApiReason' => $e->getMessage(),
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', '0x0', 'null');
+                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', '0x0', 'null');
                     return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                     return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                     return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                 }
 			}

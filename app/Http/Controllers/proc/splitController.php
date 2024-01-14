@@ -68,6 +68,7 @@ class splitController extends Controller
 						$pdfUpload_Location = env('PDF_UPLOAD');
                         $file = $request->file('file');
                         $fileSize = filesize($file);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $randomizePdfFileName = 'pdf_split_'.substr(md5(uniqid($str)), 0, 8);
                         $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
 						$pdfFileName = $file->getClientOriginalName();
@@ -91,7 +92,7 @@ class splitController extends Controller
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $randomizePdfFileName.'.pdf',
-                                    'fileSize' => $fileSize,
+                                    'fileSize' => $newFileSize,
                                     'fromPage' => null,
                                     'toPage' => null,
                                     'customPage' => null,
@@ -111,21 +112,21 @@ class splitController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors([
                                     'error'=>'PDF split failed!',
                                     'processId'=>$uuid,
                                     'titleMessage'=>'PDF page has failed to split !'
                                 ])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Database connection error !', 'null');
 								return redirect()->back()->withErrors([
 									'error'=>'Database connection error !',
 									'processId'=>'null',
 									'titleMessage'=>'PDF page has failed to split !',
 								])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
 								return redirect()->back()->withErrors([
 									'error'=>'Eloquent transaction error !',
 									'processId'=>'null',
@@ -1127,14 +1128,14 @@ class splitController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfSplit')->insert([
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'fromPage' => $fromPage,
-                                'toPage' => $toPage,
-                                'customPage' => $customPage,
-                                'fixedPage' => $fixedPage,
-                                'fixedPageRange' => $fixedPageRanges,
-                                'mergePDF' => $mergeDBpdf,
+                                'fileName' => null,
+                                'fileSize' => null,
+                                'fromPage' => null,
+                                'toPage' => null,
+                                'customPage' => null,
+                                'fixedPage' => null,
+                                'fixedPageRange' => null,
+                                'mergePDF' => null,
                                 'result' => false,
                                 'processId' => $uuid,
                                 'procStartAt' => $startProc,
@@ -1145,24 +1146,24 @@ class splitController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'processId' => $uuid,
-                                    'errReason' => 'PDF page has failed to split !',
+                                    'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF page has failed to split !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'PDF split failed!',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to split !'
                             ])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database transaction error !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'Database transaction error !',
                                 'processId'=>'null',
                                 'titleMessage'=>'PDF page has failed to split !',
                             ])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'Eloquent transaction error !',
                                 'processId'=>'null',
@@ -1879,9 +1880,9 @@ class splitController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfDelete')->insert([
-                                'fileName' => $pdfName,
-                                'fileSize' => $newFileSize,
-                                'deletePage' => $customPage,
+                                'fileName' => null,
+                                'fileSize' => null,
+                                'deletePage' => null,
                                 'result' => false,
                                 'processId' => $uuid,
                                 'procStartAt' => $startProc,
@@ -1892,24 +1893,24 @@ class splitController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'processId' => $uuid,
-                                    'errReason' => 'PDF page has failed to delete !',
+                                    'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'PDF page has failed to delete !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'PDF delete failed!',
                                 'processId'=>$uuid,
                                 'titleMessage'=>'PDF page has failed to delete !'
                             ])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database transaction error !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database transaction error !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'Database transaction error !',
                                 'processId'=>'null',
                                 'titleMessage'=>'PDF page has failed to delete !',
                             ])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', 'null');
                             return redirect()->back()->withErrors([
                                 'error'=>'Eloquent transaction error !',
                                 'processId'=>'null',

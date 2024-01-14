@@ -64,6 +64,7 @@ class watermarkController extends Controller
                         $randomizePdfFileName = 'pdf_watermark_'.substr(md5(uniqid($str)), 0, 8);
                         $randomizePdfPath = $pdfUpload_Location.'/'.$randomizePdfFileName.'.pdf';
                         $fileSize = filesize($file);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
 						$pdfFileName = $file->getClientOriginalName();
                         $file->storeAs('public/upload-pdf', $randomizePdfFileName.'.pdf');
 						if (Storage::disk('local')->exists('public/'.$randomizePdfPath)) {
@@ -83,7 +84,7 @@ class watermarkController extends Controller
                                 ]);
                                 DB::table('pdfWatermark')->insert([
                                     'fileName' => $randomizePdfFileName.'.pdf',
-                                    'fileSize' => $fileSize,
+                                    'fileSize' => $newFileSize,
                                     'watermarkFontFamily' => null,
                                     'watermarkFontStyle' => null,
                                     'watermarkFontSize' => null,
@@ -108,13 +109,13 @@ class watermarkController extends Controller
                                         'errReason' => 'PDF file not found on the server !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'PDF file not found on the server !', 'null');
                                 return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                                 return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                             }
 						}
@@ -128,8 +129,8 @@ class watermarkController extends Controller
                                 'errApiReason' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
-                                'fileName' => $randomizePdfFileName.'.pdf',
-                                'fileSize' => $fileSize,
+                                'fileName' => null,
+                                'fileSize' => null,
                                 'watermarkFontFamily' => null,
                                 'watermarkFontStyle' => null,
                                 'watermarkFontSize' => null,
@@ -154,13 +155,13 @@ class watermarkController extends Controller
                                     'errReason' => 'PDF failed to upload !',
                                     'errApiReason' => null
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'PDF failed to upload !', 'null');
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'PDF failed to upload !', 'null');
                             return redirect()->back()->withErrors(['error'=>'PDF Watermark failed !', 'processId'=>$uuid])->withInput();
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify('', '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
                             return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
                         }
 					}
