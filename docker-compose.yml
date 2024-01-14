@@ -1,7 +1,7 @@
 version: '3.8'
 services:
     hana-container-app-pdf:
-        image: nicklas373/hana-container-app-pdf-sit:1.0
+        image: nicklas373/hana-container-app-pdf-sit:1.1
         container_name: app-pdf-container
         cpus: 1.0
         mem_limit: 256m
