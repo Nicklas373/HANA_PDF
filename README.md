@@ -13,7 +13,7 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 - [Docker](https://www.docker.com/)
     * On Windows use Docker Desktop
     * On Linux use docker-compose and docker.io
-- [Node JS 18.18](https://nodejs.org/en)
+- [Node JS 20.11](https://nodejs.org/en)
 - [Flowbite](https://flowbite.com/)
 - [PHP 8.2.12](https://www.php.net/downloads.php)
 - [PostgreSQL 16.2](https://www.postgresql.org/)
@@ -112,4 +112,4 @@ The HANA-CI PDF is a open source Laravel Project that has licensed under the [MI
 
 ---
 
-## HANA-CI Build Project 2016 - 2023
+## HANA-CI Build Project 2016 - 2024
