@@ -53,6 +53,20 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
         - sudo docker-compose exec hana-container-instance php artisan migrate
         - sudo docker stats
         ```
+4. Configure REST API and Telegram Notification
+    - Windows based [Using docker desktop]
+        ```bash
+        - docker compose exec hana-container-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
+        - docker compose exec hana-container-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
+        - docker compose exec hana-container-app-pdf echo "TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN" >> .env
+        ```
+    
+    - Linux based [Using docker.io & docker-compose]
+        ```bash
+        - sudo docker-compose exec hana-container-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
+        - sudo docker-compose exec hana-container-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
+        - sudo docker-compose exec hana-container-app-pdf echo "TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN" >> .env
+        ```
 ---
 
 ### Deployment On Native OS Host
@@ -61,19 +75,22 @@ HANA PDF is a __Laravel__ based project powered by front-end framework like __Vi
 2. Copy __.env.example__ file to __.env__ and modify database credentials
 3. Add additional environment into __.env__ with this string (Add yourself value :p)
 ````bash
-- ASPOSE_CLOUD_CLIENT_ID="Aspose cloud AppId, get it in [https://dashboard.aspose.cloud/]"
-- ASPOSE_CLOUD_TOKEN="Aspose Cloud storage token, get it in [https://dashboard.aspose.cloud/]"
-- ADOBE_CLIENT_ID="Adobe API key for PDF embed API, get it in [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]"
-- FTP_USERNAME="Used for 3rd party cloud storage for Aspose Cloud"
-- FTP_USERPASS="Used for 3rd party cloud storage for Aspose Cloud"
-- FTP_SERVER="Used for 3rd party cloud storage for Aspose Cloud"
-- ILOVEPDF_ENC_KEY="Generate your hash key (Max. 25 digits)"
-- ILOVEPDF_PUBLIC_KEY="iLovePDF public key, get it in [https://developer.ilovepdf.com/]"
-- ILOVEPDF_SECRET_KEY="iLovePDF secret key, get it in _[https://developer.ilovepdf.com/]"
+- ASPOSE_CLOUD_CLIENT_ID="ASPOSE_CLOUD_CLIENT_ID" [https://dashboard.aspose.cloud/]
+- ASPOSE_CLOUD_TOKEN="ASPOSE_CLOUD_TOKEN" [https://dashboard.aspose.cloud/]
+- ADOBE_CLIENT_ID="ADOBE_CLIENT_ID" [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]
+- FTP_USERNAME="FTP_USERNAME" [https://dashboard.aspose.cloud/]
+- FTP_USERPASS="FTP_USERPASS" [https://dashboard.aspose.cloud/]
+- FTP_SERVER="FTP_SERVER" [https://dashboard.aspose.cloud/]
+- ILOVEPDF_ENC_KEY="ILOVEPDF_ENC_KEY" [Generate your hash key (Max. 25 digits)]
+- ILOVEPDF_PUBLIC_KEY="ILOVEPDF_PUBLIC_KEY" [https://developer.ilovepdf.com/]
+- ILOVEPDF_SECRET_KEY="ILOVEPDF_SECRET_KEY" [https://developer.ilovepdf.com/]
 - ILOVEPDF_EXT_IMG_DIR="temp-image"
 - PDF_MERGE_TEMP="temp-merge"
 - PDF_UPLOAD="upload-pdf"
 - PDF_DOWNLOAD="temp"
+- TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+- TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID [https://telegram-bot-sdk.com/docs/getting-started/installation]
+- TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN
 ````
 4. Run the following command [Make sure to configure database connectivity before use migrate function]
 ```bash

@@ -1,18 +1,19 @@
 version: '3.8'
 services:
     hana-container-app-pdf:
-        image: nicklas373/hana-container-app-pdf-sit:1.1
+        image: nicklas373/hana-container-app-pdf-sit:1.2
         container_name: app-pdf-container
         cpus: 1.0
         mem_limit: 256m
         mem_reservation: 128M
         restart: unless-stopped
+        working_dir: /var/www/html/hanaci-pdf
         environment:
             - APP_NAME=pdf.hana-ci.com
         volumes:
-            - hanaci-app-pdf:/var/www/html/hanaci-pdf
+            - hana-container-app-pdf:/var/www/html/hanaci-pdf
         networks:
-            - hanaci-network
+            - hana-container-network
         depends_on:
             - hana-container-instance
     hana-container-postgres:
@@ -25,7 +26,7 @@ services:
         ports:
             - '5432:5432'
         env_file:
-            - module/.env-db
+            - module/.env
         environment:
             PGPASSWORD: '${DB_PASSWORD}'
             POSTGRES_DB: '${DB_DATABASE}'
@@ -34,9 +35,9 @@ services:
             PGDATA: /var/lib/postgresql/data/pgdata
             POSTGRES_HOST_AUTH_METHOD: trust
         volumes:
-            - 'hanaci-db:/var/lib/postgresql/data'
+            - 'hana-container-postgres:/var/lib/postgresql/data'
         networks:
-            - hanaci-network
+            - hana-container-network
         depends_on:
             - hana-container-instance
     hana-container-instance:
@@ -55,7 +56,7 @@ services:
             - ./module/php/php.ini:/etc/php/8.2/fpm/conf.d/99-hana.ini:ro
             - hana-container-app-pdf:/var/www/html/hanaci-pdf
         networks:
-            - hanaci-network
+            - hana-container-network
 networks:
     hana-container-network:
         driver: bridge
