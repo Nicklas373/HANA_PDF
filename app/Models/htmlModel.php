@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class compression_pdf extends Model
+class htmlModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'pdfHtml';
+
     protected $fillable = [
-        'fileName',
-        'fileSize',
-        'compFileSize',
-        'compMethod',
+        'urlName',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

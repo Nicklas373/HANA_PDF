@@ -5,17 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class pdf_cnv extends Model
+class compressModel extends Model
 {
     use HasFactory;
+
+    protected $table = 'pdfCompress';
 
     protected $fillable = [
         'fileName',
         'fileSize',
-        'container',
-        'img_extract',
+        'compFileSize',
+        'compMethod',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

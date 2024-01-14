@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class datalog extends Model
+class jobLogsModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'jobLogs';
+
     protected $fillable = [
-        'id',
-        'jobsId',
         'jobsName',
         'jobsEnv',
         'jobsRuntime',
         'jobsResult',
-        'jobsErrMessage',
-        'jobsStart',
-        'jobsEnd'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

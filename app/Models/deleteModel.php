@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class delete_pdf extends Model
+class deleteModel extends Model
 {
     use HasFactory;
+
+    protected $table = 'pdfDelete';
 
     protected $fillable = [
         'fileName',
@@ -15,7 +17,8 @@ class delete_pdf extends Model
         'deletePage',
         'mergePDF',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

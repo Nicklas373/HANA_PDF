@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class merge_pdf extends Model
+class appLogsModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'appLogs';
+
     protected $fillable = [
-        'fileName',
-        'fileSize',
-        'result',
-        'err_reason',
-        'err_api_reason'
+        'processId',
+        'errReason',
+        'errApiReason'
     ];
 }

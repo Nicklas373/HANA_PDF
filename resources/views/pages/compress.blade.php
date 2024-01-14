@@ -8,7 +8,7 @@
                 <p class="mb-4 text-base font-poppins font-thin text-gray-500 lg:text-2xl">Reduce PDF file size while try to keep optimize for maximal PDF quality</p>
             </div>
         </section>
-        <form action="/compress/pdf" id="splitForm" method="POST" enctype="multipart/form-data">
+        <form action="/api/v1/proc/compress" id="splitForm" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="grid grid-columns-3 gap-4 p-4 mx-auto mb-8" id="grid-layout">
                 <div class="grid md:grid-cols-2 gap-4 md:gap-20">

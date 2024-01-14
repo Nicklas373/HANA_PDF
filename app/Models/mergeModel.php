@@ -5,21 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class split_pdf extends Model
+class mergeModel extends Model
 {
     use HasFactory;
+
+    protected $table = 'pdfMerge';
 
     protected $fillable = [
         'fileName',
         'fileSize',
-        'fromPage',
-        'toPage',
-        'customPage',
-        'fixedPage',
-        'fixedPageRange',
-        'mergePDF',
         'result',
-        'err_reason',
-        'err_api_reason'
+        'procStartAt',
+        'procEndAt',
+        'procDuration'
     ];
 }

@@ -3,7 +3,7 @@ FROM php:8.2-fpm
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.1"
+LABEL version="1.2"
 LABEL description="Docker application image for HANA-CI SIT"
 
 # Configure ARG
@@ -41,6 +41,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     git
+
+# Configure PostgresSQL PHP Driver
+RUN apt-get update && apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo_pgsql
 
 # Clone App Services
 RUN git clone -b dev/master-live https://github.com/Nicklas373/Hana-PDF hanaci-pdf

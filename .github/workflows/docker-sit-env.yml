@@ -30,11 +30,11 @@ jobs:
             --build-arg FTP_ROOT=/ \
             --build-arg ILOVEPDF_PUBLIC_KEY=${{ secrets.ILOVEPDF_PUBLIC_KEY }} \
             --build-arg ILOVEPDF_SECRET_KEY=${{ secrets.ILOVEPDF_SECRET_KEY }} \
-            -t nicklas373/hana-container-app-pdf-sit:1.1 \
+            -t nicklas373/hana-container-app-pdf-sit:1.2 \
             -f Dockerfile/Dockerfile.hana-app-pdf.sit \
             .
           mkdir -p pdf_image
-          docker save -o pdf_image/pdf_image.tar nicklas373/hana-container-app-pdf-sit:1.1
+          docker save -o pdf_image/pdf_image.tar nicklas373/hana-container-app-pdf-sit:1.2
 
       - name: Upload PDF Docker Image as Artifact
         uses: actions/upload-artifact@v4
@@ -147,7 +147,7 @@ jobs:
       - name: Deploy Docker Image to Docker Hub
         env:
           IMAGE_NAMES: |
-            nicklas373/hana-container-app-pdf-sit:1.1
+            nicklas373/hana-container-app-pdf-sit:1.2
             nicklas373/hana-container-instance-sit:1.0
         run: |
           for image_name in $IMAGE_NAMES; do
@@ -157,4 +157,4 @@ jobs:
       - name: Docker Deploy Notifications
         run: |
             chmod +x ./module/bash/docker-build-info.sh
-            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deplot_to_sit Deployed
+            bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/Hana-PDF/actions/workflows/docker-sit-env.yml deploy_to_sit Deployed
