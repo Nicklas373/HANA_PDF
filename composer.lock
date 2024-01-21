@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "805920bf4adecc8848ae65de9408dc6c",
+    "content-hash": "8e36164c70ab313d93fcbf476603d682",
     "packages": [
         {
             "name": "aspose-cloud/aspose-words-cloud",
-            "version": "23.12.0",
+            "version": "24.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aspose-words-cloud/aspose-words-cloud-php.git",
-                "reference": "0b75a7bd11d0a68d4f24caa81102e1286ddc134f"
+                "reference": "021a3242b5b4276dfc7d703d83ae2bd1ee07c776"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aspose-words-cloud/aspose-words-cloud-php/zipball/0b75a7bd11d0a68d4f24caa81102e1286ddc134f",
-                "reference": "0b75a7bd11d0a68d4f24caa81102e1286ddc134f",
+                "url": "https://api.github.com/repos/aspose-words-cloud/aspose-words-cloud-php/zipball/021a3242b5b4276dfc7d703d83ae2bd1ee07c776",
+                "reference": "021a3242b5b4276dfc7d703d83ae2bd1ee07c776",
                 "shasum": ""
             },
             "require": {
@@ -94,9 +94,9 @@
             ],
             "support": {
                 "issues": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/issues",
-                "source": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/tree/23.12.0"
+                "source": "https://github.com/aspose-words-cloud/aspose-words-cloud-php/tree/24.1.0"
             },
-            "time": "2023-12-08T12:24:07+00:00"
+            "time": "2024-01-12T07:02:06+00:00"
         },
         {
             "name": "brick/math",
