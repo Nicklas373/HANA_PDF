@@ -64,7 +64,8 @@ class Kernel extends ConsoleKernel
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'procEndAt' => $end
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
 					]);
                 } else {
                     DB::table('jobLogs')
@@ -114,7 +115,8 @@ class Kernel extends ConsoleKernel
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'procEndAt' => $end
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
 					]);
                 } else {
                     DB::table('jobLogs')
@@ -164,7 +166,8 @@ class Kernel extends ConsoleKernel
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'procEndAt' => $end
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
 					]);
                 } else {
                     DB::table('jobLogs')
@@ -214,7 +217,8 @@ class Kernel extends ConsoleKernel
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'procEndAt' => $end
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
 					]);
                 } else {
                     DB::table('jobLogs')
@@ -264,7 +268,8 @@ class Kernel extends ConsoleKernel
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
                         'jobsResult' => true,
-                        'procEndAt' => $end
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
 					]);
                 } else {
                     DB::table('jobLogs')
