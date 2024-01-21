@@ -2,13 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use App\Http\Controller\data\dataLogController;
-use App\Http\Controller\proc\convertController;
-use App\Http\Controller\proc\compressController;
-use App\Http\Controller\proc\htmltopdfController;
-use App\Http\Controller\proc\mergeController;
-use App\Http\Controller\proc\splitController;
-use App\Http\Controller\proc\watermarkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,37 +79,6 @@ Route::get('/api/v1/token', function (Request $request) {
     }
 });
 
-// A[I Redirect Route
-Route::get('/api/v1/proc/compress', function()
-{
-    return redirect()->back();
-});
-
-Route::get('/api/v1/proc/convert', function()
-{
-    return redirect()->back();
-});
-
-Route::get('/api/v1/proc/html', function()
-{
-    return redirect()->back();
-});
-
-Route::get('/api/v1/proc/merge', function()
-{
-    return redirect()->back();
-});
-
-Route::get('/api/v1/proc/split', function()
-{
-    return redirect()->back();
-});
-
-Route::get('/api/v1/proc/watermark', function()
-{
-    return redirect()->back();
-});
-
 // API Processing Route
 Route::post('/api/v1/proc/compress', 'App\Http\Controllers\proc\compressController@compress');
 Route::post('/api/v1/proc/convert', 'App\Http\Controllers\proc\convertController@convert');
@@ -125,6 +87,9 @@ Route::post('/api/v1/proc/merge', 'App\Http\Controllers\proc\mergeController@mer
 Route::post('/api/v1/proc/split', 'App\Http\Controllers\proc\splitController@split');
 Route::post('/api/v1/proc/watermark', 'App\Http\Controllers\proc\watermarkController@watermark');
 
-// API Backend Data Route
-Route::post('/api/v1/logs/single', 'App\Http\Controllers\data\dataLogController@getSingleLogs');
-Route::post('/api/v1/logs/all', 'App\Http\Controllers\data\dataLogController@getAllLogs');
+// API Backend Logging Route
+Route::post('/api/v1/logs/limit', 'App\Http\Controllers\data\limitLogController@getLimit');
+Route::post('/api/v1/logs/proc/single', 'App\Http\Controllers\data\processLogController@getLogs');
+Route::post('/api/v1/logs/proc/all', 'App\Http\Controllers\data\processLogController@getAllLogs');
+Route::post('/api/v1/logs/notify/single', 'App\Http\Controllers\data\notifyLogController@getLogs');
+Route::post('/api/v1/logs/notify/all', 'App\Http\Controllers\data\notifyLogController@getAllLogs');

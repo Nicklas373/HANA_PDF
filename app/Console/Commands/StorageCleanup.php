@@ -29,14 +29,14 @@ class StorageCleanup extends Command
         $pdfUpload_Location = env('PDF_UPLOAD');
         $pdfProcessed_Location = env('PDF_DOWNLOAD');
         $pdfMerge_Location = env('PDF_MERGE_TEMP');
-	    $pdfImage_Location = env('ILOVEPDF_EXT_IMG_DIR');
+        $pdfImage_Location = env('ILOVEPDF_EXT_IMG_DIR');
         $publicUploadTemp = Storage::allFiles('public/'.$pdfUpload_Location);
         $publicDownloadTemp = Storage::allFiles('public/'.$pdfProcessed_Location);
         $publicMergeTemp = Storage::allFiles('public/'.$pdfMerge_Location);
-	    $publicImageTemp = Storage::allFiles('public/'.$pdfImage_Location);
+        $publicImageTemp = Storage::allFiles('public/'.$pdfImage_Location);
         Storage::delete($publicUploadTemp);
         Storage::delete($publicDownloadTemp);
         Storage::delete($publicMergeTemp);
-	    Storage::delete($publicImageTemp);
+        Storage::delete($publicImageTemp);
     }
 }
