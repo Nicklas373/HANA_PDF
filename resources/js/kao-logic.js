@@ -354,22 +354,31 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none";
                     newModal.show();
             } else if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
-                if (xhrBalance) {
+                if (document.getElementById("firstRadio").checked == true) {
+                    if (xhrBalance) {
+                        procTitleMessageModal.innerText = "Processing Document..."
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        errAltSubMessageModal.style.display = "none";
+                        newModal.hide();
+                        modal.show();
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerText  = "PDF file can not be processed !";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Error message"
+                        resetErrListMessage();
+                        generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)");
+                        errAltSubMessageModal.style = null;
+                        newModal.show();
+                    }
+                } else {
                     procTitleMessageModal.innerText = "Processing Document..."
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     newModal.hide();
                     modal.show();
-                } else {
-                    event.preventDefault();
-                    errMessage.innerText  = "PDF file can not be processed !";
-                    errSubMessage.innerText = "";
-                    errListTitleMessage.innerText = "Error message"
-                    resetErrListMessage();
-                    generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)");
-                    errAltSubMessageModal.style = null;
-                    newModal.show();
                 }
             } else {
                 var file = document.getElementById("file_input");
