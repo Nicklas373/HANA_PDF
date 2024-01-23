@@ -21,6 +21,8 @@ class NotificationHelper
 
         if ($fileSize == null || $fileSize == "") {
             $newFileSize = '0.0 MB';
+        } else if (strstr($fileSize, "MB")) {
+            $newFileSize = $fileSize;
         } else {
             $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
         }

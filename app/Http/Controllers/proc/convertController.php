@@ -335,7 +335,7 @@ class convertController extends Controller
                                     }
                                 } else {
                                     if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx'), $pdfNameWithoutExtension.".xlsx") == true) {
-                                        $download_excel = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx');
+                                        $download_xlsx = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfNameWithoutExtension.'.xlsx');
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         try {
@@ -609,7 +609,7 @@ class convertController extends Controller
                                                     'errReason' => 'Converted file not found on the server !',
                                                     'errApiReason' => $asposeAPI->getOutput(),
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                             return redirect()->back()->withErrors(['error'=>'PDF Conversion failed !', 'processId'=>$uuid])->withInput();
                                         } catch (QueryException $ex) {
                                             NotificationHelper::Instance()->sendErrNotify($pdfName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
