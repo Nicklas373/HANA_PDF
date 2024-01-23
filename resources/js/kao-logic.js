@@ -32,9 +32,27 @@ var procBtn2_submit = document.getElementById('submitBtn_2');
 var procBtn3_submit = document.getElementById('submitBtn_3');
 
 if (uploadBtn_submit) {
-    uploadBtn_submit.onclick = function(event) {
-        uploadBtn = true;
-        submit(event)
+    if (document.getElementById('urlToPDF') !== null) {
+        remainingBalance().then(function () {
+            uploadBtn_submit.onclick = function(event) {
+                uploadBtn = true;
+                submit(event)
+            }
+        }).catch(function (error) {
+            console.error(error);
+            errMessage.innerText  = "There was unexpected error !";
+            errSubMessage.innerText = "";
+            errListTitleMessage.innerText = "Error message"
+            resetErrListMessage();
+            generateMesssage("Failed to fetch monthly limit");
+            errAltSubMessageModal.style = null;
+            newModal.show();
+        });
+    } else {
+        uploadBtn_submit.onclick = function(event) {
+            uploadBtn = true;
+            submit(event)
+        }
     }
 }
 
@@ -249,12 +267,32 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none";
                     newModal.show();
             } else if (!document.getElementById("file_input").value && document.getElementById("fileAlt") != null && uploadBtn == false) {
-                procTitleMessageModal.innerText = "Processing Document..."
-                errMessage.style.visibility = null;
-                errSubMessage.style.visibility = null;
-                errAltSubMessageModal.style.display = "none";
-                newModal.hide();
-                modal.show();
+                if (document.getElementById("firstRadio").checked == true) {
+                    if (xhrBalance) {
+                        procTitleMessageModal.innerText = "Processing Document..."
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        errAltSubMessageModal.style.display = "none";
+                        newModal.hide();
+                        modal.show();
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerText  = "PDF file can not be processed !";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Error message"
+                        resetErrListMessage();
+                        generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)");
+                        errAltSubMessageModal.style = null;
+                        newModal.show();
+                    }
+                } else {
+                    procTitleMessageModal.innerText = "Processing Document..."
+                    errMessage.style.visibility = null;
+                    errSubMessage.style.visibility = null;
+                    errAltSubMessageModal.style.display = "none";
+                    newModal.hide();
+                    modal.show();
+                }
             } else {
                 var file = document.getElementById("file_input");
                 let fileSize = file.files[0].size;
