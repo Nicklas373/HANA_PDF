@@ -24,10 +24,11 @@ class notifyLogController extends Controller
             return response()->json([
                 'status' => 401,
                 'message' => 'Validation failed',
-                'process'=> null,
-                'errors' => $errors,
-                'telegram' => null
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors' => $errors
+            ], 401);
         }
         $logModel = $request->input('logType');
         $processId = $request->input('processId');
@@ -62,36 +63,40 @@ class notifyLogController extends Controller
                 return response()->json([
                     'status' => 200,
                     'message'=> 'Request generated',
-                    'process'=> $datalog,
-                    'error' => $applog,
-                    'telegram' => $telegramlog
-                ]);
+                    'data_1' => $datalog,
+                    'data_2' => $applog,
+                    'notification' => $telegramlog,
+                    'errors' => null
+                ], 200);
             } else {
                 return response()->json([
                     'status' => 200,
                     'message'=> 'Request generated',
-                    'process'=> $datalog,
-                    'error' => $applog,
-                    'telegram' => null
-                ]);
+                    'data_1' => $datalog,
+                    'data_2' => $applog,
+                    'notification' => null,
+                    'errors' => null
+                ], 200);
             }
 
         } catch (QueryException $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Eloquent QueryException',
-                'process'=> null,
-                'error' => $e->getMessage(),
-                'telegram' => null
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors' => $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Unknown Exception',
-                'process'=> null,
-                'error' => $e->getMessage(),
-                'telegram' => null
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -106,10 +111,11 @@ class notifyLogController extends Controller
             return response()->json([
                 'status' => 401,
                 'message' => 'Validation failed',
-                'process'=> null,
-                'errors' => $errors,
-                'telegram' => null
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors'=> $errors
+            ], 401);
         }
         $logCount = $request->input('logCount');
         $logModel = $request->input('logType');
@@ -125,25 +131,28 @@ class notifyLogController extends Controller
             return response()->json([
                 'status' => 200,
                 'message'=> 'Request generated',
-                'process'=> $dataArrayLog,
-                'error' => null,
-                'telegram' => null
-            ]);
+                'data_1' => $dataArrayLog,
+                'data_2' => null,
+                'notification' => null,
+                'errors' => null
+            ], 200);
         } catch (QueryException $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Eloquent QueryException',
-                'process'=> null,
-                'error' => $e->getMessage(),
-                'telegram' => null
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors'=> $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Unknown Exception',
-                'process'=> null,
-                'error' => $e->getMessage(),
-                'telegram' => null
+                'data_1' => null,
+                'data_2' => null,
+                'notification' => null,
+                'errors'=> $e->getMessage()
             ]);
         }
     }
