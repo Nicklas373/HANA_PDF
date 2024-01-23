@@ -26,7 +26,12 @@ class dataLogController extends Controller
 
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
-            return response()->json(['status' => '402', 'message' => 'Validation failed', 'errors' => $errors], 422);
+            return response()->json([
+                'status' => 402,
+                'message' => 'Validation failed',
+                'data' => null,
+                'errors' => $errors
+            ], 422);
         }
 
         $logModel = $request->input('logType');
@@ -52,10 +57,20 @@ class dataLogController extends Controller
 
         if ($datalog->isEmpty() || !$datalog) {
             if ($errorlog->isEmpty() || !$errorlog) {
-                return response()->json(['status' => '404', 'message' => 'data and error model was not found or invalid'], 404);
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Request generated',
+                    'data' => null,
+                    'error' => 'Data response empty or not found'
+                ], 200);
             } else {
                 $errorArrayLog = $errorlog->toArray();
-                return response()->json(['data'=>'data model was not found or invalid','error'=>$errorArrayLog]);
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Request generated',
+                    'data'=> $errorArrayLog,
+                    'error' => null
+                ], 200);
             }
         } else {
             $dataArrayLog = $datalog->toArray();
@@ -74,7 +89,12 @@ class dataLogController extends Controller
 
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
-            return response()->json(['status' => '404', 'message' => 'Validation failed', 'errors' => $errors], 404);
+            return response()->json([
+                'status' => 404,
+                'message' => 'Validation failed',
+                'data' => null,
+                'errors' => $errors
+            ], 404);
         }
 
         $logCount = $request->input('logCount');
@@ -101,6 +121,11 @@ class dataLogController extends Controller
 
         $dataArrayLog = $datalog->toArray();
 
-        return response()->json(['data'=>$dataArrayLog]);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Request generated',
+            'data' => $dataArrayLog,
+            'error' => null
+        ], 200);
     }
 }
