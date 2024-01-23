@@ -27,9 +27,10 @@ class processLogController extends Controller
             return response()->json([
                 'status' => 401,
                 'message' => 'Validation failed',
-                'process'=> null,
+                'data_1' => null,
+                'data_2' => null,
                 'errors' => $errors
-            ]);
+            ], 401);
         }
         $logModel = $request->input('logType');
         $processId = $request->input('processId');
@@ -55,23 +56,26 @@ class processLogController extends Controller
             return response()->json([
                 'status' => 200,
                 'message'=> 'Request generated',
-                'process'=> $dataArrayLog,
-                'error' => $errorArrayLog
-            ]);
+                'data_1' => $dataArrayLog,
+                'data_2' => $errorArrayLog,
+                'errors' => null
+            ], 200);
         } catch (QueryException $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Eloquent QueryException',
-                'process'=> null,
-                'error' => $e->getMessage()
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'errors' => $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Unknown Exception',
-                'process'=> null,
-                'error' => $e->getMessage()
-            ]);
+                'data_1' => null,
+                'data_2' => null,
+                'errors' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -87,9 +91,10 @@ class processLogController extends Controller
             return response()->json([
                 'status' => 401,
                 'message' => 'Validation failed',
-                'process'=> null,
+                'data_1' => null,
+                'data_2' => null,
                 'errors' => $errors
-            ]);
+            ], 401);
         }
         $logCount = $request->input('logCount');
         $logModel = $request->input('logType');
@@ -114,22 +119,25 @@ class processLogController extends Controller
             return response()->json([
                 'status' => 200,
                 'message'=> 'Request generated',
-                'process'=> $dataArrayLog,
-                'error' => null
+                'data_1' => $dataArrayLog,
+                'data_2' => null,
+                'errors' => null
             ]);
         } catch (QueryException $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Eloquent QueryException',
-                'process'=> null,
-                'error' => $e->getMessage()
+                'data_1' => null,
+                'data_2' => null,
+                'errors' => $e->getMessage()
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
                 'message'=> 'Unknown Exception',
-                'process'=> null,
-                'error' => $e->getMessage()
+                'data_1' => null,
+                'data_2' => null,
+                'errors' => $e->getMessage()
             ]);
         }
     }

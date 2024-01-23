@@ -26,7 +26,7 @@ class mergeController extends Controller
 {
     public function merge(Request $request): RedirectResponse{
         $validator = Validator::make($request->all(),[
-            'file' => 'mimes:pdf|max:25600',
+            'file' => 'max:25600',
 			'fileAlt' => '',
             'dropFile' => ''
         ]);

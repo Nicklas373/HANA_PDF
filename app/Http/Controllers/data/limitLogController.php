@@ -16,11 +16,11 @@ class limitLogController extends Controller
             $totalUsage = 250 - $remainingFiles;
             return response()->json([
                 'status' => 200,
-                'message' => 'iLovePDF limit generated',
+                'message' => 'Request generated',
                 'remaining' => $remainingFiles,
                 'total' => 0,
                 'error' => ''
-            ],200);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
@@ -28,7 +28,7 @@ class limitLogController extends Controller
                 'remaining' => 0,
                 'total' => 0,
                 'error' => $e->getMessage()
-            ],500);
+            ], 500);
         }
     }
 }
