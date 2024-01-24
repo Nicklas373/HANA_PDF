@@ -50,7 +50,8 @@ class NotificationHelper
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => true,
-                    'notifyMessage' => $response->getMessage(),
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => null
                 ]);
@@ -69,6 +70,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => $e->getMessage(),
+                    'notifyResponse' => null,
                     'notifyErrStatus' => $httpStatus,
                     'notifyErrMessage' => $e->getErrorType()
                 ]);
@@ -82,6 +84,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => null,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => $e->getMessage()
                 ]);
@@ -115,7 +118,8 @@ class NotificationHelper
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => true,
-                    'notifyMessage' => $response->getMessage(),
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => null
                 ]);
@@ -134,8 +138,9 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => $e->getMessage(),
+                    'notifyResponse' => null,
                     'notifyErrStatus' => $httpStatus,
-                    'notifyErrMessage' => $e->getRawResponse()
+                    'notifyErrMessage' => $e->getErrorType()
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -147,6 +152,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => null,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => $e->getMessage()
                 ]);
@@ -181,7 +187,8 @@ class NotificationHelper
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => true,
-                    'notifyMessage' => $response->getMessage(),
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => null
                 ]);
@@ -200,6 +207,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => $e->getMessage(),
+                    'notifyResponse' => null,
                     'notifyErrStatus' => $httpStatus,
                     'notifyErrMessage' => $e->getErrorType()
                 ]);
@@ -213,6 +221,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => null,
                     'notifyErrStatus' => null,
                     'notifyErrMessage' => $e->getMessage()
                 ]);
