@@ -16,6 +16,7 @@ class notifyLogsModel extends Model
         'notifyName',
         'notifyResult',
         'notifyMessage',
+        'notifyResponse',
         'notifyErrStatus',
         'notifiyErrMessage'
     ];

@@ -18,7 +18,7 @@ class limitLogController extends Controller
                 'status' => 200,
                 'message' => 'Request generated',
                 'remaining' => $remainingFiles,
-                'total' => 0,
+                'total' => $totalUsage,
                 'error' => ''
             ], 200);
         } catch (\Exception $e) {

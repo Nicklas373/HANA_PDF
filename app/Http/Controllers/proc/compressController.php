@@ -47,7 +47,7 @@ class compressController extends Controller
                 NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','PDF Compression failed !',$validator->messages());
                 return redirect()->back()->withErrors(['error'=>'PDF Compression failed !', 'processId'=>$uuid])->withInput();
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->messages());
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->getMessage());
                 return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
             }
 		} else {

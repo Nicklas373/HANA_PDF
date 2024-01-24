@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('notifyName', 25);
             $table->boolean('notifyResult');
             $table->text('notifyMessage')->nullable();
+            $table->json('notifyResponse')->nullable();
             $table->text('notifyErrStatus')->nullable();
             $table->text('notifyErrMessage')->nullable();
         });

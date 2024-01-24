@@ -27,11 +27,11 @@ class dataLogController extends Controller
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
             return response()->json([
-                'status' => 402,
+                'status' => 401,
                 'message' => 'Validation failed',
                 'data' => null,
                 'errors' => $errors
-            ], 422);
+            ], 401);
         }
 
         $logModel = $request->input('logType');
