@@ -122,7 +122,7 @@ class processLogController extends Controller
                 'data_1' => $dataArrayLog,
                 'data_2' => null,
                 'errors' => null
-            ]);
+            ], 200);
         } catch (QueryException $e) {
             return response()->json([
                 'status' => 500,
@@ -138,7 +138,7 @@ class processLogController extends Controller
                 'data_1' => null,
                 'data_2' => null,
                 'errors' => $e->getMessage()
-            ]);
+            ], 500);
         }
     }
 }

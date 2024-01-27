@@ -60,24 +60,8 @@ Route::get('/watermark', function()
    return View::make('pages.watermark');
 });
 
-// API Generate CRSF Token
-Route::get('/api/v1/token', function (Request $request) {
-    if (!$request->has('token')) {
-        return response()->json(['status'=>'400','message' => 'Missing required token'], 400);
-    }
-
-    $origToken = env('TOKEN_GENERATE');
-    $inputToken = $request->input('token');
-    $hashedInputToken = hash('sha512', $inputToken);
-
-    if ($hashedInputToken !== $origToken) {
-        return response()->json(['status'=>'401','message' => 'Token verification failed'], 401);
-    } else {
-        $token = $request->session()->token();
-        $token = csrf_token();
-        return response()->json(['status'=>'200','token' => $token]);
-    }
-});
+// API CSRF Token
+Route::get('/api/v1/token', 'App\Http\Controllers\tokenController@getToken');
 
 // API Processing Route
 Route::post('/api/v1/proc/compress', 'App\Http\Controllers\proc\compressController@compress');

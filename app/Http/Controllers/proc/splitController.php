@@ -51,7 +51,7 @@ class splitController extends Controller
                     'titleMessage'=>'PDF page has failed to split !',
                 ])->withInput();
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->messages());
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->getMessage());
                 return redirect()->back()->withErrors([
                     'error'=>'Database connection error !',
                     'processId'=>'null',

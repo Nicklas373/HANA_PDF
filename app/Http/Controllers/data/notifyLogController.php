@@ -153,7 +153,7 @@ class notifyLogController extends Controller
                 'data_2' => null,
                 'notification' => null,
                 'errors'=> $e->getMessage()
-            ]);
+            ], 500);
         }
     }
 }
