@@ -15,6 +15,6 @@
         "vite-plugin-mkcert": "^1.17.1"
     },
     "dependencies": {
-        "flowbite": "^2.2.1"
+        "flowbite": "^2.3.0"
     }
 }
