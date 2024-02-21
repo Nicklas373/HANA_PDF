@@ -12,7 +12,7 @@ asposeClientSecret=str(sys.argv[2])
 asposeContainer=str(sys.argv[3])
 asposeFile=str(sys.argv[4])
 asposeOut=str(sys.argv[5])
-asposeFileDirFix = asposeFile.replace("/upload-pdf/","/app/public/upload-pdf/")
+asposeFileDirFix = asposeFile.replace("/upload/","/app/public/upload/")
 linuxSemanticDir = r"/var/www/html/hanaci-pdf"+asposeFileDirFix
 
 def getAsposeToken():
