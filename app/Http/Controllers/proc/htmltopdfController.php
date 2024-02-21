@@ -8,9 +8,7 @@ use App\Http\Controllers\Controller;;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
@@ -25,7 +23,7 @@ use Ilovepdf\Exceptions\PathException;
 
 class htmltopdfController extends Controller
 {
-    public function html(Request $request): RedirectResponse{
+    public function html(Request $request) {
         $validator = Validator::make($request->all(),[
 		    'urlToPDF' => 'required',
 	    ]);
@@ -44,11 +42,29 @@ class htmltopdfController extends Controller
                     'errReason' => $validator->messages(),
                     'errApiReason' => null
                 ]);
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','HTML to PDF process failed !',$validator->messages());
-                return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Failed to convert HTML to PDF !',$validator->messages());
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'Failed to convert HTML to PDF !',
+                    'error' => $validator->errors()->all(),
+                    'processId' => $uuid
+                ], 401);
             } catch (QueryException $ex) {
                 NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL','Database connection error !',$ex->getMessage());
-                return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>'null'])->withInput();
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'Database connection error !',
+                    'error' => $ex->getMessage(),
+                    'processId' => $uuid
+                ], 401);
+            } catch (\Exception $e) {
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Eloquent transaction error !',
+                    'error' => $ex->getMessage(),
+                    'processId' => $uuid
+                ], 400);
             }
         } else {
             $start = Carbon::parse($startProc);
@@ -90,16 +106,31 @@ class htmltopdfController extends Controller
                             ->update([
                                 'processId' => $uuid,
                                 'errReason' => '404',
-                                'errApiReason' => null
+                                'errApiReason' => 'Webpage are not available or not valid'
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify($newUrl, '', $uuid, 'FAIL', 'HTML to PDF process failed !', '404');
-                        return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'HTML To PDF Conversion Failed !', 'Webpage are not available or not valid');
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'HTML To PDF Conversion Failed !',
+                            'error' => 'Webpage are not available or not valid',
+                            'processId' => $uuid
+                        ], 400);
                     } catch (QueryException $ex) {
-                        NotificationHelper::Instance()->sendErrNotify($newUrl, '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                        return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'Database connection error !',
+                            'error' => $ex->getMessage(),
+                            'processId' => $uuid
+                        ], 400);
                     } catch (\Exception $e) {
-                        NotificationHelper::Instance()->sendErrNotify($newUrl, '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                        return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'Eloquent transaction error !',
+                            'error' => $ex->getMessage(),
+                            'processId' => $uuid
+                        ], 400);
                     }
                 }
             }
@@ -131,18 +162,32 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on StartException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (AuthException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -164,18 +209,32 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on AuthException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (UploadException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -197,18 +256,32 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on UploadException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (ProcessException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -230,18 +303,32 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (DownloadException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -267,14 +354,29 @@ class htmltopdfController extends Controller
                             'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (TaskException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -296,18 +398,32 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on TaskException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (PathException $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -333,14 +449,29 @@ class htmltopdfController extends Controller
                             'errReason' => 'iLovePDF API Error !, Catch on PathException',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } catch (\Exception $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -362,22 +493,35 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
-                            'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on Exception',
                             'errApiReason' => $e->getMessage()
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', 'null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Failed to convert HTML to PDF !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $e->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             }
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
-                $download_pdf = Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);
                 try {
@@ -401,13 +545,29 @@ class htmltopdfController extends Controller
                             'errReason' => null,
                             'errApiReason' => null
                     ]);
-                    return redirect()->back()->with(["stats" => "scs", "res"=>$download_pdf]);
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'OK',
+                        'res' => Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'),
+                        'fileName' => $pdfDefaultFileName.'.pdf',
+                        'urlSource' => $pdfUrl
+                    ], 200);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), $fileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), $fileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             } else {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -433,14 +593,29 @@ class htmltopdfController extends Controller
                             'errReason' => 'Failed to download converted file from iLovePDF API !',
                             'errApiReason' => null
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'),'', $uuid, 'FAIL','HTML to PDF process failed !','null');
-                    return redirect()->back()->withErrors(['error'=>'HTML to PDF process failed !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'HTML To PDF Conversion Failed !', null);
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'HTML To PDF Conversion Failed !',
+                        'error' => null,
+                        'processId' => $uuid
+                    ], 400);
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Database connection error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Database connection error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($request->post('urlToPDF'), '', $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                    return redirect()->back()->withErrors(['error'=>'Eloquent transaction error !', 'processId'=>$uuid])->withInput();
+                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Eloquent transaction error !',
+                        'error' => $ex->getMessage(),
+                        'processId' => $uuid
+                    ], 400);
                 }
             }
         }
