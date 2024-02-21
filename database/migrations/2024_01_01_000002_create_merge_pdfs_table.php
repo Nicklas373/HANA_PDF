@@ -21,9 +21,11 @@ return new class extends Migration
         Schema::create('pdfMerge', function (Blueprint $table) {
             $table->id('mergeId');
             $table->text('fileName')->nullable();
-            $table->string('fileSize', 25);
+            $table->string('fileSize', 25)->nullable();
             $table->boolean('result');
+            $table->boolean('isBatch');
             $table->uuid('processId');
+            $table->uuid('batchId')->nullable();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();

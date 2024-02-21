@@ -17,6 +17,8 @@ class compressModel extends Model
         'compFileSize',
         'compMethod',
         'result',
+        'isBatch',
+        'batchId',
         'procStartAt',
         'procEndAt',
         'procDuration'
