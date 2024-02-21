@@ -1,141 +1,118 @@
 if (firstArea) {
     firstArea.onclick = function() {
-        firstColumnArea.style.borderColor = '#38bdf8'
-        firstAreaText.style.color = '#38bdf8'
+        firstAreaText.style.color = '#E0E4E5'
+        firstColumnArea.style.borderColor = '#4DAAAA'
+        firstRadio.style.borderColor = '#4DAAAA'
         firstAreaInput.checked = true
-        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
-            secondAreaText.style.color = '#1e293b'
-        } else {
-            secondAreaText.style.color = '#6b7280'
-        }
+        secondAreaText.style.color = '#E0E4E5'
         secondColumnArea.style = null
         if (thirdArea) {
             if (firstAreaAltInput.value !== "split") {
-                if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
-                    thirdAreaText.style.color = '#1e293b'
-                } else {
-                    thirdAreaText.style.color = '#6b7280'
-                }
+                thirdAreaText.style.color = '#E0E4E5'
                 thirdAreaInput.checked = false
                 thirdColumnArea.style = null
             } else {
                 if (thirdAreaInput.checked == true) {
-                    thirdColumnArea.style.borderColor = '#38bdf8'
-                    thirdAreaText.style.color = '#38bdf8'
+                    thirdRadio.style.borderColor = '#4DAAAA'
+                    thirdColumnArea.style.borderColor = '#4DAAAA'
+                    thirdAreaText.style.color = '#E0E4E5'
                     splitLayout3_wthn()
                 }
             }
         }
         if (fourthArea) {
             if (firstAreaAltInput.value !== "split") {
-                if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
-                    fourthAreaText.style.color = '#1e293b'
-                } else {
-                    fourthAreaText.style.color = '#6b7280'
-                }
+                fourthAreaText.style.color = '#E0E4E5'
                 fourthAreaInput.checked = false
                 fourthColumnArea.style = null
             }  else {
                 if (fourthAreaInput.checked == true) {
-                    fourthColumnArea.style.borderColor = '#38bdf8'
-                    fourthAreaText.style.color = '#38bdf8'
+                    fourthRadio.style.borderColor = '#4DAAAA'
+                    fourthColumnArea.style.borderColor = '#4DAAAA'
+                    fourthAreaText.style.color = '#E0E4E5'
                     splitLayout3_cstm()
+                    document.getElementById("submitBtn").textContent = 'Delete Page'
                 }
             }
         }
         if (firstAreaAltInput.value == "split") {
             splitLayout2_split();
-            if (thirdColumnArea.style.borderColor == "rgb(56, 189, 248)" || fourthColumnArea.style.borderColor == "rgb(56, 189, 248)") {
-                document.getElementById("submitBtn_2").style.display = null;
-                document.getElementById("submitBtn_3").style.display = "none";
-            } else {
+            if (!thirdColumnArea.style.borderColor == "rgb(77, 170, 170)" || !fourthColumnArea.style.borderColor == "rgb(77, 170, 170)") {
                 splitLayout2_splitClean()
             }
+            document.getElementById("submitBtn").textContent = "Split PDF"
         } else if (firstAreaAltInput.value == "cnvFrPDF") {
             extImageChkBox.style.display = null
         } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_ImageInputRestore()
             wmLayout_image()
             showVal(document.getElementById('watermarkFontTransparency').value,'image')
+            document.getElementById("submitBtn").style = null;
         }
     }
 }
 
 if (secondArea) {
     secondArea.onclick = function() {
-        secondColumnArea.style.borderColor = '#38bdf8'
-        secondAreaText.style.color = '#38bdf8'
+        secondAreaText.style.color = '#E0E4E5'
+        secondColumnArea.style.borderColor = '#4DAAAA'
+        secondRadio.style.borderColor = '#4DAAAA'
         secondAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
-            firstAreaText.style.color = '#1e293b'
             if (firstAreaAltInput.value == "cnvFrPDF") {
                 extImageChkBox.style.display = 'none'
                 extImageSwitch.checked = false
             }
-        } else {
-            firstAreaText.style.color = '#6b7280'
         }
+        firstAreaText.style.color = '#E0E4E5'
         firstColumnArea.style = null
         if (thirdArea) {
-            if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
-                thirdAreaText.style.color = '#1e293b'
-            } else {
-                thirdAreaText.style.color = '#6b7280'
-            }
+            thirdAreaText.style.color = '#E0E4E5'
             thirdColumnArea.style = null
         }
         if (fourthArea) {
-            if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
-                fourthAreaText.style.color = '#1e293b'
-            } else {
-                fourthAreaText.style.color = '#6b7280'
-            }
+            fourthAreaText.style.color = '#E0E4E5'
             fourthColumnArea.style = null
         }
         if (secondAreaAltInput.value == "split") {
             splitLayout2_delete();
-        }  else if (firstAreaAltInput.value == "watermark") {
+            document.getElementById("submitBtn").textContent = "Delete Page";
+        } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_TextInputRestore()
             wmLayout_text()
             showVal(document.getElementById('watermarkFontTransparency').value,'text')
+            document.getElementById("submitBtn").style = null;
         }
     }
 }
 
 if (thirdArea) {
     thirdArea.onclick = function() {
-        thirdColumnArea.style.borderColor = '#38bdf8'
-        thirdAreaText.style.color = '#38bdf8'
+        thirdAreaText.style.color = '#E0E4E5'
+        thirdColumnArea.style.borderColor = '#4DAAAA'
+        thirdRadio.style.borderColor = '#4DAAAA'
         thirdAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
-            firstAreaText.style.color = '#1e293b'
             if (firstAreaAltInput.value == "cnvFrPDF") {
                 extImageChkBox.style.display = 'none'
                 extImageSwitch.checked = false
             }
-        } else {
-            firstAreaText.style.color = '#6b7280'
         }
+        firstAreaText.style.color = '#E0E4E5'
         firstColumnArea.style = null
-        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
-            secondAreaText.style.color = '#1e293b'
-        } else {
-            secondAreaText.style.color = '#6b7280'
-        }
+        secondAreaText.style.color = '#E0E4E5'
         secondColumnArea.style = null
         if (fourthArea) {
-            if (fourthAreaAltInput.value == "comp" || fourthAreaAltInput.value == "cnvFrPDF") {
-                fourthAreaText.style.color = '#1e293b'
-            } else {
-                fourthAreaText.style.color = '#6b7280'
-            }
+            fourthAreaText.style.color = '#E0E4E5'
             fourthColumnArea.style = null
         }
         if (thirdAreaAltInput.value == "split") {
             splitLayout3_wthn()
+            document.getElementById("submitBtn").textContent = "Split PDF"
             if (firstAreaInput.checked == true) {
-                firstColumnArea.style.borderColor = '#38bdf8'
-                firstAreaText.style.color = '#38bdf8'
+                firstAreaText.style.color = '#E0E4E5'
+                firstColumnArea.style.borderColor = '#4DAAAA'
+                firstRadio.style.borderColor = '#4DAAAA'
             }
         }
     }
@@ -143,38 +120,31 @@ if (thirdArea) {
 
 if (fourthArea) {
     fourthArea.onclick = function() {
-        fourthColumnArea.style.borderColor = '#38bdf8'
-        fourthAreaText.style.color = '#38bdf8'
+        fourthAreaText.style.color = '#E0E4E5'
+        fourthColumnArea.style.borderColor = '#4DAAAA'
+        fourthRadio.style.borderColor = '#4DAAAA'
         fourthAreaInput.checked = true
         if (firstAreaAltInput.value == "comp" || firstAreaAltInput.value == "cnvFrPDF") {
-            firstAreaText.style.color = '#1e293b'
             if (firstAreaAltInput.value == "cnvFrPDF") {
                 extImageChkBox.style.display = 'none'
                 extImageSwitch.checked = false
             }
-        } else {
-            firstAreaText.style.color = '#6b7280'
         }
+        firstAreaText.style.color = '#E0E4E5'
         firstColumnArea.style = null
-        if (secondAreaAltInput.value == "comp" || secondAreaAltInput.value == "cnvFrPDF") {
-            secondAreaText.style.color = '#1e293b'
-        } else {
-            secondAreaText.style.color = '#6b7280'
-        }
+        secondAreaText.style.color = '#E0E4E5'
         secondColumnArea.style = null
         if (thirdArea) {
-            if (thirdAreaAltInput.value == "comp" || thirdAreaAltInput.value == "cnvFrPDF") {
-                thirdAreaText.style.color = '#1e293b'
-            } else {
-                thirdAreaText.style.color = '#6b7280'
-            }
+            thirdAreaText.style.color = '#E0E4E5'
             thirdColumnArea.style = null
         }
         if (fourthAreaAltInput.value == "split") {
             splitLayout3_cstm()
+            document.getElementById("submitBtn").textContent = "Split PDF"
             if (firstAreaInput.checked == true) {
-                firstColumnArea.style.borderColor = '#38bdf8'
-                firstAreaText.style.color = '#38bdf8'
+                firstAreaText.style.color = '#E0E4E5'
+                firstColumnArea.style.borderColor = '#4DAAAA'
+                firstRadio.style.borderColor = '#4DAAAA'
             }
         }
     }
@@ -184,12 +154,14 @@ if (wmLayoutImageStyleAreaA) {
     wmLayoutImageStyleAreaA.onclick = function() {
         reuseOnClickWmLayoutImageStyleAreaA()
         if (firstAreaInput.checked == true) {
-            firstColumnArea.style.borderColor = '#38bdf8'
-            firstAreaText.style.color = '#38bdf8'
+            firstAreaText.style.color = '#E0E4E5'
+            firstColumnArea.style.borderColor = '#4DAAAA'
+            firstRadio.style.borderColor = '#4DAAAA'
             firstAreaInput.checked = true
         } else if (secondAreaInput.checked == true) {
-            secondColumnArea.style.borderColor = '#38bdf8'
-            secondAreaText.style.color = '#38bdf8'
+            secondAreaText.style.color = '#E0E4E5'
+            secondColumnArea.style.borderColor = '#4DAAAA'
+            secondRadio.style.borderColor = '#4DAAAA'
             secondAreaInput.checked = true
         }
     }
@@ -199,12 +171,14 @@ if (wmLayoutImageStyleAreaB) {
     wmLayoutImageStyleAreaB.onclick = function() {
         reuseOnClickWmLayoutImageStyleAreaB()
         if (firstAreaInput.checked == true) {
-            firstColumnArea.style.borderColor = '#38bdf8'
-            firstAreaText.style.color = '#38bdf8'
+            firstAreaText.style.color = '#E0E4E5'
+            firstColumnArea.style.borderColor = '#4DAAAA'
+            firstRadio.style.borderColor = '#4DAAAA'
             firstAreaInput.checked = true
         } else if (secondAreaInput.checked == true) {
-            secondColumnArea.style.borderColor = '#38bdf8'
-            secondAreaText.style.color = '#38bdf8'
+            secondAreaText.style.color = '#E0E4E5'
+            secondColumnArea.style.borderColor = '#4DAAAA'
+            secondRadio.style.borderColor = '#4DAAAA'
             secondAreaInput.checked = true
         }
     }
@@ -212,15 +186,15 @@ if (wmLayoutImageStyleAreaB) {
 
 if (wmImageRotationAreaA) {
     wmImageRotationAreaA.onclick = function() {
-        wmImageRotationColumnAreaA.style.borderColor = '#38bdf8'
-        wmImageRotationRadioAreaTextA.style.color = '#38bdf8'
+        wmImageRotationColumnAreaA.style.borderColor = '#4DAAAA'
+        wmImageRotationRadioAreaTextA.style.color = '#E0E4E5'
         wmImageRotationRadioAreaInputA.checked = true
         wmImageRotationColumnAreaB.style = null
-        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextB.style.color = '#E0E4E5'
         wmImageRotationColumnAreaC.style = null
-        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextC.style.color = '#E0E4E5'
         wmImageRotationColumnAreaD.style = null
-        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextD.style.color = '#E0E4E5'
         if (wmLayoutImageRadioAreaInputA.checked == true) {
             reuseOnClickWmLayoutImageStyleAreaA()
         } else if (wmLayoutImageRadioAreaInputB.checked == true) {
@@ -231,15 +205,15 @@ if (wmImageRotationAreaA) {
 
 if (wmImageRotationAreaB) {
     wmImageRotationAreaB.onclick = function() {
-        wmImageRotationColumnAreaB.style.borderColor = '#38bdf8'
-        wmImageRotationRadioAreaTextB.style.color = '#38bdf8'
+        wmImageRotationColumnAreaB.style.borderColor = '#4DAAAA'
+        wmImageRotationRadioAreaTextB.style.color = '#E0E4E5'
         wmImageRotationRadioAreaInputB.checked = true
         wmImageRotationColumnAreaA.style = null
-        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextA.style.color = '#E0E4E5'
         wmImageRotationColumnAreaC.style = null
-        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextC.style.color = '#E0E4E5'
         wmImageRotationColumnAreaD.style = null
-        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextD.style.color = '#E0E4E5'
         if (wmLayoutImageRadioAreaInputA.checked == true) {
             reuseOnClickWmLayoutImageStyleAreaA()
         } else if (wmLayoutImageRadioAreaInputB.checked == true) {
@@ -250,15 +224,15 @@ if (wmImageRotationAreaB) {
 
 if (wmImageRotationAreaC) {
     wmImageRotationAreaC.onclick = function() {
-        wmImageRotationColumnAreaC.style.borderColor = '#38bdf8'
-        wmImageRotationRadioAreaTextC.style.color = '#38bdf8'
+        wmImageRotationColumnAreaC.style.borderColor = '#4DAAAA'
+        wmImageRotationRadioAreaTextC.style.color = '#E0E4E5'
         wmImageRotationRadioAreaInputC.checked = true
         wmImageRotationColumnAreaA.style = null
-        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextA.style.color = '#E0E4E5'
         wmImageRotationColumnAreaB.style = null
-        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextB.style.color = '#E0E4E5'
         wmImageRotationColumnAreaD.style = null
-        wmImageRotationRadioAreaTextD.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextD.style.color = '#E0E4E5'
         if (wmLayoutImageRadioAreaInputA.checked == true) {
             reuseOnClickWmLayoutImageStyleAreaA()
         } else if (wmLayoutImageRadioAreaInputB.checked == true) {
@@ -269,15 +243,15 @@ if (wmImageRotationAreaC) {
 
 if (wmImageRotationAreaD) {
     wmImageRotationAreaD.onclick = function() {
-        wmImageRotationColumnAreaD.style.borderColor = '#38bdf8'
-        wmImageRotationRadioAreaTextD.style.color = '#38bdf8'
+        wmImageRotationColumnAreaD.style.borderColor = '#4DAAAA'
+        wmImageRotationRadioAreaTextD.style.color = '#E0E4E5'
         wmImageRotationRadioAreaInputD.checked = true
         wmImageRotationColumnAreaA.style = null
-        wmImageRotationRadioAreaTextA.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextA.style.color = '#E0E4E5'
         wmImageRotationColumnAreaB.style = null
-        wmImageRotationRadioAreaTextB.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextB.style.color = '#E0E4E5'
         wmImageRotationColumnAreaC.style = null
-        wmImageRotationRadioAreaTextC.style.color = '#6b7280'
+        wmImageRotationRadioAreaTextC.style.color = '#E0E4E5'
         if (wmLayoutImageRadioAreaInputA.checked == true) {
             reuseOnClickWmLayoutImageStyleAreaA()
         } else if (wmLayoutImageRadioAreaInputB.checked == true) {
@@ -288,222 +262,222 @@ if (wmImageRotationAreaD) {
 
 if (wmChkFontFamilyA) {
     wmChkFontFamilyA.onclick = function() {
-        wmColFontFamilyA.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextA.style.color = '#38bdf8'
+        wmColFontFamilyA.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
         wmRadioFontFamilyA.checked = true
         wmColFontFamilyB.style = null
-        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmColFontFamilyC.style = null
-        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmColFontFamilyD.style = null
-        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmColFontFamilyE.style = null
-        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmColFontFamilyF.style = null
-        wmRadioFontFamilyTextF.style.color = '#6b7280'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontFamilyB) {
     wmChkFontFamilyB.onclick = function() {
-        wmColFontFamilyB.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextB.style.color = '#38bdf8'
+        wmColFontFamilyB.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmRadioFontFamilyB.checked = true
         wmColFontFamilyA.style = null
-        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
         wmColFontFamilyC.style = null
-        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmColFontFamilyD.style = null
-        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmColFontFamilyE.style = null
-        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmColFontFamilyF.style = null
-        wmRadioFontFamilyTextF.style.color = '#6b7280'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontFamilyC) {
     wmChkFontFamilyC.onclick = function() {
-        wmColFontFamilyC.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextC.style.color = '#38bdf8'
+        wmColFontFamilyC.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmRadioFontFamilyC.checked = true
         wmColFontFamilyB.style = null
-        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmColFontFamilyA.style = null
-        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
         wmColFontFamilyD.style = null
-        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmColFontFamilyE.style = null
-        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmColFontFamilyF.style = null
-        wmRadioFontFamilyTextF.style.color = '#6b7280'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontFamilyD) {
     wmChkFontFamilyD.onclick = function() {
-        wmColFontFamilyD.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextD.style.color = '#38bdf8'
+        wmColFontFamilyD.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmRadioFontFamilyD.checked = true
         wmColFontFamilyB.style = null
-        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmColFontFamilyC.style = null
-        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmColFontFamilyA.style = null
-        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
         wmColFontFamilyE.style = null
-        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmColFontFamilyF.style = null
-        wmRadioFontFamilyTextF.style.color = '#6b7280'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontFamilyE) {
     wmChkFontFamilyE.onclick = function() {
-        wmColFontFamilyE.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextE.style.color = '#38bdf8'
+        wmColFontFamilyE.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmRadioFontFamilyE.checked = true
         wmColFontFamilyB.style = null
-        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmColFontFamilyC.style = null
-        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmColFontFamilyD.style = null
-        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmColFontFamilyA.style = null
-        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
         wmColFontFamilyF.style = null
-        wmRadioFontFamilyTextF.style.color = '#6b7280'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontFamilyF) {
     wmChkFontFamilyF.onclick = function() {
-        wmColFontFamilyF.style.borderColor = '#38bdf8'
-        wmRadioFontFamilyTextF.style.color = '#38bdf8'
+        wmColFontFamilyF.style.borderColor = '#4DAAAA'
+        wmRadioFontFamilyTextF.style.color = '#E0E4E5'
         wmRadioFontFamilyF.checked = true
         wmColFontFamilyB.style = null
-        wmRadioFontFamilyTextB.style.color = '#6b7280'
+        wmRadioFontFamilyTextB.style.color = '#E0E4E5'
         wmColFontFamilyC.style = null
-        wmRadioFontFamilyTextC.style.color = '#6b7280'
+        wmRadioFontFamilyTextC.style.color = '#E0E4E5'
         wmColFontFamilyD.style = null
-        wmRadioFontFamilyTextD.style.color = '#6b7280'
+        wmRadioFontFamilyTextD.style.color = '#E0E4E5'
         wmColFontFamilyE.style = null
-        wmRadioFontFamilyTextE.style.color = '#6b7280'
+        wmRadioFontFamilyTextE.style.color = '#E0E4E5'
         wmColFontFamilyA.style = null
-        wmRadioFontFamilyTextA.style.color = '#6b7280'
+        wmRadioFontFamilyTextA.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontStyleA) {
     wmChkFontStyleA.onclick = function() {
-        wmColFontStyleA.style.borderColor = '#38bdf8'
-        wmRadioFontStyleTextA.style.color = '#38bdf8'
+        wmColFontStyleA.style.borderColor = '#4DAAAA'
+        wmRadioFontStyleTextA.style.color = '#E0E4E5'
         wmRadioFontStyleA.checked = true
         wmColFontStyleB.style = null
-        wmRadioFontStyleTextB.style.color = '#6b7280'
+        wmRadioFontStyleTextB.style.color = '#E0E4E5'
         wmColFontStyleC.style = null
-        wmRadioFontStyleTextC.style.color = '#6b7280'
+        wmRadioFontStyleTextC.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontStyleB) {
     wmChkFontStyleB.onclick = function() {
-        wmColFontStyleB.style.borderColor = '#38bdf8'
-        wmRadioFontStyleTextB.style.color = '#38bdf8'
+        wmColFontStyleB.style.borderColor = '#4DAAAA'
+        wmRadioFontStyleTextB.style.color = '#E0E4E5'
         wmRadioFontStyleB.checked = true
         wmColFontStyleA.style = null
-        wmRadioFontStyleTextA.style.color = '#6b7280'
+        wmRadioFontStyleTextA.style.color = '#E0E4E5'
         wmColFontStyleC.style = null
-        wmRadioFontStyleTextC.style.color = '#6b7280'
+        wmRadioFontStyleTextC.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkFontStyleC) {
     wmChkFontStyleC.onclick = function() {
-        wmColFontStyleC.style.borderColor = '#38bdf8'
-        wmRadioFontStyleTextC.style.color = '#38bdf8'
+        wmColFontStyleC.style.borderColor = '#4DAAAA'
+        wmRadioFontStyleTextC.style.color = '#E0E4E5'
         wmRadioFontStyleC.checked = true
         wmColFontStyleB.style = null
-        wmRadioFontStyleTextB.style.color = '#6b7280'
+        wmRadioFontStyleTextB.style.color = '#E0E4E5'
         wmColFontStyleA.style = null
-        wmRadioFontStyleTextA.style.color = '#6b7280'
+        wmRadioFontStyleTextA.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkLayoutStyleA) {
     wmChkLayoutStyleA.onclick = function() {
-        wmColLayoutStyleA.style.borderColor = '#38bdf8'
-        wmRadioLayoutStyleTextA.style.color = '#38bdf8'
+        wmColLayoutStyleA.style.borderColor = '#4DAAAA'
+        wmRadioLayoutStyleTextA.style.color = '#E0E4E5'
         wmRadioLayoutStyleA.checked = true
         wmColLayoutStyleB.style = null
-        wmRadioLayoutStyleTextB.style.color = '#6b7280'
+        wmRadioLayoutStyleTextB.style.color = '#E0E4E5'
 
     }
 }
 
 if (wmChkLayoutStyleB) {
     wmChkLayoutStyleB.onclick = function() {
-        wmColLayoutStyleB.style.borderColor = '#38bdf8'
-        wmRadioLayoutStyleTextB.style.color = '#38bdf8'
+        wmColLayoutStyleB.style.borderColor = '#4DAAAA'
+        wmRadioLayoutStyleTextB.style.color = '#E0E4E5'
         wmRadioLayoutStyleB.checked = true
         wmColLayoutStyleA.style = null
-        wmRadioLayoutStyleTextA.style.color = '#6b7280'
+        wmRadioLayoutStyleTextA.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkRotationA) {
     wmChkRotationA.onclick = function() {
-        wmColRotationA.style.borderColor = '#38bdf8'
-        wmRadioRotationTextA.style.color = '#38bdf8'
+        wmColRotationA.style.borderColor = '#4DAAAA'
+        wmRadioRotationTextA.style.color = '#E0E4E5'
         wmRadioRotationA.checked = true
         wmColRotationB.style = null
-        wmRadioRotationTextB.style.color = '#6b7280'
+        wmRadioRotationTextB.style.color = '#E0E4E5'
         wmColRotationC.style = null
-        wmRadioRotationTextC.style.color = '#6b7280'
+        wmRadioRotationTextC.style.color = '#E0E4E5'
         wmColRotationD.style = null
-        wmRadioRotationTextD.style.color = '#6b7280'
+        wmRadioRotationTextD.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkRotationB) {
     wmChkRotationB.onclick = function() {
-        wmColRotationB.style.borderColor = '#38bdf8'
-        wmRadioRotationTextB.style.color = '#38bdf8'
+        wmColRotationB.style.borderColor = '#4DAAAA'
+        wmRadioRotationTextB.style.color = '#E0E4E5'
         wmRadioRotationB.checked = true
         wmColRotationA.style = null
-        wmRadioRotationTextA.style.color = '#6b7280'
+        wmRadioRotationTextA.style.color = '#E0E4E5'
         wmColRotationC.style = null
-        wmRadioRotationTextC.style.color = '#6b7280'
+        wmRadioRotationTextC.style.color = '#E0E4E5'
         wmColRotationD.style = null
-        wmRadioRotationTextD.style.color = '#6b7280'
+        wmRadioRotationTextD.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkRotationC) {
     wmChkRotationC.onclick = function() {
-        wmColRotationC.style.borderColor = '#38bdf8'
-        wmRadioRotationTextC.style.color = '#38bdf8'
+        wmColRotationC.style.borderColor = '#4DAAAA'
+        wmRadioRotationTextC.style.color = '#E0E4E5'
         wmRadioRotationC.checked = true
         wmColRotationB.style = null
-        wmRadioRotationTextB.style.color = '#6b7280'
+        wmRadioRotationTextB.style.color = '#E0E4E5'
         wmColRotationA.style = null
-        wmRadioRotationTextA.style.color = '#6b7280'
+        wmRadioRotationTextA.style.color = '#E0E4E5'
         wmColRotationD.style = null
-        wmRadioRotationTextD.style.color = '#6b7280'
+        wmRadioRotationTextD.style.color = '#E0E4E5'
     }
 }
 
 if (wmChkRotationD) {
     wmChkRotationD.onclick = function() {
-        wmColRotationD.style.borderColor = '#38bdf8'
-        wmRadioRotationTextD.style.color = '#38bdf8'
+        wmColRotationD.style.borderColor = '#4DAAAA'
+        wmRadioRotationTextD.style.color = '#E0E4E5'
         wmRadioRotationD.checked = true
         wmColRotationB.style = null
-        wmRadioRotationTextB.style.color = '#6b7280'
+        wmRadioRotationTextB.style.color = '#E0E4E5'
         wmColRotationC.style = null
-        wmRadioRotationTextC.style.color = '#6b7280'
+        wmRadioRotationTextC.style.color = '#E0E4E5'
         wmColRotationA.style = null
-        wmRadioRotationTextA.style.color = '#6b7280'
+        wmRadioRotationTextA.style.color = '#E0E4E5'
     }
 }
 
@@ -527,156 +501,76 @@ if (isTextMosaicArea) {
     }
 }
 
-if (document.getElementById('multiple_files')) {
-    document.getElementById('multiple_files').addEventListener('change', function(e) {
-        var list = document.getElementById('filelist');
-        var newList = document.getElementById('pre-title');
-        if (document.getElementById('multiple_files').value !== '') {
-            if (newList.innerHTML !== '') {
-                newList.innerHTML = ``;
-                for (var i = 0; i < this.files.length; i++) {
-                    generateMessage(this.files[i].name)
-                }
-            } else {
-                for (var i = 0; i < this.files.length; i++) {
-                    generateMessage(this.files[i].name)
-                }
-            }
-            if (newList.innerHTML == '') {
-                list.style.display = 'none';
-            } else {
-                list.style.display = 'block';
-            }
-        } else {
-                list.style.display = 'none';
-                newList.innerHTML = ``;
-        }
-    });
-}
-
-function changeButtonColor(kaoInput) {
-    if (kaoInput == 'kaoA') {
-        document.getElementById('file_input').addEventListener('change', function(e) {
-            var fullPath = document.getElementById('file_input').value;
-            if (fullPath) {
-                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
-                var filename = fullPath.substring(startIndex);
-                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
-                    filename = filename.substring(1);
-                }
-                if (filename !== "") {
-                    document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                    document.getElementById('submitBtn').style.color="white"
-                } else {
-                    document.getElementById('submitBtn').style.backgroundColor="transparent"
-                    document.getElementById('submitBtn').style.color="#38bdf8"
-                }
-            }
-        });
-    } else if (kaoInput == 'kaoB') {
-        document.getElementById('multiple_files').addEventListener('change', function(e) {
-            var fullPath = document.getElementById('multiple_files').value;
-            if (fullPath) {
-                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
-                var filename = fullPath.substring(startIndex);
-                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
-                    filename = filename.substring(1);
-                }
-                if (filename == "") {
-                    document.getElementById('submitBtn').style.backgroundColor="#e2e8f0"
-                    document.getElementById('submitBtn').style.color="#38bdf8"
-                    document.getElementById('multiple_files').style.backgroundColor="#e2e8f0"
-                } else {
-                    document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                    document.getElementById('submitBtn').style.color="#ffffff"
-                    document.getElementById('multiple_files').style.backgroundColor="#f8fafc"
-                }
-            }
-        });
-    } else if (kaoInput == 'kaoC') {
-        var fullPath = document.getElementById('urlToPDF').value;
-            if (fullPath) {
-                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
-                var filename = fullPath.substring(startIndex);
-                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
-                    filename = filename.substring(1);
-                }
-                if (filename !== "") {
-                    document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                    document.getElementById('submitBtn').style.color="white"
-                } else {
-                    document.getElementById('submitBtn').style.backgroundColor="transparent"
-                    document.getElementById('submitBtn').style.color="#38bdf8"
-                }
-            }
-    }
-}
-
 function checkValidation(validation) {
-    if (validation == 'comp') {
-        document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
-        document.getElementById("submitBtn_1").style.color = "white"
-    }
-    if (validation == 'cnvFrPDF') {
-        document.getElementById("submitBtn_1").style.backgroundColor="#38bdf8"
-        document.getElementById("submitBtn_1").style.color = "white"
-    }
     if (validation == 'extCustomPage' || validation == 'splitCustomPage') {
-        if (document.getElementById("customPage").value != '') {
-            document.getElementById("customPage").style.borderColor = "#d1d5db"
+        if (document.getElementById("customPageSplit").value != '') {
+            document.getElementById("customPageSplit").style.borderColor = "#E0E4E5"
         } else {
-            document.getElementById("customPage").style.borderColor = "#dc2626"
+            document.getElementById("customPageSplit").style.borderColor = "#992E2E"
+        }
+        if (document.getElementById("customPageDelete").value != '') {
+            document.getElementById("customPageDelete").style.borderColor = "#E0E4E5"
+        } else {
+            document.getElementById("customPageDelete").style.borderColor = "#992E2E"
         }
     }
     if (validation == 'splitFirstPage') {
         if (document.getElementById("fromPage").value != '') {
-            document.getElementById("fromPage").style.borderColor = "#d1d5db"
+            document.getElementById("fromPage").style.borderColor = "#E0E4E5"
         } else {
-            document.getElementById("fromPage").style.borderColor = "#dc2626"
+            document.getElementById("fromPage").style.borderColor = "#992E2E"
         }
     }
     if (validation == 'splitLastPage') {
         if (document.getElementById("toPage").value != '') {
-            document.getElementById("toPage").style.borderColor = "#d1d5db"
+            document.getElementById("toPage").style.borderColor = "#E0E4E5"
         } else {
-            document.getElementById("toPage").style.borderColor = "#dc2626"
+            document.getElementById("toPage").style.borderColor = "#992E2E"
         }
     }
     if (validation == 'watermarkText') {
         if (document.getElementById("watermarkText").value != '') {
-            document.getElementById("watermarkText").style.borderColor = "#d1d5db"
+            document.getElementById("watermarkText").style.borderColor = "#E0E4E5"
         } else {
-            document.getElementById("watermarkText").style.borderColor = "#dc2626"
+            document.getElementById("watermarkText").style.borderColor = "#992E2E"
+        }
+        if (document.getElementById("watermarkFontSize").value != '') {
+            document.getElementById("watermarkFontSize").style.borderColor = "#E0E4E5"
+        } else {
+            document.getElementById("watermarkFontSize").style.borderColor = "#992E2E"
         }
     }
     if (validation == 'watermarkPage') {
         if (firstAreaInput.checked == true) {
             if (document.getElementById("watermarkPageImage").value != '') {
-                document.getElementById("watermarkPageImage").style.borderColor = "#d1d5db"
+                document.getElementById("watermarkPageImage").style.borderColor = "#E0E4E5"
             } else {
-                document.getElementById("watermarkPageImage").style.borderColor = "#dc2626"
+                document.getElementById("watermarkPageImage").style.borderColor = "#992E2E"
             }
         } else if (secondAreaInput.checked == true) {
             if (document.getElementById("watermarkPageText").value != '') {
-                document.getElementById("watermarkPageText").style.borderColor = "#d1d5db"
+                document.getElementById("watermarkPageText").style.borderColor = "#E0E4E5"
             } else {
-                document.getElementById("watermarkPageText").style.borderColor = "#dc2626"
+                document.getElementById("watermarkPageText").style.borderColor = "#992E2E"
             }
         }
     }
     if (validation == 'wm_file_input') {
         if (document.getElementById("wm_file_input").value != '') {
-            document.getElementById("wm_file_input").style.borderColor = "#d1d5db"
+            document.getElementById("wm_file_input").style.borderColor = "#E0E4E5"
         } else {
-            document.getElementById("wm_file_input").style.borderColor = "#dc2626"
+            document.getElementById("wm_file_input").style.borderColor = "#992E2E"
         }
     }
     if (validation == 'urlToPDF') {
-        changeButtonColor('kaoC')
         if (document.getElementById("urlToPDF").value != '') {
-            document.getElementById("urlToPDF").style.borderColor = "#d1d5db"
+            document.getElementById("urlToPDF").style.borderColor = "#E0E4E5"
+            document.getElementById("submitBtn").style.backgroundColor ="#4DAAAA"
+            document.getElementById("submitBtn").style.color = "white"
         } else {
-            document.getElementById("urlToPDF").style.borderColor = "#dc2626"
+            document.getElementById("urlToPDF").style.borderColor = "#992E2E"
+            document.getElementById("submitBtn").style.backgroundColor = null
+            document.getElementById("submitBtn").style.color = null
         }
     }
 }
@@ -721,115 +615,14 @@ function dropdownManage() {
     }
 }
 
-function formatBytes(bytes, decimals = 2) {
-    if (!+bytes) return '0 Bytes'
-
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
-}
-
-function generateMessage(subMessage) {
-    var ul = document.getElementById("pre-title");
-    var li = document.createElement("li");
-    li.id = "pre-list_"+ul.childElementCount;
-    li.appendChild(document.createTextNode(subMessage));
-    ul.appendChild(li);
-}
-
-function init() {
-    if (document.getElementById('cnvFrPDF') !== null || document.getElementById('compPDF') !== null || document.getElementById('cnvToPDF') !== null) {
-        var fullPath = document.getElementById('caption');
-        var pdfLayout = document.getElementById('pdfCompLayout');
-        var btnLayout = document.getElementById('submitBtn_1');
-        if (fullPath) {
-            document.getElementById("fileAlt").style.display = "none";
-            if (fullPath.value !== '') {
-                document.getElementById('submitBtn').style.backgroundColor="transparent"
-                document.getElementById('submitBtn').style.color="#38bdf8"
-                pdfLayout.style = null
-                btnLayout.style = null
-            } else {
-                document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                document.getElementById('submitBtn').style.color="transparent"
-                pdfLayout.style.display = "none"
-                btnLayout.style.display = "none"
-            }
-        }
-    } else if (document.getElementById("multiple_files") !== null) {
-        var fullPath = document.getElementById('caption');
-        var btnLayout = document.getElementById('submitBtn')
-        var mergeLayout = document.getElementById('submitBtn_1')
-        if (fullPath) {
-            if (fullPath.value !== '') {
-                document.getElementById("fileAlt").style.display = "none";
-                document.getElementById('submitBtn').style.backgroundColor="#e2e8f0"
-                document.getElementById('submitBtn').style.color="#38bdf8"
-                document.getElementById('multiple_files').style.backgroundColor="#f8fafc"
-                btnLayout.style = null
-                mergeLayout.style = "none"
-            } else {
-                document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                document.getElementById('submitBtn').style.color="#e2e8f0"
-                document.getElementById('multiple_files').style.backgroundColor="#e2e8f0"
-                btnLayout.style.display = "none"
-                mergeLayout.style = null
-            }
-        }
-    } else if (document.getElementById("splitLayout1") !== null) {
-        var fullPath = document.getElementById('caption')
-        if (fullPath) {
-            var splitLayout = document.getElementById('splitLayout1')
-            document.getElementById("fileAlt").style.display = "none";
-            if (fullPath.value !== '') {
-                document.getElementById('submitBtn').style.backgroundColor="transparent"
-                document.getElementById('submitBtn').style.color="#38bdf8"
-                splitLayout.style = null
-            } else {
-                document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                document.getElementById('submitBtn').style.color="transparent"
-                splitLayout.style.display="none"
-            }
-        }
-    } else if (document.getElementById("wmColImageLayoutStyleA") !== null) {
-        var fullPath = document.getElementById('caption')
-        var btnLayout = document.getElementById('submitBtn')
-        var mergeLayout = document.getElementById('submitBtn_1')
-        var pdfLayout = document.getElementById('pdfCompLayout')
-        if (fullPath) {
-            document.getElementById("fileAlt").style.display = "none";
-            if (fullPath.value !== '') {
-                document.getElementById('submitBtn').style.backgroundColor="transparent"
-                document.getElementById('submitBtn').style.color="#38bdf8"
-                btnLayout.style = null
-                pdfLayout.style = null
-                mergeLayout.style = "none"
-            } else {
-                document.getElementById('submitBtn').style.backgroundColor="#38bdf8"
-                document.getElementById('submitBtn').style.color="transparent"
-                btnLayout.style.display = "none"
-                mergeLayout.style = null
-                pdfLayout.style.display="none"
-            }
-        }
-    } else if (document.getElementById("api") !== null) {
-        var currentUsage = document.getElementById("progressValue").textContent;
-        var limitUsage = 250;
-        var totalUsagePercentage = (currentUsage*100)/limitUsage;
-        document.getElementById("progressValue").innerText = currentUsage + "/250";
-        document.getElementById("progressBar").style.width = totalUsagePercentage.toFixed(2) + "%";
-    }
+function fontColorValue() {
+    watermarkFontColor.value = wmFontColorPicker.value
 }
 
 function reloadIFrame() {
     var iframe = document.getElementById("iFrame");
     if (iframe !== null) {
         if (iframe.contentDocument !== null) {
-            console.log(iframe.contentDocument.URL); //work control
             if(iframe.contentDocument.URL == "about:blank"){
                 iframe.src =  iframe.src;
             }
@@ -841,47 +634,46 @@ function reloadIFrame() {
             document.getElementById("iFrame").style.display = null
         }
     }
-
 }
 
 function reuseOnClickWmLayoutImageStyleAreaA() {
-    wmLayoutImageStyleColumnAreaA.style.borderColor = '#38bdf8'
-    wmLayoutImageStyleAreaTextA.style.color = '#38bdf8'
+    wmLayoutImageStyleColumnAreaA.style.borderColor = '#4DAAAA'
+    wmLayoutImageStyleAreaTextA.style.color = '#E0E4E5'
     wmLayoutImageRadioAreaInputA.checked = true
     firstColumnArea.style = null
-    firstAreaText.color = '#6b7280'
+    firstAreaText.color = '#E0E4E5'
     secondColumnArea.style = null
-    secondAreaText.color = '#6b7280'
+    secondAreaText.color = '#E0E4E5'
     wmLayoutImageStyleColumnAreaB.style = null
-    wmLayoutImageStyleAreaTextB.style.color = '#6b7280'
+    wmLayoutImageStyleAreaTextB.style.color = '#E0E4E5'
     if (firstAreaInput.checked == true) {
-        firstColumnArea.style.borderColor = '#38bdf8'
-        firstAreaText.style.color = '#38bdf8'
+        firstColumnArea.style.borderColor = '#4DAAAA'
+        firstareatext.style.color = '#E0E4E5'
         firstAreaInput.checked = true
     } else if (secondAreaInput.checked == true) {
-        secondColumnArea.style.borderColor = '#38bdf8'
-        secondAreaText.style.color = '#38bdf8'
+        secondColumnArea.style.borderColor = '#4DAAAA'
+        secondareatext.style.color = '#E0E4E5'
         secondAreaInput.checked = true
     }
 }
 
 function reuseOnClickWmLayoutImageStyleAreaB() {
-    wmLayoutImageStyleColumnAreaB.style.borderColor = '#38bdf8'
-    wmLayoutImageStyleAreaTextB.style.color = '#38bdf8'
+    wmLayoutImageStyleColumnAreaB.style.borderColor = '#4DAAAA'
+    wmLayoutImageStyleAreaTextB.style.color = '#E0E4E5'
     wmLayoutImageRadioAreaInputB.checked = true
     firstColumnArea.style = null
-    firstAreaText.color = '#6b7280'
+    firstAreaText.color = '#E0E4E5'
     secondColumnArea.style = null
-    secondAreaText.color = '#6b7280'
+    secondAreaText.color = '#E0E4E5'
     wmLayoutImageStyleColumnAreaA.style = null
-    wmLayoutImageStyleAreaTextA.style.color = '#6b7280'
+    wmLayoutImageStyleAreaTextA.style.color = '#E0E4E5'
     if (firstAreaInput.checked == true) {
-        firstColumnArea.style.borderColor = '#38bdf8'
-        firstAreaText.style.color = '#38bdf8'
+        firstColumnArea.style.borderColor = '#4DAAAA'
+        firstareatext.style.color = '#E0E4E5'
         firstAreaInput.checked = true
     } else if (secondAreaInput.checked == true) {
-        secondColumnArea.style.borderColor = '#38bdf8'
-        secondAreaText.style.color = '#38bdf8'
+        secondColumnArea.style.borderColor = '#4DAAAA'
+        secondareatext.style.color = '#E0E4E5'
         secondAreaInput.checked = true
     }
 }
@@ -897,15 +689,11 @@ function showVal(newVal,state){
 function splitLayout2_split(){
     document.getElementById("splitLayout2_split").style.display = null;
     document.getElementById("splitLayout2_delete").style.display = "none";
-    document.getElementById("submitBtn_2").style.display = "none";
-    document.getElementById("submitBtn_3").style.display = "none";
 };
 
 function splitLayout2_splitClean() {
     document.getElementById("splitLayout3Cstm").style.display = "none";
     document.getElementById("splitLayout3Wthn").style.display = "none";
-    document.getElementById("submitBtn_2").style.display = "none";
-    document.getElementById("submitBtn_3").style.display= "none";
 };
 
 function splitLayout2_delete(){
@@ -913,22 +701,19 @@ function splitLayout2_delete(){
     document.getElementById("splitLayout2_delete").style.display = null;
     document.getElementById("splitLayout3Cstm").style.display = "none";
     document.getElementById("splitLayout3Wthn").style.display = "none";
-    document.getElementById("submitBtn_2").style.display = "none";
-    document.getElementById("submitBtn_3").style.display = null;
+    document.getElementById("submitBtn").style.display = null;
 };
 
 function splitLayout3_cstm(){
     document.getElementById("splitLayout3Cstm").style.display = null;
     document.getElementById("splitLayout3Wthn").style.display = "none";
-    document.getElementById("submitBtn_2").style.display = null;
-    document.getElementById("submitBtn_3").style.display = "none";
+    document.getElementById("submitBtn").style.display = null;
 };
 
 function splitLayout3_wthn(){
     document.getElementById("splitLayout3Cstm").style.display = "none";
     document.getElementById("splitLayout3Wthn").style.display = null;
-    document.getElementById("submitBtn_2").style.display= null;
-    document.getElementById("submitBtn_3").style.display= "none";
+    document.getElementById("submitBtn").style.display = null;
 };
 
 function wmLayout_image(){
@@ -937,22 +722,22 @@ function wmLayout_image(){
 };
 
 function wmLayout_ImageInputRestore() {
-    if (wmLayoutImageStyleColumnAreaA.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmLayoutImageStyleColumnAreaA.style.borderColor == "rgb(77, 170, 170)") {
         wmLayoutImageRadioAreaInputA.checked = true
     }
-    if (wmLayoutImageStyleColumnAreaB.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmLayoutImageStyleColumnAreaB.style.borderColor == "rgb(77, 170, 170)") {
         wmLayoutImageRadioAreaInputB.checked = true
     }
-    if (wmImageRotationColumnAreaA.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmImageRotationColumnAreaA.style.borderColor == "rgb(77, 170, 170)") {
         wmImageRotationRadioAreaInputA.checked = true
     }
-    if (wmImageRotationColumnAreaB.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmImageRotationColumnAreaB.style.borderColor == "rgb(77, 170, 170)") {
         wmImageRotationRadioAreaInputB.checked = true
     }
-    if (wmImageRotationColumnAreaC.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmImageRotationColumnAreaC.style.borderColor == "rgb(77, 170, 170)") {
         wmImageRotationRadioAreaInputC.checked = true
     }
-    if (wmImageRotationColumnAreaD.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmImageRotationColumnAreaD.style.borderColor == "rgb(77, 170, 170)") {
         wmImageRotationRadioAreaInputD.checked = true
     }
 }
@@ -963,35 +748,26 @@ function wmLayout_text(){
 }
 
 function wmLayout_TextInputRestore() {
-    if (wmColLayoutStyleA.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColLayoutStyleA.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioLayoutStyleA.checked = true
     }
-    if (wmColLayoutStyleB.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColLayoutStyleB.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioLayoutStyleB.checked = true
     }
-    if (wmColRotationA.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColRotationA.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioRotationA.checked = true
     }
-    if (wmColRotationB.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColRotationB.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioRotationB.checked = true
     }
-    if (wmColRotationC.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColRotationC.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioRotationC.checked = true
     }
-    if (wmColRotationD.style.borderColor == "rgb(56, 189, 248)") {
+    if (wmColRotationD.style.borderColor == "rgb(77, 170, 170)") {
         wmRadioRotationD.checked = true
     }
 }
 
-/*
-function remove_wm() {
-    var pdfComp = document.getElementById('pdfCompLayout');
-    var pdfImage = document.getElementById('pdfPreview');
-    var pdfWMlayout = document.getElementById('grid-layout_2');
-    pdfComp.style.display="none";
-    pdfWMlayout.style.display="none";
-    pdfImage.style.display="none";
+function returnToHome() {
+    window.location.href = "/";
 }
-*/
-
-init();
