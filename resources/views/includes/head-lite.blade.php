@@ -3,4 +3,5 @@
 <meta name="theme-color" content="#d1d5db">
 <title>HANA PDF</title>
 <link rel="icon" type="image/svg" href="{{ asset('assets/Logo/ico.svg') }}">
-@vite(['resources/css/app-lite.css','resources/css/font.css'])
+<link rel="stylesheet" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
+<link rel="stylesheet" href="{{ asset('build/assets/app-lite-DDvaTyvM.css')}}" />
