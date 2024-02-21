@@ -26,6 +26,8 @@ class watermarkModel extends Model
         'watermarkText',
         'watermarkPage',
         'result',
+        'isBatch',
+        'batchId',
         'procStartAt',
         'procEndAt',
         'procDuration'

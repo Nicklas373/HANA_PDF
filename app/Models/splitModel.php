@@ -20,7 +20,10 @@ class splitModel extends Model
         'fixedPage',
         'fixedPageRange',
         'mergePDF',
+        'action',
         'result',
+        'isBatch',
+        'batchId',
         'procStartAt',
         'procEndAt',
         'procDuration'

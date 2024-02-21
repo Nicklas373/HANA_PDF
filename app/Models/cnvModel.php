@@ -17,6 +17,8 @@ class cnvModel extends Model
         'container',
         'imgExtract',
         'result',
+        'isBatch',
+        'batchId',
         'procStartAt',
         'procEndAt',
         'procDuration'

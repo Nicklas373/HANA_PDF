@@ -25,7 +25,9 @@ return new class extends Migration
             $table->string('container', 25)->nullable();
             $table->boolean('imgExtract');
             $table->boolean('result');
+            $table->boolean('isBatch');
             $table->uuid('processId');
+            $table->uuid('batchId')->nullable();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
