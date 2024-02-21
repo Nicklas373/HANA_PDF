@@ -81,7 +81,7 @@ class Handler extends ExceptionHandler
                     Log::error('Query Exception failed with: '. $e->getMessage());
                 }
             }
-            abort(404);
+            abort(403);
         } else if ($exception instanceof TokenMismatchException || ($exception instanceof HttpException && $exception->getStatusCode() == 419)) {
              $message = 'TokenMismatchException: ' . $exception->getMessage();
              NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', 'Token Mismatch exception!', $currentRouteInfo, $message, $userIp);
@@ -96,7 +96,7 @@ class Handler extends ExceptionHandler
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $e->getMessage());
             }
-            abort(419);
+            abort(401);
         }
         return parent::render($request, $exception);
     }
