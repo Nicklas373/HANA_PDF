@@ -924,7 +924,7 @@ function sendToAPI(files, proc, action) {
                 document.getElementById("alert-err").classList.remove("hidden","opacity-0")
                 document.getElementById("errMsgTitle").textContent = "Hana PDF Process failed !"
                 document.getElementById("errMsg").textContent = "There was unexpected error !, please try again later."
-                document.getElementById("errProcId").textContent = ""
+                document.getElementById("errProcId").textContent = "00000-00000-00000-00000-00000"
                 reject(new Error('API response error !'))
             }
         }
