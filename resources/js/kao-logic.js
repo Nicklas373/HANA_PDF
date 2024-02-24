@@ -81,7 +81,7 @@ if (uploadDropzone) {
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
-                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/Placeholder_pdf.svg">' +
+                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/placeholder_pdf.svg">' +
                                 '</div>' +
                                 '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
                                 '<div class="dz-success-mark"><svg class="w-4 h-4 text-ac" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div>' +
@@ -282,7 +282,7 @@ if (uploadDropzoneAlt) {
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
-                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/Placeholder_pdf.svg">' +
+                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/placeholder_pdf.svg">' +
                                 '</div>' +
                                 '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
                                 '<div class="dz-success-mark"><svg class="w-4 h-4 text-ac" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div>' +
@@ -418,7 +418,7 @@ if (uploadDropzoneAlt) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = thumbnailURL
                     })
                     .catch(function(error) {
-                        file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/Placeholder_ppt.svg"
+                        file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_ppt.svg"
                         console.log(error.message)
                     })
                 }
@@ -472,7 +472,7 @@ if (uploadDropzoneSingle) {
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
-                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/Placeholder_pdf.svg">' +
+                                    '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/placeholder_pdf.svg">' +
                                 '</div>' +
                                 '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
                                 '<div class="dz-success-mark"><svg class="w-4 h-4 text-ac" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div>' +
