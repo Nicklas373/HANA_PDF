@@ -12,7 +12,7 @@
             <form action="{{ url('api/v1/file/upload') }}" method="post" class="dropzone flex flex-col lg:flex-row xl:flex-row mx-4 items-center justify-center w-6/6 lg:w-4/6 min-h-96 h-fit lg:h-72 max-h-full lg:overflow-y-auto cursor-pointer bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-15 mb-2" id="dropzoneArea">
                 {{ csrf_field() }}
                 <div class="flex flex-col items-center justify-content p-4" id="dropzoneUiInit">
-                    <img class="p-4 h-24 w-24" src="/assets/icons/Placeholder_pdf.svg">
+                    <img class="p-4 h-24 w-24" src="{{ asset('assets/icons/placeholder_pdf.svg') }}">
                     <p class="mb-2 text-md text-lt3 font-quicksand font-medium">Drop PDF files here</p>
                     <p class="text-xs text-lt3 font-quicksand">Or</p>
                     <button type="button" id="dropzoneUploadInit" class="mx-auto mt-2 p-4 text-xs font-quicksand font-semibold bg-ac text-lt rounded-lg cursor-pointer w-42 h-12 text-center flex items-center justify-center">

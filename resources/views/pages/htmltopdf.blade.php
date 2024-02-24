@@ -14,7 +14,7 @@
         <label for="convertType" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Write the Website URL</label>
         <div class="flex">
             <span class="inline-flex items-center px-3 text-sm text-ac bg-ac border border-ac rounded-s-lg">
-                <img class="h-6 w-6 text-lt1" src="/assets/icons/Website.svg" />
+                <img class="h-6 w-6 text-lt1" src="{{ asset('assets/icons/website.svg') }}" />
             </span>
             <input type="text" id="urlToPDF" name="urlToPDF" class="flowbite-drop-zone font-poppins rounded-r-lg block w-full cursor-pointer border border-gray-300 text-sm text-slate-900 shadow-inner focus:ring-sky-400" onfocusin="checkValidation('urlToPDF')" onfocusout="checkValidation('urlToPDF')" placeholder="https://pdf.hana-ci.com" />
         </div>
