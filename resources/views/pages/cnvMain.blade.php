@@ -11,7 +11,7 @@
     <div class="h-fit w-full p-2 lg:w-4/6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" data-ripple-light="true" type="button">
       <a href="/cnvToPDF">
         <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="/assets/icons/To_pdf.svg" alt="" height="64px" width="64px" />
+          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/to_pdf.svg') }}" alt="" height="64px" width="64px" />
         </div>
         <div class="mx-8 py-2 md:mx-4 lg:mx-0 lg:p-2 mt-8 lg:mt-6 lg:mb-4 ">
           <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">Convert To PDF</h5>
@@ -22,7 +22,7 @@
     <div class="h-fit w-full p-2 lg:w-4/6 lg:mx-6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" type="button" data-ripple-light="true">
       <a href="/cnvFromPDF">
         <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="/assets/icons/From_pdf.svg" alt="" height="64px" width="64px" />
+          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/from_pdf.svg') }}" alt="" height="64px" width="64px" />
         </div>
         <div class="mx-8 py-2 md:mx-4 lg:mx-0 lg:p-2 mt-8 lg:mt-6 lg:mb-4">
           <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">Convert From PDF</h5>
@@ -33,7 +33,7 @@
     <div class="h-fit w-full p-2 lg:w-4/6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" type="button" data-ripple-light="true">
       <a href="/htmltopdf">
         <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="/assets/icons/Html_to_pdf.svg" alt="" height="64px" width="64px" />
+          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/html_to_pdf.svg') }}" alt="" height="64px" width="64px" />
         </div>
         <div class="mx-8 py-2 md:mx-4 mt-8 lg:mt-6 lg:mb-4">
           <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">HTML To PDF</h5>

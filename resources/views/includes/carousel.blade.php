@@ -4,7 +4,7 @@
         <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
             <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
-                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/Compress.svg') }}">
+                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/compress.svg') }}">
                 </div>
                 <div class="mx-6 w-2/6 sm:w-3/6 md:w-2/6 lg:w-2/6 h-48 flex flex-col">
                     <div class="mt-8 lg:mt-0">
@@ -22,7 +22,7 @@
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
             <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
-                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/Convert.svg') }}">
+                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/convert.svg') }}">
                 </div>
                 <div class="mx-6 w-2/6 sm:w-3/6 md:w-2/6 lg:w-2/6 h-48 flex flex-col">
                     <div class="mt-8 lg:mt-0">
@@ -40,7 +40,7 @@
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
             <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
-                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/Merge.svg') }}">
+                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/merge.svg') }}">
                 </div>
                 <div class="mx-6 w-2/6 sm:w-3/6 md:w-2/6 lg:w-2/6 h-48 flex flex-col">
                     <div class="mt-8 lg:mt-0">
@@ -58,7 +58,7 @@
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
             <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
-                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/Split.svg') }}">
+                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/split.svg') }}">
                 </div>
                 <div class="mx-6 w-2/6 sm:w-3/6 md:w-2/6 lg:w-2/6 h-48 flex flex-col">
                     <div class="mt-8 lg:mt-0">
@@ -76,7 +76,7 @@
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
             <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
-                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/Watermark.svg') }}">
+                    <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/watermark.svg') }}">
                 </div>
                 <div class="mx-6 w-2/6 sm:w-3/6 md:w-2/6 lg:w-2/6 h-48 flex flex-col">
                     <div class="mt-8 lg:mt-0">
