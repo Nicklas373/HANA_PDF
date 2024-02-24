@@ -4,7 +4,7 @@
             <div class="p-6 space-y-6 text-center">
                 <p id="titleMessageModal" class="font-quicksand font-medium text-dt text-lg leading-relaxed">Processing PDF...</p>
                 <div class="animate-spin-counter-clockwise inline-block w-12 h-12" role="status" aria-label="loading">
-                    <img src="{{ asset('assets/icons/Process.svg') }}" alt="loading">
+                    <img src="{{ asset('assets/icons/process.svg') }}" alt="loading">
                 </div>
             </div>
         </div>
@@ -14,7 +14,7 @@
     <div class="relative w-full max-w-2xl max-h-full">
         <div class="relative bg-pc4 rounded-lg shadow">
             <div class="p-6 space-y-6">
-                <img class="mx-auto mt-4 mb-4 text-dt3 w-12 h-12" src="{{ asset('assets/icons/Exclamation.svg') }}" alt="exclamation">
+                <img class="mx-auto mt-4 mb-4 text-dt3 w-12 h-12" src="{{ asset('assets/icons/exclamation.svg') }}" alt="exclamation">
                 <p id="errMessageModal" class="font-quicksand font-semibold text-dt1 text-lg leading-relaxed text-center">....</p>
                 <p id="errSubMessageModal" class="font-quicksand font text-dt3 text-xs leading-relaxed text-center">
                     <div id="altSubMessageModal" class="flex p-4 mb-4 text-sm text-lt1 bg-rt1 rounded-md" role="alert" style="display: none;">

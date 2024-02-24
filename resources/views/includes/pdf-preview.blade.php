@@ -32,7 +32,7 @@
             <div class="w-full h-full">
                 <div id="iFrameBorder" class="w-full h-full bg-lt1 backdrop-filter backdrop-blur-md bg-opacity-50">
                     <div class="animate-spin-counter-clockwise w-16 h-16 mt-64 absolute top-0 bottom-0 left-0 right-0 mx-auto" role="status" aria-label="loading">
-                        <img src="{{ asset('assets/icons/Process.svg') }}" alt="loading">
+                        <img src="{{ asset('assets/icons/process.svg') }}" alt="loading">
                     </div>
                     <p class="font-quicksand font-semibold text-pc4 text-semibold leading-relaxed text-center mt-48 absolute top-0 bottom-0 left-0 right-0">
                         Loading document preview...
