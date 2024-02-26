@@ -34,7 +34,9 @@ return new class extends Migration
             $table->text('watermarkText')->nullable();
             $table->string('watermarkPage', 25)->nullable();
             $table->boolean('result');
+            $table->boolean('isBatch');
             $table->uuid('processId');
+            $table->uuid('batchId')->nullable();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();

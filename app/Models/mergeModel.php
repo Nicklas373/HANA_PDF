@@ -15,6 +15,8 @@ class mergeModel extends Model
         'fileName',
         'fileSize',
         'result',
+        'isBatch',
+        'batchId',
         'procStartAt',
         'procEndAt',
         'procDuration'

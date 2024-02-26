@@ -1,26 +1,36 @@
 {
-  "_index-Qkg2JGee.js": {
-    "file": "assets/index-Qkg2JGee.js"
+  "_index-D1AB55dp.js": {
+    "file": "assets/index-D1AB55dp.js"
+  },
+  "resources/css/app-lite.css": {
+    "file": "assets/app-lite-DGYbdi6z.css",
+    "src": "resources/css/app-lite.css",
+    "isEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-l6JlhLPd.css",
-    "isEntry": true,
-    "src": "resources/css/app.css"
+    "file": "assets/app-Q8IUc3hd.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/font.css": {
+    "file": "assets/font-C1ampFSP.css",
+    "src": "resources/css/font.css",
+    "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DBpsIzgy.js",
-    "imports": [
-      "_index-Qkg2JGee.js"
-    ],
+    "file": "assets/app-lW0wcPz6.js",
+    "src": "resources/js/app.js",
     "isEntry": true,
-    "src": "resources/js/app.js"
+    "imports": [
+      "_index-D1AB55dp.js"
+    ]
   },
   "resources/js/kao-logic.js": {
-    "file": "assets/kao-logic-qBLjOotu.js",
-    "imports": [
-      "_index-Qkg2JGee.js"
-    ],
+    "file": "assets/kao-logic-CKUGkD5x.js",
+    "src": "resources/js/kao-logic.js",
     "isEntry": true,
-    "src": "resources/js/kao-logic.js"
+    "imports": [
+      "_index-D1AB55dp.js"
+    ]
   }
 }

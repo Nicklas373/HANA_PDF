@@ -2,6 +2,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#dee7ed">
 <title>HANA PDF</title>
-<link rel="stylesheet" href="{{ asset('build/assets/app-l6JlhLPd.css')}}" />
-<link rel="script" href="{{ asset('build/assets/app-DBpsIzgy.js') }}" />
-<link rel="script" href="{{ asset('build/assets/index-Qkg2JGee.js')}}" />
+<link rel="icon" type="image/svg" href="{{ asset('assets/logo/ico.svg') }}">
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" />
+<link rel="stylesheet" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
+<link rel="stylesheet" href="{{ asset('build/assets/app-Q8IUc3hd.css')}}" />
+<link rel="script" href="{{ asset('build/assets/app-lW0wcPz6.js') }}" />
+<link rel="script" href="{{ asset('build/assets/index-D1AB55dp.js')}}" />

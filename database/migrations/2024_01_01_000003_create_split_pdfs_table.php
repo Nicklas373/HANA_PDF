@@ -28,8 +28,11 @@ return new class extends Migration
             $table->text('fixedPage')->nullable();
             $table->text('fixedPageRange')->nullable();
             $table->string('mergePDF', 25)->nullable();
+            $table->string('action', 10)->nullable();
             $table->boolean('result');
+            $table->boolean('isBatch');
             $table->uuid('processId');
+            $table->uuid('batchId')->nullable();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
