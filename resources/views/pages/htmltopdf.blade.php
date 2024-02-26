@@ -11,7 +11,7 @@
   <form method="POST" enctype="multipart/form-data" class="flex flex-col p-2">
     {{ csrf_field() }}
     <div class="w-full p-2 lg:w-3/6 bg-transparent rounded-lg bg-opacity-50 p-2 mt-2 lg:mx-2">
-        <label for="convertType" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Write the Website URL</label>
+        <p class="block mb-2 font-quicksand text-xl font-bold text-pc4">Write the Website URL</p>
         <div class="flex">
             <span class="inline-flex items-center px-3 text-sm text-ac bg-ac border border-ac rounded-s-lg">
                 <img class="h-6 w-6 text-lt1" src="{{ asset('assets/icons/website.svg') }}" />

@@ -1,8 +1,8 @@
 <div id="indicators-carousel" class="relative w-full bg-lt backdrop-filter backdrop-blur-md rounded-t-[40px] bg-opacity-15" data-carousel="static">
-    <div class="relative h-full overflow-hidden rounded-t-[40px] md:h-96 2xl:h-full shadow-[inset_0px_10px_25px_-10px_rgba(239,323,324,1)]">
+    <div class="relative h-96 overflow-hidden rounded-t-[40px] shadow-[inset_0px_10px_25px_-10px_rgba(239,323,324,1)]">
         <h1 class="font-quicksand font-medium mt-6 md:mt-8 text-center text-xl md:text-2xl xl:text-3xl text-pc4">Our Features</h1>
         <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
-            <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
+            <div class="flex flex-row mx-auto items-center px-4 h-full w-full xl:mt-4 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
                     <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/compress.svg') }}">
                 </div>
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
+            <div class="flex flex-row mx-auto items-center px-4 h-full w-full xl:mt-4 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
                     <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/convert.svg') }}">
                 </div>
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
+            <div class="flex flex-row mx-auto items-center px-4 h-full w-full xl:mt-4 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
                     <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/merge.svg') }}">
                 </div>
@@ -49,14 +49,14 @@
                     <div class="mt-2 mb-2 md:mt-4 md:mb-4">
                         <p class="font-quicksand font-normal text-xs lg:text-xl text-lt1">Combine multiple PDF files online quickly and securely.</p>
                     </div>
-                    <div class="mt-4 lg:mt-8">
+                    <div class="mt-8">
                         <button type="button" class="font-quicksand font-medium h-8 w-full lg:w-2/5 lg:h-10 rounded-lg bg-ac text-md lg:text-xl text-lt1" type="button" data-ripple-light="true" onclick="window.location.href='/merge'">Learn More</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
+            <div class="flex flex-row mx-auto items-center px-4 h-full w-full xl:mt-4 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
                     <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/split.svg') }}">
                 </div>
@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <div class="flex flex-row mx-auto items-center px-4 mt-14 md:mt-32 lg:mt-32 lg:ms-32 justify-center">
+            <div class="flex flex-row mx-auto items-center px-4 h-full w-full xl:mt-4 justify-center">
                 <div class="w-16 h-20 ms-4 md:w-48 lg:w-48 lg:h-40 mb-2 items-center lg:mx-8">
                     <img class="h-14 w-14 md:h-32 md:w-32 lg:w-36 lg:h-36 mx-auto" src="{{ asset('assets/icons/watermark.svg') }}">
                 </div>
@@ -85,7 +85,7 @@
                     <div class="mt-2 mb-2 md:mt-4 md:mb-4">
                         <p class="font-quicksand font-normal text-xs lg:text-xl text-lt1">Add and customize watermark with image or text over your PDF.</p>
                     </div>
-                    <div class="mt-4 lg:mt-2">
+                    <div class="mt-8 lg:mt-2">
                         <button type="button" class="font-quicksand font-medium h-8 w-full lg:w-2/5 lg:h-10 rounded-lg bg-ac text-md lg:text-xl text-lt1" type="button" data-ripple-light="true" onclick="window.location.href='/watermark'">Learn More</button>
                     </div>
                 </div>

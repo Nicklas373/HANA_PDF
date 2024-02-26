@@ -7,40 +7,52 @@
             <div class="font-quicksand font-light text-md lg:text-3xl text-lt1">Convert PDF or document files to other format with our converter.</div>
         </div>
     </section>
-  <div class="flex flex-col lg:flex-row justify-between items-center">
-    <div class="h-fit w-full p-2 lg:w-4/6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" data-ripple-light="true" type="button">
-      <a href="/cnvToPDF">
-        <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/to_pdf.svg') }}" alt="" height="64px" width="64px" />
+    <div class="mx-4 mb-16 mt-32 grid grid-cols-1 gap-8 p-4 lg:grid-cols-3">
+        <div class="h-fit w-full rounded-lg px-2 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-15 md:mt-0 md:h-64 md:w-11/12" data-ripple-light="true" type="button">
+            <a href="/cnvToPDF" class="flex flex-row items-center justify-center mx-auto h-full">
+                <div dir="rtl" class="h-full w-3/6 md:h-3/6 lg:w-2/6">
+                    <img class="p-2 mt-0 h-28 w-28 lg:w-36 lg:h-36" src="{{ asset('assets/icons/to_pdf.svg') }}"/>
+                </div>
+                <div class="flex flex-col mx-4 w-4/6 sm:w-3/6 md:w-4/6 lg:w-3/6 h-48">
+                    <div class="mt-12 2xl:mt-8">
+                        <h5 class="font-magistral font-semibold text-md md:text-lg 2xl:text-2xl text-pc4">Convert To PDF</h5>
+                    </div>
+                    <div class="mt-2 mb-2 md:mt-4 md:mb-4 overflow-auto">
+                        <p class="font-quicksand font-normal text-xs md:text-sm 2xl:text-lg text-lt1">Convert document or image files into specified document format.</p>
+                    </div>
+                </div>
+            </a>
         </div>
-        <div class="mx-8 py-2 md:mx-4 lg:mx-0 lg:p-2 mt-8 lg:mt-6 lg:mb-4 ">
-          <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">Convert To PDF</h5>
-          <p class="font-poppins mt-4 mb-4 text-xs lg:text-sm text-gray-700">Convert document or image files into specified document format</p>
+        <div class="h-fit w-full rounded-lg px-2 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-15 md:mt-0 md:h-64 md:w-11/12" data-ripple-light="true" type="button">
+            <a href="/cnvFromPDF" class="flex flex-row items-center justify-center mx-auto h-full">
+                <div dir="rtl" class="h-full w-3/6 md:h-3/6 lg:w-2/6">
+                    <img class="p-2 mt-0 h-28 w-28 lg:w-36 lg:h-36" src="{{ asset('assets/icons/from_pdf.svg') }}"/>
+                </div>
+                <div class="flex flex-col mx-4 w-4/6 sm:w-3/6 md:w-4/6 lg:w-3/6 h-48">
+                    <div class="mt-12 2xl:mt-8">
+                        <h5 class="font-magistral font-semibold text-md md:text-lg 2xl:text-2xl text-pc4">Convert From PDF</h5>
+                    </div>
+                    <div class="mt-2 mb-2 md:mt-4 md:mb-4 overflow-auto">
+                        <p class="font-quicksand font-normal text-xs md:text-sm 2xl:text-lg text-lt1">Convert PDF files into specified document format.</p>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
+        <div class="h-fit w-full rounded-lg px-2 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-15 md:mt-0 md:h-64 md:w-11/12" data-ripple-light="true" type="button">
+            <a href="/htmltopdf" class="flex flex-row items-center justify-center mx-auto h-full">
+                <div dir="rtl" class="h-full w-3/6 md:h-3/6 lg:w-2/6">
+                    <img class="p-2 mt-0 h-28 w-28 lg:w-36 lg:h-36" src="{{ asset('assets/icons/html_to_pdf.svg') }}"/>
+                </div>
+                <div class="flex flex-col mx-4 w-4/6 sm:w-3/6 md:w-4/6 lg:w-3/6 h-48">
+                    <div class="mt-12 2xl:mt-8">
+                        <h5 class="font-magistral font-semibold text-md md:text-lg 2xl:text-2xl text-pc4">HTML To PDF</h5>
+                    </div>
+                    <div class="mt-2 mb-2 md:mt-4 md:mb-4 overflow-auto">
+                        <p class="font-quicksand font-normal text-xs md:text-sm 2xl:text-lg text-lt1">Convert URL address or web page into PDF format.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
-    <div class="h-fit w-full p-2 lg:w-4/6 lg:mx-6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" type="button" data-ripple-light="true">
-      <a href="/cnvFromPDF">
-        <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/from_pdf.svg') }}" alt="" height="64px" width="64px" />
-        </div>
-        <div class="mx-8 py-2 md:mx-4 lg:mx-0 lg:p-2 mt-8 lg:mt-6 lg:mb-4">
-          <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">Convert From PDF</h5>
-          <p class="font-poppins mt-4 mb-4 text-xs lg:text-sm text-gray-700">Convert PDF files into specified document format</p>
-        </div>
-      </a>
-    </div>
-    <div class="h-fit w-full p-2 lg:w-4/6 bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-60" type="button" data-ripple-light="true">
-      <a href="/htmltopdf">
-        <div dir="rtl">
-          <img class="p-2 mt-4 mr-6 xl:mt-6 xl:p-2 2xl:mt-8 2xl:mr-8 2xl:p-0" src="{{ asset('assets/icons/html_to_pdf.svg') }}" alt="" height="64px" width="64px" />
-        </div>
-        <div class="mx-8 py-2 md:mx-4 mt-8 lg:mt-6 lg:mb-4">
-          <h5 class="font-poppins mb-2 text-xl xl:text-2xl xl:mb-4 font-semibold tracking-tight text-slate-900">HTML To PDF</h5>
-          <p class="font-poppins mt-4 mb-4 text-xs lg:text-sm text-gray-700">Convert URL address or web page into PDF format</p>
-        </div>
-      </a>
-    </div>
-  </div>
   @stop
 </div>

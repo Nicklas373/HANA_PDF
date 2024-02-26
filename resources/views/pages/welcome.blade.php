@@ -9,8 +9,11 @@
         </div>
     </section>
 </div>
-<div class="dynamic-carousel-viewport">
-    @include('includes.carousel')
-    @include('includes.footer')
+<div class="dynamic-carousel-viewport h-full grid grid-rows-1">
+    <div></div>
+    <div>
+        @include('includes.carousel')
+        @include('includes.footer')
+    </div>
 </div>
 @stop
