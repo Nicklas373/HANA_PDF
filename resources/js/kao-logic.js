@@ -418,7 +418,7 @@ if (uploadDropzoneAlt) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = thumbnailURL
                     })
                     .catch(function(error) {
-                        file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_ppt.svg"
+                        file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
                         console.log(error.message)
                     })
                 }
@@ -954,6 +954,50 @@ function submit(event) {
                     cnvdocx.style.borderColor = '#A84E4E'
                     loadingModal.hide()
                     errModal.show()
+                } else {
+                    var cnvImage = document.getElementById('firstRadio')
+                    var cnvPptx = document.getElementById('secondRadio')
+                    var cnvXls = document.getElementById('thirdRadio')
+                    var cnvDocx = document.getElementById('fourthRadio')
+                    cnvImage.style.borderColor = '#4DAAAA'
+                    cnvPptx.style.borderColor = '#4DAAAA'
+                    cnvXls.style.borderColor = '#4DAAAA'
+                    cnvDocx.style.borderColor = '#4DAAAA'
+                    if (getUploadedFileName().length > 0) {
+                        if (xhrBalance && xhrBalanceTotal > 10) {
+                             procTitleMessageModal.innerText = "Processing PDF..."
+                             errMessage.style.visibility = null
+                             errSubMessage.style.visibility = null
+                             errAltSubMessageModal.style.display = "none"
+                             errModal.hide()
+                             loadingModal.show()
+                             if (document.getElementById('cnvFrPDF') !== null) {
+                                 apiGateway("convert","")
+                             } else {
+                                 apiGateway("compress","")
+                             }
+                         } else {
+                             event.preventDefault()
+                             errMessage.innerText  = "PDF file can not be processed !"
+                             errSubMessage.innerText = ""
+                             errListTitleMessage.innerText = "Error message"
+                             resetErrListMessage()
+                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                             errAltSubMessageModal.style = null
+                             loadingModal.hide()
+                             errModal.show()
+                         }
+                     } else {
+                         event.preventDefault()
+                         errMessage.innerText  = "PDF file can not be processed !"
+                         errSubMessage.innerText = ""
+                         errListTitleMessage.innerText = "Error message"
+                         resetErrListMessage()
+                         generateMesssage("No file has been chosen")
+                         errAltSubMessageModal.style = null
+                         loadingModal.hide()
+                         errModal.show()
+                     }
                 }
             } else {
                 var compLow = document.getElementById('firstRadio')
