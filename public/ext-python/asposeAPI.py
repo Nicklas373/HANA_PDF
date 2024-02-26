@@ -12,9 +12,7 @@ asposeClientSecret=str(sys.argv[2])
 asposeContainer=str(sys.argv[3])
 asposeFile=str(sys.argv[4])
 asposeOut=str(sys.argv[5])
-asposeFileDirFix = asposeFile.replace("/upload/","/app/public/upload/")
-WinSemanticCnv = asposeFileDirFix.replace("/", "\\\\")
-WinSemanticDir = r"C:\\Users\\Nickl\\Documents\\GitHub\\emsitpro-pdftools-tailwind"+WinSemanticCnv
+WinSemanticCnv = asposeFile.replace("/", "\\\\")
 
 os.chdir('..')
 
@@ -47,8 +45,8 @@ def convAsposeAPI(token, container):
     params = {
         'outPath': asposeOut,
     }
-    if os.path.isfile(WinSemanticDir):
-        with open(WinSemanticDir, 'rb') as f:
+    if os.path.isfile(WinSemanticCnv):
+        with open(WinSemanticCnv, 'rb') as f:
             data = f.read()
         if len(container) != 0:
             try:
@@ -72,7 +70,7 @@ def convAsposeAPI(token, container):
             print("Invalid Container")
             return False
     else:
-        print('File source not found! :'+WinSemanticDir)
+        print('File source not found! :'+WinSemanticCnv)
         return False
 
 getAsposeToken()
