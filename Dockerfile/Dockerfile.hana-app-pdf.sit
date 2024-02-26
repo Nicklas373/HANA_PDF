@@ -3,7 +3,7 @@ FROM php:8.2-fpm
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.2"
+LABEL version="1.3"
 LABEL description="Docker application image for HANA-CI SIT"
 
 # Configure ARG
@@ -40,7 +40,23 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
-    git
+    git \
+    libmagickwand-dev \
+    libzip-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    ghostscript
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) \
+        gd \
+        zip
+
+# Install Imagick extension
+RUN pecl install imagick && \
+    docker-php-ext-enable imagick
 
 # Configure PostgresSQL PHP Driver
 RUN apt-get update && apt-get install -y libpq-dev && \
@@ -55,12 +71,14 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN cd hanaci-pdf && composer install --no-interaction --no-scripts --no-progress --prefer-dist
 
 # Configure App Service
-RUN mkdir hanaci-pdf/storage/app/public/temp
-RUN mkdir hanaci-pdf/storage/app/public/temp-merge
-RUN mkdir hanaci-pdf/storage/app/public/temp-image
-RUN mkdir hanaci-pdf/storage/app/public/upload-pdf
-RUN cd hanaci-pdf && cp .env.example .env
+RUN mkdir hanaci-pdf/storage/app/public/batch
+RUN mkdir hanaci-pdf/storage/app/public/download
+RUN mkdir hanaci-pdf/storage/app/public/image
+RUN mkdir hanaci-pdf/storage/app/public/pool
+RUN mkdir hanaci-pdf/storage/app/public/upload
+COPY module/.env hanaci-pdf/.env
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
+RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/vendor/mpdf/mpdf/tmp/ -R
 RUN cd hanaci-pdf && php artisan key:generate
 RUN cd hanaci-pdf && php artisan storage:link
 RUN cd hanaci-pdf && php artisan config:cache
