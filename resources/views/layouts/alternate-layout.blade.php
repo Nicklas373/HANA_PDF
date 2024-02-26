@@ -9,9 +9,9 @@
     <div id="content" class="flex flex-col min-h-screen justify-between">
         @yield('content')
     </div>
-    <script async type="module" src="/build/assets/kao-logic-CKUGkD5x.js"></script>
-    <script async type="module" src="/pdfjs/build/pdf.mjs"></script>
-    <script async type="module" src="/pdfjs/build/pdf.worker.mjs"></script>
+    <script async type="module" src="/build/assets/kao-logic-CPjYiSmx.js"></script>
+    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.mjs"></script>
+    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.mjs"></script>
     <script async type="text/javascript" src="/ext-js/kao-controller.js"></script>
     <script async type="text/javascript" src="/ext-js/kao-main.js"></script>
     <script async type="text/javascript" src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
