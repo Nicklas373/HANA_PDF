@@ -41,10 +41,10 @@ var uploadedFile = []
 var uploadDropzone = document.getElementById("dropzoneArea")
 var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
 var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
-var adobeClientID = 'dd4ea66dee324fd3bc8337870d13ebb0'
+var adobeClientID = '16199e0c9a4042f0969ea2ed591c547b'
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
-var uploadUrl = 'http://sit.pdf.hana-ci.com/storage/upload/'
+var uploadUrl = 'http://pdf.hana-ci.com/storage/upload/'
 
 if (procBtn) {
     remainingBalance().then(function () {

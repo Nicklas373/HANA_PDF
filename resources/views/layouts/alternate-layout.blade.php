@@ -9,7 +9,7 @@
     <div id="content" class="flex flex-col min-h-screen justify-between">
         @yield('content')
     </div>
-    <script async type="module" src="/build/assets/kao-logic-DBxccJeQ.js"></script>
+    <script async type="module" src="/build/assets/kao-logic-CKUGkD5x.js"></script>
     <script async type="module" src="/pdfjs/build/pdf.mjs"></script>
     <script async type="module" src="/pdfjs/build/pdf.worker.mjs"></script>
     <script async type="text/javascript" src="/ext-js/kao-controller.js"></script>
