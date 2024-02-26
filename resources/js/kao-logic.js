@@ -203,7 +203,7 @@ if (uploadDropzone) {
                 if (file) {
                     const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = "/storage/upload/" + file.name
-                    uploadedFile.filter(item => !file.name.includes(item))
+                    uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
                     fetch("api/v1/file/remove", {
                         method: "POST",
@@ -382,7 +382,7 @@ if (uploadDropzoneAlt) {
                 if (file) {
                     const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = uploadPath + file.name
-                    uploadedFile.filter(item => !file.name.includes(item))
+                    uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
                     fetch("api/v1/file/remove", {
                         method: "POST",
@@ -593,7 +593,7 @@ if (uploadDropzoneSingle) {
                 if (file) {
                     const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = uploadPath+file.name
-                    uploadedFile.filter(item => !file.name.includes(item))
+                    uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
                     fetch("api/v1/file/remove", {
                         method: "POST",
@@ -903,8 +903,8 @@ function sendToAPI(files, proc, action) {
                             autoDownload(xhrReturn.res, xhrReturn.fileName)
                             document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
-                            document.getElementById("scsMsgTitle").innerHTML = `HANA PDF Process completed !`
-                            document.getElementById("scsMsgResult").innerHTML = `Download the file or PDF below.`
+                            document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
+                            document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
                             document.getElementById("scsMsgLink").href = xhrReturn.res
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         }
@@ -914,17 +914,18 @@ function sendToAPI(files, proc, action) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                     document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                    document.getElementById("errMsgTitle").textContent = "Hana PDF Process failed !"
-                    document.getElementById("errMsg").textContent = xhrReturn.message
-                    document.getElementById("errProcId").textContent = xhrReturn.processId
+                    document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                    document.getElementById("errMsg").innerText = xhrReturn.message
+                    document.getElementById("errProcId").classList.remove("hidden")
+                    document.getElementById("errProcId").innerText = xhrReturn.processId
                     reject(new Error('API response error !'))
                 }
             } else {
                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                 document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                document.getElementById("errMsgTitle").textContent = "Hana PDF Process failed !"
-                document.getElementById("errMsg").textContent = "There was unexpected error !, please try again later."
-                document.getElementById("errProcId").textContent = "00000-00000-00000-00000-00000"
+                document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
+                document.getElementById("errProcId").classList.add("hidden")
                 reject(new Error('API response error !'))
             }
         }
