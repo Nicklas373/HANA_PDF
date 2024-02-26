@@ -6,6 +6,6 @@
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" />
 <link rel="stylesheet" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
-<link rel="stylesheet" href="{{ asset('build/assets/app-D-wjbIFi.css')}}" />
+<link rel="stylesheet" href="{{ asset('build/assets/app-Q8IUc3hd.css')}}" />
 <link rel="script" href="{{ asset('build/assets/app-lW0wcPz6.js') }}" />
 <link rel="script" href="{{ asset('build/assets/index-D1AB55dp.js')}}" />

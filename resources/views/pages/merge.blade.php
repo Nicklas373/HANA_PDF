@@ -31,7 +31,7 @@
             </div>
         </form>
         <div class="flex flex-col mx-4 mt-8 lg:w-3/6">
-            <label for="convertType" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Merge Options</label>
+            <p class="block mb-2 font-quicksand text-xl font-bold text-pc4">Merge Options</p>
             <div dir="ltl">
                 <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-2 lg:mt-4 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-4/6 h-10" data-ripple-light="true">Merge PDF</button>
             </div>

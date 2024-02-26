@@ -61,7 +61,7 @@
                         <input type="text" id="thirdInput" class="" style="display: none;" value="cnvFrPDF">
                         <div class="flex" id="thirdChk" value="cnvFrPDF">
                             <div class="flex items-center h-5">
-                                <input id="thirdRadio" name="convertType" value="excel" aria-describedby="helper-thirdRadioText" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
+                                <input id="thirdRadio" name="convertType" value="xlsx" aria-describedby="helper-thirdRadioText" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
                             </div>
                             <div class="ml-4">
                                 <label for="thirdRadio" class="font-semibold text-md text-lt1 font-quicksand" id="thirdRadioText">Spreadsheet</label>
@@ -83,7 +83,7 @@
                     </li>
                 </ul>
                 <div class="flex flex-col w-full lg:w-2/6 mb-8" id="extImageLayout" style="display: none;">
-                    <label for="extImageLayout" class="block mb-2 font-quicksand text-xl font-bold text-pc4 mt-4">Image Options</label>
+                    <p class="block mb-2 font-quicksand text-xl font-bold text-pc4 mt-4">Image Options</p>
                     <div class="p-2 w-full lg:w-5/6 flex flex-col bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2">
                         <label id="extImageLayoutAlt" class="relative inline-flex items-center cursor-pointer mt-2 lg:ms-2">
                             <input type="checkbox" id="extImage" name="extImage" class="sr-only peer">
