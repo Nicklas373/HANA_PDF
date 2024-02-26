@@ -129,7 +129,7 @@ class convertController extends Controller
                     $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                     if ($convertType == 'xlsx') {
                         $asposeAPI = new Process([
-                            'python',
+                            'python3',
                             public_path().'/ext-python/asposeAPI.py',
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
@@ -326,9 +326,9 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput(),
+                                            'errApiReason' => $asposeAPI->getErrorOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
@@ -428,9 +428,9 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput(),
+                                            'errApiReason' => $asposeAPI->getErrorOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
@@ -458,7 +458,7 @@ class convertController extends Controller
                         }
                     } else if ($convertType == 'pptx') {
                         $asposeAPI = new Process([
-                            'python',
+                            'python3',
                             public_path().'/ext-python/asposeAPI.py',
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
@@ -655,13 +655,13 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput(),
+                                            'errApiReason' => $asposeAPI->getErrorOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
-                                        'error' => $asposeAPI->getOutput(),
+                                        'error' => $asposeAPI->getErrorOutput(),
                                         'processId' => $Nuuid
                                     ], 400);
                                 } catch (QueryException $ex) {
@@ -757,9 +757,9 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput(),
+                                            'errApiReason' => $asposeAPI->getErrorOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
