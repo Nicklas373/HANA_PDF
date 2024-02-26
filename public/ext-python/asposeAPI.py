@@ -55,10 +55,10 @@ def convAsposeAPI(token, container):
                 asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data, timeout=(85,90))
                 values = asposeResponse.status_code
                 if values == 200:
-                    print('File conversion success!')
+                    print('File conversion success! ')
                     return True
                 else:
-                    print('File conversion failed!')
+                    print('File conversion failed! ')
                     return False
             except Timeout:
                 print("Request time out!")
