@@ -76,7 +76,7 @@ RUN mkdir hanaci-pdf/storage/app/public/download
 RUN mkdir hanaci-pdf/storage/app/public/image
 RUN mkdir hanaci-pdf/storage/app/public/pool
 RUN mkdir hanaci-pdf/storage/app/public/upload
-COPY module/.env hanaci-pdf/.env
+RUN cd hanaci-pdf && mv .env.example .env
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/vendor/mpdf/mpdf/tmp/ -R
 RUN cd hanaci-pdf && php artisan key:generate
@@ -102,7 +102,8 @@ RUN cd hanaci-pdf && echo "FTP_SERVER=$FTP_SERVER" >> .env
 RUN cd hanaci-pdf && echo "FTP_ROOT=$FTP_ROOT" >> .env
 RUN cd hanaci-pdf && echo "ILOVEPDF_PUBLIC_KEY=$ILOVEPDF_PUBLIC_KEY" >> .env
 RUN cd hanaci-pdf && echo "ILOVEPDF_SECRET_KEY=$ILOVEPDF_SECRET_KEY" >> .env
-RUN cd hanaci-pdf && echo "ILOVEPDF_EXT_IMG_DIR=temp-image" >> .env
-RUN cd hanaci-pdf && echo "PDF_MERGE_TEMP=temp-merge" >> .env
-RUN cd hanaci-pdf && echo "PDF_UPLOAD=upload-pdf" >> .env
-RUN cd hanaci-pdf && echo "PDF_DOWNLOAD=temp" >> .env
+RUN cd hanaci-pdf && echo "PDF_IMG_POOL=image" >> .env
+RUN cd hanaci-pdf && echo "PDF_BATCH=batch" >> .env
+RUN cd hanaci-pdf && echo "PDF_UPLOAD=upload" >> .env
+RUN cd hanaci-pdf && echo "PDF_DOWNLOAD=download" >> .env
+RUN cd hanaci-pdf && echo "PDF_POOL=pool" >> .env

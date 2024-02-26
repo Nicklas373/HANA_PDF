@@ -25,8 +25,6 @@ services:
         mem_reservation: 128M
         ports:
             - '5432:5432'
-        env_file:
-            - module/.env
         environment:
             PGPASSWORD: '${DB_PASSWORD}'
             POSTGRES_DB: '${DB_DATABASE}'
