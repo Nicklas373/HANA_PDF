@@ -12,8 +12,6 @@ asposeClientSecret=str(sys.argv[2])
 asposeContainer=str(sys.argv[3])
 asposeFile=str(sys.argv[4])
 asposeOut=str(sys.argv[5])
-asposeFileDirFix = asposeFile.replace("/upload/","/app/public/upload/")
-linuxSemanticDir = r"/var/www/html/hanaci-pdf"+asposeFileDirFix
 
 def getAsposeToken():
     asposeCloudAPI = http.client.HTTPSConnection("api.aspose.cloud")
@@ -44,18 +42,18 @@ def convAsposeAPI(token, container):
     params = {
         'outPath': asposeOut,
     }
-    if os.path.isfile(linuxSemanticDir):
-        with open(linuxSemanticDir, 'rb') as f:
+    if os.path.isfile(asposeFile):
+        with open(asposeFile, 'rb') as f:
             data = f.read()
         if len(container) != 0:
             try:
                 asposeResponse = requests.put('https://api.aspose.cloud/v3.0/pdf/convert/'+container, params=params, headers=headers, data=data, timeout=(85,90))
                 values = asposeResponse.status_code
                 if values == 200:
-                    print('File conversion success!')
+                    print('File conversion success! ')
                     return True
                 else:
-                    print('File conversion failed!')
+                    print('File conversion failed! ')
                     return False
             except Timeout:
                 print("Request time out!")
@@ -69,7 +67,7 @@ def convAsposeAPI(token, container):
             print("Invalid Container")
             return False
     else:
-        print('File source not found! :'+linuxSemanticDir)
+        print('File source not found! :'+asposeFile)
         return False
 
 getAsposeToken()

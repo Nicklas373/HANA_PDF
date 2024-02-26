@@ -134,7 +134,7 @@ class convertController extends Controller
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
                             "xlsx",
-                            $file,
+                            $newFilePath,
                             $newFileNameWithoutExtension.".xlsx"
                         ],
                         null,
@@ -171,10 +171,10 @@ class convertController extends Controller
                                 DB::table('appLogs')
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
-                                        'errReason' => 'Symfony runtime running out of time !',
+                                        'errReason' => 'Symfony runtime process out of time exception !',
                                         'errApiReason' => $message->getMessage(),
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Symfony runtime running out of time !', $message->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Symfony runtime process out of time exception !', $message->getMessage());
                                 return response()->json([
                                     'status' => 400,
                                     'message' => 'HANA PDF process timeout !',
@@ -252,106 +252,10 @@ class convertController extends Controller
                             }
                         }
                         if (!$asposeAPI->isSuccessful()) {
-                            if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xslx'), $newFileNameWithoutExtension.".xlsx") == true) {
-                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                $duration = $end->diff($startProc);
-                                $fileProcSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xslx'));
-                                $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
-                                $procFile += 1;
-                                try {
-                                    DB::table('appLogs')->insert([
-                                        'processId' => $Nuuid,
-                                        'errReason' => null,
-                                        'errApiReason' => null
-                                    ]);
-                                    DB::table('pdfConvert')->insert([
-                                        'fileName' => $currentFileName,
-                                        'fileSize' => $newFileProcSize,
-                                        'container' => $convertType,
-                                        'imgExtract' => false,
-                                        'result' => true,
-                                        'isBatch' => $batchValue,
-                                        'processId' => $Nuuid,
-                                        'batchId' => $batchId,
-                                        'procStartAt' => $startProc,
-                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                        'procDuration' =>  $duration->s.' seconds'
-                                    ]);
-                                } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileProcSize, $Nuuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                                    return response()->json([
-                                        'status' => 400,
-                                        'message' => 'Database connection error !',
-                                        'error' => $ex->getMessage(),
-                                        'processId' => $Nuuid
-                                    ], 400);
-                                } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileProcSize, $Nuuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                                    return response()->json([
-                                        'status' => 400,
-                                        'message' => 'Eloquent transaction error !',
-                                        'error' => $e->getMessage(),
-                                        'processId' => $Nuuid
-                                    ], 400);
-                                }
-                            } else {
-                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                $duration = $end->diff($startProc);
-                                try {
-                                    DB::table('appLogs')->insert([
-                                        'processId' => $Nuuid,
-                                        'errReason' => null,
-                                        'errApiReason' => null
-                                    ]);
-                                    DB::table('pdfConvert')->insert([
-                                        'fileName' => $currentFileName,
-                                        'fileSize' => $newFileSize,
-                                        'container' => $convertType,
-                                        'imgExtract' => false,
-                                        'result' => false,
-                                        'isBatch' => $batchValue,
-                                        'processId' => $Nuuid,
-                                        'batchId' => $batchId,
-                                        'procStartAt' => $startProc,
-                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                        'procDuration' =>  $duration->s.' seconds'
-                                    ]);
-                                    DB::table('appLogs')
-                                        ->where('processId', '=', $Nuuid)
-                                        ->update([
-                                            'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput(),
-                                    ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
-                                    return response()->json([
-                                        'status' => 400,
-                                        'message' => 'PDF Conversion failed !',
-                                        'error' => $asposeAPI->getMessage(),
-                                        'processId' => $Nuuid
-                                    ], 400);
-                                } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Database connection error !', $ex->getMessage());
-                                    return response()->json([
-                                        'status' => 400,
-                                        'message' => 'Database connection error !',
-                                        'error' => $ex->getMessage(),
-                                        'processId' => $Nuuid
-                                    ], 400);
-                                } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
-                                    return response()->json([
-                                        'status' => 400,
-                                        'message' => 'Eloquent transaction error !',
-                                        'error' => $e->getMessage(),
-                                        'processId' => $Nuuid
-                                    ], 400);
-                                }
-                            }
-                        } else {
                             if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'), $newFileNameWithoutExtension.".xlsx") == true) {
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
-                                $fileProcSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xslx'));
+                                $fileProcSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'));
                                 $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
                                 $procFile += 1;
                                 try {
@@ -422,13 +326,115 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getOutput()
+                                            'errApiReason' => $asposeAPI->getOutput(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
-                                        'error' => $asposeAPI->getMessage(),
+                                        'error' => null,
+                                        'processId' => $Nuuid
+                                    ], 400);
+                                } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return response()->json([
+                                        'status' => 400,
+                                        'message' => 'Database connection error !',
+                                        'error' => $ex->getMessage(),
+                                        'processId' => $Nuuid
+                                    ], 400);
+                                } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return response()->json([
+                                        'status' => 400,
+                                        'message' => 'Eloquent transaction error !',
+                                        'error' => $e->getMessage(),
+                                        'processId' => $Nuuid
+                                    ], 400);
+                                }
+                            }
+                        } else {
+                            if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'), $newFileNameWithoutExtension.".xlsx") == true) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                $fileProcSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'));
+                                $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
+                                $procFile += 1;
+                                try {
+                                    DB::table('appLogs')->insert([
+                                        'processId' => $Nuuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
+                                    ]);
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $currentFileName,
+                                        'fileSize' => $newFileProcSize,
+                                        'container' => $convertType,
+                                        'imgExtract' => false,
+                                        'result' => true,
+                                        'isBatch' => $batchValue,
+                                        'processId' => $Nuuid,
+                                        'batchId' => $batchId,
+                                        'procStartAt' => $startProc,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                    DB::table('appLogs')
+                                        ->where('processId', '=', $Nuuid)
+                                        ->update([
+                                            'errReason' => null,
+                                            'errApiReason' => null
+                                    ]);
+                                } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileProcSize, $Nuuid, 'FAIL', 'Database connection error !', $ex->getMessage());
+                                    return response()->json([
+                                        'status' => 400,
+                                        'message' => 'Database connection error !',
+                                        'error' => $ex->getMessage(),
+                                        'processId' => $Nuuid
+                                    ], 400);
+                                } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileProcSize, $Nuuid, 'FAIL', 'Eloquent transaction error !', $e->getMessage());
+                                    return response()->json([
+                                        'status' => 400,
+                                        'message' => 'Eloquent transaction error !',
+                                        'error' => $e->getMessage(),
+                                        'processId' => $Nuuid
+                                    ], 400);
+                                }
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                try {
+                                    DB::table('appLogs')->insert([
+                                        'processId' => $Nuuid,
+                                        'errReason' => null,
+                                        'errApiReason' => null
+                                    ]);
+                                    DB::table('pdfConvert')->insert([
+                                        'fileName' => $currentFileName,
+                                        'fileSize' => $newFileSize,
+                                        'container' => $convertType,
+                                        'imgExtract' => false,
+                                        'result' => false,
+                                        'isBatch' => $batchValue,
+                                        'processId' => $Nuuid,
+                                        'batchId' => $batchId,
+                                        'procStartAt' => $startProc,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                    DB::table('appLogs')
+                                        ->where('processId', '=', $Nuuid)
+                                        ->update([
+                                            'errReason' => 'Converted file not found on the server !',
+                                            'errApiReason' => $asposeAPI->getOutput(),
+                                    ]);
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
+                                    return response()->json([
+                                        'status' => 400,
+                                        'message' => 'PDF Conversion failed !',
+                                        'error' => null,
                                         'processId' => $Nuuid
                                     ], 400);
                                 } catch (QueryException $ex) {
@@ -457,7 +463,7 @@ class convertController extends Controller
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
                             "pptx",
-                            $file,
+                            $newFilePath,
                             $newFileNameWithoutExtension.".pptx"
                         ],
                         null,
@@ -479,7 +485,7 @@ class convertController extends Controller
                                     'errApiReason' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
-                                    'fileName' => $newFileNameWithoutExtension.'.pptx',
+                                    'fileName' => $currentFileName,
                                     'fileSize' => $newFileSize,
                                     'container' => $convertType,
                                     'imgExtract' => false,
@@ -651,11 +657,11 @@ class convertController extends Controller
                                             'errReason' => 'Converted file not found on the server !',
                                             'errApiReason' => $asposeAPI->getOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', null);
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
-                                        'error' => null,
+                                        'error' => $asposeAPI->getOutput(),
                                         'processId' => $Nuuid
                                     ], 400);
                                 } catch (QueryException $ex) {
@@ -751,9 +757,9 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => null,
+                                            'errApiReason' => $asposeAPI->getOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', null);
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getOutput());
                                     return response()->json([
                                         'status' => 400,
                                         'message' => 'PDF Conversion failed !',
