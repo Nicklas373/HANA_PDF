@@ -767,7 +767,3 @@ function wmLayout_TextInputRestore() {
         wmRadioRotationD.checked = true
     }
 }
-
-function returnToHome() {
-    window.location.href = "/";
-}

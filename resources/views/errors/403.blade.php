@@ -12,7 +12,7 @@
             <h2 class="text-xs lg:text-lg text-center font-medium font-quicksand text-lt4">You do not have access this for this page.</h3>
         </div>
         <div class="mt-10 px-4">
-            <button type="button" id="submitBtn_1" class="p-4 font-quicksand font-medium bg-rt1 text-lt1 rounded-lg cursor-pointer w-full h-14" onclick="returnToHome()" data-ripple-light="true">Go Back Home</button>
+            <button type="button" id="submitBtn_1" class="p-4 font-quicksand font-medium bg-rt1 text-lt1 rounded-lg cursor-pointer w-full h-14" onclick="window.location.href='/'" data-ripple-light="true">Go Back Home</button>
         </div>
     </section>
 </div>

@@ -44,7 +44,7 @@ var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
 var adobeClientID = '16199e0c9a4042f0969ea2ed591c547b'
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
-var uploadUrl = 'http://pdf.hana-ci.com/storage/upload/'
+var uploadUrl = 'https://pdf.hana-ci.com/storage/upload/'
 
 if (procBtn) {
     remainingBalance().then(function () {
@@ -147,7 +147,7 @@ if (uploadDropzone) {
                         button.addEventListener("click", function(event) {
                             var parentContainer = event.target.closest('.dz-file-preview')
                             var filenameElement = parentContainer.querySelector('.dz-filename span')
-                            var uploadedFile1 = filenameElement.innerText.trim()
+                            var uploadedFile1 = fileNameFormat(filenameElement.innerText)
                             var newUrl = uploadUrl+uploadedFile1
                             var adobeDCView = new AdobeDC.View(
                                 {
@@ -344,9 +344,9 @@ if (uploadDropzoneAlt) {
                     button.addEventListener("click", function(event) {
                         var parentContainer = event.target.closest('.dz-preview')
                         var filenameElement = parentContainer.querySelector('.dz-filename span')
-                        var uploadedFile1 = filenameElement.innerText.trim()
+                        var uploadedFile1 = fileNameFormat(filenameElement.innerText)
                         var imageUrl = uploadUrl+uploadedFile1
-                        var documentUrl = googleViewerUrl+uploadUrl+uploadedFile1
+                        var documentUrl = googleViewerUrl+uploadUrl+uploadedFile1+'&embedded=true'
                         if (file.type.startsWith('image/')) {
                             document.getElementById('imgPrv').src = imageUrl
                             previewImageModal.show()
@@ -538,7 +538,7 @@ if (uploadDropzoneSingle) {
                         button.addEventListener("click", function(event) {
                             var parentContainer = event.target.closest('.dz-file-preview')
                             var filenameElement = parentContainer.querySelector('.dz-filename span')
-                            var uploadedFile1 = filenameElement.innerText.trim()
+                            var uploadedFile1 = fileNameFormat(filenameElement.innerText)
                             var newUrl = uploadUrl+uploadedFile1
                             var adobeDCView = new AdobeDC.View(
                                 {
@@ -1123,7 +1123,7 @@ function submit(event) {
                             } else {
                                 toPage = false
                             }
-                            getTotalPages(uploadUrl+getUploadedFileName()[0].replace(/\s/g, '_'))
+                            getTotalPages(uploadUrl+fileNameFormat(getUploadedFileName()[0]))
                             .then((totalPages) => {
                                 if (totalPages == null) {
                                     totalPage = null
@@ -1700,6 +1700,12 @@ function autoDownload(url, filename) {
     document.body.removeChild(link)
 }
 
+function fileNameFormat(fileName) {
+    let trimmedFileName = fileName.trim()
+    let newFileName = trimmedFileName.replace(/\s+/g, '_')
+
+    return newFileName;
+}
 
 function generateMesssage(subMessage) {
     var ul = document.getElementById("err-list")
