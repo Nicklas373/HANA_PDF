@@ -46,7 +46,7 @@ if (firstArea) {
         } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_ImageInputRestore()
             wmLayout_image()
-            showVal(document.getElementById('watermarkFontTransparency').value,'image')
+            showVal(document.getElementById('watermarkImageTransparency').value,'image')
             document.getElementById("submitBtn").style = null;
         }
     }
@@ -80,7 +80,7 @@ if (secondArea) {
         } else if (firstAreaAltInput.value == "watermark") {
             wmLayout_TextInputRestore()
             wmLayout_text()
-            showVal(document.getElementById('watermarkFontTransparency').value,'text')
+            showVal(document.getElementById('watermarkTextTransparency').value,'text')
             document.getElementById("submitBtn").style = null;
         }
     }
@@ -648,7 +648,7 @@ function reuseOnClickWmLayoutImageStyleAreaA() {
     wmLayoutImageStyleAreaTextB.style.color = '#E0E4E5'
     if (firstAreaInput.checked == true) {
         firstColumnArea.style.borderColor = '#4DAAAA'
-        firstareatext.style.color = '#E0E4E5'
+        firstAreaText.style.color = '#E0E4E5'
         firstAreaInput.checked = true
     } else if (secondAreaInput.checked == true) {
         secondColumnArea.style.borderColor = '#4DAAAA'
@@ -669,7 +669,7 @@ function reuseOnClickWmLayoutImageStyleAreaB() {
     wmLayoutImageStyleAreaTextA.style.color = '#E0E4E5'
     if (firstAreaInput.checked == true) {
         firstColumnArea.style.borderColor = '#4DAAAA'
-        firstareatext.style.color = '#E0E4E5'
+        firstAreaText.style.color = '#E0E4E5'
         firstAreaInput.checked = true
     } else if (secondAreaInput.checked == true) {
         secondColumnArea.style.borderColor = '#4DAAAA'
