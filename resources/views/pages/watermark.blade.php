@@ -93,7 +93,7 @@
                         </div>
                         <div class="mb-6">
                             <label for="watermarkPageImage" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Page</label>
-                            <input type="text" id="watermarkPageImage" name="watermarkPageImage" class="block font-quicksand text-sm lg:w-4/6 font-medium text-dt1 w-fullcursor-pointer rounded-lg bg-lt1" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')">
+                            <input type="text" id="watermarkPageImage" name="watermarkPageImage" class="block font-quicksand text-sm w-full lg:w-4/6 font-medium text-dt1 w-fullcursor-pointer rounded-lg bg-lt1" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onfocusout="checkValidation('watermarkPage')">
                         </div>
                         <div class="mb-6">
                             <label for="wmRadioImageRotationA" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Orientation</label>
@@ -145,10 +145,10 @@
                             </ul>
                         </div>
                         <div class="mb-6 flex flex-col">
-                            <label id="Transparency" class="block mb-2 font-quicksand text-xl font-bold text-pc4" for="watermarkFontTransparency">Opacity</label>
+                            <label id="Transparency" class="block mb-2 font-quicksand text-xl font-bold text-pc4" for="watermarkImageTransparency">Opacity</label>
                             <div class="flex flex-row w-full">
-                                <input id="watermarkFontTransparency" name="watermarkFontImageTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full lg:w-4/6 h-2 mt-4 accent-ac rounded-lg cursor-pointer" oninput="showVal(this.value,'image')" onchange="showVal(this.value,'image')">
-                                <label id="TransparencyValueImage" class="font-semibold text-md text-lt1 ml-3 mt-2.5 font-quicksand" for="watermarkFontTransparency">100 %</label>
+                                <input id="watermarkImageTransparency" name="watermarkFontImageTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full lg:w-4/6 h-2 mt-4 accent-ac rounded-lg cursor-pointer" oninput="showVal(this.value,'image')" onchange="showVal(this.value,'image')">
+                                <label id="TransparencyValueImage" class="font-semibold text-md text-lt1 ml-3 mt-2.5 font-quicksand" for="watermarkImageTransparency">100 %</label>
                             </div>
                         </div>
                         <div id="isMosaicImageArea" class="mb-6">
@@ -368,10 +368,10 @@
                             </ul>
                         </div>
                         <div class="mb-6 flex flex-col">
-                            <label id="Transparency" class="block mb-2 font-quicksand text-xl font-bold text-pc4" for="watermarkFontTransparency">Opacity</label>
+                            <label id="Transparency" class="block mb-2 font-quicksand text-xl font-bold text-pc4" for="watermarkTextTransparency">Opacity</label>
                             <div class="flex flex-row w-full">
-                                <input id="watermarkFontTransparency" name="watermarkFontTextTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full lg:w-4/6 h-2 mt-4 accent-ac rounded-lg cursor-pointer" oninput="showVal(this.value,'image')" onchange="showVal(this.value,'image')">
-                                <label id="TransparencyValueText" class="font-semibold text-md text-lt1 ml-3 mt-2.5 font-quicksand" for="watermarkFontTransparency">100 %</label>
+                                <input id="watermarkTextTransparency" name="watermarkFontTextTransparency" type="range" min="0" max="100" value="100" step="1" class="w-full lg:w-4/6 h-2 mt-4 accent-ac rounded-lg cursor-pointer" oninput="showVal(this.value,'text')" onchange="showVal(this.value,'text')">
+                                <label id="TransparencyValueText" class="font-semibold text-md text-lt1 ml-3 mt-2.5 font-quicksand" for="watermarkTextTransparency">100 %</label>
                             </div>
                         </div>
                         <div id="isMosaicImageArea" class="mb-6">

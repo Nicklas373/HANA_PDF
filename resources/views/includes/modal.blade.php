@@ -31,7 +31,7 @@
                     </div>
                 </p>
                 <div class="flex flex-col items-center">
-                    <button data-modal-hide="errModal" type="button" class="text-white bg-rt1 font-semibold font-quicksand rounded-md text-sm mx-auto px-5 py-2.5 w-1/6">OK</button>
+                    <button data-modal-hide="errModal" type="button" class="text-white bg-rt1 font-semibold font-quicksand rounded-md text-sm mx-auto px-5 py-2.5 w-2/6 lg:w-1/6">OK</button>
                 </div>
             </div>
         </div>

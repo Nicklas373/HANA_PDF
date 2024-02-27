@@ -253,7 +253,8 @@ if (uploadDropzone) {
 
     if (!uploadDropzone) {
         if (procBtn) {
-            if (document.getElementById('compress') !== null || document.getElementById('cnvFrPDF') !== null) {
+            if (document.getElementById('compress') !== null || document.getElementById('cnvFrPDF') !== null
+                || document.getElementById('merge') !== null) {
                 console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
@@ -643,8 +644,7 @@ if (uploadDropzoneSingle) {
 
     if (!uploadDropzoneSingle) {
         if (procBtn) {
-            if (document.getElementById('merge') !== null || document.getElementById('split') !== null ||
-                document.getElementById('watermark') !== null) {
+            if (document.getElementById('split') !== null || document.getElementById('watermark') !== null) {
                 console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
@@ -770,7 +770,7 @@ function sendToAPI(files, proc, action) {
                 let wmRotation
                 var imgFile = document.getElementById('wm_file_input').files[0]
                 var wmPage = document.getElementById('watermarkPageImage').value
-                var wmTransparency = document.getElementById('watermarkFontTransparency').value
+                var wmTransparency = document.getElementById('watermarkImageTransparency').value
                 var wmMosaic = document.getElementById('isMosaicImage').checked
                 if (document.getElementById('wmRadioImageLayoutStyleA').checked == true) {
                     wmLayoutStyle = document.getElementById('wmRadioImageLayoutStyleA').value
@@ -811,7 +811,7 @@ function sendToAPI(files, proc, action) {
                 var wmFontColor = document.getElementById('watermarkFontColor').value
                 var wmPage = document.getElementById('watermarkPageText').value
                 var wmText = document.getElementById('watermarkText').value
-                var wmTransparency = document.getElementById('watermarkFontTransparency').value
+                var wmTransparency = document.getElementById('watermarkTextTransparency').value
                 var wmMosaic = document.getElementById('isMosaicText').checked
                 if (document.getElementById('wmRadioFontFamilyA').checked == true) {
                     wmFontFamily = document.getElementById('wmRadioFontFamilyA').value
@@ -1076,7 +1076,19 @@ function submit(event) {
                 if (document.getElementById('cnvToPDF') !== null) {
                     apiGateway("convert","")
                 } else {
-                    apiGateway("merge","")
+                    if (getUploadedFileName().length < 2) {
+                        event.preventDefault()
+                        errMessage.innerText  = "PDF file can not be processed !"
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Required fields:"
+                        errAltSubMessageModal.style = null
+                        resetErrListMessage()
+                        generateMesssage("Minimum PDF to merge is 2 (Total files: "+getUploadedFileName().length+")")
+                        loadingModal.hide()
+                        errModal.show()
+                    } else {
+                        apiGateway("merge","")
+                    }
                 }
             } else {
                 event.preventDefault()
@@ -1487,8 +1499,8 @@ function submit(event) {
             if (document.getElementById("wm_file_input").value) {
                 var imgFile = document.getElementById("wm_file_input")
                 let fileSize = imgFile.files[0].size
-                if (imgFile.files[0].type == "image/jpeg" && imgFile.files[0].type == "image/png"
-                    && imgFile.files[0].type == "image/jpg") {
+                if (imgFile.files[0].type == "image/jpeg" || imgFile.files[0].type == "image/png"
+                    || imgFile.files[0].type == "image/jpg") {
                     if (fileSize >= 5242880) {
                         event.preventDefault()
                         errMessage.innerText  = "Uploaded file has exceeds the limit!"

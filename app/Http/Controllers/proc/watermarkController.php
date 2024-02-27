@@ -173,10 +173,10 @@ class watermarkController extends Controller
                     try {
                         $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                         $ilovepdfTask = $ilovepdf->newTask('watermark');
-                        $pdfFile = $ilovepdfTask->addFile($newFilePath);
                         if ($watermarkAction == 'img') {
                             $ilovepdfTask->setEncryption(true);
                             $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$wmImageName));
+                            $pdfFile = $ilovepdfTask->addFile($newFilePath);
                             $ilovepdfTask->setMode("image");
                             $ilovepdfTask->setImageFile($wmImage);
                             $ilovepdfTask->setTransparency($watermarkTransparency);
@@ -186,8 +186,10 @@ class watermarkController extends Controller
                             $ilovepdfTask->setMosaic($isMosaic);
                             $ilovepdfTask->setVerticalPosition("middle");
                         } else if ($watermarkAction == 'txt') {
+                            $ilovepdfTask->setFileEncryption($pdfEncKey);
                             $ilovepdfTask->setEncryptKey($pdfEncKey);
                             $ilovepdfTask->setEncryption(true);
+                            $pdfFile = $ilovepdfTask->addFile($newFilePath);
                             $ilovepdfTask->setMode("text");
                             $ilovepdfTask->setText($watermarkText);
                             $ilovepdfTask->setPages($watermarkPage);
