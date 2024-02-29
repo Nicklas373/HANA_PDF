@@ -1,13 +1,14 @@
 ## HANA PDF
 
 <br>
-<div style="text-align: center;">
+<div align="center">
   <img src="screenshot/logo.png" alt="HANA" width="300" height="300">
 </div>
 <br>
 
-__HANA PDF__ is your go-to solution for effortlessly managing your PDFs. We've designed it with simplicity in mind, so you can edit,
-combine, shrink, convert, and personalize your PDFs with just a few clicks. And was implemented with front-end framework like ViteJS and Tailwind CSS and used of Flowbite library to maintain responsive and materialize interface. And powered with iLovePDF and Aspose Cloud API as one of the back-end.
+__HANA PDF__ is your go-to solution for effortlessly managing your PDFs. We've designed it with simplicity in mind, so you can combine,
+shrink, convert, and personalize your PDFs with just a few clicks. It was implemented with front-end framework like Tailwind CSS and
+used of Flowbite library to maintain responsive and materialize interface. And powered with iLovePDF and Aspose Cloud API as one of the back-end.
 
 ---
 
@@ -77,7 +78,7 @@ combine, shrink, convert, and personalize your PDFs with just a few clicks. And 
 
 ### Deployment On Native OS Host
 #### Step to configure
-1. Clone the repository with __git clone__
+1. Clone the repository with __git clone__ with branch __dev/master__
 2. Copy __.env.example__ file to __.env__ and modify database credentials
 3. Add additional environment into __.env__ with this string (Add yourself value :p)
 ````bash
@@ -126,8 +127,9 @@ combine, shrink, convert, and personalize your PDFs with just a few clicks. And 
 - [DropzoneJS](https://www.dropzone.dev/)
 - [Flowbite](https://flowbite.com/)
 - [iLovePDF](https://developer.ilovepdf.com/)
+- [Laravel](https://laravel.com/)
 - [Node JS](https://nodejs.org/en)
-- [PDFJS](https://mozilla.github.io/pdf.js/)
+- [Mozilla PDFJS](https://mozilla.github.io/pdf.js/)
 - [PHPOffice](https://github.com/PHPOffice)
 - [Python](https://www.python.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
