@@ -3,5 +3,5 @@
 <meta name="theme-color" content="#d1d5db">
 <title>HANA PDF</title>
 <link rel="icon" type="image/svg" href="{{ asset('assets/logo/ico.svg') }}">
-<link rel="stylesheet" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
-<link rel="stylesheet" href="{{ asset('build/assets/app-lite-Bcv6T1H2.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-lite-Bcv6T1H2.css')}}" />
