@@ -1,0 +1,36 @@
+{
+  "_index-D1AB55dp.js": {
+    "file": "assets/index-D1AB55dp.js"
+  },
+  "resources/css/app-lite.css": {
+    "file": "assets/app-lite-Bcv6T1H2.css",
+    "src": "resources/css/app-lite.css",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BOaETB2h.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/font.css": {
+    "file": "assets/font-C1ampFSP.css",
+    "src": "resources/css/font.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-lW0wcPz6.js",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_index-D1AB55dp.js"
+    ]
+  },
+  "resources/js/kao-logic.js": {
+    "file": "assets/kao-logic-Cm9tHtUC.js",
+    "src": "resources/js/kao-logic.js",
+    "isEntry": true,
+    "imports": [
+      "_index-D1AB55dp.js"
+    ]
+  }
+}
