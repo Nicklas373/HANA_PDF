@@ -44,7 +44,7 @@ var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
 var adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 var apiUrl = 'http://gw.hana-ci.com/'
 var altApiUrl = 'http://gw.hana-ci.com'
-var bearerToken = import.meta.env.VITE_JWT_TOKEN
+var bearerToken = "PLACE_YOUR_TOKEN_HERE"
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
 var uploadUrl = 'http://gw.hana-ci.com/storage/upload/'
