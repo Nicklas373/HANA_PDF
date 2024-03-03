@@ -182,6 +182,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
+        'AppHelper' => App\Helper\AppHelper::class,
         'NotificationHelper' => App\Helper\NotificationHelper::class,
     ])->toArray(),
 
