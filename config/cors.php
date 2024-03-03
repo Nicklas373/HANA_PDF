@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['GET','POST'],
 
-    'allowed_origins' => ['http://pdf.hana-ci.com:81','https://pdf.hana-ci.com'],
+    'allowed_origins' => ['http://sit.pdf.hana-ci.com:81','https://pdf.hana-ci.com'],
 
     'allowed_origins_patterns' => [],
 
