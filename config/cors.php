@@ -17,9 +17,9 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET','POST'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://pdf.hana-ci.com:81','https://pdf.hana-ci.com'],
 
     'allowed_origins_patterns' => [],
 
