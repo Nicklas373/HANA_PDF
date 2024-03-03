@@ -1,0 +1,58 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Internal CSS */
+input[type="file"]::file-selector-button {
+    background-color: #4DAAAA !important;
+    font-family: 'quicksand', 'sans-serif';
+    color: #E0E4E5;
+}
+@media (orientation: portrait) {
+    body {
+        padding-top: 100px;
+    }
+}
+@media (orientation: landscape) {
+    body {
+        padding-top: 120px;
+    }
+}
+/* Hardcoded counter clockwise animation */
+@keyframes spin-counter-clockwise {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+.animate-spin-counter-clockwise {
+    animation: spin-counter-clockwise 1s linear infinite;
+}
+/* Dropzone Area */
+.dropzone {
+    border: none;
+}
+.dz-success-mark {
+    background-color: transparent !important;
+}
+.dz-error-mark {
+    background-color: transparent !important;
+}
+.dz-error-message {
+    font-size: x-small !important;
+}
+.dz-preview {
+    background-color: transparent !important;
+}
+/* Styles */
+.dynamic-headline-viewport {
+    height: 70vh;
+}
+.dynamic-section-viewport {
+    height: 55vh;
+}
+.dynamic-carousel-viewport {
+    height: 40vh;
+}
+.sub-headline-viewport {
+    height: 30vh;
+}
