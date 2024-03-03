@@ -43,11 +43,9 @@ var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
 var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
 var adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 var apiUrl = 'http://gw.hana-ci.com/'
-var altApiUrl = 'http://gw.hana-ci.com'
 var bearerToken = import.meta.env.VITE_JWT_TOKEN
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
-var uploadUrl = 'http://gw.hana-ci.com/storage/upload/'
 
 if (procBtn) {
     remainingBalance().then(function () {
@@ -154,7 +152,7 @@ if (uploadDropzone) {
                             var parentContainer = event.target.closest('.dz-file-preview')
                             var filenameElement = parentContainer.querySelector('.dz-filename span')
                             var uploadedFile1 = fileNameFormat(filenameElement.innerText)
-                            var newUrl = uploadUrl+uploadedFile1
+                            var newUrl = apiUrl+uploadPath+uploadedFile1
                             var adobeDCView = new AdobeDC.View(
                                 {
                                     clientId: adobeClientID,
@@ -211,7 +209,7 @@ if (uploadDropzone) {
                     const filePath = "/storage/upload/" + file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
-                    fetch("api/v1/file/remove", {
+                    fetch(apiUrl+"/api/v1/file/remove", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -355,8 +353,8 @@ if (uploadDropzoneAlt) {
                         var parentContainer = event.target.closest('.dz-preview')
                         var filenameElement = parentContainer.querySelector('.dz-filename span')
                         var uploadedFile1 = fileNameFormat(filenameElement.innerText)
-                        var imageUrl = uploadUrl+uploadedFile1
-                        var documentUrl = googleViewerUrl+uploadUrl+uploadedFile1+'&embedded=true'
+                        var imageUrl = apiUrl+uploadPath+uploadedFile1
+                        var documentUrl = googleViewerUrl+apiUrl+uploadPath+uploadedFile1+'&embedded=true'
                         if (file.type.startsWith('image/')) {
                             document.getElementById('imgPrv').src = imageUrl
                             previewImageModal.show()
@@ -394,7 +392,7 @@ if (uploadDropzoneAlt) {
                     const filePath = uploadPath + file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
-                    fetch("api/v1/file/remove", {
+                    fetch(apiUrl+"/api/v1/file/remove", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -552,7 +550,7 @@ if (uploadDropzoneSingle) {
                             var parentContainer = event.target.closest('.dz-file-preview')
                             var filenameElement = parentContainer.querySelector('.dz-filename span')
                             var uploadedFile1 = fileNameFormat(filenameElement.innerText)
-                            var newUrl = uploadUrl+uploadedFile1
+                            var newUrl = apiUrl+uploadPath+uploadedFile1
                             var adobeDCView = new AdobeDC.View(
                                 {
                                     clientId: adobeClientID,
@@ -608,7 +606,7 @@ if (uploadDropzoneSingle) {
                     const filePath = uploadPath+file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
-                    fetch("api/v1/file/remove", {
+                    fetch(apiUrl+"/api/v1/file/remove", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -906,7 +904,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("scsMsgResult").innerHTML = `
                                 PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
                             `
-                            document.getElementById("scsMsgLink").href = apiUrl+"//"+xhrReturn.fileSource
+                            document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         } else {
                             //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
@@ -914,7 +912,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
                             document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
-                            document.getElementById("scsMsgLink").href = apiUrl+"//"+xhrReturn.fileSource
+                            document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         }
                     }
@@ -1145,7 +1143,7 @@ function submit(event) {
                                 } else {
                                     toPage = false
                                 }
-                                getTotalPages(uploadUrl+getUploadedFileName()[0].replace(/\s/g, '_'))
+                                getTotalPages(apiUrl+uploadPath+getUploadedFileName()[0].replace(/\s/g, '_'))
                                 .then((totalPages) => {
                                     if (totalPages == null) {
                                         totalPage = null
@@ -1690,7 +1688,7 @@ function submit(event) {
 
 function autoDownload(url, filename) {
     var link = document.createElement('a')
-    link.href = apiUrl+"//"+url
+    link.href = apiUrl+url
     link.download = filename
     document.body.appendChild(link)
     link.click()
