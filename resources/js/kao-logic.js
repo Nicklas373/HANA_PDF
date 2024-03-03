@@ -72,7 +72,7 @@ if (procBtn) {
 
 if (uploadDropzone) {
     let uploadDropzone = new Dropzone("#dropzoneArea", {
-        url: apiUrl+"api/v1/file/upload",
+        url: apiUrl+"/api/v1/file/upload",
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 4,
@@ -277,7 +277,7 @@ if (uploadDropzone) {
 
 if (uploadDropzoneAlt) {
     let uploadDropzoneAlt = new Dropzone("#dropzoneAreaCnv", {
-        url: apiUrl+"api/v1/file/upload",
+        url: apiUrl+"/api/v1/file/upload",
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 4,
@@ -470,7 +470,7 @@ if (uploadDropzoneAlt) {
 
 if (uploadDropzoneSingle) {
     let uploadDropzoneSingle = new Dropzone("#dropzoneAreaSingle", {
-        url: apiUrl+"api/v1/file/upload",
+        url: apiUrl+"/api/v1/file/upload",
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 1,
@@ -719,7 +719,7 @@ function generateThumbnail(fileName) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
         formData.append('file', fileName)
-        xhr.open('POST', apiUrl+'api/v1/file/thumbnail', true)
+        xhr.open('POST', apiUrl+'/api/v1/file/thumbnail', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
@@ -890,7 +890,7 @@ function sendToAPI(files, proc, action) {
                 formData.append('file[' + index + ']', file)
             })
         }
-        xhr.open('POST', apiUrl+'api/v1/core/'+proc, true)
+        xhr.open('POST', apiUrl+'/api/v1/core/'+proc, true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
@@ -906,7 +906,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("scsMsgResult").innerHTML = `
                                 PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
                             `
-                            document.getElementById("scsMsgLink").href = altApiUrl+xhrReturn.fileSource
+                            document.getElementById("scsMsgLink").href = apiUrl+"//"+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         } else {
                             //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
@@ -914,7 +914,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
                             document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
-                            document.getElementById("scsMsgLink").href = altApiUrl+xhrReturn.fileSource
+                            document.getElementById("scsMsgLink").href = apiUrl+"//"+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         }
                     }
@@ -1690,7 +1690,7 @@ function submit(event) {
 
 function autoDownload(url, filename) {
     var link = document.createElement('a')
-    link.href = altApiUrl+url
+    link.href = apiUrl+"//"+url
     link.download = filename
     document.body.appendChild(link)
     link.click()
@@ -1731,7 +1731,7 @@ function remainingBalance() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
-        xhr.open('GET', apiUrl+'api/v1/logs/limit', true)
+        xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 
