@@ -5,7 +5,4 @@
 <link rel="icon" type="image/svg" href="{{ asset('assets/logo/ico.svg') }}">
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" />
-<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
-<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-BOaETB2h.css')}}" />
-<link rel="script" type="module" href="{{ asset('build/assets/app-lW0wcPz6.js') }}" />
-<link rel="script" type="module" href="{{ asset('build/assets/index-D1AB55dp.js')}}" />
+@vite(['resources/css/app.css','resources/css/font.css','resources/js/app.js','resources/js/kao-logic.js'])
