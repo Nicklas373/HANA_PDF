@@ -23,7 +23,7 @@
         <br>
         <span class="text-xs text-lt1 font-normal font-quicksand"><b>Error Reason:</b> <span id="errMsg"></span></span>
         <br>
-        <span class="text-xs text-lt1 font-normal font-quicksand"><b>Process ID:</b> <span id="errProcId"></span></span>
+        <span id="errProcMain" class="text-xs text-lt1 font-normal font-quicksand"><b>Process ID:</b> <span id="errProcId"></span></span>
         <br>
         <button type="button" class="mt-2 bg-lt1 text-rt1 rounded-lg font-normal font-quicksand text-sm px-3 py-1.5 text-center inline-flex items-center" data-dismiss-target="#alert-err" aria-label="Close" data-ripple-light="true">
             <b>Dismiss</b>
