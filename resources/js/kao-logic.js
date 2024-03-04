@@ -28,7 +28,6 @@ const previewModal = new Modal($previewModal, options)
 const previewDocumentModal = new Modal($previewDocumentModal, options)
 const previewImageModal = new Modal($previewImageModal, options)
 let xhrBalance
-let xhrBalanceTotal
 let xhrBalanceRemaining
 var errAltSubMessageModal = document.getElementById("altSubMessageModal")
 var errMessage = document.getElementById("errMessageModal")
@@ -42,7 +41,7 @@ var uploadDropzone = document.getElementById("dropzoneArea")
 var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
 var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
 var adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
-var apiUrl = 'http://gw.hana-ci.com/'
+var apiUrl = 'http://gw.hana-ci.com'
 var bearerToken = import.meta.env.VITE_JWT_TOKEN
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
@@ -62,9 +61,6 @@ if (procBtn) {
         errAltSubMessageModal.style = null
         loadingModal.hide()
         errModal.show()
-        setTimeout(function(){
-            location.reload()
-        }, 3000)
     })
 }
 
@@ -205,7 +201,6 @@ if (uploadDropzone) {
                 }
 
                 if (file) {
-                    const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = "/storage/upload/" + file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
@@ -213,7 +208,7 @@ if (uploadDropzone) {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
+                            "Authorization": `Bearer ${bearerToken}`,
                             "file": filePath,
                         },
                         body: JSON.stringify({
@@ -239,7 +234,6 @@ if (uploadDropzone) {
 
                 var uploadedFileName = response.name
                 uploadedFile.push(uploadedFileName)
-
             })
 
             this.on("maxfilesexceeded", function(file) {
@@ -388,7 +382,6 @@ if (uploadDropzoneAlt) {
                 }
 
                 if (file) {
-                    const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = uploadPath + file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
@@ -396,7 +389,7 @@ if (uploadDropzoneAlt) {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
+                            "Authorization": `Bearer ${bearerToken}`,
                             "file": filePath,
                         },
                         body: JSON.stringify({
@@ -602,7 +595,6 @@ if (uploadDropzoneSingle) {
                 }
 
                 if (file) {
-                    const csrfToken = document.querySelector('input[name="_token"]').value
                     const filePath = uploadPath+file.name
                     uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
 
@@ -610,7 +602,7 @@ if (uploadDropzoneSingle) {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
+                            "Authorization": `Bearer ${bearerToken}`,
                             "file": filePath,
                         },
                         body: JSON.stringify({
@@ -897,7 +889,7 @@ function sendToAPI(files, proc, action) {
                     if (xhrReturn.status == 200) {
                         if (proc == 'compress')
                         {
-                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                            autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
                             document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
@@ -907,7 +899,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         } else {
-                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                            autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
                             document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
@@ -972,7 +964,7 @@ function submit(event) {
                     cnvXls.style.borderColor = '#4DAAAA'
                     cnvDocx.style.borderColor = '#4DAAAA'
                     if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceTotal > 10) {
+                        if (xhrBalance && xhrBalanceRemaining > 10) {
                              procTitleMessageModal.innerText = "Processing PDF..."
                              errMessage.style.visibility = null
                              errSubMessage.style.visibility = null
@@ -1036,7 +1028,7 @@ function submit(event) {
                 cnvdocx.style.borderColor = '#4DAAAA'
             }
             if (getUploadedFileName().length > 0) {
-               if (xhrBalance && xhrBalanceTotal > 10) {
+               if (xhrBalance && xhrBalanceRemaining > 10) {
                     procTitleMessageModal.innerText = "Processing PDF..."
                     errMessage.style.visibility = null
                     errSubMessage.style.visibility = null
@@ -1073,7 +1065,7 @@ function submit(event) {
         }
     } else if (document.getElementById('cnvToPDF') !== null || document.getElementById('merge') !== null) {
         if (getUploadedFileName().length > 0) {
-           if (xhrBalance && xhrBalanceTotal > 10) {
+           if (xhrBalance && xhrBalanceRemaining > 10) {
                 procTitleMessageModal.innerText = "Processing PDF..."
                 errMessage.style.visibility = null
                 errSubMessage.style.visibility = null
@@ -1201,27 +1193,15 @@ function submit(event) {
                                         errAltSubMessageModal.style.display = "none"
                                         errModal.hide()
                                         loadingModal.show()
-                                        if (getUploadedFileName().length > 0) {
-                                            if (xhrBalance && xhrBalanceTotal > 10) {
-                                                apiGateway("split", "split")
-                                             } else {
-                                                 event.preventDefault()
-                                                 errMessage.innerText  = "PDF file can not be processed !"
-                                                 errSubMessage.innerText = ""
-                                                 errListTitleMessage.innerText = "Error message"
-                                                 resetErrListMessage()
-                                                 generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                                 errAltSubMessageModal.style = null
-                                                 loadingModal.hide()
-                                                 errModal.show()
-                                             }
+                                        if (xhrBalance && xhrBalanceRemaining > 10) {
+                                            apiGateway("split", "split")
                                          } else {
                                              event.preventDefault()
                                              errMessage.innerText  = "PDF file can not be processed !"
                                              errSubMessage.innerText = ""
                                              errListTitleMessage.innerText = "Error message"
                                              resetErrListMessage()
-                                             generateMesssage("No file has been chosen")
+                                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
                                              errAltSubMessageModal.style = null
                                              loadingModal.hide()
                                              errModal.show()
@@ -1291,7 +1271,7 @@ function submit(event) {
                                     errAltSubMessageModal.style.display = "none"
                                     errModal.hide()
                                     loadingModal.show()
-                                    if (xhrBalance && xhrBalanceTotal > 10) {
+                                    if (xhrBalance && xhrBalanceRemaining > 10) {
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1331,7 +1311,7 @@ function submit(event) {
                                     errAltSubMessageModal.style.display = "none"
                                     errModal.hide()
                                     loadingModal.show()
-                                    if (xhrBalance && xhrBalanceTotal > 10) {
+                                    if (xhrBalance && xhrBalanceRemaining > 10) {
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1413,7 +1393,7 @@ function submit(event) {
                             errAltSubMessageModal.style.display = "none"
                             errModal.hide()
                             loadingModal.show()
-                            if (xhrBalance && xhrBalanceTotal > 10) {
+                            if (xhrBalance && xhrBalanceRemaining > 10) {
                                 apiGateway("split", "delete")
                              } else {
                                  event.preventDefault()
@@ -1503,7 +1483,7 @@ function submit(event) {
                             errModal.hide()
                             loadingModal.show()
                             if (getUploadedFileName().length > 0) {
-                                if (xhrBalance && xhrBalanceTotal > 10) {
+                                if (xhrBalance && xhrBalanceRemaining > 10) {
                                     apiGateway("watermark","img")
                                  } else {
                                      event.preventDefault()
@@ -1591,7 +1571,7 @@ function submit(event) {
                     errModal.hide()
                     loadingModal.show()
                     if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceTotal > 10) {
+                        if (xhrBalance && xhrBalanceRemaining > 10) {
                             apiGateway("watermark","txt")
                          } else {
                              event.preventDefault()
@@ -1652,7 +1632,7 @@ function submit(event) {
     } else if (document.getElementById('html') !== null) {
         var urlAddr = document.getElementById('html')
         if (document.getElementById('urlToPDF').value) {
-            if (xhrBalance && xhrBalanceTotal > 10) {
+            if (xhrBalance && xhrBalanceRemaining > 10) {
                 procTitleMessageModal.innerText = "Processing URL..."
                 errMessage.style.visibility = null
                 errSubMessage.style.visibility = null
@@ -1740,17 +1720,13 @@ function remainingBalance() {
                     if (xhrReturn.status == 200) {
                         if (xhrReturn.remaining > 0) {
                             xhrBalance = true
-                            xhrBalanceRemaining = xhrReturn.remaining
-                            xhrBalanceTotal = xhrReturn.total
                         } else {
                             xhrBalance = false
-                            xhrBalanceRemaining = xhrReturn.remaining
-                            xhrBalanceTotal = xhrReturn.total
                         }
+                        xhrBalanceRemaining = xhrReturn.remaining
                     } else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
-                        xhrBalanceTotal = 0
                     }
                     resolve()
                 } else {
