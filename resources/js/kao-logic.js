@@ -360,8 +360,6 @@ if (uploadDropzoneAlt) {
                 })
                 rmvBtn.forEach(function(button) {
                     button.addEventListener("click", function() {
-                        document.getElementById('iFrame').src = null
-
                         if (uploadDropzoneAlt.files.length > 3) {
                             document.getElementById("dropzoneUiExt").classList.add('hidden')
                         } else if (uploadDropzoneAlt.files.length > 0 && uploadDropzoneAlt.files.length < 4) {
@@ -417,6 +415,7 @@ if (uploadDropzoneAlt) {
                     generateThumbnail(file.name)
                     .then(function(thumbnailURL) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = thumbnailURL
+                        console.log(thumbnailURL)
                     })
                     .catch(function(error) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
@@ -889,7 +888,7 @@ function sendToAPI(files, proc, action) {
                     if (xhrReturn.status == 200) {
                         if (proc == 'compress')
                         {
-                            autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
                             document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
@@ -899,7 +898,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                             document.getElementById("scsMsgLink").innerText = "Download PDF"
                         } else {
-                            autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
                             document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                             document.getElementById("alert-err").classList.add("hidden","opacity-0")
                             document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
