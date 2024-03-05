@@ -41,7 +41,7 @@ var uploadDropzone = document.getElementById("dropzoneArea")
 var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
 var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
 var adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
-var apiUrl = 'http://gw.hana-ci.com'
+var apiUrl = 'http://192.168.0.2'
 var bearerToken = import.meta.env.VITE_JWT_TOKEN
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
@@ -414,8 +414,8 @@ if (uploadDropzoneAlt) {
                 if (!file.type.startsWith('image/')) {
                     generateThumbnail(file.name)
                     .then(function(thumbnailURL) {
-                        file.previewElement.querySelector(".dz-image-thumbnail").src = thumbnailURL
-                        console.log(thumbnailURL)
+                        file.previewElement.querySelector(".dz-image-thumbnail").src = apiUrl+thumbnailURL
+                        console.log(apiUrl+thumbnailURL)
                     })
                     .catch(function(error) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
