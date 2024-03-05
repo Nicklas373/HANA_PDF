@@ -52,7 +52,6 @@ if (procBtn) {
             submit(event)
         }
     }).catch(function (error) {
-        console.log(error)
         errMessage.innerText  = "There was unexpected error !"
         errSubMessage.innerText = ""
         errListTitleMessage.innerText = "Error message"
@@ -61,6 +60,7 @@ if (procBtn) {
         errAltSubMessageModal.style = null
         loadingModal.hide()
         errModal.show()
+        console.log(error)
     })
 }
 
@@ -218,20 +218,15 @@ if (uploadDropzone) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
             this.on("success", function (response) {
-                console.log(response)
-
                 var uploadedFileName = response.name
                 uploadedFile.push(uploadedFileName)
             })
@@ -253,7 +248,6 @@ if (uploadDropzone) {
         if (procBtn) {
             if (document.getElementById('compress') !== null || document.getElementById('cnvFrPDF') !== null
                 || document.getElementById('merge') !== null) {
-                console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
@@ -397,14 +391,11 @@ if (uploadDropzoneAlt) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
@@ -415,11 +406,9 @@ if (uploadDropzoneAlt) {
                     generateThumbnail(file.name)
                     .then(function(thumbnailURL) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = thumbnailURL
-                        console.log(thumbnailURL)
                     })
                     .catch(function(error) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
-                        console.log(error.message)
                     })
                 }
             })
@@ -445,7 +434,6 @@ if (uploadDropzoneAlt) {
 
     if (!uploadDropzoneAlt) {
         if (procBtn && document.getElementById('cnvToPDF') !== null) {
-            console.log("Dropzone instance are not ready")
             errMessage.innerText  = "There was unexpected error !"
             errSubMessage.innerText = ""
             errListTitleMessage.innerText = "Error message"
@@ -611,20 +599,15 @@ if (uploadDropzoneSingle) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
             this.on("success", function (response) {
-                console.log(response)
-
                 var uploadedFileName = response.name
                 uploadedFile.push(uploadedFileName)
 
@@ -646,7 +629,6 @@ if (uploadDropzoneSingle) {
     if (!uploadDropzoneSingle) {
         if (procBtn) {
             if (document.getElementById('split') !== null || document.getElementById('watermark') !== null) {
-                console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
@@ -699,7 +681,7 @@ function apiGateway(proc, action) {
         loadingModal.hide()
     }).catch(function (error) {
         loadingModal.hide()
-        console.log(error)
+        console.error(error)
     })
 }
 
@@ -715,7 +697,7 @@ function generateThumbnail(fileName) {
                 if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhrReturn.status == 200) {
-                        resolve(xhrReturn.fileSource)
+                        resolve(xhrReturn.res)
                     } else {
                         reject(new Error('API response error: ' + xhrReturn.message))
                     }
