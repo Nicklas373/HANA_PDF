@@ -715,7 +715,7 @@ function generateThumbnail(fileName) {
                 if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhrReturn.status == 200) {
-                        resolve(xhrReturn.res)
+                        resolve(xhrReturn.fileSource)
                     } else {
                         reject(new Error('API response error: ' + xhrReturn.message))
                     }
