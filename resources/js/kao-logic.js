@@ -342,7 +342,7 @@ if (uploadDropzoneAlt) {
                         var filenameElement = parentContainer.querySelector('.dz-filename span')
                         var uploadedFile1 = fileNameFormat(filenameElement.innerText)
                         var imageUrl = apiUrl+uploadPath+uploadedFile1
-                        var documentUrl = googleViewerUrl+apiUrl+uploadPath+uploadedFile1+'&embedded=true'
+                        var documentUrl = googleViewerUrl+'https://pdf.hana-ci.com/'+uploadPath+uploadedFile1+'&embedded=true'
                         if (file.type.startsWith('image/')) {
                             document.getElementById('imgPrv').src = imageUrl
                             previewImageModal.show()
@@ -732,11 +732,16 @@ function sendToAPI(files, proc, action) {
             }
             formData.append('convertType', cnvValue)
         } else if (proc == 'split') {
+            let mergePdf
             var customPageSplit = document.getElementById('customPageSplit').value
             var customPageDelete = document.getElementById('customPageDelete').value
             var firstPage = document.getElementById('fromPage').value
             var lastPage = document.getElementById('toPage').value
-            var mergePdf = document.getElementById('mergePDF').checked
+            if (firstPage && lastPage) {
+                mergePdf = document.getElementById('mergePDF').checked
+            } else {
+                mergePdf = document.getElementById('mergePDF1').checked
+            }
             formData.append('action', action)
             formData.append('fromPage', firstPage)
             formData.append('toPage', lastPage)
@@ -865,40 +870,56 @@ function sendToAPI(files, proc, action) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
+                if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
-                    if (xhrReturn.status == 200) {
-                        if (proc == 'compress')
-                        {
-                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
-                            document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
-                            document.getElementById("alert-err").classList.add("hidden","opacity-0")
-                            document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
-                            document.getElementById("scsMsgResult").innerHTML = `
-                                PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
-                            `
-                            document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
-                            document.getElementById("scsMsgLink").innerText = "Download PDF"
+                    if (xhr.status == 200) {
+                        if (xhrReturn.status == 200) {
+                            if (xhrReturn.errors == null) {
+                                if (proc == 'compress')
+                                {
+                                    //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                                    document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
+                                    document.getElementById("alert-err").classList.add("hidden","opacity-0")
+                                    document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
+                                    document.getElementById("scsMsgResult").innerHTML = `
+                                        PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
+                                    `
+                                    document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
+                                    document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                } else {
+                                    //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
+                                    document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
+                                    document.getElementById("alert-err").classList.add("hidden","opacity-0")
+                                    document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
+                                    document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
+                                    document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
+                                    document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                }
+                            } else {
+                                document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                                document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                                document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                                document.getElementById("errMsg").innerText = xhrReturn.message
+                                document.getElementById("errProcMain").classList.remove("hidden")
+                                document.getElementById("errProcId").innerText = xhrReturn.processId
+                            }
                         } else {
-                            //autoDownload(xhrReturn.fileSource, xhrReturn.fileName)
-                            document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
-                            document.getElementById("alert-err").classList.add("hidden","opacity-0")
-                            document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
-                            document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
-                            document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
-                            document.getElementById("scsMsgLink").innerText = "Download PDF"
+                            document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                            document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                            document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                            document.getElementById("errMsg").innerText = xhrReturn.message
+                            document.getElementById("errProcMain").classList.remove("hidden")
+                            document.getElementById("errProcId").innerText = xhrReturn.processId
                         }
+                        resolve()
+                    } else {
+                        document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                        document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                        document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                        document.getElementById("errMsg").innerText = xhrReturn.message
+                        document.getElementById("errProcMain").classList.remove("hidden")
+                        document.getElementById("errProcId").innerText = xhrReturn.processId
                     }
-                    resolve()
-                } else {
-                    var xhrReturn = JSON.parse(xhr.responseText)
-                    document.getElementById("alert-scs").classList.add("hidden","opacity-0")
-                    document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                    document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
-                    document.getElementById("errMsg").innerText = xhrReturn.message
-                    document.getElementById("errProcMain").classList.remove("hidden")
-                    document.getElementById("errProcId").innerText = xhrReturn.processId
-                    reject(new Error('API response error !'))
                 }
             } else {
                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -945,7 +966,7 @@ function submit(event) {
                     cnvXls.style.borderColor = '#4DAAAA'
                     cnvDocx.style.borderColor = '#4DAAAA'
                     if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceRemaining > 10) {
+                        if (xhrBalance && xhrBalanceRemaining > 0) {
                              procTitleMessageModal.innerText = "Processing PDF..."
                              errMessage.style.visibility = null
                              errSubMessage.style.visibility = null
@@ -1009,7 +1030,7 @@ function submit(event) {
                 cnvdocx.style.borderColor = '#4DAAAA'
             }
             if (getUploadedFileName().length > 0) {
-               if (xhrBalance && xhrBalanceRemaining > 10) {
+               if (xhrBalance && xhrBalanceRemaining > 0) {
                     procTitleMessageModal.innerText = "Processing PDF..."
                     errMessage.style.visibility = null
                     errSubMessage.style.visibility = null
@@ -1046,7 +1067,7 @@ function submit(event) {
         }
     } else if (document.getElementById('cnvToPDF') !== null || document.getElementById('merge') !== null) {
         if (getUploadedFileName().length > 0) {
-           if (xhrBalance && xhrBalanceRemaining > 10) {
+           if (xhrBalance && xhrBalanceRemaining > 0) {
                 procTitleMessageModal.innerText = "Processing PDF..."
                 errMessage.style.visibility = null
                 errSubMessage.style.visibility = null
@@ -1174,7 +1195,7 @@ function submit(event) {
                                         errAltSubMessageModal.style.display = "none"
                                         errModal.hide()
                                         loadingModal.show()
-                                        if (xhrBalance && xhrBalanceRemaining > 10) {
+                                        if (xhrBalance && xhrBalanceRemaining > 0) {
                                             apiGateway("split", "split")
                                          } else {
                                              event.preventDefault()
@@ -1252,7 +1273,7 @@ function submit(event) {
                                     errAltSubMessageModal.style.display = "none"
                                     errModal.hide()
                                     loadingModal.show()
-                                    if (xhrBalance && xhrBalanceRemaining > 10) {
+                                    if (xhrBalance && xhrBalanceRemaining > 0) {
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1292,7 +1313,7 @@ function submit(event) {
                                     errAltSubMessageModal.style.display = "none"
                                     errModal.hide()
                                     loadingModal.show()
-                                    if (xhrBalance && xhrBalanceRemaining > 10) {
+                                    if (xhrBalance && xhrBalanceRemaining > 0) {
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1374,7 +1395,7 @@ function submit(event) {
                             errAltSubMessageModal.style.display = "none"
                             errModal.hide()
                             loadingModal.show()
-                            if (xhrBalance && xhrBalanceRemaining > 10) {
+                            if (xhrBalance && xhrBalanceRemaining > 0) {
                                 apiGateway("split", "delete")
                              } else {
                                  event.preventDefault()
@@ -1464,7 +1485,7 @@ function submit(event) {
                             errModal.hide()
                             loadingModal.show()
                             if (getUploadedFileName().length > 0) {
-                                if (xhrBalance && xhrBalanceRemaining > 10) {
+                                if (xhrBalance && xhrBalanceRemaining > 0) {
                                     apiGateway("watermark","img")
                                  } else {
                                      event.preventDefault()
@@ -1552,7 +1573,7 @@ function submit(event) {
                     errModal.hide()
                     loadingModal.show()
                     if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceRemaining > 10) {
+                        if (xhrBalance && xhrBalanceRemaining > 0) {
                             apiGateway("watermark","txt")
                          } else {
                              event.preventDefault()
@@ -1613,7 +1634,7 @@ function submit(event) {
     } else if (document.getElementById('html') !== null) {
         var urlAddr = document.getElementById('html')
         if (document.getElementById('urlToPDF').value) {
-            if (xhrBalance && xhrBalanceRemaining > 10) {
+            if (xhrBalance && xhrBalanceRemaining > 0) {
                 procTitleMessageModal.innerText = "Processing URL..."
                 errMessage.style.visibility = null
                 errSubMessage.style.visibility = null
