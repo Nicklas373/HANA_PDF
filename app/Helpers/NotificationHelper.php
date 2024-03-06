@@ -45,18 +45,18 @@ class NotificationHelper
 
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
         $message = "<b>HANA API Alert</b>
-                    \nServices: <b>Backend Services</b>
-                    Source: <b>https://gw.hana-ci.com</b>
-                    Endpoint: <b>".$newRoute.
-                    "</b>\nProcess: <b>".$proc.
-                    "</b>\nType: <b>Process Error</b>
-                    \nFilename: <b>".$newProcFile.
-                    "</b>\nFileSize: <b>".$newFileSize.
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
                     "</b>\nEnvironment: <b>".env('APP_ENV').
-                    "</b>\nStatus: <b>".$status.
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$newRoute.
+                    "</b>\n\nProcess: <b>".$proc.
                     "</b>\nProcess Id: <b>".$processId.
-                    "</b>\nStart At: <b>".$CurrentTime.
-                    "</b>\nError Reason: <b>".$errReason.
+                    "</b>\nType: <b>Process Error</b>".
+                    "\n\nFilename: <b>".$newProcFile.
+                    "</b>\nFileSize: <b>".$newFileSize.
+                    "</b>\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
 
@@ -119,16 +119,16 @@ class NotificationHelper
     function sendRouteErrNotify($processId, $status, $errReason, $errRoute, $errCode, $ip) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
         $message = "<b>HANA API Alert</b>
-                    \nServices: <b>Backend Services</b>
-                    Source: <b>https://gw.hana-ci.com</b>
-                    Endpoint: <b>".$errRoute.
-                    "</b>\nType: <b>Route Error</b>
-                    </b>\nEnvironment: <b>".env('APP_ENV').
-                    "</b>\nStatus: <b>".$status.
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
+                    "</b>\nEnvironment: <b>".env('APP_ENV').
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$errRoute.
+                    "</b>\n\nIP Address: <b>".$ip.
                     "</b>\nProcess Id: <b>".$processId.
-                    "</b>\nIP Address: <b>".$ip.
-                    "</b>\nStart At: <b>".$CurrentTime.
-                    "</b>\nError Reason: <b>".$errReason.
+                    "</b>\nType: <b>Route Error</b>".
+                    "</b>\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
         try {
@@ -191,16 +191,16 @@ class NotificationHelper
     function sendSchedErrNotify($schedName, $schedRuntime, $processId , $status, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
         $message = "<b>HANA API Alert</b>
-                    \nServices: <b>Backend Services</b>
-                    Source: <b>https://gw.hana-ci.com</b>
-                    Route: <b>".$errRoute.
-                    "</b>\nType: <b>Jobs Error</b>
-                    </b>\nJob Runtime: <b>".$schedRuntime.
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
                     "</b>\nEnvironment: <b>".env('APP_ENV').
-                    "</b>\nStatus: <b>".$status.
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$schedName.
+                    "</b>\n\nProcess: <b>".$schedRuntime.
                     "</b>\nProcess Id: <b>".$processId.
-                    "</b>\nStart At: <b>".$CurrentTime.
-                    "</b>\nError Reason: <b>".$errReason.
+                    "</b>\nType: <b>Jobs Error</b>".
+                    "</b>\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
         try {
