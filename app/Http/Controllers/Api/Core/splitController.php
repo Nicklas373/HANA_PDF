@@ -26,11 +26,11 @@ class splitController extends Controller
 		$validator = Validator::make($request->all(),[
             'file' => 'required',
             'action' => ['required', 'in:delete,split'],
-            'fromPage' => '',
-            'toPage' => '',
-            'mergePDF' => 'required',
-            'customPageSplit' => '',
-            'customPageDelete' => ''
+            'fromPage' => ['nullable', 'numeric'],
+            'toPage' => ['nullable', 'numeric'],
+            'mergePDF' => ['required', 'in:true,false'],
+            'customPageSplit' => ['nullable', 'regex:/^[0-9a-zA-Z,]+$/'],
+            'customPageDelete' => ['nullable', 'regex:/^[0-9a-zA-Z,]+$/']
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();

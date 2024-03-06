@@ -24,7 +24,7 @@ class mergeController extends Controller
 {
     public function merge(Request $request) {
         $validator = Validator::make($request->all(),[
-            'batch' => 'required',
+            'batch' => ['required', 'in:true,false'],
             'file' => 'required',
 		]);
 

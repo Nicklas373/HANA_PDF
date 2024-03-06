@@ -36,10 +36,10 @@ class convertController extends Controller
 {
 	public function convert(Request $request) {
 		$validator = Validator::make($request->all(),[
-            'batch' => 'required',
-            'convertType' => 'required',
+            'batch' => ['required', 'in:true,false'],
+            'convertType' => ['required', 'in:jpg,docx,pptx,xlsx,pdf'],
             'file' => 'required',
-            'extImage' => 'required'
+            'extImage' => ['required', 'in:true,false']
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();

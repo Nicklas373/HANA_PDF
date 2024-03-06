@@ -27,16 +27,16 @@ class watermarkController extends Controller
             'file' => '',
             'imgFile' => '',
             'action' => ['required', 'in:img,txt'],
-            'wmFontColor' => '',
-            'wmFontSize' => '',
-            'wmFontStyle' => '',
-            'wmFontFamily' => '',
-            'wmLayoutStyle' => '',
-            'wmRotation' => '',
-            'wmPage' => '',
-            'wmText' => '',
-            'wmTransparency' => '',
-            'wmMosaic' => ''
+            'wmFontColor' => ['nullable','regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'wmFontSize' => ['nullable', 'numeric'],
+            'wmFontStyle' => ['required', 'in:Regular,Bold,Italic'],
+            'wmFontFamily' => ['required', 'in:Arial,Arial Unicode MS,Comic Sans MS,Courier,Times New Roman,Verdana'],
+            'wmLayoutStyle' => ['required', 'in:above,below'],
+            'wmRotation' => ['nullable', 'numeric'],
+            'wmPage' => ['nullable', 'numeric'],
+            'wmText' => ['nullable','string'],
+            'wmTransparency' => ['nullable', 'numeric'],
+            'wmMosaic' => ['required', 'in:true,false']
 		]);
 
         $uuid = AppHelper::Instance()->get_guid();

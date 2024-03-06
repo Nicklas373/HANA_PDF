@@ -27,8 +27,8 @@ class compressController extends Controller
 {
  	public function compress(Request $request) {
 		$validator = Validator::make($request->all(),[
-            'batch' => 'required',
-            'compMethod' => 'required',
+            'batch' => ['required', 'in:true,false'],
+            'compMethod' => ['required', 'in:low,recommended,extreme'],
             'file' => 'required',
 		]);
 
