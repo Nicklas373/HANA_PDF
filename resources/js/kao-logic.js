@@ -342,7 +342,7 @@ if (uploadDropzoneAlt) {
                         var filenameElement = parentContainer.querySelector('.dz-filename span')
                         var uploadedFile1 = fileNameFormat(filenameElement.innerText)
                         var imageUrl = apiUrl+uploadPath+uploadedFile1
-                        var documentUrl = googleViewerUrl+'https://pdf.hana-ci.com/'+uploadPath+uploadedFile1+'&embedded=true'
+                        var documentUrl = googleViewerUrl+apiUrl+uploadPath+uploadedFile1+'&embedded=true'
                         if (file.type.startsWith('image/')) {
                             document.getElementById('imgPrv').src = imageUrl
                             previewImageModal.show()
