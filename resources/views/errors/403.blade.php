@@ -8,7 +8,7 @@
         </div>
         <div class="text-center px-4">
             <h2 class="mt-4 lg:mt-8 text-lg lg:text-3xl font-medium font-quicksand text-lt2">Forbidden</h2>
-            <h2 class="mt-4 text-xs text-start lg:text-lg font-medium font-quicksand text-lt4">The page that you are looking for are restricted</h2>
+            <h2 class="mt-4 text-xs text-center lg:text-start lg:text-lg font-medium font-quicksand text-lt4">The page that you are looking for are restricted</h2>
             <h2 class="text-xs lg:text-lg text-center font-medium font-quicksand text-lt4">You do not have access this for this page.</h3>
         </div>
         <div class="mt-10 px-4">

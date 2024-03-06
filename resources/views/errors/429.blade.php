@@ -8,7 +8,7 @@
         </div>
         <div class="text-center px-4">
             <h2 class="mt-4 lg:mt-8 text-lg lg:text-3xl font-medium font-quicksand text-lt2">Too Many Requests</h2>
-            <h2 class="mt-4 text-xs text-start lg:text-lg font-medium font-quicksand text-lt4">You've made too many requests recently</h2>
+            <h2 class="mt-4 text-xs text-center lg:text-start lg:text-lg font-medium font-quicksand text-lt4">You've made too many requests recently</h2>
             <h2 class="text-xs lg:text-lg text-center font-medium font-quicksand text-lt4">Please wait and try again later.</h3>
         </div>
         <div class="mt-10 px-4">
