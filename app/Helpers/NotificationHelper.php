@@ -128,7 +128,7 @@ class NotificationHelper
                     "</b>\n\nIP Address: <b>".$ip.
                     "</b>\nProcess Id: <b>".$processId.
                     "</b>\nType: <b>Route Error</b>".
-                    "</b>\n\nError Reason: <b>".$errReason.
+                    "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
         try {
@@ -200,7 +200,7 @@ class NotificationHelper
                     "</b>\n\nProcess: <b>".$schedRuntime.
                     "</b>\nProcess Id: <b>".$processId.
                     "</b>\nType: <b>Jobs Error</b>".
-                    "</b>\n\nError Reason: <b>".$errReason.
+                    "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
         try {
