@@ -40,9 +40,9 @@ var uploadedFile = []
 var uploadDropzone = document.getElementById("dropzoneArea")
 var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
 var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
-var adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
+var adobeClientID = "STATIC_CLIENT_ID"
 var apiUrl = 'http://192.168.0.2'
-var bearerToken = import.meta.env.VITE_JWT_TOKEN
+var bearerToken = "STATIC_BEARER"
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
 
