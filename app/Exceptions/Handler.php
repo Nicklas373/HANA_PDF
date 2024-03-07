@@ -98,6 +98,108 @@ class Handler extends ExceptionHandler
                 Log::error('Query Exception failed with: '. $e->getMessage());
             }
             abort(401);
+        }  else if ($exception instanceof RouteNotFoundException) {
+            $message = 'RouteNotFoundException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', 'Route not found exception!', $currentRouteInfo, $message, $userIp);
+             try {
+                DB::table('accessLogs')->insert([
+                    'processId' => $uuid,
+                    'routePath' => $currentRouteInfo,
+                    'accessIpAddress' => true,
+                    'routeExceptionMessage' => 'Route not found exception!',
+                    'routeExceptionLog' => $message
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $e->getMessage());
+            }
+            return response()->json([
+                'status' => 404,
+                'message' => 'Route not found exception!',
+            ], 404);
+        } else if ($exception instanceof NotFoundHttpException || ($exception instanceof HttpException && $exception->getStatusCode() == 404)) {
+            $message = 'NotFoundHttpException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '404 - Page not found', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '404 - Page not found',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
+        } else if ($exception instanceof HttpException && $exception->getStatusCode() == 403) {
+            $message = 'HTTPResponseException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '403 - Forbidden', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '403 - Forbidden',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
+        } else if ($exception instanceof HttpException && $exception->getStatusCode() == 419) {
+            $message = 'HTTPResponseException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '419 - Page Expired', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '419 - Page Expired',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
+        } else if ($exception instanceof HttpException && $exception->getStatusCode() == 429) {
+            $message = 'HTTPResponseException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '429 - Too Many Requests', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '429 - Too Many Requests',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
+        } else if ($exception instanceof HttpException && $exception->getStatusCode() == 500) {
+            $message = 'HTTPResponseException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '500 - Internal Server Error', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '500 - Internal Server Error',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
+        } else if ($exception instanceof HttpException && $exception->getStatusCode() == 503) {
+            $message = 'HTTPResponseException: ' . $exception->getMessage();
+            NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '503 - Service Temporary Unavailable', $currentRouteInfo, $message, $userIp);
+            try {
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => true,
+                   'routeExceptionMessage' => '503 - Service Temporary Unavailable',
+                   'routeExceptionLog' => $message
+               ]);
+           } catch (QueryException $ex) {
+               Log::error('Query Exception failed with: '. $e->getMessage());
+           }
         }
         return parent::render($request, $exception);
     }
