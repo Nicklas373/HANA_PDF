@@ -1,0 +1,55 @@
+# Configure php fpm as base image 
+FROM php:8.2-fpm
+
+# Configure image maintainer
+LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
+LABEL version="1.0"
+LABEL description="Docker application image for HANA PDF Apps"
+
+# Configure ARG
+ARG DB_USERNAME
+ARG DB_PASSWORD
+
+# Configure work directory
+WORKDIR /var/www/html
+
+# Configure initial updates for instance
+RUN apt-get update && apt-get upgrade -y 
+
+# Configure initial packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    git \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Clone App Services
+RUN git clone -b fe/master https://github.com/Nicklas373/Hana-PDF hanaci-pdf
+RUN chown -R www-data:www-data hanaci-pdf
+
+# Configure Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN cd hanaci-pdf && composer install --no-interaction --no-scripts --no-progress --prefer-dist
+
+# Configure App Service
+RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
+RUN cd hanaci-pdf && cp .env.example .env
+RUN cd hanaci-pdf && php artisan key:generate
+RUN cd hanaci-pdf && php artisan config:cache
+RUN cd hanaci-pdf && php artisan config:clear
+
+# Configure Laravel Env
+RUN cd hanaci-pdf && echo "VITE_ADOBE_CLIENT_ID=xxxx" >> .env
+RUN cd hanaci-pdf && echo "" >> .env
+RUN cd hanaci-pdf && sed -i 's/APP_NAME=Laravel/APP_NAME="HANA PDF"/' .env
+RUN cd hanaci-pdf && sed -i "s#APP_URL=http://localhost#APP_URL=http://sit.pdf.hana-ci.com#" .env
+RUN cd hanaci-pdf && sed -i "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_HOST=127.0.0.1/DB_HOST=hana-db-services/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_PORT=3306/DB_PORT=5432/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_DATABASE=laravel/DB_DATABASE=postgres/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_USERNAME=root/DB_USERNAME=$DB_USERNAME/" .env
+RUN cd hanaci-pdf && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
+RUN cd hanaci-pdf && echo "TELEGRAM_BOT_ID=xxxx" >> .env
+RUN cd hanaci-pdf && echo "TELEGRAM_CHAT_ID=xxxx" >> .env
