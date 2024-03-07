@@ -15,16 +15,16 @@ class NotificationHelper
     function sendRouteErrNotify($processId, $status, $errReason, $errRoute, $errCode, $ip) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
         $message = "<b>HANA API Alert</b>
-                    \nServices: <b>Frontend Services</b>
-                    Source: <b>https://pdf.hana-ci.com</b>
-                    Endpoint: <b>".$errRoute.
-                    "</b>\nType: <b>Route Error</b>
-                    </b>\nEnvironment: <b>".env('APP_ENV').
-                    "</b>\nStatus: <b>".$status.
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
+                    "</b>\nEnvironment: <b>".env('APP_ENV').
+                    "\n\n</b>Services: <b>Frontend Services</b>".
+                    "\nSource: <b>https://pdf.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$errRoute.
+                    "</b>\n\nIP Address: <b>".$ip.
                     "</b>\nProcess Id: <b>".$processId.
-                    "</b>\nIP Address: <b>".$ip.
-                    "</b>\nStart At: <b>".$CurrentTime.
-                    "</b>\nError Reason: <b>".$errReason.
+                    "</b>\nType: <b>Route Error</b>".
+                    "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
         try {
