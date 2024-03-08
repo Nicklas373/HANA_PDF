@@ -42,9 +42,16 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ---
 
+### Commit History
+- [Old branch - master](https://github.com/Nicklas373/Hana-PDF/tree/master)
+- [Frontend Services - fe/master](https://github.com/Nicklas373/Hana-PDF/tree/fe/master)
+- [Backend Services - fe/master](https://github.com/Nicklas373/Hana-PDF/tree/be/master)
+
+---
+
 ### Deployment On Docker
 #### Step to configure
-1. Clone the repository with branch __docker/master
+1. Clone the repository with branch __docker/master__
 2. Go to root directory from this project
 3. Start to deploy
     ````bash
@@ -92,7 +99,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ### Deployment On Native OS Host
 #### Step to configure
-1. Clone the repository with branch __dev/fe/master [Frontend Services]
+1. Clone the repository with branch __dev/fe/master__ [Frontend Services]
     
     A. Copy __.env.example__ file to __.env__ and modify database credentials
     ````bash
