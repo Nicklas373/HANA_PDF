@@ -74,7 +74,7 @@ if (uploadDropzone) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        timeout: 5000,
+        timeout: 30000,
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
@@ -241,6 +241,18 @@ if (uploadDropzone) {
                 errModal.show()
                 uploadDropzone.removeFile(file)
             })
+
+            this.on("timeout", function(file) {
+                uploadDropzone.removeFile(file)
+                uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
+                errMessage.innerText  = "Connection timeout !"
+                errSubMessage.innerText = "Please try again later"
+                errListTitleMessage.innerText = "Failed to upload:"
+                resetErrListMessage()
+                generateMesssage(file.name)
+                errAltSubMessageModal.style = null
+                errModal.show()
+            })
         }
     })
 
@@ -271,7 +283,7 @@ if (uploadDropzoneAlt) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        timeout: 5000,
+        timeout: 30000,
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
@@ -429,6 +441,18 @@ if (uploadDropzoneAlt) {
                 errModal.show()
                 uploadDropzoneAlt.removeFile(file)
             })
+
+            this.on("timeout", function(file) {
+                uploadDropzone.removeFile(file)
+                uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
+                errMessage.innerText  = "Connection timeout !"
+                errSubMessage.innerText = "Please try again later"
+                errListTitleMessage.innerText = "Failed to upload:"
+                resetErrListMessage()
+                generateMesssage(file.name)
+                errAltSubMessageModal.style = null
+                errModal.show()
+            })
         }
     })
 
@@ -456,7 +480,7 @@ if (uploadDropzoneSingle) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        timeout: 5000,
+        timeout: 30000,
         previewTemplate: '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
                             '<div class="flex flex-col items-center justify-center">' +
                                 '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">'+
@@ -622,6 +646,18 @@ if (uploadDropzoneSingle) {
                 errAltSubMessageModal.style = null
                 errModal.show()
                 uploadDropzoneSingle.removeFile(file)
+            })
+
+            this.on("timeout", function(file) {
+                uploadDropzone.removeFile(file)
+                uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
+                errMessage.innerText  = "Connection timeout !"
+                errSubMessage.innerText = "Please try again later"
+                errListTitleMessage.innerText = "Failed to upload:"
+                resetErrListMessage()
+                generateMesssage(file.name)
+                errAltSubMessageModal.style = null
+                errModal.show()
             })
         }
     })
