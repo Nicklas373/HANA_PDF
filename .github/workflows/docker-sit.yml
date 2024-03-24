@@ -1,0 +1,124 @@
+name: "HANA PDF Container [SIT]"
+
+on:
+  push:
+    branches:
+      - fe/master
+      - be/master
+      
+jobs:
+  api_build_image:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cleanup Unused Docker Images
+        run: docker rmi $(docker images -q) || true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: nicklas373
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build HANA API Docker Image
+        run: |
+          docker build \
+            --build-arg JWT_SHOW_BLACKLIST_EXCEPTION=${{ secrets.JWT_SHOW_BLACKLIST_EXCEPTION }} \
+            --build-arg JWT_TTL=${{ secrets.JWT_TTL }} \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -t nicklas373/hana-api-services-sit:1.0 \
+            -f Dockerfile/Dockerfile.hana-api-services.sit \
+            .
+          mkdir -p api_image
+          docker save -o api_image/api_image.tar nicklas373/hana-api-services-sit:1.0
+
+      - name: Load Docker Images
+        run:  docker load -i api_image/api_image.tar
+
+      - name: Deploy Docker Image to Docker Hub
+        run:  docker push nicklas373/hana-api-services-sit:1.0
+
+      - name: Docker Success Notifications
+        run: |
+          chmod +x ./module/bash/docker-build-info.sh
+          bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/hana-pdf/actions/workflows/docker-sit-env.yml api_build_image Done
+
+  pdf_build_image:
+    runs-on: ubuntu-latest
+    needs: [api_build_image]
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cleanup Unused Docker Images
+        run: docker rmi $(docker images -q) || true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: nicklas373
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build HANA PDF Docker Image
+        run: |
+          docker build \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -t nicklas373/hana-app-pdf-sit:1.0 \
+            -f Dockerfile/Dockerfile.hana-app-pdf.sit \
+            .
+          mkdir -p pdf_image
+          docker save -o pdf_image/pdf_image.tar nicklas373/hana-app-pdf-sit:1.0
+
+      - name: Load Docker Images
+        run: docker load -i pdf_image/pdf_image.tar
+
+      - name: Deploy Docker Image to Docker Hub
+        run: docker push nicklas373/hana-app-pdf-sit:1.0
+
+      - name: Docker Success Notifications
+        run: |
+          chmod +x ./module/bash/docker-build-info.sh
+          bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/hana-pdf/actions/workflows/docker-sit-env.yml pdf_build_image Done
+
+  instance_build_image:
+    runs-on: ubuntu-latest
+    needs: [api_build_image, pdf_build_image]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cleanup Unused Docker Images
+        run: docker rmi $(docker images -q) || true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: nicklas373
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build Instance Docker Image
+        run: |
+          docker build \
+            -t nicklas373/hana-instance-services-sit:1.0 \
+            -f Dockerfile/Dockerfile.hana-instance-services.sit \
+            .
+          mkdir -p instance_image
+          docker save -o instance_image/instance_image.tar nicklas373/hana-instance-services-sit:1.0
+  
+      - name: Load Docker Images
+        run: docker load -i instance_image/instance_image.tar
+  
+      - name: Deploy Docker Image to Docker Hub
+        run: docker push nicklas373/hana-instance-services-sit:1.0
+
+      - name: Docker Success Notifications
+        run: |
+          chmod +x ./module/bash/docker-build-info.sh
+          bash ./module/bash/docker-build-info.sh ${{ secrets.TG_TOKEN }} ${{ secrets.TG_CHAT_ID }} HANA_PDF_Container_[SIT] https://github.com/Nicklas373/hana-pdf/actions/workflows/docker-sit-env.yml instance_build_image Done
