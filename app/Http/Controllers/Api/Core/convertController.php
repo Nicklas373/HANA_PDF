@@ -147,7 +147,7 @@ class convertController extends Controller
                     $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                     if ($convertType == 'xlsx') {
                         $asposeAPI = new Process([
-                            'python',
+                            'python3',
                             public_path().'/ext-python/asposeAPI.py',
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
@@ -572,7 +572,7 @@ class convertController extends Controller
                         }
                     } else if ($convertType == 'pptx') {
                         $asposeAPI = new Process([
-                            'python',
+                            'python3',
                             public_path().'/ext-python/asposeAPI.py',
                             env('ASPOSE_CLOUD_CLIENT_ID'),
                             env('ASPOSE_CLOUD_TOKEN'),
