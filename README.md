@@ -51,14 +51,15 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ### Deployment On Docker
 #### Step to configure
-1. Go to root directory from this project
-2. Start to deploy
+1. Clone the repository with branch __docker/master__
+2. Go to root directory from this project
+3. Start to deploy
     ````bash
         - docker compose up -d
         - docker compose exec hana-api-service php artisan migrate
         - docker compose exec hana-api-service php artisan db:seed
     ````
-3. Configure Server Host
+4. Configure Server Host
      ````bash
         - docker compose exec hana-api-services echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
         - docker compose exec hana-api-services echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
@@ -71,13 +72,13 @@ used of Flowbite library to maintain responsive and materialize interface. And p
         - docker compose exec hana-api-services sed -i "s/ILOVEPDF_PUBLIC_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_PUBLIC_KEY/" >> .env
         - docker compose exec hana-api-services sed -i "s/ILOVEPDF_SECRET_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_SECRET_KEY/" >> .env
     ````
-4. Configure Client Host
+5. Configure Client Host
      ````bash
         - docker compose exec hana-app-pdf sed -i "s/VITE_ADOBE_CLIENT_ID=xxxx/VITE_ADOBE_CLIENT_ID=YOUR_ADOBE_CLIENT_ID/" >> .env
         - docker compose exec hana-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
         - docker compose exec hana-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
      ````
-5. Configure REST API
+6. Configure REST API
     - Install Postman
     - Create a new HTTP request with POST format
         - URL: http://YOUR_LOCAL_IP:YOUR_LOCAL_PORT/api/v1/auth/token
@@ -92,7 +93,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
             - docker compose exec hana-app-pdf sed -i 's|http://192.168.0.2|YOUR_BACKEND_URL:PORT|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
             - docker compose exec hana-app-pdf sed -i 's|STATIC_CLIENT_ID|YOUR_ADOBE_CLIENT_ID|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
         ````
-6. Refresh page and done.
+7. Refresh page and done.
 
 ---
 
