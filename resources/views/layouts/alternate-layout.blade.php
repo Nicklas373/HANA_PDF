@@ -3,7 +3,7 @@
     @include('includes.head')
     <header>@include('includes.header')</header>
   </head>
-  <body class="bg-origin-padding bg-top bg-scroll bg-dt1 bg-no-repeat" style="background-image: url('{{ asset('assets/home.avif') }}');">
+  <body class="bg-origin-padding bg-top bg-scroll bg-cover bg-dt1 bg-no-repeat" style="background-image: url('{{ asset('assets/home.avif') }}');">
     @include('includes.modal')
     @include('includes.pdf-preview')
     <div id="content" class="flex flex-col min-h-screen justify-between">
