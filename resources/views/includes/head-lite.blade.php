@@ -4,4 +4,4 @@
 <title>HANA PDF</title>
 <link rel="icon" type="image/svg" href="{{ asset('assets/logo/ico.svg') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
-<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-lite-BhxJozjM.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-lite-mVRHGcos.css')}}" />
