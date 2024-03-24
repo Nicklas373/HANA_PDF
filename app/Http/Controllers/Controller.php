@@ -72,13 +72,12 @@ class Controller extends BaseController
         ], $status);
     }
 
-    protected function returnFileMesage($status, $message, $fileSource, $fileName, $errors)
+    protected function returnFileMesage($status, $message, $files, $errors)
     {
         return response()->json([
             'status' => $status,
             'message'=> $message,
-            'fileName' => $fileName,
-            'fileSource' => $fileSource,
+            'files' => $files,
             'errors' => $errors
         ], $status);
     }

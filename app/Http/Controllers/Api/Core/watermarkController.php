@@ -33,7 +33,7 @@ class watermarkController extends Controller
             'wmFontFamily' => ['required', 'in:Arial,Arial Unicode MS,Comic Sans MS,Courier,Times New Roman,Verdana'],
             'wmLayoutStyle' => ['required', 'in:above,below'],
             'wmRotation' => ['nullable', 'numeric'],
-            'wmPage' => ['nullable', 'numeric'],
+            'wmPage' => ['nullable', 'regex:/^[0-9a-zA-Z,]+$/'],
             'wmText' => ['nullable','string'],
             'wmTransparency' => ['nullable', 'numeric'],
             'wmMosaic' => ['required', 'in:true,false']
