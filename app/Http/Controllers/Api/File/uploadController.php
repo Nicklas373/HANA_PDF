@@ -12,7 +12,7 @@ class uploadController extends Controller
 {
     public function upload(Request $request) {
 		$validator = Validator::make($request->all(),[
-			'file' => 'mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg,tiff|max:25600',
+			'file' => 'required|mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg,tiff|max:25600',
 			'fileAlt' => ''
 		]);
 
@@ -20,7 +20,6 @@ class uploadController extends Controller
             return $this->returnFileMesage(
                 401,
                 'Validation failed',
-                null,
                 null,
                 $validator->messages()->first()
             );
@@ -40,14 +39,12 @@ class uploadController extends Controller
                         200,
                         'File uploaded successfully !',
                         Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$pdfFileName),
-                        $pdfFileName,
                         null
                     );
                 } else {
                     return $this->returnFileMesage(
                         200,
                         'Failed to upload file !',
-                        null,
                         null,
                         $pdfFileName.' could not be found in the server'
                     );
@@ -56,7 +53,6 @@ class uploadController extends Controller
                 return $this->returnFileMesage(
                     200,
                     'Failed to upload file !',
-                    null,
                     null,
                     'Requested file could not be found in the server'
                 );
@@ -91,14 +87,12 @@ class uploadController extends Controller
                         200,
                         'File removed successfully !',
                         Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$pdfFileName),
-                        $pdfFileName,
                         null
                     );
                 } else {
                     return $this->returnFileMesage(
                         200,
-                        'Failed to upload file !',
-                        null,
+                        'Failed to remove file !',
                         null,
                         $pdfFileName.' could not be found in the server'
                     );
@@ -106,8 +100,7 @@ class uploadController extends Controller
             } else {
                 return $this->returnFileMesage(
                     200,
-                    'Failed to upload file !',
-                    null,
+                    'Failed to remove file !',
                     null,
                     'Requested file could not be found in the server'
                 );
