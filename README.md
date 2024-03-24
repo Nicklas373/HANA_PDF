@@ -1,4 +1,4 @@
-## HANA PDF
+## HANA PDF 
 
 <br>
 <div align="center">
@@ -25,8 +25,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 - [Node JS 20.11](https://nodejs.org/en)
 - [PHP 8.2.12](https://www.php.net/downloads.php)
 - [PostgreSQL 16.2](https://www.postgresql.org/)
-- [Python 3.10.x](https://www.python.org/downloads/release/python-31011/)
-- [Vite JS](https://vitejs.dev/)
+- [Postman](https://www.postman.com/)
 
 ---
 
@@ -42,96 +41,135 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ---
 
-### Deployment On Docker [YOUR_LOCAL_IP_ADDRESS:80]
+### Commit History
+- [Old branch - master](https://github.com/Nicklas373/Hana-PDF/tree/master)
+- [Docker Container - docker/master](https://github.com/Nicklas373/Hana-PDF/tree/docker/master)
+- [Frontend Services - fe/master](https://github.com/Nicklas373/Hana-PDF/tree/fe/master)
+- [Backend Services - be/master](https://github.com/Nicklas373/Hana-PDF/tree/be/master)
+
+---
+
+### Deployment On Docker
 #### Step to configure
-1. Clone the repository with __git clone__
+1. Clone the repository with branch __docker/master__
 2. Go to root directory from this project
 3. Start to deploy
-    - Windows based [Using docker desktop]
-        ```bash
+    ````bash
         - docker compose up -d
-        - docker compose exec hana-container-instance php artisan migrate
-        - docker stats
-        ```
-    
-    - Linux based [Using docker.io & docker-compose]
-        ```bash
-        - sudo docker-compose up -d
-        - sudo docker-compose exec hana-container-instance php artisan migrate
-        - sudo docker stats
-        ```
-4. Configure REST API and Telegram Notification
-    - Windows based [Using docker desktop]
-        ```bash
-        - docker compose exec hana-container-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
-        - docker compose exec hana-container-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
-        - docker compose exec hana-container-app-pdf echo "TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN" >> .env
-        ```
-    
-    - Linux based [Using docker.io & docker-compose]
-        ```bash
-        - sudo docker-compose exec hana-container-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
-        - sudo docker-compose exec hana-container-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
-        - sudo docker-compose exec hana-container-app-pdf echo "TOKEN_GENERATE=YOUR_ENCODE_SHA512_TOKEN" >> .env
-        ```
+        - docker compose exec hana-api-service php artisan migrate
+        - docker compose exec hana-api-service php artisan db:seed
+    ````
+4. Configure Server Host
+     ````bash
+        - docker compose exec hana-api-services echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
+        - docker compose exec hana-api-services echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
+        - docker compose exec hana-api-services echo "HANA_UNIQUE_TOKEN=YOUR_SHA512_UNIQUE_TOKEN" >> .env
+        - docker compose exec hana-api-services sed -i "s/ASPOSE_CLOUD_CLIENT_ID=xxxx/ASPOSE_CLOUD_CLIENT_ID=YOUR_ASPOSE_CLOUD_CLIENT_ID/" >> .env
+        - docker compose exec hana-api-services sed -i "s/ASPOSE_CLOUD_TOKEN=xxxx/ASPOSE_CLOUD_TOKEN=YOUR_ASPOSE_CLOUD_TOKEN" >> .env
+        - docker compose exec hana-api-services sed -i "s/FTP_USERNAME=xxxx/FTP_USERNAME=YOUR_FTP_USERNAME/" >> .env
+        - docker compose exec hana-api-services sed -i "s/FTP_USERPASS=xxxx/FTP_USERNAME=YOUR_FTP_USERPASS/" >> .env
+        - docker compose exec hana-api-services sed -i "s/FTP_ROOT=xxxx/FTP_USERNAME=YOUR_FTP_ROOT_DIR/" >> .env
+        - docker compose exec hana-api-services sed -i "s/ILOVEPDF_PUBLIC_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_PUBLIC_KEY/" >> .env
+        - docker compose exec hana-api-services sed -i "s/ILOVEPDF_SECRET_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_SECRET_KEY/" >> .env
+    ````
+5. Configure Client Host
+     ````bash
+        - docker compose exec hana-app-pdf sed -i "s/VITE_ADOBE_CLIENT_ID=xxxx/VITE_ADOBE_CLIENT_ID=YOUR_ADOBE_CLIENT_ID/" >> .env
+        - docker compose exec hana-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
+        - docker compose exec hana-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
+     ````
+6. Configure REST API
+    - Install Postman
+    - Create a new HTTP request with POST format
+        - URL: http://YOUR_LOCAL_IP:YOUR_LOCAL_PORT/api/v1/auth/token
+        - Body: form-data
+            - email: eureka@hana-ci.com
+            - password: YOUR_SHA512_UNIQUE_TOKEN
+    - Send a POST request to get access token
+    - Set token to FE services
+        ````bash
+            - docker compose exec hana-app-pdf sed -i 's|Bearer STATIC_BEARER|Bearer YOUR_CURRENT_BEARER|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
+            - docker compose exec hana-app-pdf sed -i 's|STATIC_BEARER|YOUR_CURRENT_BEARER|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
+            - docker compose exec hana-app-pdf sed -i 's|http://192.168.0.2|YOUR_BACKEND_URL:PORT|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
+            - docker compose exec hana-app-pdf sed -i 's|STATIC_CLIENT_ID|YOUR_ADOBE_CLIENT_ID|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
+        ````
+7. Refresh page and done.
+
 ---
 
 ### Deployment On Native OS Host
 #### Step to configure
-1. Clone the repository with __git clone__ with branch __dev/master__
-2. Copy __.env.example__ file to __.env__ and modify database credentials
-3. Add additional environment into __.env__ with this string (Add yourself value :p)
-````bash
-- ASPOSE_CLOUD_CLIENT_ID="ASPOSE_CLOUD_CLIENT_ID" [https://dashboard.aspose.cloud/]
-- ASPOSE_CLOUD_TOKEN="ASPOSE_CLOUD_TOKEN" [https://dashboard.aspose.cloud/]
-- ADOBE_CLIENT_ID="ADOBE_CLIENT_ID" [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]
-- FTP_USERNAME="FTP_USERNAME" [https://dashboard.aspose.cloud/]
-- FTP_USERPASS="FTP_USERPASS" [https://dashboard.aspose.cloud/]
-- FTP_SERVER="FTP_SERVER" [https://dashboard.aspose.cloud/]
-- ILOVEPDF_ENC_KEY="ILOVEPDF_ENC_KEY" [Generate your hash key (Max. 25 digits)]
-- ILOVEPDF_PUBLIC_KEY="ILOVEPDF_PUBLIC_KEY" [https://developer.ilovepdf.com/]
-- ILOVEPDF_SECRET_KEY="ILOVEPDF_SECRET_KEY" [https://developer.ilovepdf.com/]
-- PDF_IMG_POOL="image"
-- PDF_BATCH="batch"
-- PDF_UPLOAD="upload"
-- PDF_DOWNLOAD="download"
-- PDF_POOL="pool"
-- TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
-- TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
-- TOKEN_GENERATE="YOUR_ENCODE_SHA512_TOKEN"
-````
-4. Run the following command [Make sure to configure database connectivity before use migrate function]
-```bash
-- composer install
-- php artisan key:generate
-- php artisan storage:link
-- php artisan migrate
-```
-5. Create new directory inside storage/app/public
-    - image
-    - batch
-    - upload
-    - download
-    - pool
-6. Start to deploy
-    ```bash
-    - npm run dev -- --host
-    - php artisan serve --host=localhost --port=80
-    ```
+1. Clone the repository with branch __fe/master__ [Frontend Services]
     
+    A. Copy __.env.example__ file to __.env__ and modify database credentials
+    ````bash
+        - VITE_ADOBE_CLIENT_ID="ADOBE_CLIENT_ID" [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]
+        - VITE_JWT_TOKEN="YOUR_CURRENT_BEARER_TOKEN" [Get it from Backend with route api/v1/auth/token]
+        - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+        - TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+    ````
+    B. Run the following command [Make sure to configure database connectivity before use migrate function]
+    ````bash
+        - composer install
+        - npm run install
+        - php artisan key:generate
+        - php artisan storage:link
+    ````
+    C. Start to deploy
+    ```bash
+        - php artisan serve --host=localhost --port=81
+    ```
+2. Clone the repository with branch __dev/be/master [Backend Services]
+
+    A. Copy __.env.example__ file to __.env__ and modify database credentials
+    ````bash
+        - ASPOSE_CLOUD_CLIENT_ID="ASPOSE_CLOUD_CLIENT_ID" [https://dashboard.aspose.cloud/]
+        - ASPOSE_CLOUD_TOKEN="ASPOSE_CLOUD_TOKEN" [https://dashboard.aspose.cloud/]
+        - FTP_USERNAME="FTP_USERNAME" [https://dashboard.aspose.cloud/]
+        - FTP_USERPASS="FTP_USERPASS" [https://dashboard.aspose.cloud/]
+        - FTP_SERVER="FTP_SERVER" [https://dashboard.aspose.cloud/]
+        - ILOVEPDF_ENC_KEY="ILOVEPDF_ENC_KEY" [Generate your hash key (Max. 25 digits)]
+        - ILOVEPDF_PUBLIC_KEY="ILOVEPDF_PUBLIC_KEY" [https://developer.ilovepdf.com/]
+        - ILOVEPDF_SECRET_KEY="ILOVEPDF_SECRET_KEY" [https://developer.ilovepdf.com/]
+        - PDF_IMG_POOL="image"
+        - PDF_BATCH="batch"
+        - PDF_UPLOAD="upload"
+        - PDF_DOWNLOAD="download"
+        - PDF_POOL="pool"
+        - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+        - TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+        - HANA_UNIQUE_TOKEN="YOUR_SHA512_UNIQUE_TOKEN"
+    ````
+    B. Run the following command [Make sure to configure database connectivity before use migrate function]
+    ````bash
+        - composer install
+        - php artisan key:generate
+        - php artisan jwt:secret
+        - php artisan storage:link
+    ````
+
+    C. Create new directory inside storage/app/public
+    * image
+    * batch
+    * upload
+    * download
+    * pool
+
+    D. Start to deploy
+    ````bash
+        - npm run dev -- --host
+        - php artisan serve --host=localhost --port=80
+    ````
+    E. Configure apiUrl variable on resources/js/kao-logic.js to your considered BE address and port !
 ---
 
 ### Technology Stack
-- [Aspose](https://www.aspose.cloud/)
 - [Docker](https://www.docker.com/)
 - [DropzoneJS](https://www.dropzone.dev/)
 - [Flowbite](https://flowbite.com/)
-- [iLovePDF](https://developer.ilovepdf.com/)
 - [Laravel](https://laravel.com/)
 - [Node JS](https://nodejs.org/en)
 - [Mozilla PDFJS](https://mozilla.github.io/pdf.js/)
-- [PHPOffice](https://github.com/PHPOffice)
-- [Python](https://www.python.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite JS](https://vitejs.dev/)
 
