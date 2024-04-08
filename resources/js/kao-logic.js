@@ -488,7 +488,7 @@ if (uploadDropzoneAlt) {
             })
 
             this.on("success", function (file, response) {
-                var uploadedFileName = response.fileName
+                var uploadedFileName = response.name
                 uploadedFile.push(uploadedFileName)
 
                 xhrScsUploads = xhrScsUploads + 1
