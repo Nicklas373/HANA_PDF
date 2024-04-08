@@ -4,12 +4,12 @@
     "name": "index"
   },
   "resources/css/app-lite.css": {
-    "file": "assets/app-lite-mVRHGcos.css",
+    "file": "assets/app-lite-DzKrquXv.css",
     "src": "resources/css/app-lite.css",
     "isEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-BZyyKDdV.css",
+    "file": "assets/app-C5XKjO5t.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -28,7 +28,7 @@
     ]
   },
   "resources/js/kao-logic.js": {
-    "file": "assets/kao-logic-tOTTPXJc.js",
+    "file": "assets/kao-logic-B5QqQ6SF.js",
     "name": "kao-logic",
     "src": "resources/js/kao-logic.js",
     "isEntry": true,
