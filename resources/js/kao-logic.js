@@ -122,7 +122,7 @@ if (uploadDropzone) {
                         '</div>',
         clickable: true,
         headers: {
-            "Authorization": "Bearer "+import.meta.env.VITE_JWT_TOKEN
+            "Authorization": "Bearer "+bearerToken
         },
         init: function () {
             document.getElementById("dropzoneUploadInit").addEventListener("click", function () {
