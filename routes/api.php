@@ -36,7 +36,7 @@ Route::group([
     Route::post('revoke', [AuthController::class, 'revoke']);
 });
 
-Route::middleware('auth:api')->prefix('v1/core')->group(function() {
+Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/core')->group(function() {
     // API v1 Backend PDF Core Processing Route
     Route::post('compress', [compressController::class, 'compress']);
     Route::post('convert', [convertController::class, 'convert']);
@@ -46,14 +46,14 @@ Route::middleware('auth:api')->prefix('v1/core')->group(function() {
     Route::post('watermark', [watermarkController::class, 'watermark']);
 });
 
-Route::middleware('auth:api')->prefix('v1/file')->group(function() {
+Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/file')->group(function() {
     // API v1 Backend File Management Route
     Route::post('upload', [uploadController::class, 'upload']);
     Route::post('remove', [uploadController::class, 'remove']);
     Route::post('thumbnail', [thumbnailController::class, 'getThumbnail']);
 });
 
-Route::middleware('auth:api')->prefix('v1/logs')->group(function() {
+Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/logs')->group(function() {
     // API v1 Backend Logging Route
     Route::get('limit', [limitLogController::class, 'getLimit']);
     Route::post('proc/single', [processLogController::class, 'getLogs']);

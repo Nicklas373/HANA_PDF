@@ -405,7 +405,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        null
+                                        $asposeAPI->getErrorOutput()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Database connection error !', $ex->getMessage());
@@ -537,7 +537,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        null
+                                        $asposeAPI->getErrorOutput()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Database connection error !', $ex->getMessage());
@@ -1338,7 +1338,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1408,7 +1408,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1478,7 +1478,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1548,7 +1548,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1618,7 +1618,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1688,7 +1688,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1758,7 +1758,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1828,7 +1828,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -2103,7 +2103,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2173,7 +2173,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2243,7 +2243,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2313,7 +2313,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2383,7 +2383,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2454,7 +2454,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2524,7 +2524,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2594,7 +2594,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2673,7 +2673,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2743,7 +2743,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2813,7 +2813,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2883,7 +2883,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -2953,7 +2953,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -3024,7 +3024,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -3094,7 +3094,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -3413,7 +3413,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    'Archive processing failure'
+                                    null
                                 );
                             } else {
                                 return $this->returnCoreMessage(
