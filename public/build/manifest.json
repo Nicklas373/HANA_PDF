@@ -1,6 +1,6 @@
 {
-  "_index-D1AB55dp.js": {
-    "file": "assets/index-D1AB55dp.js",
+  "_index-BIMocUgy.js": {
+    "file": "assets/index-BIMocUgy.js",
     "name": "index"
   },
   "resources/css/app-lite.css": {
@@ -19,21 +19,21 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BmQLG_Ka.js",
+    "file": "assets/app-BLTSLIHL.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_index-D1AB55dp.js"
+      "_index-BIMocUgy.js"
     ]
   },
   "resources/js/kao-logic.js": {
-    "file": "assets/kao-logic-DIrGAE1t.js",
+    "file": "assets/kao-logic-FkzQKDWK.js",
     "name": "kao-logic",
     "src": "resources/js/kao-logic.js",
     "isEntry": true,
     "imports": [
-      "_index-D1AB55dp.js"
+      "_index-BIMocUgy.js"
     ]
   }
 }
