@@ -15,4 +15,4 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-C5XKjO5t.css')}}" />
 <link rel="script" type="module" href="{{ asset('build/assets/app-BLTSLIHL.js') }}" />
-<link rel="script" type="module" href="{{ asset('build/assets/index-D1AB55dp.js')}}" />
+<link rel="script" type="module" href="{{ asset('build/assets/index-BIMocUgy.js')}}" />
