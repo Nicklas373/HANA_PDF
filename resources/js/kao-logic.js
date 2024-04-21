@@ -52,7 +52,9 @@ var xhrTotalUploads = 0
 if (procBtn) {
     remainingBalance().then(function () {
         procBtn.onclick = function(event) {
-            if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
+            if (document.getElementById('html') !== null) {
+                submit(event)
+            } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
                 if (xhrScsUploads == xhrTotalUploads) {
                     submit(event)
                 } else {
@@ -83,7 +85,7 @@ if (procBtn) {
         errSubMessage.innerText = ""
         errListTitleMessage.innerText = "Error message"
         resetErrListMessage()
-        generateMesssage("Cannot establish connection with the server")
+        generateMesssage(error)
         errAltSubMessageModal.style = null
         loadingModal.hide()
         errModal.show()
@@ -1829,6 +1831,9 @@ function remainingBalance() {
                         xhrBalanceRemaining = 0
                     }
                     resolve()
+                } else if (xhr.status == 429) {
+                    xhrBalance = false
+                    reject(new Error('Too many request'))
                 } else {
                     xhrBalance = false
                     reject(new Error('Failed to fetch monthly limit'))
