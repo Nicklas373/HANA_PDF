@@ -31,6 +31,7 @@ return new class extends Migration
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
+            $table->boolean('isReport')->nullable()->default(false);
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

@@ -73,9 +73,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => true,
                     'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response,
-                    'notifyErrStatus' => $errReason,
-                    'notifyErrMessage' => $errCode
+                    'notifyResponse' => $response
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -92,9 +90,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => $e->getMessage(),
-                    'notifyResponse' => null,
-                    'notifyErrStatus' => $httpStatus,
-                    'notifyErrMessage' => $e->getErrorType()
+                    'notifyResponse' => null
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -106,9 +102,7 @@ class NotificationHelper
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => null,
-                    'notifyErrStatus' => null,
-                    'notifyErrMessage' => $e->getMessage()
+                    'notifyResponse' => null
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -128,6 +122,72 @@ class NotificationHelper
                     "</b>\n\nIP Address: <b>".$ip.
                     "</b>\nProcess Id: <b>".$processId.
                     "</b>\nType: <b>Route Error</b>".
+                    "\n\nError Reason: <b>".$errReason.
+                    "</b>\nError Log: <pre><code>".$errCode.
+                    "</code></pre>";
+        try {
+            $response = Telegram::sendMessage([
+                'chat_id' => env('TELEGRAM_CHAT_ID'),
+                'text' => $message,
+                'parse_mode' => 'HTML'
+            ]);
+            $messageId = $response->getMessageId();
+
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => true,
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
+            try {
+                if ($e->getHttpStatusCode() == null) {
+                  $httpStatus = null;
+                } else {
+                  $httpStatus = $e->getHttpStatusCode();
+                }
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => $e->getMessage(),
+                    'notifyResponse' => null
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Exception $e) {
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => null
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        }
+    }
+
+    function sendSchedErrNotify($schedName, $schedRuntime, $processId , $status, $errReason, $errCode) {
+        $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $message = "<b>HANA API Alert</b>
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
+                    "</b>\nEnvironment: <b>".env('APP_ENV').
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$schedName.
+                    "</b>\n\nProcess: <b>".$schedRuntime.
+                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nType: <b>Jobs Error</b>".
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
@@ -188,29 +248,45 @@ class NotificationHelper
         }
     }
 
-    function sendSchedErrNotify($schedName, $schedRuntime, $processId , $status, $errReason, $errCode) {
+    function sendDailyTaskNotify($compTotalScs, $compTotalErr, $cnvTotalScs, $cnvTotalErr, $htmlTotalScs, $htmlTotalErr,
+                                $mergeTotalScs, $mergeTotalErr, $splitTotalScs, $splitTotalErr, $watermarkTotalScs,
+                                $watermarkTotalErr, $taskStatus, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
-        $message = "<b>HANA API Alert</b>
-                    \nStatus: <b>".$status."</b>".
-                    "\nStart At: <b>".$CurrentTime.
-                    "</b>\nEnvironment: <b>".env('APP_ENV').
-                    "\n\n</b>Services: <b>Backend Services</b>".
-                    "\nSource: <b>https://gw.hana-ci.com</b>".
-                    "\nEndpoint: <b>".$schedName.
-                    "</b>\n\nProcess: <b>".$schedRuntime.
-                    "</b>\nProcess Id: <b>".$processId.
-                    "</b>\nType: <b>Jobs Error</b>".
-                    "\n\nError Reason: <b>".$errReason.
-                    "</b>\nError Log: <pre><code>".$errCode.
-                    "</code></pre>";
+        $processId = AppHelper::instance()->get_guid();
+        if ($taskStatus) {
+            $CountTotalScsProc = $compTotalScs + $cnvTotalScs + $htmlTotalScs + $mergeTotalScs + $splitTotalScs + $watermarkTotalScs;
+            $CountTotalErrProc = $compTotalErr + $cnvTotalErr + $htmlTotalErr + $mergeTotalErr + $splitTotalErr + $watermarkTotalErr;
+            $message = "<b>HANA API Daily Report Alert</b>".
+                        "\n\nReported At: <b>".$CurrentTime.
+                        "</b>\nReport Status: <b>Success".
+                        "</b>\nEnvironment: <b>".env('APP_ENV').
+                        "</b>\nServices: <b>Backend Services</b>".
+                        "\nSource: <b>https://gw.hana-ci.com</b>".
+                        "\n\n<b>Compress Task\n </b>Success: ".$compTotalScs."\n Error: ".$compTotalErr.
+                        "\n\n<b>Convert Task:\n </b>Success: ".$cnvTotalScs."\n Error: ".$cnvTotalErr.
+                        "\n\n<b>HTMLtoPDF Task:\n </b>Success: ".$htmlTotalScs."\n Error: ".$htmlTotalErr.
+                        "\n\n<b>Merge Task:\n </b>Success: ".$mergeTotalScs."\n Error: ".$mergeTotalErr.
+                        "\n\n<b>Split Task:\n </b>Success: ".$splitTotalScs."\n Error: ".$splitTotalErr.
+                        "\n\n<b>Watermark Task:\n </b>Success: ".$watermarkTotalScs."\n Error: ".$watermarkTotalErr.
+                        "\n\n<b>Total Task:\n </b>Success: ".$CountTotalScsProc."\n Error: ".$CountTotalErrProc;
+        } else {
+            $message = "<b>HANA API Daily Report Alert</b>".
+                        "\n\nReported At: <b>".$CurrentTime.
+                        "</b>\nReport Status: <b>FAIL".
+                        "</b>\nEnvironment: <b>".env('APP_ENV').
+                        "</b>\nServices: <b>Backend Services</b>".
+                        "\nSource: <b>https://gw.hana-ci.com</b>".
+                        "\n\nError Reason: <b>".$errReason.
+                        "</b>\nError Log: <pre><code>".$errCode.
+                        "</code></pre>";
+        }
         try {
             $response = Telegram::sendMessage([
-                'chat_id' => env('TELEGRAM_CHAT_ID'),
+                'chat_id' => env('TELEGRAM_REPORT_ID'),
                 'text' => $message,
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-
             try {
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
