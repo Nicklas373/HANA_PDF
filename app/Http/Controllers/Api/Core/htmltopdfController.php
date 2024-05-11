@@ -26,6 +26,10 @@ class htmltopdfController extends Controller
     public function html(Request $request) {
         $validator = Validator::make($request->all(),[
 		    'urlToPDF' => 'required',
+            'urlMarginValue' => ['required', 'numeric'],
+            'urlSizeValue' => ['required', 'in:A3,A4,A5,A6,Auto,Letter'],
+            'urlPageOrientationValue' => ['required', 'in:landscape,portrait'],
+            'urlSinglePage' => ['required', 'in:true,false']
 	    ]);
 
         $uuid = AppHelper::Instance()->get_guid();
@@ -92,6 +96,10 @@ class htmltopdfController extends Controller
             $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $pdfUpload_Location = env('PDF_UPLOAD');
             $pdfUrl = $request->post('urlToPDF');
+            $pdfOrientation = $request->post('urlPageOrientationValue');
+            $pdfMargin = $request->post('urlMarginValue');
+            $pdfSize = $request->post('urlSizeValue');
+            $pdfSinglePage = $request->post('urlSinglePage');
             $newUrl = '';
             if (AppHelper::Instance()->checkWebAvailable($pdfUrl)) {
                 $newUrl = $pdfUrl;
@@ -117,7 +125,11 @@ class htmltopdfController extends Controller
                             'processId' => $uuid,
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' =>  $duration->s.' seconds'
+                            'procDuration' =>  $duration->s.' seconds',
+                            'urlMargin' => $pdfMargin,
+                            'urlOrientation' => $pdfOrientation,
+                            'urlSinglePage' => $pdfSinglePage,
+                            'urlSize' => $pdfSize
                         ]);
                         DB::table('appLogs')
                             ->where('processId', '=', $uuid)
@@ -175,6 +187,16 @@ class htmltopdfController extends Controller
                 $ilovepdfTask->setEncryptKey($pdfEncKey);
                 $ilovepdfTask->setEncryption(true);
                 $pdfFile = $ilovepdfTask->addUrl($newUrl);
+                $ilovepdfTask->setPageOrientation($pdfOrientation);
+                $ilovepdfTask->setPageMargin($pdfMargin);
+                if ($pdfSize !== 'Auto') {
+                    $ilovepdfTask->setPageSize($pdfSize);
+                }
+                if ($pdfSinglePage == 'true') {
+                    $ilovepdfTask->setSinglePage(true);
+                } else {
+                    $ilovepdfTask->setSinglePage(false);
+                }
                 $ilovepdfTask->setOutputFileName($pdfDefaultFileName);
                 $ilovepdfTask->execute();
                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
@@ -193,7 +215,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -258,7 +284,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -323,7 +353,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -388,7 +422,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -453,7 +491,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -519,7 +561,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -584,7 +630,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -650,7 +700,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -716,7 +770,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
@@ -781,7 +839,11 @@ class htmltopdfController extends Controller
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
+                        'procDuration' =>  $duration->s.' seconds',
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
