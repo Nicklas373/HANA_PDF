@@ -8,6 +8,19 @@ input[type="file"]::file-selector-button {
     font-family: 'quicksand', 'sans-serif';
     color: #E0E4E5;
 }
+select option {
+    background: rgba(77, 170, 170, 0.5) !important;
+    color: #EFF3F4 !important;
+    text-shadow: rgba(77, 170, 170, 1) !important;
+    font-family: 'quicksand';
+    font-size: 15px;
+    font-weight: bold;
+    appearance: none !important;
+}
+select:hover {
+    background: rgba(58, 99, 141, 1) !important;
+    appearance: none !important;
+}
 @media (orientation: portrait) {
     body {
         padding-top: 100px;

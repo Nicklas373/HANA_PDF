@@ -683,6 +683,8 @@ function showVal(newVal,state){
         document.getElementById("TransparencyValueText").innerText=newVal+" %";
     } else if (state == 'image') {
         document.getElementById("TransparencyValueImage").innerText=newVal+" %";
+    } else if (state == 'html') {
+        document.getElementById("pageMarginValueText").innerText=newVal+" px";
     }
 }
 
