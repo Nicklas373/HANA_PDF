@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Data\limitLogController;
 use App\Http\Controllers\Api\Data\notifyLogController;
-use App\Http\Controllers\Api\Data\processLogController;
 use App\Http\Controllers\Api\File\thumbnailController;
 use App\Http\Controllers\Api\File\uploadController;
 use App\Http\Controllers\Api\Core\compressController;
@@ -56,10 +55,8 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/file')->group(funct
 Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/logs')->group(function() {
     // API v1 Backend Logging Route
     Route::get('limit', [limitLogController::class, 'getLimit']);
-    Route::post('proc/single', [processLogController::class, 'getLogs']);
-    Route::post('proc/all', [processLogController::class, 'getAllLogs']);
-    Route::post('notify/single', [notifyLogController::class, 'getLogs']);
-    Route::post('notify/all', [notifyLogController::class, 'getAllLogs']);
+    Route::post('proc/single', [notifyLogController::class, 'getLogs']);
+    Route::post('proc/all', [notifyLogController::class, 'getAllLogs']);
 });
 
 Route::fallback(function () {
