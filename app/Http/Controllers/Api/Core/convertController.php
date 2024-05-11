@@ -1038,10 +1038,10 @@ class convertController extends Controller
                                 DB::table('appLogs')
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
-                                        'errReason' => 'Aspose PDF API Error !',
+                                        'errReason' => 'Aspose Clouds API Error !',
                                         'errApiReason' => $e->getMessage()
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose PDF API Error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', $e->getMessage());
                                 return $this->returnCoreMessage(
                                     200,
                                     'Error while connecting to external API !',
@@ -1052,7 +1052,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Database connection error !', $ex->getMessage());
@@ -1173,7 +1173,7 @@ class convertController extends Controller
                                             'errReason' => 'FTP Server Connection Failed !',
                                             'errApiReason' => null
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose PDF API Error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', null);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Error while connecting to external API !',
@@ -1184,7 +1184,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        null
                                     );
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Database connection error !', $ex->getMessage());
@@ -1244,7 +1244,7 @@ class convertController extends Controller
                                         'errReason' => 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !',
                                         'errApiReason' => null
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose PDF API Error !', null);
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', null);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Error while connecting to external API !',
@@ -1255,7 +1255,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     null,
                                     null,
-                                    $asposeAPI->getErrorOutput()
+                                    null
                                 );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Database connection error !', $ex->getMessage());
