@@ -21,7 +21,8 @@ return new class extends Migration
         Schema::create('appLogs', function (Blueprint $table) {
             $table->uuid('processId');
             $table->text('errReason')->nullable();
-            $table->text('errApiReason')->nullable();
+            $table->text('errStatus')->nullable();
+            $table->timestamp('createdAt');
 
             // Configure primary key
             $table->primary('processId');
@@ -35,6 +36,8 @@ return new class extends Migration
             $table->foreign('processId')->references('processId')->on('pdfWatermark')->name('pdf_watermark_fk');
             $table->foreign('processId')->references('processId')->on('pdfHtml')->name('pdf_html_fk');
             $table->foreign('processId')->references('processId')->on('jobLogs')->name('job_logs_fk');
+            $table->foreign('processId')->references('processId')->on('accessLogs')->name('access_logs_fk');
+            $table->foreign('processId')->references('processId')->on('notifyLogs')->name('notify_logs_fk');
         });
     }
 

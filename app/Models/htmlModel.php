@@ -13,9 +13,14 @@ class htmlModel extends Model
 
     protected $fillable = [
         'urlName',
+        'urlMargin',
+        'urlOrientation',
+        'urlSinglePage',
+        'urlSize',
         'result',
         'procStartAt',
         'procEndAt',
-        'procDuration'
+        'procDuration',
+        'isReport'
     ];
 }

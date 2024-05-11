@@ -23,8 +23,9 @@ return new class extends Migration
             $table->uuid('processId');
             $table->text('routePath')->nullable();
             $table->text('accessIpAddress')->nullable();
-            $table->text('routeExceptionMessage')->nullable();
-            $table->text('routeExceptionLog')->nullable();
+
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 

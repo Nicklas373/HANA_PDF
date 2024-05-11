@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $viewClearGUID = AppHelper::instance()->get_guid();
         $viewCacheGUID = AppHelper::instance()->get_guid();
         $hanaClearGUID = AppHelper::instance()->get_guid();
+        $hanaReportGUID = AppHelper::instance()->get_guid();
 
 		// Carbon timezone
         date_default_timezone_set('Asia/Jakarta');
@@ -286,6 +287,57 @@ class Kernel extends ConsoleKernel
                             'errApiReason' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('hana:clear-storage','hourly', $hanaClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
+                }
+            });
+        $schedule
+            ->command('hana:daily-report')
+            ->dailyAt('19:00')
+            ->timezone('Asia/Jakarta')
+            ->environments(['production'])
+            ->before(function(AppHelper $helper) use($hanaReportGUID) {
+				DB::table('appLogs')
+					->insert([
+						'processId' => $hanaReportGUID,
+						'errReason' => null,
+						'errApiReason' => null,
+					]);
+                DB::table('jobLogs')->insert([
+                    'jobsName' => 'hana:daily-report',
+                    'jobsEnv' => 'production',
+                    'jobsRuntime' => 'Daily at 19.00',
+                    'jobsResult' => false,
+                    'processId' => $hanaReportGUID,
+                    'procStartAt' => $helper::instance()->getCurrentTimeZone(),
+                    'procEndAt' => null
+                ]);
+            })
+            ->after(function(AppHelper $helper, Stringable $output) use($hanaReportGUID,$startProc) {
+                $start = Carbon::parse($startProc);
+                $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($start);
+                if ($output == null || $output == '' || empty($output)) {
+                    DB::table('jobLogs')
+                    ->where('processId', '=', $hanaReportGUID)
+                    ->update([
+                        'jobsResult' => true,
+                        'procEndAt' => $end,
+                        'procDuration' => $duration->s.' seconds'
+					]);
+                } else {
+                    DB::table('jobLogs')
+                        ->where('processId', '=', $hanaReportGUID)
+                        ->update([
+                            'jobsResult' => false,
+                            'procEndAt' => $end,
+                            'procDuration' => $duration->s.' seconds'
+                    ]);
+                    DB::table('appLogs')
+                        ->where('processId', '=', $hanaReportGUID)
+                        ->update([
+                            'errReason' => 'Laravel Scheduler Error !',
+                            'errApiReason' => $output,
+                    ]);
+                    NotificationHelper::Instance()->sendSchedErrNotify('hana:daily-report','hourly', $hanaReportGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
     }

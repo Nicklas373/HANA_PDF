@@ -21,6 +21,7 @@ class compressModel extends Model
         'batchId',
         'procStartAt',
         'procEndAt',
-        'procDuration'
+        'procDuration',
+        'isReport'
     ];
 }

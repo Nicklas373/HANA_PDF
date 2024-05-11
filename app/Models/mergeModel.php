@@ -19,6 +19,7 @@ class mergeModel extends Model
         'batchId',
         'procStartAt',
         'procEndAt',
-        'procDuration'
+        'procDuration',
+        'isReport'
     ];
 }

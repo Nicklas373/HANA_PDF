@@ -25,8 +25,9 @@ return new class extends Migration
             $table->boolean('notifyResult');
             $table->text('notifyMessage')->nullable();
             $table->json('notifyResponse')->nullable();
-            $table->text('notifyErrStatus')->nullable();
-            $table->text('notifyErrMessage')->nullable();
+
+            // Configure foreign key
+            $table->foreign('processId')->references('processId')->on('appLogs');
         });
     }
 

@@ -21,11 +21,16 @@ return new class extends Migration
         Schema::create('pdfHtml', function (Blueprint $table) {
             $table->id('htmlId');
             $table->text('urlName')->nullable();
+            $table->text('urlMargin')->nullable();
+            $table->integer('urlOrientation')->nullable();
+            $table->boolean('urlSinglePage')->nullable();
+            $table->text('urlSize')->nullable();
             $table->boolean('result');
             $table->uuid('processId');
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
+            $table->boolean('isReport')->nullable()->default(false);
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');
