@@ -50,8 +50,15 @@ var xhrScsUploads = 0
 var xhrTotalUploads = 0
 
 if (procBtn) {
-    remainingBalance().then(function () {
-        procBtn.onclick = function(event) {
+    procBtn.onclick = function(event) {
+        procTitleMessageModal.innerText = "Preparing document..."
+        errMessage.style.visibility = null
+        errSubMessage.style.visibility = null
+        errAltSubMessageModal.style.display = "none"
+        errModal.hide()
+        loadingModal.show()
+        remainingBalance().then(function () {
+            loadingModal.hide()
             if (document.getElementById('html') !== null) {
                 submit(event)
             } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
@@ -79,17 +86,18 @@ if (procBtn) {
                 loadingModal.hide()
                 errModal.show()
             }
-        }
-    }).catch(function (error) {
-        errMessage.innerText  = "There was unexpected error !"
-        errSubMessage.innerText = ""
-        errListTitleMessage.innerText = "Error message"
-        resetErrListMessage()
-        generateMesssage(error)
-        errAltSubMessageModal.style = null
-        loadingModal.hide()
-        errModal.show()
-    })
+        }).catch(function (error) {
+            errModal.hide()
+            errMessage.innerText  = "There was unexpected error !"
+            errSubMessage.innerText = ""
+            errListTitleMessage.innerText = "Error message"
+            resetErrListMessage()
+            generateMesssage(error)
+            errAltSubMessageModal.style = null
+            loadingModal.hide()
+            errModal.show()
+        })
+    }
 }
 
 if (uploadDropzone) {
@@ -1006,7 +1014,15 @@ function sendToAPI(files, proc, action) {
             }
         } else if (proc == 'html') {
             var urlValue = document.getElementById('urlToPDF').value
+            var urlMarginValue = document.getElementById('pageMargin').value
+            var urlSizeValue = document.getElementById('pageSize').value
+            var urlPageOrientation = document.querySelector('input[name="pageOrientation"]:checked').value
+            var urlSinglePage = document.getElementById('isSinglePageText').checked
             formData.append('urlToPDF', urlValue)
+            formData.append('urlMarginValue', urlMarginValue)
+            formData.append('urlSizeValue', urlSizeValue)
+            formData.append('urlPageOrientationValue', urlPageOrientation)
+            formData.append('urlSinglePage', urlSinglePage)
         }
         if (proc !== 'html') {
             if (files.length > 1) {
@@ -1734,22 +1750,38 @@ function submit(event) {
     } else if (document.getElementById('html') !== null) {
         var urlAddr = document.getElementById('html')
         if (document.getElementById('urlToPDF').value) {
-            if (xhrBalance && xhrBalanceRemaining > 0) {
-                procTitleMessageModal.innerText = "Processing URL..."
-                errMessage.style.visibility = null
-                errSubMessage.style.visibility = null
-                errAltSubMessageModal.style.display = "none"
-                errModal.hide()
-                loadingModal.show()
-                apiGateway("html","")
+            if (document.getElementById('firstRadio').checked || document.getElementById('secondRadio').checked) {
+                if (xhrBalance && xhrBalanceRemaining > 0) {
+                    procTitleMessageModal.innerText = "Processing URL..."
+                    errMessage.style.visibility = null
+                    errSubMessage.style.visibility = null
+                    errAltSubMessageModal.style.display = "none"
+                    errModal.hide()
+                    loadingModal.show()
+                    apiGateway("html","")
+                } else {
+                    event.preventDefault()
+                    errMessage.innerText  = "PDF file can not be processed !"
+                    errSubMessage.innerText = ""
+                    errListTitleMessage.innerText = "Error message"
+                    resetErrListMessage()
+                    generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                    errAltSubMessageModal.style = null
+                    loadingModal.hide()
+                    errModal.show()
+                }
             } else {
+                var urlLandscape = document.getElementById('firstRadio')
+                var urlPotrait = document.getElementById('secondRadio')
                 event.preventDefault()
-                errMessage.innerText  = "PDF file can not be processed !"
+                errMessage.innerText  = "Please select out these fields!"
                 errSubMessage.innerText = ""
-                errListTitleMessage.innerText = "Error message"
-                resetErrListMessage()
-                generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                errListTitleMessage.innerText = "Required fields:"
                 errAltSubMessageModal.style = null
+                resetErrListMessage()
+                generateMesssage("Page Orientation")
+                urlLandscape.style.borderColor = '#A84E4E'
+                urlPotrait.style.borderColor = '#A84E4E'
                 loadingModal.hide()
                 errModal.show()
             }
