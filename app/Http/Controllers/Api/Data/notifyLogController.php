@@ -7,6 +7,13 @@ use App\Models\accessLogsModel;
 use App\Models\appLogsModel;
 use App\Models\jobLogsModel;
 use App\Models\notifyLogsModel;
+use App\Models\compressModel;
+use App\Models\cnvModel;
+use App\Models\deleteModel;
+use App\Models\htmlModel;
+use App\Models\mergeModel;
+use App\Models\splitModel;
+use App\Models\watermarkModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -174,6 +181,7 @@ class notifyLogController extends Controller
         $validator = Validator::make($request->all(), [
             'logCount' => 'required|int',
             'logType' =>  ['required', 'in:access,jobs,notify,compress,convert,html,merge,split,watermark'],
+            'logOrder' => ['required', 'in:asc,desc']
         ]);
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
@@ -190,6 +198,7 @@ class notifyLogController extends Controller
         }
         $logCount = $request->input('logCount');
         $logModel = $request->input('logType');
+        $logOrder = $request->input('logOrder');
         try {
             if ($logModel == 'access') {
                 $datalog = accessLogsModel::take($logCount)->get();
