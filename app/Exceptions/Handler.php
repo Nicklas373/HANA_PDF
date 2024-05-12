@@ -62,12 +62,12 @@ class Handler extends ExceptionHandler
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => 'Method not allowed exception!',
-                        'errApiReason' => $message
+                        'errStatus' => $message
                     ]);
                     DB::table('accessLogs')->insert([
                         'processId' => $uuid,
                         'routePath' => $currentRouteInfo,
-                        'accessIpAddress' => true
+                        'accessIpAddress' => $userIp
                     ]);
                 } catch (QueryException $ex) {
                     Log::error('Query Exception failed with: '. $e->getMessage());
@@ -79,12 +79,12 @@ class Handler extends ExceptionHandler
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => 'Method not allowed exception!',
-                        'errApiReason' => $message
+                        'errStatus' => $message
                     ]);
                     DB::table('accessLogs')->insert([
                         'processId' => $uuid,
                         'routePath' => null,
-                        'accessIpAddress' => true
+                        'accessIpAddress' => $userIp
                     ]);
                 } catch (QueryException $ex) {
                     Log::error('Query Exception failed with: '. $e->getMessage());
@@ -98,12 +98,12 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => 'Token Mismatch exception!',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                 DB::table('accessLogs')->insert([
                     'processId' => $uuid,
                     'routePath' => $currentRouteInfo,
-                    'accessIpAddress' => true
+                    'accessIpAddress' => $userIp
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $e->getMessage());
@@ -116,7 +116,7 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => 'Route not found exception!',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                 DB::table('accessLogs')->insert([
                     'processId' => $uuid,
@@ -139,12 +139,12 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '404 - Page not found',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                DB::table('accessLogs')->insert([
                    'processId' => $uuid,
                    'routePath' => $currentRouteInfo,
-                   'accessIpAddress' => true
+                   'accessIpAddress' => $userIp
                ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
@@ -156,13 +156,13 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '403 - Forbidden',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
-                DB::table('accessLogs')->insert([
-                    'processId' => $uuid,
-                    'routePath' => $currentRouteInfo,
-                    'accessIpAddress' => true
-                ]);
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => $userIp
+               ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
            }
@@ -173,12 +173,12 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '419 - Page Expired',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                DB::table('accessLogs')->insert([
                    'processId' => $uuid,
                    'routePath' => $currentRouteInfo,
-                   'accessIpAddress' => true
+                   'accessIpAddress' => $userIp
                ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
@@ -190,13 +190,13 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '429 - Too Many Requests',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
-                DB::table('accessLogs')->insert([
-                    'processId' => $uuid,
-                    'routePath' => $currentRouteInfo,
-                    'accessIpAddress' => true
-                ]);
+               DB::table('accessLogs')->insert([
+                   'processId' => $uuid,
+                   'routePath' => $currentRouteInfo,
+                   'accessIpAddress' => $userIp
+               ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
            }
@@ -207,14 +207,12 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '500 - Internal Server Error',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                DB::table('accessLogs')->insert([
                    'processId' => $uuid,
                    'routePath' => $currentRouteInfo,
-                   'accessIpAddress' => true,
-                   'routeExceptionMessage' => '500 - Internal Server Error',
-                   'routeExceptionLog' => $message
+                   'accessIpAddress' => $userIp
                ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
@@ -226,14 +224,12 @@ class Handler extends ExceptionHandler
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => '503 - Service Temporary Unavailable',
-                    'errApiReason' => $message
+                    'errStatus' => $message
                 ]);
                DB::table('accessLogs')->insert([
                    'processId' => $uuid,
                    'routePath' => $currentRouteInfo,
-                   'accessIpAddress' => true,
-                   'routeExceptionMessage' => '503 - Service Temporary Unavailable',
-                   'routeExceptionLog' => $message
+                   'accessIpAddress' => $userIp
                ]);
            } catch (QueryException $ex) {
                Log::error('Query Exception failed with: '. $e->getMessage());
