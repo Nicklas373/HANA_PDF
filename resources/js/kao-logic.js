@@ -92,7 +92,7 @@ if (procBtn) {
             errSubMessage.innerText = ""
             errListTitleMessage.innerText = "Error message"
             resetErrListMessage()
-            generateMesssage(error)
+            generateMesssage(error.xhrBalanceStatus+" - "+error.xhrBalanceResponse)
             errAltSubMessageModal.style = null
             loadingModal.hide()
             errModal.show()
@@ -848,8 +848,15 @@ function apiGateway(proc, action) {
     sendToAPI(files,proc,action).then(function () {
         loadingModal.hide()
     }).catch(function (error) {
+        errModal.hide()
+        errMessage.innerText  = "There was unexpected error !"
+        errSubMessage.innerText = ""
+        errListTitleMessage.innerText = "Error message"
+        resetErrListMessage()
+        generateMesssage(error.xhrRequestStatus+" - "+error.xhrRequestMessage)
+        errAltSubMessageModal.style = null
         loadingModal.hide()
-        console.error(error)
+        errModal.show()
     })
 }
 
@@ -882,6 +889,8 @@ function sendToAPI(files, proc, action) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
+        var timerStart = Date.now()
+
         if (proc == 'compress') {
             var compMethodValue = document.querySelector('input[name="compMethod"]:checked').value
             formData.append('compMethod', compMethodValue)
@@ -1042,10 +1051,25 @@ function sendToAPI(files, proc, action) {
                 formData.append('file[' + index + ']', file)
             })
         }
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 105000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    xhrRequestCondition: 'ERROR',
+                    xhrRequestMessage: 'Connection timeout',
+                    xhrRequestServerMessage: '',
+                    xhrRequestStatus: 524
+                })
+            }
+        }, 1000)
+
         xhr.open('POST', apiUrl+'/api/v1/core/'+proc, true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
+                clearInterval(timerStart)
                 if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
@@ -1061,7 +1085,12 @@ function sendToAPI(files, proc, action) {
                                     `
                                     document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                                     document.getElementById("scsMsgLink").innerText = "Download PDF"
-                                    resolve()
+                                    resolve({
+                                        xhrRequestCondition: 'OK',
+                                        xhrRequestMessage: xhrReturn.message,
+                                        xhrRequestServerMessage: '',
+                                        xhrRequestStatus: xhr.status
+                                    })
                                 } else {
                                     document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                                     document.getElementById("alert-err").classList.add("hidden","opacity-0")
@@ -1069,7 +1098,12 @@ function sendToAPI(files, proc, action) {
                                     document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
                                     document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                                     document.getElementById("scsMsgLink").innerText = "Download PDF"
-                                    resolve()
+                                    resolve({
+                                        xhrRequestCondition: 'OK',
+                                        xhrRequestMessage: xhrReturn.message,
+                                        xhrRequestServerMessage: '',
+                                        xhrRequestStatus: xhr.status
+                                    })
                                 }
                             } else {
                                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -1078,7 +1112,12 @@ function sendToAPI(files, proc, action) {
                                 document.getElementById("errMsg").innerText = xhrReturn.message
                                 document.getElementById("errProcMain").classList.remove("hidden")
                                 document.getElementById("errProcId").innerText = xhrReturn.processId
-                                reject(new Error('API response: '+xhrReturn.errors+' !')) //Force stop loadingModal while return error !
+                                reject({
+                                    xhrRequestCondition: 'ERROR',
+                                    xhrRequestMessage: 'Response are not return 200 !',
+                                    xhrRequestServerMessage: xhrReturn.errors,
+                                    xhrRequestStatus: xhr.status
+                                })
                             }
                         } else {
                             document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -1087,16 +1126,37 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("errMsg").innerText = xhrReturn.message
                             document.getElementById("errProcMain").classList.remove("hidden")
                             document.getElementById("errProcId").innerText = xhrReturn.processId
-                            reject(new Error('API response: '+xhrReturn.status+' !')) //Force stop loadingModal while return error !
+                            reject({
+                                xhrRequestCondition: 'ERROR',
+                                xhrRequestMessage: 'Response are not return 200 !',
+                                xhrRequestServerMessage: xhrReturn.message,
+                                xhrRequestStatus: xhr.status
+                            })
                         }
+                    } else if (xhr.status == 524) {
+                        document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                        document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                        document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                        document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
+                        document.getElementById("errProcMain").classList.remove("hidden")
+                        reject({
+                            xhrRequestCondition: 'ERROR',
+                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestServerMessage: '',
+                            xhrRequestStatus: xhr.status
+                        })
                     } else {
                         document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                         document.getElementById("alert-err").classList.remove("hidden","opacity-0")
                         document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
-                        document.getElementById("errMsg").innerText = xhrReturn.message
+                        document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
                         document.getElementById("errProcMain").classList.remove("hidden")
-                        document.getElementById("errProcId").innerText = xhrReturn.processId
-                        reject(new Error('API response: '+xhr.status+' !')) //Force stop loadingModal while return error !
+                        reject({
+                            xhrRequestCondition: 'ERROR',
+                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestServerMessage: '',
+                            xhrRequestStatus: xhr.status
+                        })
                     }
                 }
             } else {
@@ -1105,8 +1165,12 @@ function sendToAPI(files, proc, action) {
                 document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
                 document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
                 document.getElementById("errProcMain").classList.add("hidden")
-                reject(new Error('API response error !'))
-                loadingModal.hide() //Force stop loadingModal while return error !
+                reject({
+                    xhrRequestCondition: 'ERROR',
+                    xhrRequestMessage: 'Server are not in readyState ! ('+xhr.readyState+')',
+                    xhrRequestServerMessage: '',
+                    xhrRequestStatus: 0
+                })
             }
         }
         xhr.send(formData)
@@ -1858,21 +1922,52 @@ function remainingBalance() {
                     if (xhrReturn.status == 200) {
                         if (xhrReturn.remaining > 0) {
                             xhrBalance = true
+                            xhrBalanceRemaining = xhrReturn.remaining
+                            resolve({
+                                xhrBalance: true,
+                                xhrBalanceRemaining: xhrReturn.remaining,
+                                xhrBalanceStatus: xhrReturn.status,
+                                xhrBalanceResponse: xhrReturn.message
+                            })
                         } else {
                             xhrBalance = false
+                            xhrBalanceRemaining = xhrReturn.remaining
+                            resolve({
+                                xhrBalance: false,
+                                xhrBalanceRemaining: xhrReturn.remaining,
+                                xhrBalanceStatus: xhrReturn.status,
+                                xhrBalanceResponse: xhrReturn.message
+                            })
                         }
                         xhrBalanceRemaining = xhrReturn.remaining
                     } else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
+                        resolve({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: xhrReturn.status,
+                            xhrBalanceResponse: xhrReturn.message
+                        })
                     }
-                    resolve()
                 } else if (xhr.status == 429) {
                     xhrBalance = false
-                    reject(new Error('Too many request'))
+                    xhrBalanceRemaining = 0
+                    reject({
+                        xhrBalance: false,
+                        xhrBalanceRemaining: 0,
+                        xhrBalanceStatus: 429,
+                        xhrBalanceResponse: 'Too many request'
+                    })
                 } else {
                     xhrBalance = false
-                    reject(new Error('Failed to fetch monthly limit'))
+                    xhrBalanceRemaining = 0
+                    reject({
+                        xhrBalance: false,
+                        xhrBalanceRemaining: 0,
+                        xhrBalanceStatus: xhr.status,
+                        xhrBalanceResponse: 'Failed to fetch monthly limit'
+                    })
                 }
             }
         }

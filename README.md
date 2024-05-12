@@ -46,6 +46,8 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 - [Docker Container - docker/master](https://github.com/Nicklas373/Hana-PDF/tree/docker/master)
 - [Frontend Services - fe/master](https://github.com/Nicklas373/Hana-PDF/tree/fe/master)
 - [Backend Services - be/master](https://github.com/Nicklas373/Hana-PDF/tree/be/master)
+- [(DEV) Frontend Services - dev/fe/master](https://github.com/Nicklas373/Hana-PDF/tree/dev/fe/master)
+- [(DEV) Backend Services - dev/be/master](https://github.com/Nicklas373/Hana-PDF/tree/dev/be/master)
 
 ---
 
@@ -55,12 +57,13 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 2. Start to deploy
     ````bash
         - docker compose up -d
-        - docker compose exec hana-api-service php artisan migrate
-        - docker compose exec hana-api-service php artisan db:seed
+        - docker compose exec hana-api-services php artisan migrate
+        - docker compose exec hana-api-services php artisan db:seed
     ````
 3. Configure Server Host
      ````bash
         - docker compose exec hana-api-services echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
+        - docker compose exec hana-api-services echo "TELEGRAM_TASK_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
         - docker compose exec hana-api-services echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
         - docker compose exec hana-api-services echo "HANA_UNIQUE_TOKEN=YOUR_SHA512_UNIQUE_TOKEN" >> .env
         - docker compose exec hana-api-services sed -i "s/ASPOSE_CLOUD_CLIENT_ID=xxxx/ASPOSE_CLOUD_CLIENT_ID=YOUR_ASPOSE_CLOUD_CLIENT_ID/" >> .env
