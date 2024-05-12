@@ -41,6 +41,7 @@ return new class extends Migration
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
             $table->boolean('isReport')->nullable()->default(false);
+            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');
