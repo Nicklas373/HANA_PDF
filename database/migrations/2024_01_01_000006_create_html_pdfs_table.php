@@ -22,7 +22,7 @@ return new class extends Migration
             $table->id('htmlId');
             $table->text('urlName')->nullable();
             $table->text('urlMargin')->nullable();
-            $table->integer('urlOrientation')->nullable();
+            $table->text('urlOrientation')->nullable();
             $table->boolean('urlSinglePage')->nullable();
             $table->text('urlSize')->nullable();
             $table->boolean('result');
