@@ -848,15 +848,20 @@ function apiGateway(proc, action) {
     sendToAPI(files,proc,action).then(function () {
         loadingModal.hide()
     }).catch(function (error) {
-        errModal.hide()
-        errMessage.innerText  = "There was unexpected error !"
-        errSubMessage.innerText = ""
-        errListTitleMessage.innerText = "Error message"
-        resetErrListMessage()
-        generateMesssage(error.xhrRequestStatus+" - "+error.xhrRequestMessage)
-        errAltSubMessageModal.style = null
-        loadingModal.hide()
-        errModal.show()
+        if (error.xhrRequestStatus == 2 || error.xhrRequestStatus == 4) {
+            // Do not treat this status as error
+            loadingModal.hide()
+        } else {
+            errModal.hide()
+            errMessage.innerText  = "There was unexpected error !"
+            errSubMessage.innerText = ""
+            errListTitleMessage.innerText = "Error message"
+            resetErrListMessage()
+            generateMesssage(error.xhrRequestStatus+" - "+error.xhrRequestMessage)
+            errAltSubMessageModal.style = null
+            loadingModal.hide()
+            errModal.show()
+        }
     })
 }
 
@@ -1169,7 +1174,7 @@ function sendToAPI(files, proc, action) {
                     xhrRequestCondition: 'ERROR',
                     xhrRequestMessage: 'Server are not in readyState ! ('+xhr.readyState+')',
                     xhrRequestServerMessage: '',
-                    xhrRequestStatus: 0
+                    xhrRequestStatus: xhr.readyState
                 })
             }
         }

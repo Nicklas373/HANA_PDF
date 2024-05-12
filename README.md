@@ -63,7 +63,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 3. Configure Server Host
      ````bash
         - docker compose exec hana-api-services echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
-        - docker compose exec hana-api-services echo "TELEGRAM_TASK_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
+        - docker compose exec hana-api-services echo "TELEGRAM_REPORT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
         - docker compose exec hana-api-services echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
         - docker compose exec hana-api-services echo "HANA_UNIQUE_TOKEN=YOUR_SHA512_UNIQUE_TOKEN" >> .env
         - docker compose exec hana-api-services sed -i "s/ASPOSE_CLOUD_CLIENT_ID=xxxx/ASPOSE_CLOUD_CLIENT_ID=YOUR_ASPOSE_CLOUD_CLIENT_ID/" >> .env
