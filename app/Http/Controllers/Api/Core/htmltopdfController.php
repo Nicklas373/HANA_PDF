@@ -765,7 +765,6 @@ class htmltopdfController extends Controller
                         'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
-                        'urlSize' => $pdfSize,
                         'urlName' => $request->post('urlToPDF'),
                         'urlMargin' => $pdfMargin,
                         'urlOrientation' => $pdfOrientation,
@@ -835,7 +834,6 @@ class htmltopdfController extends Controller
                         'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
-                        'urlSize' => $pdfSize,
                         'urlName' => $request->post('urlToPDF'),
                         'urlMargin' => $pdfMargin,
                         'urlOrientation' => $pdfOrientation,
