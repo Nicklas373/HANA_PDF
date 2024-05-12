@@ -526,7 +526,7 @@ class convertController extends Controller
                                             'errReason' => 'Converted file not found on the server !',
                                             'errStatus' => $asposeAPI->getErrorOutput(),
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion failed !',
@@ -687,7 +687,7 @@ class convertController extends Controller
                                         'errReason' => 'Symfony runtime process fail exception !',
                                         'errStatus' => $message->getMessage(),
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Symfony runtime process fail exception !', $message->getMessage());
                                 return $this->returnCoreMessage(
                                     200,
                                     'HANA PDF process timeout !',

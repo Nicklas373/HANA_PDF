@@ -301,13 +301,13 @@ class NotificationHelper
                         "</b>\nEnvironment: <b>".env('APP_ENV').
                         "</b>\nServices: <b>Backend Services</b>".
                         "\nSource: <b>https://gw.hana-ci.com</b>".
-                        "\n\n<b>Compress Task\n </b>Success: ".$compTotalScs."\n Error: ".$compTotalErr.
-                        "\n\n<b>Convert Task:\n </b>Success: ".$cnvTotalScs."\n Error: ".$cnvTotalErr.
-                        "\n\n<b>HTMLtoPDF Task:\n </b>Success: ".$htmlTotalScs."\n Error: ".$htmlTotalErr.
-                        "\n\n<b>Merge Task:\n </b>Success: ".$mergeTotalScs."\n Error: ".$mergeTotalErr.
-                        "\n\n<b>Split Task:\n </b>Success: ".$splitTotalScs."\n Error: ".$splitTotalErr.
-                        "\n\n<b>Watermark Task:\n </b>Success: ".$watermarkTotalScs."\n Error: ".$watermarkTotalErr.
-                        "\n\n<b>Total Task:\n </b>Success: ".$CountTotalScsProc."\n Error: ".$CountTotalErrProc;
+                        "\n\n<b>Compress Task\n</b>Success: <b>".$compTotalScs."</b>\nError: <b>".$compTotalErr."</b>".
+                        "\n\n<b>Convert Task\n</b>Success: <b>".$cnvTotalScs."</b>\nError: <b>".$cnvTotalErr."</b>".
+                        "\n\n<b>HTMLtoPDF Task\n</b>Success: <b>".$htmlTotalScs."</b>\nError: <b>".$htmlTotalErr."</b>".
+                        "\n\n<b>Merge Task\n</b>Success: <b>".$mergeTotalScs."</b>\nError: <b>".$mergeTotalErr."</b>".
+                        "\n\n<b>Split Task\n</b>Success: <b>".$splitTotalScs."</b>\nError: <b>".$splitTotalErr."</b>".
+                        "\n\n<b>Watermark Task\n</b>Success: <b>".$watermarkTotalScs."</b>\nError: <b>".$watermarkTotalErr."</b>".
+                        "\n\n<b>Total Task\n</b>Success: <b>".$CountTotalScsProc."</b>\nError: <b>".$CountTotalErrProc."</b>";
         } else {
             $message = "<b>HANA API Daily Report Alert</b>".
                         "\n\nReported At: <b>".$CurrentTime.

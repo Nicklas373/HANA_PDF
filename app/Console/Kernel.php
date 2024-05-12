@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $cacheClearGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'cache:clear',
@@ -80,7 +80,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $cacheClearGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('cache:clear','weekly', $cacheClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
@@ -95,7 +95,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $optimizeClearGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'optimize:clear',
@@ -131,7 +131,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $optimizeClearGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('optimize:clear','weekly', $optimizeClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
@@ -146,7 +146,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $viewClearGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:clear',
@@ -182,7 +182,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $viewClearGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('view:clear','weekly', $viewClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
@@ -197,7 +197,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $viewCacheGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:cache',
@@ -233,7 +233,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $viewCacheGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('view:cache','weekly', $viewCacheGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
@@ -248,7 +248,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $hanaClearGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:clear-storage',
@@ -284,7 +284,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $hanaClearGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('hana:clear-storage','hourly', $hanaClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
@@ -299,7 +299,7 @@ class Kernel extends ConsoleKernel
 					->insert([
 						'processId' => $hanaReportGUID,
 						'errReason' => null,
-						'errApiReason' => null,
+						'errStatus' => null,
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:daily-report',
@@ -335,7 +335,7 @@ class Kernel extends ConsoleKernel
                         ->where('processId', '=', $hanaReportGUID)
                         ->update([
                             'errReason' => 'Laravel Scheduler Error !',
-                            'errApiReason' => $output,
+                            'errStatus' => $output,
                     ]);
                     NotificationHelper::Instance()->sendSchedErrNotify('hana:daily-report','hourly', $hanaReportGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
