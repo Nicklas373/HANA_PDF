@@ -1053,6 +1053,7 @@ function sendToAPI(files, proc, action) {
                                     `
                                     document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                                     document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                    resolve()
                                 } else {
                                     document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
                                     document.getElementById("alert-err").classList.add("hidden","opacity-0")
@@ -1060,6 +1061,7 @@ function sendToAPI(files, proc, action) {
                                     document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
                                     document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
                                     document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                    resolve()
                                 }
                             } else {
                                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -1068,6 +1070,7 @@ function sendToAPI(files, proc, action) {
                                 document.getElementById("errMsg").innerText = xhrReturn.message
                                 document.getElementById("errProcMain").classList.remove("hidden")
                                 document.getElementById("errProcId").innerText = xhrReturn.processId
+                                reject(new Error('API response: '+xhrReturn.errors+' !')) //Force stop loadingModal while return error !
                             }
                         } else {
                             document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -1076,8 +1079,8 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("errMsg").innerText = xhrReturn.message
                             document.getElementById("errProcMain").classList.remove("hidden")
                             document.getElementById("errProcId").innerText = xhrReturn.processId
+                            reject(new Error('API response: '+xhrReturn.status+' !')) //Force stop loadingModal while return error !
                         }
-                        resolve()
                     } else {
                         document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                         document.getElementById("alert-err").classList.remove("hidden","opacity-0")
@@ -1085,6 +1088,7 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errMsg").innerText = xhrReturn.message
                         document.getElementById("errProcMain").classList.remove("hidden")
                         document.getElementById("errProcId").innerText = xhrReturn.processId
+                        reject(new Error('API response: '+xhr.status+' !')) //Force stop loadingModal while return error !
                     }
                 }
             } else {
@@ -1094,6 +1098,7 @@ function sendToAPI(files, proc, action) {
                 document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
                 document.getElementById("errProcMain").classList.add("hidden")
                 reject(new Error('API response error !'))
+                loadingModal.hide() //Force stop loadingModal while return error !
             }
         }
         xhr.send(formData)
