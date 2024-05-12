@@ -44,7 +44,7 @@ class compressController extends Controller
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
-                    'errApiReason' => null
+                    'errStatus' => null
                 ]);
                 NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','compress','PDF Compression failed !',$validator->messages());
                 return $this->returnCoreMessage(
@@ -143,7 +143,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -162,7 +162,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -213,7 +213,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -232,7 +232,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -283,7 +283,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -302,7 +302,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -353,7 +353,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -372,7 +372,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -423,7 +423,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -443,7 +443,7 @@ class compressController extends Controller
                                 ->update([
                                     'processId' => $Nuuid,
                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -494,7 +494,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -513,7 +513,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -564,7 +564,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName,
@@ -584,7 +584,7 @@ class compressController extends Controller
                                 ->update([
                                     'processId' => $Nuuid,
                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -635,7 +635,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName.'.pdf',
@@ -654,7 +654,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $Nuuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -709,7 +709,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $newFileNameWithoutExtension.'.pdf',
@@ -746,7 +746,7 @@ class compressController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $Nuuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfCompress')->insert([
                                 'fileName' => $currentFileName.'.pdf',
@@ -765,7 +765,7 @@ class compressController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errApiReason' => null
+                                    'errStatus' => null
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $Nuuid, 'FAIL', 'compress', 'Failed to download file from iLovePDF API !', null);
                             return $this->returnCoreMessage(
@@ -876,7 +876,7 @@ class compressController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => 'Archive processing failure',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Failed archiving PDF files !', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -927,7 +927,7 @@ class compressController extends Controller
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => 'PDF Compress failed',
-                            'errApiReason' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
+                            'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'PDF Compress failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount);
                         return $this->returnCoreMessage(
@@ -979,7 +979,7 @@ class compressController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfCompress')->insert([
                         'fileName' => null,
@@ -997,7 +997,7 @@ class compressController extends Controller
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'PDF failed to upload !',
-                            'errApiReason' => null
+                            'errStatus' => null
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'compress', 'PDF failed to upload !', null);
                     return $this->returnCoreMessage(

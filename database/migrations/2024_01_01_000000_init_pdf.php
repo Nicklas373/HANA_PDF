@@ -22,7 +22,7 @@ return new class extends Migration
             $table->uuid('processId');
             $table->text('errReason')->nullable();
             $table->text('errStatus')->nullable();
-            $table->timestamp('createdAt');
+            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             // Configure primary key
             $table->primary('processId');

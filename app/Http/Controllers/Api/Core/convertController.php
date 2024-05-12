@@ -54,7 +54,7 @@ class convertController extends Controller
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
-                    'errApiReason' => null
+                    'errStatus' => null
                 ]);
                 NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'convert', 'PDF Conversion failed !',$validator->messages());
                 return $this->returnCoreMessage(
@@ -171,7 +171,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -190,7 +190,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Symfony runtime process out of time exception !',
-                                        'errApiReason' => $message->getMessage(),
+                                        'errStatus' => $message->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Symfony runtime process out of time exception !', $message->getMessage());
                                 return $this->returnCoreMessage(
@@ -241,7 +241,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -260,7 +260,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Symfony runtime process fail exception !',
-                                        'errApiReason' => $message->getMessage(),
+                                        'errStatus' => $message->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Symfony runtime process fail exception !', $message->getMessage());
                                 return $this->returnCoreMessage(
@@ -316,7 +316,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -335,7 +335,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Database connection error !', $ex->getMessage());
@@ -373,7 +373,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -392,7 +392,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getErrorOutput(),
+                                            'errStatus' => $asposeAPI->getErrorOutput(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return $this->returnCoreMessage(
@@ -448,7 +448,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -467,7 +467,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Database connection error !', $ex->getMessage());
@@ -505,7 +505,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -524,7 +524,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getErrorOutput(),
+                                            'errStatus' => $asposeAPI->getErrorOutput(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return $this->returnCoreMessage(
@@ -596,7 +596,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -615,7 +615,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Symfony runtime process out of time exception !',
-                                        'errApiReason' => $message->getMessage(),
+                                        'errStatus' => $message->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Symfony runtime process out of time exception !', $message->getMessage());
                                 return $this->returnCoreMessage(
@@ -666,7 +666,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -685,7 +685,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Symfony runtime process fail exception !',
-                                        'errApiReason' => $message->getMessage(),
+                                        'errStatus' => $message->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'Symfony runtime process fail exception !', $message->getMessage());
                                 return $this->returnCoreMessage(
@@ -741,7 +741,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -760,7 +760,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Database connection error !', $ex->getMessage());
@@ -798,7 +798,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -817,7 +817,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getErrorOutput(),
+                                            'errStatus' => $asposeAPI->getErrorOutput(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return $this->returnCoreMessage(
@@ -873,7 +873,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -892,7 +892,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Database connection error !', $ex->getMessage());
@@ -930,7 +930,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -949,7 +949,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'Converted file not found on the server !',
-                                            'errApiReason' => $asposeAPI->getErrorOutput(),
+                                            'errStatus' => $asposeAPI->getErrorOutput(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Converted file not found on the server !', $asposeAPI->getErrorOutput());
                                     return $this->returnCoreMessage(
@@ -1020,7 +1020,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1039,7 +1039,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Aspose Clouds API Error !',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1095,7 +1095,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -1114,7 +1114,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Database connection error !', $ex->getMessage());
@@ -1152,7 +1152,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -1171,7 +1171,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'FTP Server Connection Failed !',
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', null);
                                     return $this->returnCoreMessage(
@@ -1223,7 +1223,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1242,7 +1242,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Aspose Clouds API has fail while process, Please look on Aspose Dashboard !',
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToDocx', 'Aspose Clouds API Error !', null);
                                 return $this->returnCoreMessage(
@@ -1306,7 +1306,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1325,7 +1325,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1376,7 +1376,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1395,7 +1395,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1446,7 +1446,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1465,7 +1465,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1516,7 +1516,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1535,7 +1535,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1586,7 +1586,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1605,7 +1605,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1656,7 +1656,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1675,7 +1675,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1726,7 +1726,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1745,7 +1745,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1796,7 +1796,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1815,7 +1815,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'errApiReason' => $e->getMessage(),
+                                        'errStatus' => $e->getMessage(),
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1876,7 +1876,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -1895,7 +1895,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                 ]);
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1938,7 +1938,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -1957,7 +1957,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -1999,7 +1999,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2018,7 +2018,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage());
@@ -2071,7 +2071,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2090,7 +2090,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2141,7 +2141,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2160,7 +2160,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2211,7 +2211,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2230,7 +2230,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2281,7 +2281,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2300,7 +2300,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2351,7 +2351,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2370,7 +2370,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2421,7 +2421,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2441,7 +2441,7 @@ class convertController extends Controller
                                         ->update([
                                             'processId' => $uuid,
                                             'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2492,7 +2492,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2511,7 +2511,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2562,7 +2562,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2581,7 +2581,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2641,7 +2641,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2660,7 +2660,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2711,7 +2711,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2730,7 +2730,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2781,7 +2781,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2800,7 +2800,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2851,7 +2851,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2870,7 +2870,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2921,7 +2921,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -2940,7 +2940,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -2991,7 +2991,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -3011,7 +3011,7 @@ class convertController extends Controller
                                         ->update([
                                             'processId' => $uuid,
                                             'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -3062,7 +3062,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -3081,7 +3081,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -3132,7 +3132,7 @@ class convertController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $Nuuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfConvert')->insert([
                                         'fileName' => $currentFileName,
@@ -3151,7 +3151,7 @@ class convertController extends Controller
                                         ->where('processId', '=', $Nuuid)
                                         ->update([
                                             'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                            'errApiReason' => $e->getMessage(),
+                                            'errStatus' => $e->getMessage(),
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                     return $this->returnCoreMessage(
@@ -3207,7 +3207,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -3226,7 +3226,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                 ]);
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
@@ -3264,7 +3264,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $Nuuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfConvert')->insert([
                                     'fileName' => $currentFileName,
@@ -3283,7 +3283,7 @@ class convertController extends Controller
                                     ->where('processId', '=', $Nuuid)
                                     ->update([
                                         'errReason' => 'Failed to download converted file from iLovePDF API !',
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Failed to download converted file from iLovePDF API !', null);
                                 return $this->returnCoreMessage(
@@ -3434,7 +3434,7 @@ class convertController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => 'Archive processing failure',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'convert', 'Failed convert PDF file!', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -3485,7 +3485,7 @@ class convertController extends Controller
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => 'PDF convert failed',
-                            'errApiReason' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
+                            'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'convert', 'PDF Compress failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount);
                         return $this->returnCoreMessage(
@@ -3537,7 +3537,7 @@ class convertController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfConvert')->insert([
                         'fileName' => null,
@@ -3557,7 +3557,7 @@ class convertController extends Controller
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'PDF failed to upload !',
-                            'errApiReason' => $e->getMessage(),
+                            'errStatus' => $e->getMessage(),
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'convert', 'PDF failed to upload !', null);
                     return $this->returnCoreMessage(

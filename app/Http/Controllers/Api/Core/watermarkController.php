@@ -51,7 +51,7 @@ class watermarkController extends Controller
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
-                    'errApiReason' => null
+                    'errStatus' => null
                 ]);
                 NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'watermark', 'PDF Watermark failed !',$validator->messages());
                 return $this->returnCoreMessage(
@@ -127,7 +127,7 @@ class watermarkController extends Controller
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => null,
-                            'errApiReason' => null
+                            'errStatus' => null
                         ]);
                         DB::table('pdfWatermark')->insert([
                             'fileName' => $currentFileName,
@@ -154,7 +154,7 @@ class watermarkController extends Controller
                             ->where('processId', '=', $uuid)
                             ->update([
                                 'errReason' => 'Invalid request action !',
-                                'errApiReason' => 'Current request: '.$watermarkAction
+                                'errStatus' => 'Current request: '.$watermarkAction
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Invalid request action !', 'Current request: '.$watermarkAction);
                         return response()->json([
@@ -241,7 +241,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -268,7 +268,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -319,7 +319,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -346,7 +346,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -397,7 +397,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -424,7 +424,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -475,7 +475,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -502,7 +502,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -553,7 +553,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -581,7 +581,7 @@ class watermarkController extends Controller
                                 ->update([
                                     'processId' => $uuid,
                                     'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -632,7 +632,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -659,7 +659,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -710,7 +710,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -738,7 +738,7 @@ class watermarkController extends Controller
                                 ->update([
                                     'processId' => $uuid,
                                     'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -789,7 +789,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $currentFileName,
@@ -816,7 +816,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                    'errApiReason' => $e->getMessage()
+                                    'errStatus' => $e->getMessage()
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                             return $this->returnCoreMessage(
@@ -870,7 +870,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $randomizePdfFileName.'.pdf',
@@ -941,7 +941,7 @@ class watermarkController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
                                 'fileName' => $newFileNameWithoutExtension.'.pdf',
@@ -968,7 +968,7 @@ class watermarkController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errApiReason' => null
+                                    'errStatus' => null
                             ]);
                             return $this->returnCoreMessage(
                                 200,
@@ -1020,7 +1020,7 @@ class watermarkController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfWatermark')->insert([
                         'fileName' => null,
@@ -1048,7 +1048,7 @@ class watermarkController extends Controller
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'PDF failed to upload !',
-                            'errApiReason' => null
+                            'errStatus' => null
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'watermark', 'PDF failed to upload !', null);
                     return $this->returnCoreMessage(

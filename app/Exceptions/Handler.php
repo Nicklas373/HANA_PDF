@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
             if ($route && method_exists($route, 'methods')) {
                 $methods = $route->methods();
                 $message = 'MethodNotAllowedHttpException for route: ' . $uri . ' (' . implode(', ', $methods) . ')';
-                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', 'Method not allowed exception!', $currentRouteInfo, $message, $userIp);
+                Log::error($message);
                 try {
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
@@ -74,7 +74,7 @@ class Handler extends ExceptionHandler
                 }
             } else {
                 $message = 'MethodNotAllowedHttpException for route: ' . $uri;
-                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', 'Method not allowed exception!', 'null', $message, $userIp);
+                Log::error($message);
                 try {
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
