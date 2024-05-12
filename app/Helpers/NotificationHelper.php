@@ -39,7 +39,7 @@ class NotificationHelper
                 DB::table('appLogs')->insert([
                     'processId' => $processId,
                     'errReason' => null,
-                    'errApiReason' => null,
+                    'errStatus' => null,
 				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
@@ -61,7 +61,7 @@ class NotificationHelper
                 DB::table('appLogs')->insert([
                     'processId' => $processId,
                     'errReason' => 'TelegramResponseException',
-                    'errApiReason' => $e->getMessage(),
+                    'errStatus' => $e->getMessage(),
 				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
@@ -78,7 +78,7 @@ class NotificationHelper
                 DB::table('appLogs')->insert([
                     'processId' => $processId,
                     'errReason' => 'Unexpected handling exception !',
-                    'errApiReason' => $e->getMessage(),
+                    'errStatus' => $e->getMessage(),
 				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
