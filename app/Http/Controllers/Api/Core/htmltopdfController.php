@@ -44,7 +44,7 @@ class htmltopdfController extends Controller
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
-                    'errApiReason' => null
+                    'errStatus' => null
                 ]);
                 NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'htmlToPdf', 'Failed to convert HTML to PDF !',$validator->messages());
                 return $this->returnCoreMessage(
@@ -117,26 +117,26 @@ class htmltopdfController extends Controller
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => null,
-                            'errApiReason' => null
+                            'errStatus' => null
                         ]);
                         DB::table('pdfHtml')->insert([
                             'urlName' => $request->post('urlToPDF'),
+                            'urlMargin' => $pdfMargin,
+                            'urlOrientation' => $pdfOrientation,
+                            'urlSinglePage' => $pdfSinglePage,
+                            'urlSize' => $pdfSize,
                             'result' => false,
                             'processId' => $uuid,
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' =>  $duration->s.' seconds',
-                            'urlMargin' => $pdfMargin,
-                            'urlOrientation' => $pdfOrientation,
-                            'urlSinglePage' => $pdfSinglePage,
-                            'urlSize' => $pdfSize
+                            'procDuration' =>  $duration->s.' seconds'
                         ]);
                         DB::table('appLogs')
                             ->where('processId', '=', $uuid)
                             ->update([
                                 'processId' => $uuid,
                                 'errReason' => '404',
-                                'errApiReason' => 'Webpage are not available or not valid'
+                                'errStatus' => 'Webpage are not available or not valid'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmlToPdf', 'HTML To PDF Conversion Failed !', 'Webpage are not available or not valid');
                         return $this->returnCoreMessage(
@@ -207,25 +207,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmlToPdf', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -276,25 +276,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPdf', 'FAIL', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -345,25 +345,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPdf', 'FAIL', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -414,25 +414,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmlToPdf', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -483,26 +483,26 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPdf', 'FAIL', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -553,25 +553,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPdf', 'FAIL', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -622,26 +622,26 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPDF', 'FAIL', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -692,25 +692,25 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                            'errApiReason' => $e->getMessage()
+                            'errStatus' => $e->getMessage()
                     ]);
                     NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'htmlToPdf', 'FAIL', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                     return $this->returnCoreMessage(
@@ -762,26 +762,27 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
+                        'urlSize' => $pdfSize,
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => true,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'processId' => $uuid,
                             'errReason' => null,
-                            'errApiReason' => null
+                            'errStatus' => null
                     ]);
                     return $this->returnCoreMessage(
                         200,
@@ -831,26 +832,27 @@ class htmltopdfController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfHtml')->insert([
+                        'urlSize' => $pdfSize,
                         'urlName' => $request->post('urlToPDF'),
+                        'urlMargin' => $pdfMargin,
+                        'urlOrientation' => $pdfOrientation,
+                        'urlSinglePage' => $pdfSinglePage,
+                        'urlSize' => $pdfSize,
                         'result' => false,
                         'processId' => $uuid,
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds',
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize
+                        'procDuration' =>  $duration->s.' seconds'
                     ]);
                     DB::table('appLogs')
                         ->where('processId', '=', $uuid)
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'Failed to download converted file from iLovePDF API !',
-                            'errApiReason' => null
+                            'errStatus' => null
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'HTML To PDF Conversion Failed !', null);
                     return $this->returnCoreMessage(

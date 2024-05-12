@@ -21,8 +21,8 @@ return new class extends Migration
         Schema::create('appLogs', function (Blueprint $table) {
             $table->uuid('processId');
             $table->text('errReason')->nullable();
-            $table->text('errStatus')->nullable();
-            $table->timestamp('createdAt');
+            $table->text('errApiReason')->nullable();
+            $table->timestamp('createdAt')->useCurrent()->useCurrentOnUpdate();
 
             // Configure primary key
             $table->primary('processId');

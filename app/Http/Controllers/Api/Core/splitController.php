@@ -45,7 +45,7 @@ class splitController extends Controller
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
                     'errReason' => $validator->messages(),
-                    'errApiReason' => null
+                    'errStatus' => null
                 ]);
                 NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'split','PDF Split failed !',$validator->messages());
                 return $this->returnCoreMessage(
@@ -136,7 +136,7 @@ class splitController extends Controller
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                         ]);
                                         DB::table('pdfSplit')->insert([
                                             'fileName' => $currentFileName,
@@ -160,7 +160,7 @@ class splitController extends Controller
                                             ->where('processId', '=', $uuid)
                                             ->update([
                                                 'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                'errApiReason' => null
+                                                'errStatus' => null
                                         ]);
                                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')');
                                         return $this->returnCoreMessage(
@@ -211,7 +211,7 @@ class splitController extends Controller
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                         ]);
                                         DB::table('pdfSplit')->insert([
                                             'fileName' => $currentFileName,
@@ -235,7 +235,7 @@ class splitController extends Controller
                                             ->where('processId', '=', $uuid)
                                             ->update([
                                                 'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                'errApiReason' => null
+                                                'errStatus' => null
                                         ]);
                                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')');
                                         return $this->returnCoreMessage(
@@ -286,7 +286,7 @@ class splitController extends Controller
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
                                             'errReason' => null,
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                         ]);
                                         DB::table('pdfSplit')->insert([
                                             'fileName' => $currentFileName,
@@ -310,7 +310,7 @@ class splitController extends Controller
                                             ->where('processId', '=', $uuid)
                                             ->update([
                                                 'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                'errApiReason' => null
+                                                'errStatus' => null
                                         ]);
                                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')');
                                         return $this->returnCoreMessage(
@@ -413,7 +413,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -437,7 +437,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -488,7 +488,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -512,7 +512,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -563,7 +563,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -587,7 +587,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -638,7 +638,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -662,7 +662,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -713,7 +713,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -738,7 +738,7 @@ class splitController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -789,7 +789,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -813,7 +813,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -864,7 +864,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -889,7 +889,7 @@ class splitController extends Controller
                                     ->update([
                                         'processId' => $uuid,
                                         'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -940,7 +940,7 @@ class splitController extends Controller
                                 DB::table('appLogs')->insert([
                                     'processId' => $uuid,
                                     'errReason' => null,
-                                    'errApiReason' => null
+                                    'errStatus' => null
                                 ]);
                                 DB::table('pdfSplit')->insert([
                                     'fileName' => $currentFileName,
@@ -964,7 +964,7 @@ class splitController extends Controller
                                     ->where('processId', '=', $uuid)
                                     ->update([
                                         'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'errApiReason' => $e->getMessage()
+                                        'errStatus' => $e->getMessage()
                                 ]);
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                 return $this->returnCoreMessage(
@@ -1019,7 +1019,7 @@ class splitController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfSplit')->insert([
                                         'fileName' => $currentFileName,
@@ -1089,7 +1089,7 @@ class splitController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfSplit')->insert([
                                         'fileName' => $currentFileName,
@@ -1157,7 +1157,7 @@ class splitController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfSplit')->insert([
                                         'fileName' => $currentFileName,
@@ -1181,7 +1181,7 @@ class splitController extends Controller
                                         ->where('processId', '=', $uuid)
                                         ->update([
                                             'errReason' => 'Failed to download file from iLovePDF API !',
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Failed to download file from iLovePDF API !', 'null');
                                     return $this->returnCoreMessage(
@@ -1236,7 +1236,7 @@ class splitController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfSplit')->insert([
                                         'fileName' => $currentFileName,
@@ -1304,7 +1304,7 @@ class splitController extends Controller
                                     DB::table('appLogs')->insert([
                                         'processId' => $uuid,
                                         'errReason' => null,
-                                        'errApiReason' => null
+                                        'errStatus' => null
                                     ]);
                                     DB::table('pdfSplit')->insert([
                                         'fileName' => $currentFileName,
@@ -1328,7 +1328,7 @@ class splitController extends Controller
                                         ->where('processId', '=', $uuid)
                                         ->update([
                                             'errReason' => 'Failed to download file from iLovePDF API !',
-                                            'errApiReason' => null
+                                            'errStatus' => null
                                     ]);
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Failed to download file from iLovePDF API !', 'null');
                                     return $this->returnCoreMessage(
@@ -1381,7 +1381,7 @@ class splitController extends Controller
                             DB::table('appLogs')->insert([
                                 'processId' => $uuid,
                                 'errReason' => null,
-                                'errApiReason' => null
+                                'errStatus' => null
                             ]);
                             DB::table('pdfSplit')->insert([
                                 'fileName' => null,
@@ -1405,7 +1405,7 @@ class splitController extends Controller
                                 ->where('processId', '=', $uuid)
                                 ->update([
                                     'errReason' => 'Invalid split request method !',
-                                    'errApiReason' => null
+                                    'errStatus' => null
                             ]);
                             NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'Invalid split request method !', null);
                             return $this->returnCoreMessage(
@@ -1458,7 +1458,7 @@ class splitController extends Controller
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
                         'errReason' => null,
-                        'errApiReason' => null
+                        'errStatus' => null
                     ]);
                     DB::table('pdfSplit')->insert([
                         'fileName' => null,
@@ -1483,7 +1483,7 @@ class splitController extends Controller
                         ->update([
                             'processId' => $uuid,
                             'errReason' => 'PDF failed to upload !',
-                            'errApiReason' => null
+                            'errStatus' => null
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'PDF failed to upload !', null);
                     return $this->returnCoreMessage(
