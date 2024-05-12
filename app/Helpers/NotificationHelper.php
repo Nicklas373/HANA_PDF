@@ -36,14 +36,17 @@ class NotificationHelper
             $messageId = $response->getMessageId();
 
             try {
+                DB::table('appLogs')->insert([
+                    'processId' => $processId,
+                    'errReason' => null,
+                    'errApiReason' => null,
+				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => true,
                     'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response,
-                    'notifyErrStatus' => $errReason,
-                    'notifyErrMessage' => $errCode
+                    'notifyResponse' => $response
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -55,28 +58,34 @@ class NotificationHelper
                 } else {
                   $httpStatus = $e->getHttpStatusCode();
                 }
+                DB::table('appLogs')->insert([
+                    'processId' => $processId,
+                    'errReason' => 'TelegramResponseException',
+                    'errApiReason' => $e->getMessage(),
+				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
-                    'notifyMessage' => $e->getMessage(),
-                    'notifyResponse' => null,
-                    'notifyErrStatus' => $httpStatus,
-                    'notifyErrMessage' => $e->getErrorType()
+                    'notifyMessage' => 'TelegramResponseException',
+                    'notifyResponse' => $e->getMessage()+' | '+$httpStatus+' | '+$e->getErrorType()
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
             }
         } catch (\Exception $e) {
             try {
+                DB::table('appLogs')->insert([
+                    'processId' => $processId,
+                    'errReason' => 'Unexpected handling exception !',
+                    'errApiReason' => $e->getMessage(),
+				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
                     'notifyResult' => false,
                     'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => null,
-                    'notifyErrStatus' => null,
-                    'notifyErrMessage' => $e->getMessage()
+                    'notifyResponse' => $e->getMessage()
                 ]);
             } catch (QueryException $ex) {
                 Log::error('Query Exception failed with: '. $ex->getMessage());
