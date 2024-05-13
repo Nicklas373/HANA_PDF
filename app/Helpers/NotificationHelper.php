@@ -68,11 +68,6 @@ class NotificationHelper
             ]);
             $messageId = $response->getMessageId();
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => null,
-                    'errStatus' => null,
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -90,11 +85,6 @@ class NotificationHelper
                 } else {
                   $httpStatus = $e->getHttpStatusCode();
                 }
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -107,11 +97,6 @@ class NotificationHelper
             }
         } catch (\Exception $e) {
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'Unexpected handling exception !',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -149,11 +134,6 @@ class NotificationHelper
             $messageId = $response->getMessageId();
 
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => null,
-                    'errStatus' => null,
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -171,11 +151,6 @@ class NotificationHelper
                 } else {
                   $httpStatus = $e->getHttpStatusCode();
                 }
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -188,11 +163,6 @@ class NotificationHelper
             }
         } catch (\Exception $e) {
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'Unexpected handling exception !',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -230,11 +200,6 @@ class NotificationHelper
             $messageId = $response->getMessageId();
 
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => null,
-                    'errStatus' => null,
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -252,11 +217,6 @@ class NotificationHelper
                 } else {
                   $httpStatus = $e->getHttpStatusCode();
                 }
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -269,11 +229,6 @@ class NotificationHelper
             }
         } catch (\Exception $e) {
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'Unexpected handling exception !',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -327,11 +282,6 @@ class NotificationHelper
             ]);
             $messageId = $response->getMessageId();
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => null,
-                    'errStatus' => null,
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -349,11 +299,6 @@ class NotificationHelper
                 } else {
                   $httpStatus = $e->getHttpStatusCode();
                 }
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
@@ -366,11 +311,6 @@ class NotificationHelper
             }
         } catch (\Exception $e) {
             try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'Unexpected handling exception !',
-                    'errStatus' => $e->getMessage(),
-				]);
                 DB::table('notifyLogs')->insert([
                     'processId' => $processId,
                     'notifyName' => 'Telegram SDK',
