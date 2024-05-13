@@ -129,8 +129,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on StartException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -142,12 +142,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -197,8 +191,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on AuthException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -210,12 +204,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -265,8 +253,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on UploadException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -278,12 +266,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -333,8 +315,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -346,12 +328,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -401,8 +377,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -414,12 +390,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -469,8 +439,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on TaskException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -482,12 +452,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -537,8 +501,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on PathException',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -550,12 +514,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -605,8 +563,8 @@ class mergeController extends Controller
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
-                            'errReason' => null,
-                            'errStatus' => null
+                            'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                            'errStatus' => $e->getMessage()
                         ]);
                         DB::table('pdfMerge')->insert([
                             'fileName' => $randomizePdfFileName.'.pdf',
@@ -618,12 +576,6 @@ class mergeController extends Controller
                             'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        DB::table('appLogs')
-                            ->where('processId', '=', $uuid)
-                            ->update([
-                                'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                'errStatus' => $e->getMessage()
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                         return $this->returnCoreMessage(
@@ -752,7 +704,7 @@ class mergeController extends Controller
                 try {
                     DB::table('appLogs')->insert([
                         'processId' => $uuid,
-                        'errReason' => null,
+                        'errReason' => 'PDF failed to upload !',
                         'errStatus' => null
                     ]);
                     DB::table('pdfMerge')->insert([
@@ -765,13 +717,6 @@ class mergeController extends Controller
                         'procStartAt' => $startProc,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
-                    ]);
-                    DB::table('appLogs')
-                        ->where('processId', '=', $uuid)
-                        ->update([
-                            'processId' => $uuid,
-                            'errReason' => 'PDF failed to upload !',
-                            'errStatus' => null
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'PDF failed to upload !', null);
                     return $this->returnCoreMessage(
