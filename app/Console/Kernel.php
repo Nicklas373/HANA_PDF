@@ -337,7 +337,7 @@ class Kernel extends ConsoleKernel
                             'errReason' => 'Laravel Scheduler Error !',
                             'errStatus' => $output,
                     ]);
-                    NotificationHelper::Instance()->sendSchedErrNotify('hana:daily-report','hourly', $hanaReportGUID, 'FAIL','Laravel Scheduler Error !',$output);
+                    NotificationHelper::Instance()->sendSchedErrNotify('hana:daily-report','Daily at 19.00', $hanaReportGUID, 'FAIL','Laravel Scheduler Error !',$output);
                 }
             });
     }
