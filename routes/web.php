@@ -18,5 +18,5 @@ Route::get('/', function () {
         'status' => 200,
         'endpoint' => 'gw.hana-ci.com',
         'message' => 'OK',
-    ], 401);
+    ], 200);
 });
