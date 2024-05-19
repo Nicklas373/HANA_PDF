@@ -2,11 +2,8 @@
     "release_date": "19 May 2024",
     "version": "3.2.5",
     "changelog": [
-        "Lorem ipsum dolor",
-        "Lorem ipsum dolor",
-        "Lorem ipsum dolor",
-        "Lorem ipsum dolor",
-        "Lorem ipsum dolor",
-        "Lorem ipsum dolor"
+        "Change footer location back to left from center",
+        "Introducing more advanced features for HTML to PDF convert",
+        "Upgrade our web framework to latest Laravel 11.x"
     ]
 }
