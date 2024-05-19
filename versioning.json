@@ -1,0 +1,20 @@
+[
+    {
+        "appServices": "BE",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 2,
+            "patchVersion": 5,
+            "gitRevision": "4130641"
+        }
+    },
+    {
+        "appServices": "FE",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 2,
+            "patchVersion": 5,
+            "gitRevision": "e94d204"
+        }
+    }
+]
