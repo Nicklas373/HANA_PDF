@@ -4,12 +4,13 @@ import { Dropzone } from "dropzone"
 const $errModal = document.getElementById('errModal')
 const $loadingModal = document.getElementById('loadingModal')
 const $previewModal = document.getElementById('previewModal')
+const $scsModalNotify = document.getElementById('scsModalNotify')
 const $previewDocumentModal = document.getElementById('previewDocumentModal')
 const $previewImageModal = document.getElementById('previewImgModal')
 
 const options = {
     placement: 'bottom-right',
-    backdrop: 'static',
+    backdrop: 'dynamic',
     backdropClasses: 'bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-sm fixed inset-0 z-40',
     closable: true,
     onHide: () => {
@@ -22,9 +23,11 @@ const options = {
         //console.log('modal has been toggled')
     }
 }
+
 const errModal = new Modal($errModal, options)
 const loadingModal = new Modal($loadingModal, options)
 const previewModal = new Modal($previewModal, options)
+const scsModalNotify = new Modal($scsModalNotify, options)
 const previewDocumentModal = new Modal($previewDocumentModal, options)
 const previewImageModal = new Modal($previewImageModal, options)
 let xhrBalance
@@ -34,6 +37,7 @@ var errMessage = document.getElementById("errMessageModal")
 var errSubMessage = document.getElementById("errSubMessageModal")
 var errListMessage = document.getElementById("err-list")
 var errListTitleMessage = document.getElementById("err-list-title")
+var scsMessage = document.getElementById('scsMessageModalNotify')
 var procBtn = document.getElementById('submitBtn')
 var procTitleMessageModal = document.getElementById("titleMessageModal")
 var uploadedFile = []
@@ -46,57 +50,68 @@ var bearerToken = import.meta.env.VITE_JWT_TOKEN
 var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 var uploadPath = '/storage/upload/'
 var uploadStats = false
+var xhrProcStats = true
 var xhrScsUploads = 0
 var xhrTotalUploads = 0
 
 if (procBtn) {
     procBtn.onclick = function(event) {
-        procTitleMessageModal.innerText = "Preparing document..."
-        errMessage.style.visibility = null
-        errSubMessage.style.visibility = null
-        errAltSubMessageModal.style.display = "none"
-        errModal.hide()
-        loadingModal.show()
-        remainingBalance().then(function () {
-            loadingModal.hide()
-            if (document.getElementById('html') !== null) {
-                submit(event)
-            } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
-                if (xhrScsUploads == xhrTotalUploads) {
+        if (xhrProcStats) {
+            procTitleMessageModal.innerText = "Preparing document..."
+            errMessage.style.visibility = null
+            errSubMessage.style.visibility = null
+            errAltSubMessageModal.style.display = "none"
+            errModal.hide()
+            loadingModal.show()
+            remainingBalance().then(function () {
+                loadingModal.hide()
+                if (document.getElementById('html') !== null) {
                     submit(event)
+                } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
+                    if (xhrScsUploads == xhrTotalUploads) {
+                        submit(event)
+                    } else {
+                        event.preventDefault()
+                        errMessage.innerText  = "Sorry, we're still uploading your files"
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
+                        resetErrListMessage()
+                        generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                        errAltSubMessageModal.style = null
+                        loadingModal.hide()
+                        errModal.show()
+                    }
                 } else {
                     event.preventDefault()
-                    errMessage.innerText  = "Sorry, we're still uploading your files"
+                    errMessage.innerText  = "PDF file can not be processed !"
                     errSubMessage.innerText = ""
                     errListTitleMessage.innerText = "Error message"
                     resetErrListMessage()
-                    generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                    generateMesssage("No file has been chosen")
                     errAltSubMessageModal.style = null
                     loadingModal.hide()
                     errModal.show()
                 }
-            } else {
-                event.preventDefault()
-                errMessage.innerText  = "PDF file can not be processed !"
+            }).catch(function (error) {
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
                 resetErrListMessage()
-                generateMesssage("No file has been chosen")
+                generateMesssage(error.xhrBalanceStatus+" - "+error.xhrBalanceResponse)
                 errAltSubMessageModal.style = null
                 loadingModal.hide()
                 errModal.show()
-            }
-        }).catch(function (error) {
-            errModal.hide()
-            errMessage.innerText  = "There was unexpected error !"
-            errSubMessage.innerText = ""
-            errListTitleMessage.innerText = "Error message"
-            resetErrListMessage()
-            generateMesssage(error.xhrBalanceStatus+" - "+error.xhrBalanceResponse)
-            errAltSubMessageModal.style = null
+            })
+        } else {
+            event.preventDefault()
+            errMessage.innerText  = "Sorry, we're still processing your files"
+            errSubMessage.style.visibility = null
+            errAltSubMessageModal.style.visibility = null
+            errAltSubMessageModal.style.display = "none"
             loadingModal.hide()
             errModal.show()
-        })
+        }
     }
 }
 
@@ -291,29 +306,30 @@ if (uploadDropzone) {
                 }
             })
 
-            this.on("error", function(file, dropzoneErrMessage, xhr) {
+            this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
+                    if (xhr & xhr.readyState == 4) {
+                        if (xhr.responseText.trim().startsWith('{')) {
+                            if (xhr.status == 500) {
+                                dzErrorMessage = "Internal server error"
+                            } else if (xhr.status == 524) {
+                                dzErrorMessage = "Connection timeout"
                             } else {
-                                newErrMessage = "There was an unexpected error!"
+                                dzErrorMessage.textContent = "There was unexpected error"
                             }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage
+                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
                     }
-                    dzErrorMessage.textContent = newErrMessage
+                    errMessage.innerText  = "Failed to upload " + file.name
+                    errSubMessage.innerText = ""
+                    errListTitleMessage.innerText = "Error message"
+                    resetErrListMessage()
+                    generateMesssage(dzErrorMessage.textContent)
+                    errAltSubMessageModal.style = null
+                    loadingModal.hide()
+                    errModal.show()
                 }
             })
         }
@@ -516,29 +532,30 @@ if (uploadDropzoneAlt) {
                 }
             })
 
-            this.on("error", function(file, dropzoneErrMessage, xhr) {
+            this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
+                    if (xhr & xhr.readyState == 4) {
+                        if (xhr.responseText.trim().startsWith('{')) {
+                            if (xhr.status == 500) {
+                                dzErrorMessage = "Internal server error"
+                            } else if (xhr.status == 524) {
+                                dzErrorMessage = "Connection timeout"
                             } else {
-                                newErrMessage = "There was an unexpected error!"
+                                dzErrorMessage.textContent = "There was unexpected error"
                             }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage
+                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
                     }
-                    dzErrorMessage.textContent = newErrMessage
+                    errMessage.innerText  = "Failed to upload " + file.name
+                    errSubMessage.innerText = ""
+                    errListTitleMessage.innerText = "Error message"
+                    resetErrListMessage()
+                    generateMesssage(dzErrorMessage.textContent)
+                    errAltSubMessageModal.style = null
+                    loadingModal.hide()
+                    errModal.show()
                 }
             })
 
@@ -757,29 +774,30 @@ if (uploadDropzoneSingle) {
                 }
             })
 
-            this.on("error", function(file, dropzoneErrMessage, xhr) {
+            this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
+                    if (xhr & xhr.readyState == 4) {
+                        if (xhr.responseText.trim().startsWith('{')) {
+                            if (xhr.status == 500) {
+                                dzErrorMessage = "Internal server error"
+                            } else if (xhr.status == 524) {
+                                dzErrorMessage = "Connection timeout"
                             } else {
-                                newErrMessage = "There was an unexpected error!"
+                                dzErrorMessage.textContent = "There was unexpected error"
                             }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage
+                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
                     }
-                    dzErrorMessage.textContent = newErrMessage
+                    errMessage.innerText  = "Failed to upload " + file.name
+                    errSubMessage.innerText = ""
+                    errListTitleMessage.innerText = "Error message"
+                    resetErrListMessage()
+                    generateMesssage(dzErrorMessage.textContent)
+                    errAltSubMessageModal.style = null
+                    loadingModal.hide()
+                    errModal.show()
                 }
             })
         }
@@ -838,12 +856,40 @@ function getUploadedFileName() {
 function apiGateway(proc, action) {
     var files = getUploadedFileName()
     sendToAPI(files,proc,action).then(function () {
+        xhrProcStats = true
+        closeAltModal(proc)
         loadingModal.hide()
+        errModal.hide()
+        if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+            scsMessage.innerText  = "PDF "+proc+"ed success !"
+        } else {
+            if (document.getElementById('html') !== null) {
+                scsMessage.innerText = "URL converted success !"
+            } else {
+                scsMessage.innerText = "Document converted success !"
+            }
+        }
+        scsModalNotify.show()
     }).catch(function (error) {
         if (error.xhrRequestStatus == 2 || error.xhrRequestStatus == 4) {
             // Do not treat this status as error
+            xhrProcStats = true
+            closeAltModal(proc)
             loadingModal.hide()
+            errModal.hide()
+            if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+                scsMessage.innerText  = "PDF "+proc+"ed success !"
+            } else {
+                if (document.getElementById('html') !== null) {
+                    scsMessage.innerText = "URL converted success !"
+                } else {
+                    scsMessage.innerText = "Document converted success !"
+                }
+            }
+            scsModalNotify.show()
         } else {
+            xhrProcStats = false
+            closeAltModal(proc)
             errModal.hide()
             errMessage.innerText  = "There was unexpected error !"
             errSubMessage.innerText = ""
@@ -855,6 +901,27 @@ function apiGateway(proc, action) {
             errModal.show()
         }
     })
+}
+
+function closeAltModal(proc) {
+    document.getElementById("altLoadingModal").classList.add('hidden')
+    if (proc == "html") {
+        document.getElementById("formHTML").classList.remove('animate-pulse')
+    } else {
+        if (proc == "compress") {
+           document.getElementById("dropzoneCmp").classList.remove('animate-pulse')
+        } else if (proc == "convert") {
+            if (document.getElementById('cnvFrPDF') !== null) {
+                document.getElementById("dropzoneCnvFrPDF").classList.remove('animate-pulse')
+            } else {
+                document.getElementById("dropzoneCnvToPDF").classList.remove('animate-pulse')
+            }
+        } else if (proc == "split") {
+            document.getElementById("dropzoneSplit").classList.remove('animate-pulse')
+        } else {
+            document.getElementById("dropzoneWatermark").classList.remove('animate-pulse')
+        }
+    }
 }
 
 function generateThumbnail(fileName) {
@@ -1214,9 +1281,15 @@ function submit(event) {
                              errModal.hide()
                              loadingModal.show()
                              if (document.getElementById('cnvFrPDF') !== null) {
-                                 apiGateway("convert","")
+                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
+                                xhrProcStats = false
+                                apiGateway("convert","")
                              } else {
-                                 apiGateway("compress","")
+                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                document.getElementById("dropzoneCmp").classList.add('animate-pulse')
+                                xhrProcStats = false
+                                apiGateway("compress","")
                              }
                          } else {
                              event.preventDefault()
@@ -1277,8 +1350,14 @@ function submit(event) {
                 errModal.hide()
                 loadingModal.show()
                 if (document.getElementById('cnvFrPDF') !== null) {
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("convert","")
                 } else {
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneCmp").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("compress","")
                 }
             } else {
@@ -1302,6 +1381,9 @@ function submit(event) {
             errModal.hide()
             loadingModal.show()
             if (document.getElementById('cnvToPDF') !== null) {
+                document.getElementById("altLoadingModal").classList.remove('hidden')
+                document.getElementById("dropzoneCnvToPDF").classList.add('animate-pulse')
+                xhrProcStats = false
                 apiGateway("convert","")
             } else {
                 if (getUploadedFileName().length < 2) {
@@ -1315,6 +1397,9 @@ function submit(event) {
                     loadingModal.hide()
                     errModal.show()
                 } else {
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneMerge").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("merge","")
                 }
             }
@@ -1409,6 +1494,9 @@ function submit(event) {
                                     errModal.hide()
                                     loadingModal.show()
                                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                                        document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                        xhrProcStats = false
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1487,6 +1575,9 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("split", "split")
                                  } else {
                                      event.preventDefault()
@@ -1527,6 +1618,9 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("split", "split")
                                  } else {
                                      event.preventDefault()
@@ -1609,6 +1703,9 @@ function submit(event) {
                         errModal.hide()
                         loadingModal.show()
                         if (xhrBalance && xhrBalanceRemaining > 0) {
+                            document.getElementById("altLoadingModal").classList.remove('hidden')
+                            document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                            xhrProcStats = false
                             apiGateway("split", "delete")
                          } else {
                              event.preventDefault()
@@ -1688,6 +1785,9 @@ function submit(event) {
                             loadingModal.show()
                             if (getUploadedFileName().length > 0) {
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("watermark","img")
                                  } else {
                                      event.preventDefault()
@@ -1775,6 +1875,9 @@ function submit(event) {
                     errModal.hide()
                     loadingModal.show()
                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                        document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
+                        xhrProcStats = false
                         apiGateway("watermark","txt")
                     } else {
                          event.preventDefault()
@@ -1832,6 +1935,9 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none"
                     errModal.hide()
                     loadingModal.show()
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("formHTML").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("html","")
                 } else {
                     event.preventDefault()

@@ -8,7 +8,7 @@
             <div class="font-quicksand font-light text-md lg:text-3xl text-lt1">Convert web pages into PDF documents.</div>
         </div>
     </section>
-  <form method="POST" enctype="multipart/form-data" class="flex flex-col p-2">
+  <form method="POST" enctype="multipart/form-data" class="flex flex-col p-2" id="formHTML">
     {{ csrf_field() }}
     <div class="w-full p-2 lg:w-3/6 bg-transparent rounded-lg bg-opacity-50 p-2 mt-2 lg:mb-8 lg:mx-2">
         <p class="block mb-2 font-quicksand text-xl font-bold text-pc4">Write the Website URL</p>
