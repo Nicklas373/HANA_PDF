@@ -1,8 +1,8 @@
-<div id="altLoadingModal" tabindex="-1" aria-hidden="true" class="fixed flex z-50 w-full hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full justify-center items-center" style="top: 39%;">
+<div id="altLoadingModal" tabindex="-1" aria-hidden="true" class="fixed flex z-50 w-full p-4 hidden overflow-x-hidden overflow-y-auto md:inset-0 max-h-full lg:h-fit justify-center items-center" style="top:38%;">
     <div class="relative w-full max-w-2xl max-h-full">
         <div class="relative bg-pc4 rounded-lg shadow">
             <div class="p-6 space-y-6 text-center">
-                <p id="titleMessageModal" class="font-quicksand font-medium text-dt text-lg leading-relaxed">Processing PDF...</p>
+                <p id="altTitleMessageModal" class="font-quicksand font-medium text-dt text-lg leading-relaxed">Processing PDF...</p>
                 <div class="animate-spin-counter-clockwise inline-block w-12 h-12" role="status" aria-label="loading">
                     <img src="{{ asset('assets/icons/process.svg') }}" alt="loading">
                 </div>
