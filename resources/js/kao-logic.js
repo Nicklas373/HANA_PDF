@@ -24,6 +24,10 @@ const options = {
     }
 }
 
+const appMajorVer = 3
+const appMinorVer = 2
+const appPatchVer = 5
+const commitHash = gitHash
 const errModal = new Modal($errModal, options)
 const loadingModal = new Modal($loadingModal, options)
 const previewModal = new Modal($previewModal, options)
@@ -32,6 +36,7 @@ const previewDocumentModal = new Modal($previewDocumentModal, options)
 const previewImageModal = new Modal($previewImageModal, options)
 let xhrBalance
 let xhrBalanceRemaining
+var altLoadingMessageModal = document.getElementById("altTitleMessageModal")
 var errAltSubMessageModal = document.getElementById("altSubMessageModal")
 var errMessage = document.getElementById("errMessageModal")
 var errSubMessage = document.getElementById("errSubMessageModal")
@@ -56,49 +61,74 @@ var xhrTotalUploads = 0
 
 if (procBtn) {
     procBtn.onclick = function(event) {
-        if (xhrProcStats) {
+        if (procTitleMessageModal.innerText !== 'Processing Document') {
             procTitleMessageModal.innerText = "Preparing document..."
-            errMessage.style.visibility = null
-            errSubMessage.style.visibility = null
-            errAltSubMessageModal.style.display = "none"
-            errModal.hide()
-            loadingModal.show()
-            remainingBalance().then(function () {
-                loadingModal.hide()
+        } else {
+            if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+                procTitleMessageModal.innerText = "Processing PDF..."
+            } else {
                 if (document.getElementById('html') !== null) {
-                    submit(event)
-                } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
-                    if (xhrScsUploads == xhrTotalUploads) {
+                    procTitleMessageModal.innerText = "Processing URL..."
+                } else {
+                    procTitleMessageModal.innerText = "Processing Document..."
+                }
+            }
+        }
+        errMessage.style.visibility = null
+        errSubMessage.style.visibility = null
+        errAltSubMessageModal.style.display = "none"
+        errModal.hide()
+        loadingModal.show()
+        if (xhrProcStats) {
+            validateVersion().then(function () {
+                remainingBalance().then(function () {
+                    loadingModal.hide()
+                    if (document.getElementById('html') !== null) {
                         submit(event)
+                    } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
+                        if (xhrScsUploads == xhrTotalUploads) {
+                            submit(event)
+                        } else {
+                            event.preventDefault()
+                            errMessage.innerText  = "Sorry, we're still uploading your files"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Error message"
+                            resetErrListMessage()
+                            generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                            errAltSubMessageModal.style = null
+                            loadingModal.hide()
+                            errModal.show()
+                        }
                     } else {
                         event.preventDefault()
-                        errMessage.innerText  = "Sorry, we're still uploading your files"
+                        errMessage.innerText  = "PDF file can not be processed !"
                         errSubMessage.innerText = ""
                         errListTitleMessage.innerText = "Error message"
                         resetErrListMessage()
-                        generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                        generateMesssage("No file has been chosen")
                         errAltSubMessageModal.style = null
                         loadingModal.hide()
                         errModal.show()
                     }
-                } else {
-                    event.preventDefault()
-                    errMessage.innerText  = "PDF file can not be processed !"
+                }).catch(function (error) {
+                    errModal.hide()
+                    errMessage.innerText  = "There was unexpected error !"
                     errSubMessage.innerText = ""
                     errListTitleMessage.innerText = "Error message"
                     resetErrListMessage()
-                    generateMesssage("No file has been chosen")
+                    generateMesssage(error.xhrBalanceResponse)
                     errAltSubMessageModal.style = null
                     loadingModal.hide()
                     errModal.show()
-                }
+                })
             }).catch(function (error) {
                 errModal.hide()
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
                 resetErrListMessage()
-                generateMesssage(error.xhrBalanceStatus+" - "+error.xhrBalanceResponse)
+                generateMesssage(error.versioningMessage)
+                generateMesssage("Please clear cache the browser and try again")
                 errAltSubMessageModal.style = null
                 loadingModal.hide()
                 errModal.show()
@@ -306,31 +336,21 @@ if (uploadDropzone) {
                 }
             })
 
-            this.on("error", function(file, xhr) {
+            this.on("error", function(file, dropzoneErrMessage, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    if (xhr & xhr.readyState == 4) {
-                        if (xhr.responseText.trim().startsWith('{')) {
-                            if (xhr.status == 500) {
-                                dzErrorMessage = "Internal server error"
-                            } else if (xhr.status == 524) {
-                                dzErrorMessage = "Connection timeout"
-                            } else {
-                                dzErrorMessage.textContent = "There was unexpected error"
-                            }
-                        }
-                    } else {
-                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
-                    }
-                    errMessage.innerText  = "Failed to upload " + file.name
-                    errSubMessage.innerText = ""
-                    errListTitleMessage.innerText = "Error message"
-                    resetErrListMessage()
-                    generateMesssage(dzErrorMessage.textContent)
-                    errAltSubMessageModal.style = null
-                    loadingModal.hide()
-                    errModal.show()
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
         }
     })
@@ -535,28 +555,18 @@ if (uploadDropzoneAlt) {
             this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    if (xhr & xhr.readyState == 4) {
-                        if (xhr.responseText.trim().startsWith('{')) {
-                            if (xhr.status == 500) {
-                                dzErrorMessage = "Internal server error"
-                            } else if (xhr.status == 524) {
-                                dzErrorMessage = "Connection timeout"
-                            } else {
-                                dzErrorMessage.textContent = "There was unexpected error"
-                            }
-                        }
-                    } else {
-                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
-                    }
-                    errMessage.innerText  = "Failed to upload " + file.name
-                    errSubMessage.innerText = ""
-                    errListTitleMessage.innerText = "Error message"
-                    resetErrListMessage()
-                    generateMesssage(dzErrorMessage.textContent)
-                    errAltSubMessageModal.style = null
-                    loadingModal.hide()
-                    errModal.show()
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
 
             this.on("thumbnail", function (file) {
@@ -777,28 +787,18 @@ if (uploadDropzoneSingle) {
             this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    if (xhr & xhr.readyState == 4) {
-                        if (xhr.responseText.trim().startsWith('{')) {
-                            if (xhr.status == 500) {
-                                dzErrorMessage = "Internal server error"
-                            } else if (xhr.status == 524) {
-                                dzErrorMessage = "Connection timeout"
-                            } else {
-                                dzErrorMessage.textContent = "There was unexpected error"
-                            }
-                        }
-                    } else {
-                        dzErrorMessage.textContent = 'Cannot establish connection with the server'
-                    }
-                    errMessage.innerText  = "Failed to upload " + file.name
-                    errSubMessage.innerText = ""
-                    errListTitleMessage.innerText = "Error message"
-                    resetErrListMessage()
-                    generateMesssage(dzErrorMessage.textContent)
-                    errAltSubMessageModal.style = null
-                    loadingModal.hide()
-                    errModal.show()
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
         }
     })
@@ -872,21 +872,35 @@ function apiGateway(proc, action) {
         scsModalNotify.show()
     }).catch(function (error) {
         if (error.xhrRequestStatus == 2 || error.xhrRequestStatus == 4) {
-            // Do not treat this status as error
-            xhrProcStats = true
-            closeAltModal(proc)
-            loadingModal.hide()
-            errModal.hide()
-            if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
-                scsMessage.innerText  = "PDF "+proc+"ed success !"
-            } else {
-                if (document.getElementById('html') !== null) {
-                    scsMessage.innerText = "URL converted success !"
+            console.log(error.xhrRequestMessage)
+            if (error.xhrRequestMessage == 'Internal server error (2)' || error.xhrRequestMessage == 'Internal server error (4)') {
+                xhrProcStats = true
+                closeAltModal(proc)
+                loadingModal.hide()
+                errModal.hide()
+                if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+                    scsMessage.innerText  = "PDF "+proc+"ed success ! "
                 } else {
-                    scsMessage.innerText = "Document converted success !"
+                    if (document.getElementById('html') !== null) {
+                        scsMessage.innerText = "URL converted success !"
+                    } else {
+                        scsMessage.innerText = "Document converted success !"
+                    }
                 }
+                scsModalNotify.show()
+            } else {
+                xhrProcStats = false
+                closeAltModal(proc)
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(error.xhrRequestMessage)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             }
-            scsModalNotify.show()
         } else {
             xhrProcStats = false
             closeAltModal(proc)
@@ -895,7 +909,7 @@ function apiGateway(proc, action) {
             errSubMessage.innerText = ""
             errListTitleMessage.innerText = "Error message"
             resetErrListMessage()
-            generateMesssage(error.xhrRequestStatus+" - "+error.xhrRequestMessage)
+            generateMesssage(error.xhrRequestMessage)
             errAltSubMessageModal.style = null
             loadingModal.hide()
             errModal.show()
@@ -1178,7 +1192,7 @@ function sendToAPI(files, proc, action) {
                                 document.getElementById("errProcId").innerText = xhrReturn.processId
                                 reject({
                                     xhrRequestCondition: 'ERROR',
-                                    xhrRequestMessage: 'Response are not return 200 !',
+                                    xhrRequestMessage: 'Response are not return 200',
                                     xhrRequestServerMessage: xhrReturn.errors,
                                     xhrRequestStatus: xhr.status
                                 })
@@ -1192,7 +1206,7 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("errProcId").innerText = xhrReturn.processId
                             reject({
                                 xhrRequestCondition: 'ERROR',
-                                xhrRequestMessage: 'Response are not return 200 !',
+                                xhrRequestMessage: 'Response are not return 200',
                                 xhrRequestServerMessage: xhrReturn.message,
                                 xhrRequestStatus: xhr.status
                             })
@@ -1205,7 +1219,7 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errProcMain").classList.remove("hidden")
                         reject({
                             xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestMessage: 'Connection Timeout',
                             xhrRequestServerMessage: '',
                             xhrRequestStatus: xhr.status
                         })
@@ -1217,11 +1231,23 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errProcMain").classList.remove("hidden")
                         reject({
                             xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestMessage: 'Internal server error',
                             xhrRequestServerMessage: '',
                             xhrRequestStatus: xhr.status
                         })
                     }
+                } else {
+                    document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                    document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                    document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                    document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
+                    document.getElementById("errProcMain").classList.remove("hidden")
+                    reject({
+                        xhrRequestCondition: 'ERROR',
+                        xhrRequestMessage: 'Internal server error (0)',
+                        xhrRequestServerMessage: '',
+                        xhrRequestStatus: 0
+                    })
                 }
             } else {
                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
@@ -1231,8 +1257,8 @@ function sendToAPI(files, proc, action) {
                 document.getElementById("errProcMain").classList.add("hidden")
                 reject({
                     xhrRequestCondition: 'ERROR',
-                    xhrRequestMessage: 'Server are not in readyState ! ('+xhr.readyState+')',
-                    xhrRequestServerMessage: '',
+                    xhrRequestMessage: 'Internal server error ('+xhr.readyState+')',
+                    xhrRequestServerMessage: 'Server are not in readyState ('+xhr.readyState+')',
                     xhrRequestStatus: xhr.readyState
                 })
             }
@@ -1281,11 +1307,13 @@ function submit(event) {
                              errModal.hide()
                              loadingModal.show()
                              if (document.getElementById('cnvFrPDF') !== null) {
+                                altLoadingMessageModal.innerText = "Processing PDF..."
                                 document.getElementById("altLoadingModal").classList.remove('hidden')
                                 document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
                                 xhrProcStats = false
                                 apiGateway("convert","")
                              } else {
+                                altLoadingMessageModal.innerText = "Processing PDF..."
                                 document.getElementById("altLoadingModal").classList.remove('hidden')
                                 document.getElementById("dropzoneCmp").classList.add('animate-pulse')
                                 xhrProcStats = false
@@ -1350,11 +1378,13 @@ function submit(event) {
                 errModal.hide()
                 loadingModal.show()
                 if (document.getElementById('cnvFrPDF') !== null) {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
                     document.getElementById("altLoadingModal").classList.remove('hidden')
                     document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
                     xhrProcStats = false
                     apiGateway("convert","")
                 } else {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
                     document.getElementById("altLoadingModal").classList.remove('hidden')
                     document.getElementById("dropzoneCmp").classList.add('animate-pulse')
                     xhrProcStats = false
@@ -1381,6 +1411,7 @@ function submit(event) {
             errModal.hide()
             loadingModal.show()
             if (document.getElementById('cnvToPDF') !== null) {
+                altLoadingMessageModal.innerText = "Processing Document..."
                 document.getElementById("altLoadingModal").classList.remove('hidden')
                 document.getElementById("dropzoneCnvToPDF").classList.add('animate-pulse')
                 xhrProcStats = false
@@ -1397,6 +1428,7 @@ function submit(event) {
                     loadingModal.hide()
                     errModal.show()
                 } else {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
                     document.getElementById("altLoadingModal").classList.remove('hidden')
                     document.getElementById("dropzoneMerge").classList.add('animate-pulse')
                     xhrProcStats = false
@@ -1494,6 +1526,7 @@ function submit(event) {
                                     errModal.hide()
                                     loadingModal.show()
                                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        altLoadingMessageModal.innerText = "Processing PDF..."
                                         document.getElementById("altLoadingModal").classList.remove('hidden')
                                         document.getElementById("dropzoneSplit").classList.add('animate-pulse')
                                         xhrProcStats = false
@@ -1575,6 +1608,7 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
                                     document.getElementById("altLoadingModal").classList.remove('hidden')
                                     document.getElementById("dropzoneSplit").classList.add('animate-pulse')
                                     xhrProcStats = false
@@ -1618,6 +1652,7 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
                                     document.getElementById("altLoadingModal").classList.remove('hidden')
                                     document.getElementById("dropzoneSplit").classList.add('animate-pulse')
                                     xhrProcStats = false
@@ -1703,6 +1738,7 @@ function submit(event) {
                         errModal.hide()
                         loadingModal.show()
                         if (xhrBalance && xhrBalanceRemaining > 0) {
+                            altLoadingMessageModal.innerText = "Processing PDF..."
                             document.getElementById("altLoadingModal").classList.remove('hidden')
                             document.getElementById("dropzoneSplit").classList.add('animate-pulse')
                             xhrProcStats = false
@@ -1785,6 +1821,7 @@ function submit(event) {
                             loadingModal.show()
                             if (getUploadedFileName().length > 0) {
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
                                     document.getElementById("altLoadingModal").classList.remove('hidden')
                                     document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
                                     xhrProcStats = false
@@ -1875,6 +1912,7 @@ function submit(event) {
                     errModal.hide()
                     loadingModal.show()
                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                        altLoadingMessageModal.innerText = "Processing PDF..."
                         document.getElementById("altLoadingModal").classList.remove('hidden')
                         document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
                         xhrProcStats = false
@@ -1935,6 +1973,7 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none"
                     errModal.hide()
                     loadingModal.show()
+                    altLoadingMessageModal.innerText = "Processing URL..."
                     document.getElementById("altLoadingModal").classList.remove('hidden')
                     document.getElementById("formHTML").classList.add('animate-pulse')
                     xhrProcStats = false
@@ -2014,62 +2053,170 @@ function remainingBalance() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
+        var timerStart = Date.now()
         xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 524,
+                    versioningMessage: 'Connection timeout',
+                    versioningError: 'Connection timeout',
+                })
+            }
+        }, 1000)
+
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText)
-                    if (xhrReturn.status == 200) {
-                        if (xhrReturn.remaining > 0) {
-                            xhrBalance = true
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.status == 200) {
+                            if (xhrReturn.remaining > 0) {
+                                xhrBalance = true
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: true,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            } else {
+                                xhrBalance = false
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: false,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            }
                             xhrBalanceRemaining = xhrReturn.remaining
-                            resolve({
-                                xhrBalance: true,
-                                xhrBalanceRemaining: xhrReturn.remaining,
-                                xhrBalanceStatus: xhrReturn.status,
-                                xhrBalanceResponse: xhrReturn.message
-                            })
                         } else {
                             xhrBalance = false
-                            xhrBalanceRemaining = xhrReturn.remaining
+                            xhrBalanceRemaining = 0
                             resolve({
                                 xhrBalance: false,
-                                xhrBalanceRemaining: xhrReturn.remaining,
+                                xhrBalanceRemaining: 0,
                                 xhrBalanceStatus: xhrReturn.status,
                                 xhrBalanceResponse: xhrReturn.message
                             })
                         }
-                        xhrBalanceRemaining = xhrReturn.remaining
+                    } else if (xhr.status == 429) {
+                        xhrBalance = false
+                        xhrBalanceRemaining = 0
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: 429,
+                            xhrBalanceResponse: 'Too many request'
+                        })
                     } else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
-                        resolve({
+                        reject({
                             xhrBalance: false,
                             xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.message
+                            xhrBalanceStatus: xhr.status,
+                            xhrBalanceResponse: 'Failed to fetch monthly limit'
                         })
                     }
-                } else if (xhr.status == 429) {
-                    xhrBalance = false
-                    xhrBalanceRemaining = 0
-                    reject({
-                        xhrBalance: false,
-                        xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: 429,
-                        xhrBalanceResponse: 'Too many request'
-                    })
                 } else {
-                    xhrBalance = false
-                    xhrBalanceRemaining = 0
                     reject({
                         xhrBalance: false,
                         xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: xhr.status,
-                        xhrBalanceResponse: 'Failed to fetch monthly limit'
+                        xhrBalanceStatus: 0,
+                        xhrBalanceResponse: 'Internal server error (0)'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+function validateVersion() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        formData.append('appMajorVersion', appMajorVer)
+        formData.append('appMinorVersion', appMinorVer)
+        formData.append('appPatchVersion', appPatchVer)
+        formData.append('appGitVersion', commitHash)
+        formData.append('appServicesReferrer', 'FE')
+
+        xhr.open('POST', apiUrl+'/api/v1/version', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 524,
+                    versioningMessage: 'Connection timeout',
+                    versioningError: 'Connection timeout',
+                })
+            }
+        }, 1000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.errors == null) {
+                            resolve({
+                                versioningCheck: true,
+                                versioningStats: xhrReturn.status,
+                                versioningMessage: xhrReturn.message,
+                                versioningError: null
+                            })
+                        } else {
+                            reject({
+                                versioningCheck: false,
+                                versioningStats: xhrReturn.status,
+                                versioningMessage: xhrReturn.message,
+                                versioningError: xhrReturn.errors
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: 429,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: 524,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Connection Timeout'
+                        })
+                    } else {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: xhrReturn.status,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Internal Server Error'
+                        })
+                    }
+                } else {
+                    reject({
+                        versioningCheck: false,
+                        versioningStats: 0,
+                        versioningMessage: 'Internal server error (0)',
+                        versioningError: 'Internal Server Error'
                     })
                 }
             }
