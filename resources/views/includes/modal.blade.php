@@ -1,3 +1,15 @@
+<div id="altLoadingModal" tabindex="-1" aria-hidden="true" class="fixed flex z-50 w-full hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full justify-center items-center" style="top: 39%;">
+    <div class="relative w-full max-w-2xl max-h-full">
+        <div class="relative bg-pc4 rounded-lg shadow">
+            <div class="p-6 space-y-6 text-center">
+                <p id="titleMessageModal" class="font-quicksand font-medium text-dt text-lg leading-relaxed">Processing PDF...</p>
+                <div class="animate-spin-counter-clockwise inline-block w-12 h-12" role="status" aria-label="loading">
+                    <img src="{{ asset('assets/icons/process.svg') }}" alt="loading">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="loadingModal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center">
     <div class="relative w-full max-w-2xl max-h-full">
         <div class="relative bg-pc4 rounded-lg shadow">
@@ -31,7 +43,20 @@
                     </div>
                 </p>
                 <div class="flex flex-col items-center">
-                    <button data-modal-hide="errModal" type="button" class="text-white bg-rt1 font-semibold font-quicksand rounded-md text-sm mx-auto px-5 py-2.5 w-2/6 lg:w-1/6">OK</button>
+                    <button data-modal-hide="errModal" type="button" class="text-white bg-rt1 font-semibold font-quicksand rounded-md text-sm mx-auto px-5 py-2.5 w-2/6 lg:w-1/6">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="scsModalNotify" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center">
+    <div class="relative w-full max-w-2xl max-h-full">
+        <div class="relative bg-pc4 rounded-lg shadow">
+            <div class="p-6 space-y-6 mx-auto">
+                <img class="mx-auto mt-4 mb-4 text-dt3 w-12 h-12" src="{{ asset('assets/icons/information_scs.svg') }}" alt="information">
+                <p id="scsMessageModalNotify" class="font-quicksand font-semibold text-dt1 text-lg leading-relaxed text-center">...</p>
+                <div class="flex flex-col items-center">
+                    <button data-modal-hide="scsModalNotify" type="button" class="text-white bg-ac mx-auto font-semibold font-quicksand rounded-md text-sm px-5 py-2.5 w-2/6 lg:w-1/6">Ok</button>
                 </div>
             </div>
         </div>

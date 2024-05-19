@@ -8,7 +8,7 @@
                 <div class="font-quicksand font-light text-md lg:text-3xl text-lt1">Add and customize watermark with image or text over your PDF.</div>
             </div>
         </section>
-        <div class="flex flex-col p-2">
+        <div class="flex flex-col p-2" id="dropzoneWatermark">
             <form action="{{ url('api/v1/file/upload') }}" method="post" class="dropzone flex flex-col lg:flex-row xl:flex-row mx-4 items-center justify-center w-6/6 lg:w-4/6 min-h-96 h-fit lg:h-72 max-h-full lg:overflow-y-auto cursor-pointer bg-lt backdrop-filter backdrop-blur-md rounded-[40px] bg-opacity-15 mb-2" id="dropzoneAreaSingle">
                 {{ csrf_field() }}
                 <div class="flex flex-col items-center justify-content p-4" id="dropzoneUiInit">
