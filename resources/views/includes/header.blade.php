@@ -52,6 +52,9 @@
           <li>
             <a href="/watermark" class="font-quicksand block rounded py-2 pl-3 pr-4 font-bold text-lg text-dt1 hover:text-pc md:p-0" aria-current="page" type="button" data-ripple-light="true">Watermark</a>
           </li>
+          <li>
+            <button id="whatsNew" class="font-quicksand block rounded py-2 pl-3 pr-4 font-bold text-lg text-dt1 hover:text-pc md:p-0" aria-current="page" type="button" data-ripple-light="true">What's New</button>
+          </li>
         </ul>
       </div>
     </div>
