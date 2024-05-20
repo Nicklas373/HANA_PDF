@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     @include('includes.head')
     <header>@include('includes.header')</header>
@@ -10,8 +10,8 @@
         @yield('content')
     </div>
     <script async type="module" src="{{asset('build/assets/kao-logic-iKWRdJWb.js')}}"></script>
-    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.mjs"></script>
-    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.mjs"></script>
+    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.2.67/build/pdf.mjs"></script>
+    <script async type="module" src="https://unpkg.com/pdfjs-dist@4.2.67/build/pdf.worker.mjs"></script>
     <script async type="text/javascript" src="{{asset('ext-js/kao-controller.js')}}"></script>
     <script async type="text/javascript" src="{{asset('ext-js/kao-main.js')}}"></script>
     <script async type="text/javascript" src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
