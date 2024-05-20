@@ -4,12 +4,14 @@ import { Dropzone } from "dropzone"
 const $errModal = document.getElementById('errModal')
 const $loadingModal = document.getElementById('loadingModal')
 const $previewModal = document.getElementById('previewModal')
+const $scsModalNotify = document.getElementById('scsModalNotify')
 const $previewDocumentModal = document.getElementById('previewDocumentModal')
 const $previewImageModal = document.getElementById('previewImgModal')
+const $versioningModal = document.getElementById('versioningModal')
 
 const options = {
     placement: 'bottom-right',
-    backdrop: 'static',
+    backdrop: 'dynamic',
     backdropClasses: 'bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-sm fixed inset-0 z-40',
     closable: true,
     onHide: () => {
@@ -22,77 +24,187 @@ const options = {
         //console.log('modal has been toggled')
     }
 }
+
+const adobeClientID = "STATIC_CLIENT_ID"
+const appMajorVer = 3
+const appMinorVer = 2
+const appPatchVer = 6
+const apiUrl = 'http://192.168.0.2'
+const bearerToken = "STATIC_BEARER"
+const commitHash = gitHash
 const errModal = new Modal($errModal, options)
+const googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 const loadingModal = new Modal($loadingModal, options)
-const previewModal = new Modal($previewModal, options)
 const previewDocumentModal = new Modal($previewDocumentModal, options)
 const previewImageModal = new Modal($previewImageModal, options)
+const previewModal = new Modal($previewModal, options)
+const procBtn = document.getElementById('submitBtn')
+const scsModalNotify = new Modal($scsModalNotify, options)
+const scsModalBtn = document.getElementById('scsModalBtn')
+const uploadDropzone = document.getElementById("dropzoneArea")
+const uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
+const uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
+const uploadPath = '/storage/upload/'
+const versioningModal = new Modal($versioningModal, options)
+const webContent = document.getElementById('footer')
+const whatsNewBtn = document.getElementById("whatsNew")
 let xhrBalance
 let xhrBalanceRemaining
+var altLoadingMessageModal = document.getElementById("altTitleMessageModal")
 var errAltSubMessageModal = document.getElementById("altSubMessageModal")
 var errMessage = document.getElementById("errMessageModal")
 var errSubMessage = document.getElementById("errSubMessageModal")
 var errListMessage = document.getElementById("err-list")
 var errListTitleMessage = document.getElementById("err-list-title")
-var procBtn = document.getElementById('submitBtn')
+var scsMessage = document.getElementById('scsMessageModalNotify')
 var procTitleMessageModal = document.getElementById("titleMessageModal")
 var uploadedFile = []
-var uploadDropzone = document.getElementById("dropzoneArea")
-var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
-var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
-var adobeClientID = "STATIC_CLIENT_ID"
-var apiUrl = 'http://192.168.0.2'
-var bearerToken = "STATIC_BEARER"
-var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
-var uploadPath = '/storage/upload/'
 var uploadStats = false
+var xhrProcStats = true
 var xhrScsUploads = 0
 var xhrTotalUploads = 0
 
 if (procBtn) {
     procBtn.onclick = function(event) {
-        procTitleMessageModal.innerText = "Preparing document..."
+        if (procTitleMessageModal.innerText !== 'Processing Document') {
+            procTitleMessageModal.innerText = "Preparing document..."
+        } else {
+            if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+                procTitleMessageModal.innerText = "Processing PDF..."
+            } else {
+                if (document.getElementById('html') !== null) {
+                    procTitleMessageModal.innerText = "Processing URL..."
+                } else {
+                    procTitleMessageModal.innerText = "Processing Document..."
+                }
+            }
+        }
         errMessage.style.visibility = null
         errSubMessage.style.visibility = null
         errAltSubMessageModal.style.display = "none"
         errModal.hide()
         loadingModal.show()
-        remainingBalance().then(function () {
-            loadingModal.hide()
-            if (document.getElementById('html') !== null) {
-                submit(event)
-            } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
-                if (xhrScsUploads == xhrTotalUploads) {
-                    submit(event)
-                } else {
-                    event.preventDefault()
-                    errMessage.innerText  = "Sorry, we're still uploading your files"
+        if (xhrProcStats) {
+            validateVersion().then(function () {
+                remainingBalance().then(function () {
+                    loadingModal.hide()
+                    if (document.getElementById('html') !== null) {
+                        submit(event)
+                    } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
+                        if (xhrScsUploads == xhrTotalUploads) {
+                            submit(event)
+                        } else {
+                            event.preventDefault()
+                            errMessage.innerText  = "Sorry, we're still uploading your files"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Error message"
+                            resetErrListMessage()
+                            generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                            errAltSubMessageModal.style = null
+                            loadingModal.hide()
+                            errModal.show()
+                        }
+                    } else {
+                        event.preventDefault()
+                        errMessage.innerText  = "PDF file can not be processed !"
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
+                        resetErrListMessage()
+                        generateMesssage("No file has been chosen")
+                        errAltSubMessageModal.style = null
+                        loadingModal.hide()
+                        errModal.show()
+                    }
+                }).catch(function (error) {
+                    errModal.hide()
+                    errMessage.innerText  = "There was unexpected error !"
                     errSubMessage.innerText = ""
                     errListTitleMessage.innerText = "Error message"
                     resetErrListMessage()
-                    generateMesssage(xhrScsUploads+" of "+xhrTotalUploads+" files are still uploading")
+                    generateMesssage(error.xhrBalanceResponse)
                     errAltSubMessageModal.style = null
                     loadingModal.hide()
                     errModal.show()
-                }
-            } else {
-                event.preventDefault()
-                errMessage.innerText  = "PDF file can not be processed !"
+                })
+            }).catch(function (error) {
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
                 resetErrListMessage()
-                generateMesssage("No file has been chosen")
+                generateMesssage(error.versioningMessage)
+                generateMesssage("Please clear cache the browser and try again")
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
+            })
+        } else {
+            event.preventDefault()
+            errMessage.innerText  = "Sorry, we're still processing your files"
+            errSubMessage.style.visibility = null
+            errAltSubMessageModal.style.visibility = null
+            errAltSubMessageModal.style.display = "none"
+            loadingModal.hide()
+            errModal.show()
+        }
+    }
+}
+
+if (scsModalBtn) {
+    scsModalBtn.onclick = function() {
+        if (webContent) {
+            webContent.scrollIntoView({ behavior: 'smooth', block: 'end'})
+        }
+    }
+}
+
+if (whatsNewBtn) {
+    whatsNewBtn.onclick = function() {
+        procTitleMessageModal.innerText = "Fetching latest update..."
+        loadingModal.show()
+        fetchVersion().then(data => {
+            const appVersioning = document.getElementById('versioningTitle')
+            const appReleaseDate = document.getElementById('versioningDate')
+            const listChangelog = document.getElementById('versioningChangelog')
+            if (data.versionFetchResponse.changelog && Array.isArray(data.versionFetchResponse.changelog)) {
+                appVersioning.innerText = ''
+                appReleaseDate.innerText = ''
+                listChangelog.innerText = ''
+
+                appVersioning.innerHTML = 'Hana PDF v'+data.versionFetchResponse.version+`<span class="bg-pc3 text-dt text-sm font-semibold font-quicksand mr-2 mt-0.5 px-2.5 py-0.5 rounded ms-3">Latest</span>`
+                appReleaseDate.innerText = 'Released on ' + data.versionFetchResponse.release_date
+                data.versionFetchResponse.changelog.forEach(change => {
+                    const listItem = document.createElement('li')
+                    listItem.textContent = change
+                    listChangelog.appendChild(listItem)
+                })
+                procTitleMessageModal.innerText = "Preparing document..."
+                loadingModal.hide()
+                versioningModal.show()
+            } else {
+                procTitleMessageModal.innerText = "Preparing document..."
+                loadingModal.hide()
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(data.versionFetchMessage)
+                generateMesssage("Unable to fetch latest changelog")
                 errAltSubMessageModal.style = null
                 loadingModal.hide()
                 errModal.show()
             }
         }).catch(function (error) {
+            procTitleMessageModal.innerText = "Preparing document..."
+            loadingModal.hide()
             errModal.hide()
             errMessage.innerText  = "There was unexpected error !"
             errSubMessage.innerText = ""
             errListTitleMessage.innerText = "Error message"
             resetErrListMessage()
-            generateMesssage(error.xhrBalanceStatus+" - "+error.xhrBalanceResponse)
+            generateMesssage(error.versionFetchMessage)
+            generateMesssage("Unable to fetch latest changelog")
             errAltSubMessageModal.style = null
             loadingModal.hide()
             errModal.show()
@@ -291,27 +403,18 @@ if (uploadDropzone) {
             this.on("error", function(file, dropzoneErrMessage, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
-                            } else {
-                                newErrMessage = "There was an unexpected error!"
-                            }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
-                        }
-                    } else {
-                        newErrMessage = dropzoneErrMessage
-                    }
-                    dzErrorMessage.textContent = newErrMessage
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
 
             this.on("timeout", function(file) {
@@ -519,30 +622,21 @@ if (uploadDropzoneAlt) {
                 }
             })
 
-            this.on("error", function(file, dropzoneErrMessage, xhr) {
+            this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
-                            } else {
-                                newErrMessage = "There was an unexpected error!"
-                            }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
-                        }
-                    } else {
-                        newErrMessage = dropzoneErrMessage
-                    }
-                    dzErrorMessage.textContent = newErrMessage
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
 
             this.on("thumbnail", function (file) {
@@ -754,30 +848,21 @@ if (uploadDropzoneSingle) {
                 }
             })
 
-            this.on("error", function(file, dropzoneErrMessage, xhr) {
+            this.on("error", function(file, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    let newErrMessage
-                    if (dropzoneErrMessage == '[object Object]') {
-                        if (xhr && xhr.readyState == 4) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
-                                    newErrMessage = xhrReturn.errors
-                                } else {
-                                    newErrMessage = "There was an unexpected error!"
-                                }
-                            } else {
-                                newErrMessage = "There was an unexpected error!"
-                            }
-                        } else {
-                            newErrMessage = "There was an unexpected error!"
-                        }
-                    } else {
-                        newErrMessage = dropzoneErrMessage
-                    }
-                    dzErrorMessage.textContent = newErrMessage
+                    dzErrorMessage.textContent = dropzoneErrMessage
+                } else {
+                    dzErrorMessage.textContent = "Internal server error (0)"
                 }
+                errMessage.innerText  = "Failed to upload " + file.name
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(dzErrorMessage.textContent)
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             })
 
             this.on("timeout", function(file) {
@@ -846,23 +931,54 @@ function getUploadedFileName() {
 function apiGateway(proc, action) {
     var files = getUploadedFileName()
     sendToAPI(files,proc,action).then(function () {
+        xhrProcStats = true
+        closeAltModal(proc)
         loadingModal.hide()
-    }).catch(function (error) {
-        if (error.xhrRequestStatus == 2 || error.xhrRequestStatus == 4) {
-            // Do not treat this status as error
-            loadingModal.hide()
+        errModal.hide()
+        if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
+            scsMessage.innerText  = "PDF "+proc+"ed success !"
         } else {
-            errModal.hide()
-            errMessage.innerText  = "There was unexpected error !"
-            errSubMessage.innerText = ""
-            errListTitleMessage.innerText = "Error message"
-            resetErrListMessage()
-            generateMesssage(error.xhrRequestStatus+" - "+error.xhrRequestMessage)
-            errAltSubMessageModal.style = null
-            loadingModal.hide()
-            errModal.show()
+            if (document.getElementById('html') !== null) {
+                scsMessage.innerText = "URL converted success !"
+            } else {
+                scsMessage.innerText = "Document converted success !"
+            }
         }
+        scsModalNotify.show()
+    }).catch(function (error) {
+        xhrProcStats = true
+        closeAltModal(proc)
+        errModal.hide()
+        errMessage.innerText  = "There was unexpected error !"
+        errSubMessage.innerText = ""
+        errListTitleMessage.innerText = "Error message"
+        resetErrListMessage()
+        generateMesssage(error.xhrRequestMessage)
+        errAltSubMessageModal.style = null
+        loadingModal.hide()
+        errModal.show()
     })
+}
+
+function closeAltModal(proc) {
+    document.getElementById("altLoadingModal").classList.add('hidden')
+    if (proc == "html") {
+        document.getElementById("formHTML").classList.remove('animate-pulse')
+    } else {
+        if (proc == "compress") {
+           document.getElementById("dropzoneCmp").classList.remove('animate-pulse')
+        } else if (proc == "convert") {
+            if (document.getElementById('cnvFrPDF') !== null) {
+                document.getElementById("dropzoneCnvFrPDF").classList.remove('animate-pulse')
+            } else {
+                document.getElementById("dropzoneCnvToPDF").classList.remove('animate-pulse')
+            }
+        } else if (proc == "split") {
+            document.getElementById("dropzoneSplit").classList.remove('animate-pulse')
+        } else {
+            document.getElementById("dropzoneWatermark").classList.remove('animate-pulse')
+        }
+    }
 }
 
 function generateThumbnail(fileName) {
@@ -933,8 +1049,8 @@ function sendToAPI(files, proc, action) {
         } else if (proc == 'watermark') {
             if (document.getElementById('firstRadio').checked == true) {
                 let wmLayoutStyle
-                let wmRotation
                 var imgFile = document.getElementById('wm_file_input').files[0]
+                var wmRotation = document.getElementById('watermarkImageRotation').value
                 var wmPage = document.getElementById('watermarkPageImage').value
                 var wmTransparency = document.getElementById('watermarkImageTransparency').value
                 var wmMosaic = document.getElementById('isMosaicImage').checked
@@ -944,17 +1060,6 @@ function sendToAPI(files, proc, action) {
                     wmLayoutStyle = document.getElementById('wmRadioImageLayoutStyleB').value
                 } else {
                     wmLayoutStyle = document.getElementById('wmRadioImageLayoutStyleA').value
-                }
-                if (document.getElementById('wmRadioImageRotationA').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationA').value
-                } else if (document.getElementById('wmRadioImageRotationB').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationB').value
-                } else if (document.getElementById('wmRadioImageRotationC').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationC').value
-                } else if (document.getElementById('wmRadioImageRotationD').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationD').value
-                } else {
-                    wmRotation = document.getElementById('wmRadioImageRotationA').value
                 }
                 formData.append('action', action)
                 formData.append('imgFile', imgFile)
@@ -969,57 +1074,22 @@ function sendToAPI(files, proc, action) {
                 formData.append('wmTransparency', wmTransparency)
                 formData.append('wmMosaic', wmMosaic.toString())
             } else if (document.getElementById('secondRadio').checked == true) {
-                let wmFontFamily
-                let wmFontStyle
                 let wmLayoutStyle
-                let wmRotation
-                var wmFontSize = document.getElementById('watermarkFontSize').value
                 var wmFontColor = document.getElementById('watermarkFontColor').value
+                var wmFontFamily = document.getElementById('watermarkFontFamily').value
+                var wmFontSize = document.getElementById('watermarkFontSize').value
+                var wmFontStyle = document.getElementById('watermarkFontStyle').value
+                var wmRotation = document.getElementById('watermarkTextRotation').value
                 var wmPage = document.getElementById('watermarkPageText').value
                 var wmText = document.getElementById('watermarkText').value
                 var wmTransparency = document.getElementById('watermarkTextTransparency').value
                 var wmMosaic = document.getElementById('isMosaicText').checked
-                if (document.getElementById('wmRadioFontFamilyA').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyA').value
-                } else if (document.getElementById('wmRadioFontFamilyB').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyB').value
-                } else if (document.getElementById('wmRadioFontFamilyC').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyC').value
-                } else if (document.getElementById('wmRadioFontFamilyD').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyD').value
-                } else if (document.getElementById('wmRadioFontFamilyE').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyE').value
-                } else if (document.getElementById('wmRadioFontFamilyF').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyF').value
-                } else {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyA').value
-                }
-                if (document.getElementById('wmRadioFontStyleA').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleA').value
-                } else if (document.getElementById('wmRadioFontStyleB').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleB').value
-                } else if (document.getElementById('wmRadioFontStyleC').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleC').value
-                } else {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleA').value
-                }
                 if (document.getElementById('wmRadioLayoutStyleA').checked == true) {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleA').value
                 } else if (document.getElementById('wmRadioLayoutStyleB').checked == true) {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleB').value
                 } else {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleA').value
-                }
-                if (document.getElementById('wmRadioRotationA').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationA').value
-                } else if (document.getElementById('wmRadioRotationB').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationB').value
-                } else if (document.getElementById('wmRadioRotationC').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationC').value
-                } else if (document.getElementById('wmRadioRotationD').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationD').value
-                } else {
-                    wmRotation = document.getElementById('wmRadioRotationA').value
                 }
                 formData.append('action', action)
                 formData.append('imgFile', '')
@@ -1119,7 +1189,7 @@ function sendToAPI(files, proc, action) {
                                 document.getElementById("errProcId").innerText = xhrReturn.processId
                                 reject({
                                     xhrRequestCondition: 'ERROR',
-                                    xhrRequestMessage: 'Response are not return 200 !',
+                                    xhrRequestMessage: xhrReturn.message,
                                     xhrRequestServerMessage: xhrReturn.errors,
                                     xhrRequestStatus: xhr.status
                                 })
@@ -1133,8 +1203,8 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("errProcId").innerText = xhrReturn.processId
                             reject({
                                 xhrRequestCondition: 'ERROR',
-                                xhrRequestMessage: 'Response are not return 200 !',
-                                xhrRequestServerMessage: xhrReturn.message,
+                                xhrRequestMessage: xhrReturn.message,
+                                xhrRequestServerMessage: xhrReturn.errors,
                                 xhrRequestStatus: xhr.status
                             })
                         }
@@ -1146,7 +1216,7 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errProcMain").classList.remove("hidden")
                         reject({
                             xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestMessage: 'Connection Timeout',
                             xhrRequestServerMessage: '',
                             xhrRequestStatus: xhr.status
                         })
@@ -1158,24 +1228,24 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errProcMain").classList.remove("hidden")
                         reject({
                             xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Internal server error !',
+                            xhrRequestMessage: 'Internal server error',
                             xhrRequestServerMessage: '',
                             xhrRequestStatus: xhr.status
                         })
                     }
+                } else {
+                    document.getElementById("alert-scs").classList.add("hidden","opacity-0")
+                    document.getElementById("alert-err").classList.remove("hidden","opacity-0")
+                    document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
+                    document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
+                    document.getElementById("errProcMain").classList.remove("hidden")
+                    reject({
+                        xhrRequestCondition: 'ERROR',
+                        xhrRequestMessage: 'Internal server error (0)',
+                        xhrRequestServerMessage: '',
+                        xhrRequestStatus: 0
+                    })
                 }
-            } else {
-                document.getElementById("alert-scs").classList.add("hidden","opacity-0")
-                document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
-                document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
-                document.getElementById("errProcMain").classList.add("hidden")
-                reject({
-                    xhrRequestCondition: 'ERROR',
-                    xhrRequestMessage: 'Server are not in readyState ! ('+xhr.readyState+')',
-                    xhrRequestServerMessage: '',
-                    xhrRequestStatus: xhr.readyState
-                })
             }
         }
         xhr.send(formData)
@@ -1222,9 +1292,17 @@ function submit(event) {
                              errModal.hide()
                              loadingModal.show()
                              if (document.getElementById('cnvFrPDF') !== null) {
-                                 apiGateway("convert","")
+                                altLoadingMessageModal.innerText = "Processing PDF..."
+                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
+                                xhrProcStats = false
+                                apiGateway("convert","")
                              } else {
-                                 apiGateway("compress","")
+                                altLoadingMessageModal.innerText = "Processing PDF..."
+                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                document.getElementById("dropzoneCmp").classList.add('animate-pulse')
+                                xhrProcStats = false
+                                apiGateway("compress","")
                              }
                          } else {
                              event.preventDefault()
@@ -1285,8 +1363,16 @@ function submit(event) {
                 errModal.hide()
                 loadingModal.show()
                 if (document.getElementById('cnvFrPDF') !== null) {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneCnvFrPDF").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("convert","")
                 } else {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneCmp").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("compress","")
                 }
             } else {
@@ -1310,6 +1396,10 @@ function submit(event) {
             errModal.hide()
             loadingModal.show()
             if (document.getElementById('cnvToPDF') !== null) {
+                altLoadingMessageModal.innerText = "Processing Document..."
+                document.getElementById("altLoadingModal").classList.remove('hidden')
+                document.getElementById("dropzoneCnvToPDF").classList.add('animate-pulse')
+                xhrProcStats = false
                 apiGateway("convert","")
             } else {
                 if (getUploadedFileName().length < 2) {
@@ -1323,6 +1413,10 @@ function submit(event) {
                     loadingModal.hide()
                     errModal.show()
                 } else {
+                    altLoadingMessageModal.innerText = "Processing PDF..."
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("dropzoneMerge").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("merge","")
                 }
             }
@@ -1417,6 +1511,10 @@ function submit(event) {
                                     errModal.hide()
                                     loadingModal.show()
                                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        altLoadingMessageModal.innerText = "Processing PDF..."
+                                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                                        document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                        xhrProcStats = false
                                         apiGateway("split", "split")
                                      } else {
                                          event.preventDefault()
@@ -1495,6 +1593,10 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("split", "split")
                                  } else {
                                      event.preventDefault()
@@ -1535,6 +1637,10 @@ function submit(event) {
                                 errModal.hide()
                                 loadingModal.show()
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("split", "split")
                                  } else {
                                      event.preventDefault()
@@ -1617,6 +1723,10 @@ function submit(event) {
                         errModal.hide()
                         loadingModal.show()
                         if (xhrBalance && xhrBalanceRemaining > 0) {
+                            altLoadingMessageModal.innerText = "Processing PDF..."
+                            document.getElementById("altLoadingModal").classList.remove('hidden')
+                            document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                            xhrProcStats = false
                             apiGateway("split", "delete")
                          } else {
                              event.preventDefault()
@@ -1696,6 +1806,10 @@ function submit(event) {
                             loadingModal.show()
                             if (getUploadedFileName().length > 0) {
                                 if (xhrBalance && xhrBalanceRemaining > 0) {
+                                    altLoadingMessageModal.innerText = "Processing PDF..."
+                                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                                    document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
+                                    xhrProcStats = false
                                     apiGateway("watermark","img")
                                  } else {
                                      event.preventDefault()
@@ -1783,6 +1897,10 @@ function submit(event) {
                     errModal.hide()
                     loadingModal.show()
                     if (xhrBalance && xhrBalanceRemaining > 0) {
+                        altLoadingMessageModal.innerText = "Processing PDF..."
+                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                        document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
+                        xhrProcStats = false
                         apiGateway("watermark","txt")
                     } else {
                          event.preventDefault()
@@ -1840,6 +1958,10 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none"
                     errModal.hide()
                     loadingModal.show()
+                    altLoadingMessageModal.innerText = "Processing URL..."
+                    document.getElementById("altLoadingModal").classList.remove('hidden')
+                    document.getElementById("formHTML").classList.add('animate-pulse')
+                    xhrProcStats = false
                     apiGateway("html","")
                 } else {
                     event.preventDefault()
@@ -1916,62 +2038,257 @@ function remainingBalance() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
+        var timerStart = Date.now()
         xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 524,
+                    versioningMessage: 'Connection timeout',
+                    versioningError: 'Connection timeout',
+                })
+            }
+        }, 1000)
+
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText)
-                    if (xhrReturn.status == 200) {
-                        if (xhrReturn.remaining > 0) {
-                            xhrBalance = true
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.status == 200) {
+                            if (xhrReturn.remaining > 0) {
+                                xhrBalance = true
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: true,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            } else {
+                                xhrBalance = false
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: false,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            }
                             xhrBalanceRemaining = xhrReturn.remaining
-                            resolve({
-                                xhrBalance: true,
-                                xhrBalanceRemaining: xhrReturn.remaining,
-                                xhrBalanceStatus: xhrReturn.status,
-                                xhrBalanceResponse: xhrReturn.message
-                            })
                         } else {
                             xhrBalance = false
-                            xhrBalanceRemaining = xhrReturn.remaining
+                            xhrBalanceRemaining = 0
                             resolve({
                                 xhrBalance: false,
-                                xhrBalanceRemaining: xhrReturn.remaining,
+                                xhrBalanceRemaining: 0,
                                 xhrBalanceStatus: xhrReturn.status,
                                 xhrBalanceResponse: xhrReturn.message
                             })
                         }
-                        xhrBalanceRemaining = xhrReturn.remaining
+                    } else if (xhr.status == 429) {
+                        xhrBalance = false
+                        xhrBalanceRemaining = 0
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: 429,
+                            xhrBalanceResponse: 'Too many request'
+                        })
                     } else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
-                        resolve({
+                        reject({
                             xhrBalance: false,
                             xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.message
+                            xhrBalanceStatus: xhr.status,
+                            xhrBalanceResponse: 'Failed to fetch monthly limit'
                         })
                     }
-                } else if (xhr.status == 429) {
-                    xhrBalance = false
-                    xhrBalanceRemaining = 0
-                    reject({
-                        xhrBalance: false,
-                        xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: 429,
-                        xhrBalanceResponse: 'Too many request'
-                    })
                 } else {
-                    xhrBalance = false
-                    xhrBalanceRemaining = 0
                     reject({
                         xhrBalance: false,
                         xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: xhr.status,
-                        xhrBalanceResponse: 'Failed to fetch monthly limit'
+                        xhrBalanceStatus: 0,
+                        xhrBalanceResponse: 'Internal server error (0)'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+function validateVersion() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        formData.append('appMajorVersion', appMajorVer)
+        formData.append('appMinorVersion', appMinorVer)
+        formData.append('appPatchVersion', appPatchVer)
+        formData.append('appGitVersion', commitHash)
+        formData.append('appServicesReferrer', 'FE')
+
+        xhr.open('POST', apiUrl+'/api/v1/version/check', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 524,
+                    versioningMessage: 'Connection timeout',
+                    versioningError: 'Connection timeout',
+                })
+            }
+        }, 1000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.errors == null) {
+                            resolve({
+                                versioningCheck: true,
+                                versioningStats: xhrReturn.status,
+                                versioningMessage: xhrReturn.message,
+                                versioningError: null
+                            })
+                        } else {
+                            reject({
+                                versioningCheck: false,
+                                versioningStats: xhrReturn.status,
+                                versioningMessage: xhrReturn.message,
+                                versioningError: xhrReturn.errors
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: 429,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: 524,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Connection Timeout'
+                        })
+                    } else {
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: xhrReturn.status,
+                            versioningMessage: xhrReturn.message,
+                            versioningError: 'Internal Server Error'
+                        })
+                    }
+                } else {
+                    reject({
+                        versioningCheck: false,
+                        versioningStats: 0,
+                        versioningMessage: 'Internal server error (0)',
+                        versioningError: 'Internal Server Error'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+function fetchVersion() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        formData.append('appServicesReferrer', 'FE')
+
+        xhr.open('POST', apiUrl+'/api/v1/version/fetch', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versionFetchCheck: false,
+                    versionFetchStats: 524,
+                    versionFetchMessage: 'Connection timeout',
+                    versionFetchResponse: null,
+                    versionFetchError: 'Connection timeout'
+                })
+            }
+        }, 1000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.errors == null) {
+                            resolve({
+                                versionFetchCheck: true,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: null
+                            })
+                        } else {
+                            reject({
+                                versionFetchCheck: false,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: xhrReturn.errors
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 429,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 524,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Connection Timeout'
+                        })
+                    } else {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: xhrReturn.status,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Internal Server Error'
+                        })
+                    }
+                } else {
+                    reject({
+                        versionFetchCheck: false,
+                        versionFetchStats: 0,
+                        versionFetchMessage: 'Internal server error (0)',
+                        versionFetchResponse: xhrReturn.response,
+                        versionFetchError: 'Internal Server Error'
                     })
                 }
             }

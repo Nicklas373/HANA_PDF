@@ -1,3 +1,1 @@
-<div class="w-full bg-lt bg-opacity-75 p-2 shadow backdrop-blur-md md:flex md:justify-between flex flex-col">
-    <span class="font-quicksand font-bold rounded text-dt1">© 2024 <a href="https://github.com/Nicklas373/Hana-PDF" class="hover:underline">HANA-CI Build Project</a></span>
-  </div>
+<div class="backdrop-blur-md bg-lt bg-opacity-75 flex flex-col md:flex md:justify-between p-2 shadow w-full"id=footer><span class="font-bold font-quicksand rounded text-dt1">© 2024 <a class=hover:underline href=https://github.com/Nicklas373/Hana-PDF>HANA-CI Build Project</a></span></div>
