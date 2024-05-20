@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     @include('includes.head')
     <header>@include('includes.header')</header>
