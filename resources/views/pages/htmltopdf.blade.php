@@ -19,7 +19,7 @@
             <input type="text" id="urlToPDF" name="urlToPDF" class="flowbite-drop-zone font-poppins rounded-r-lg block w-full cursor-pointer border border-gray-300 text-sm text-slate-900 shadow-inner focus:ring-sky-400" onfocusin="checkValidation('urlToPDF')" onfocusout="checkValidation('urlToPDF')" placeholder="https://pdf.hana-ci.com" />
         </div>
     </div>
-    <div class="flex flex-col mt-4 w-full lg:mx-1.5 lg:w-3/6">
+    <div class="flex flex-col mt-4 w-full lg:mx-1.5 lg:w-5/6">
         <div class="flex flex-col mx-2 mt-4 lg:mx-1.5 lg:mb-6">
             <label id="margin" class="block mb-2 font-quicksand text-xl font-bold text-pc4" for="pageMargin">Margin</label>
             <div class="flex flex-row w-full">
