@@ -25,11 +25,11 @@ const options = {
     }
 }
 
-const adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
+const adobeClientID = "STATIC_CLIENT_ID"
 const appMajorVer = 3
 const appMinorVer = 2
 const appPatchVer = 5
-const apiUrl = "STATIC_CLIENT_ID"
+const apiUrl = 'http://192.168.0.2'
 const bearerToken = "STATIC_BEARER"
 const commitHash = gitHash
 const errModal = new Modal($errModal, options)
