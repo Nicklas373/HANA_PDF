@@ -29,7 +29,7 @@
         </div>
         <div class="flex flex-col mx-2 mb-6 lg:mx-1.5 lg:mb-8">
             <label for="pageSize" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Size</label>
-            <select id="pageSize" class="appearance-none bg-transparent appearance-none border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-3/6">
+            <select id="pageSize" class="appearance-none bg-transparent w-full border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-3/6">
                 <option value="A3">A3</option>
                 <option value="A4">A4</option>
                 <option value="A5">A5</option>

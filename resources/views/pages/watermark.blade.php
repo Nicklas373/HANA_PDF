@@ -97,7 +97,7 @@
                         </div>
                         <div class="mb-6">
                             <label for="watermarkImageRotation" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Orientation</label>
-                            <select id="watermarkImageRotation" class="appearance-none bg-transparent appearance-none border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
+                            <select id="watermarkImageRotation" class="appearance-none bg-transparent w-full border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
                                 <option value="0">0°</option>
                                 <option value="45">45°</option>
                                 <option value="90">90°</option>
@@ -141,7 +141,7 @@
                         </div>
                         <div class="mb-8 mt-4">
                             <label for="watermarkFontFamily" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Font Family</label>
-                            <select id="watermarkFontFamily" class="appearance-none bg-transparent appearance-none border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
+                            <select id="watermarkFontFamily" class="appearance-none bg-transparent w-full border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
                                 <option value="Arial">Arial</option>
                                 <option value="Arial Unicode MS">Arial Unicode MS</option>
                                 <option value="Comic Sans MS">Comic Sans MS</option>
@@ -156,7 +156,7 @@
                         </div>
                         <div class="mb-8 mt-4">
                             <label for="watermarkFontStyle" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Font Style</label>
-                            <select id="watermarkFontStyle" class="appearance-none bg-transparent appearance-none border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
+                            <select id="watermarkFontStyle" class="appearance-none bg-transparent w-full border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
                                 <option value="Regular">Regular</option>
                                 <option value="Bold">Bold</option>
                                 <option value="Italic">Italic</option>
@@ -191,7 +191,7 @@
                         </div>
                         <div class="mb-8 mt-4">
                             <label for="watermarkTextRotation" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Orientation</label>
-                            <select id="watermarkTextRotation" class="appearance-none bg-transparent appearance-none border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
+                            <select id="watermarkTextRotation" class="appearance-none bg-transparent w-full border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 font-semibold text-md text-lt1 font-quicksand focus:ring-lt focus:border-lt lg:mx-0 lg:w-5/6">
                                 <option value="0">0°</option>
                                 <option value="45">45°</option>
                                 <option value="90">90°</option>
