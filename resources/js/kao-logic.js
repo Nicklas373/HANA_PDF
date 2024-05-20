@@ -403,7 +403,26 @@ if (uploadDropzone) {
             this.on("error", function(file, dropzoneErrMessage, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    dzErrorMessage.textContent = dropzoneErrMessage
+                    let newErrMessage
+                    if (dropzoneErrMessage == '[object Object]') {
+                        if (xhr && xhr.readyState == 4) {
+                            if (xhr.response) {
+                                var xhrReturn = JSON.parse(xhr.responseText)
+                                if (xhrReturn.errors !== '') {
+                                    newErrMessage = xhrReturn.errors
+                                } else {
+                                    newErrMessage = "There was an unexpected error!"
+                                }
+                            } else {
+                                newErrMessage = "There was an unexpected error!"
+                            }
+                        } else {
+                            newErrMessage = "There was an unexpected error!"
+                        }
+                    } else {
+                        newErrMessage = dropzoneErrMessage
+                    }
+                    dzErrorMessage.textContent = newErrMessage
                 } else {
                     dzErrorMessage.textContent = "Internal server error (0)"
                 }
@@ -622,10 +641,29 @@ if (uploadDropzoneAlt) {
                 }
             })
 
-            this.on("error", function(file, xhr) {
+            this.on("error", function(file, dropzoneErrMessage, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    dzErrorMessage.textContent = dropzoneErrMessage
+                    let newErrMessage
+                    if (dropzoneErrMessage == '[object Object]') {
+                        if (xhr && xhr.readyState == 4) {
+                            if (xhr.response) {
+                                var xhrReturn = JSON.parse(xhr.responseText)
+                                if (xhrReturn.errors !== '') {
+                                    newErrMessage = xhrReturn.errors
+                                } else {
+                                    newErrMessage = "There was an unexpected error!"
+                                }
+                            } else {
+                                newErrMessage = "There was an unexpected error!"
+                            }
+                        } else {
+                            newErrMessage = "There was an unexpected error!"
+                        }
+                    } else {
+                        newErrMessage = dropzoneErrMessage
+                    }
+                    dzErrorMessage.textContent = newErrMessage
                 } else {
                     dzErrorMessage.textContent = "Internal server error (0)"
                 }
@@ -848,10 +886,29 @@ if (uploadDropzoneSingle) {
                 }
             })
 
-            this.on("error", function(file, xhr) {
+            this.on("error", function(file, dropzoneErrMessage, xhr) {
                 let dzErrorMessage = file.previewElement.querySelector('.dz-error-message')
                 if (dzErrorMessage) {
-                    dzErrorMessage.textContent = dropzoneErrMessage
+                    let newErrMessage
+                    if (dropzoneErrMessage == '[object Object]') {
+                        if (xhr && xhr.readyState == 4) {
+                            if (xhr.response) {
+                                var xhrReturn = JSON.parse(xhr.responseText)
+                                if (xhrReturn.errors !== '') {
+                                    newErrMessage = xhrReturn.errors
+                                } else {
+                                    newErrMessage = "There was an unexpected error!"
+                                }
+                            } else {
+                                newErrMessage = "There was an unexpected error!"
+                            }
+                        } else {
+                            newErrMessage = "There was an unexpected error!"
+                        }
+                    } else {
+                        newErrMessage = dropzoneErrMessage
+                    }
+                    dzErrorMessage.textContent = newErrMessage
                 } else {
                     dzErrorMessage.textContent = "Internal server error (0)"
                 }
