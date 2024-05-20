@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Core\htmltopdfController;
 use App\Http\Controllers\Api\Core\mergeController;
 use App\Http\Controllers\Api\Core\splitController;
 use App\Http\Controllers\Api\Core\watermarkController;
+use App\Http\Controllers\Api\versionController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,12 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/logs')->group(funct
     Route::get('limit', [limitLogController::class, 'getLimit']);
     Route::post('proc/single', [notifyLogController::class, 'getLogs']);
     Route::post('proc/all', [notifyLogController::class, 'getAllLogs']);
+});
+
+Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/version')->group(function() {
+    // API v1 Backend PDF Version Validation Route
+    Route::post('check', [versionController::class, 'versioningCheck']);
+    Route::post('fetch', [versionController::class, 'versioningFetch']);
 });
 
 Route::fallback(function () {

@@ -338,4 +338,140 @@ class NotificationHelper
             }
         }
     }
+
+    function sendErrGlobalNotify($processEndpoint, $processName, $processId , $status, $errReason, $errCode) {
+        $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $message = "<b>HANA API Alert</b>
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
+                    "</b>\nEnvironment: <b>".env('APP_ENV').
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>".$processEndpoint.
+                    "</b>\n\nProcess: <b>".$processName.
+                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nType: <b>Universal Notifyr</b>".
+                    "\n\nError Reason: <b>".$errReason.
+                    "</b>\nError Log: <pre><code>".$errCode.
+                    "</code></pre>";
+        try {
+            $response = Telegram::sendMessage([
+                'chat_id' => env('TELEGRAM_CHAT_ID'),
+                'text' => $message,
+                'parse_mode' => 'HTML'
+            ]);
+            $messageId = $response->getMessageId();
+
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => true,
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
+            try {
+                if ($e->getHttpStatusCode() == null) {
+                  $httpStatus = null;
+                } else {
+                  $httpStatus = $e->getHttpStatusCode();
+                }
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => 'TelegramResponseException',
+                    'notifyResponse' => $e->getMessage()+' | '+$httpStatus+' | '+$e->getErrorType()
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Exception $e) {
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => $e->getMessage()
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        }
+    }
+
+    function sendVersioningErrNotify($versioningFE, $versioningGitFE, $versioningBE , $versioningGitBE, $status, $processId, $errReason, $errCode) {
+        $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $message = "<b>HANA API Alert</b>
+                    \nStatus: <b>".$status."</b>".
+                    "\nStart At: <b>".$CurrentTime.
+                    "</b>\nEnvironment: <b>".env('APP_ENV').
+                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nEndpoint: <b>api/v1/version</b>".
+                    "\n\nProcess: <b>Versioning".
+                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nType: <b>Versioning Check</b>".
+                    "\n\nBE Version: <b>".$versioningBE.
+                    "</b>\nBE Version GIT: <b>".$versioningGitBE.
+                    "</b>\nFE Version: <b>".$versioningFE.
+                    "</b>\nFE Version GIT: <b>".$versioningGitFE.
+                    "\n\n</b>Error Reason: <b>".$errReason.
+                    "</b>\nError Log: <pre><code>".$errCode.
+                    "</code></pre>";
+        try {
+            $response = Telegram::sendMessage([
+                'chat_id' => env('TELEGRAM_CHAT_ID'),
+                'text' => $message,
+                'parse_mode' => 'HTML'
+            ]);
+            $messageId = $response->getMessageId();
+
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => true,
+                    'notifyMessage' => 'Message has been sent !',
+                    'notifyResponse' => $response
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
+            try {
+                if ($e->getHttpStatusCode() == null) {
+                  $httpStatus = null;
+                } else {
+                  $httpStatus = $e->getHttpStatusCode();
+                }
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => 'TelegramResponseException',
+                    'notifyResponse' => $e->getMessage()+' | '+$httpStatus+' | '+$e->getErrorType()
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        } catch (\Exception $e) {
+            try {
+                DB::table('notifyLogs')->insert([
+                    'processId' => $processId,
+                    'notifyName' => 'Telegram SDK',
+                    'notifyResult' => false,
+                    'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => $e->getMessage()
+                ]);
+            } catch (QueryException $ex) {
+                Log::error('Query Exception failed with: '. $ex->getMessage());
+            }
+        }
+    }
 }
