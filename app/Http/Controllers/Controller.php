@@ -81,4 +81,26 @@ class Controller extends BaseController
             'errors' => $errors
         ], $status);
     }
+
+    protected function returnMessage($status, $message, $response, $errors) {
+        return response()->json([
+            'status' => $status,
+            'message'=> $message,
+            'response' => $response,
+            'errors' => $errors
+        ], $status);
+    }
+
+    protected function returnVersioningMessage($status, $message, $beVersioning, $beGitVersioning, $feVersioning, $feGitVersioning, $errors)
+    {
+        return response()->json([
+            'status' => $status,
+            'message'=> $message,
+            'beVersioning' => $beVersioning,
+            'beGitVersioning' => $beGitVersioning,
+            'feVersioning' => $feVersioning,
+            'feGitVersioning' => $feGitVersioning,
+            'errors' => $errors
+        ], $status);
+    }
 }

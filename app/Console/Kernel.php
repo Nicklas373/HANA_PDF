@@ -60,7 +60,7 @@ class Kernel extends ConsoleKernel
                 $start = Carbon::parse($startProc);
                 $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($start);
-                if ($output == null || $output == '' || empty($output)) {
+                if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
                     DB::table('jobLogs')
                     ->where('processId', '=', $cacheClearGUID)
                     ->update([
@@ -111,7 +111,7 @@ class Kernel extends ConsoleKernel
                 $start = Carbon::parse($startProc);
                 $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($start);
-                if ($output == null || $output == '' || empty($output)) {
+                if ($output == null || $output == '' || empty($output) || str_contains($output, 'DONE')) {
                     DB::table('jobLogs')
                     ->where('processId', '=', $optimizeClearGUID)
                     ->update([
@@ -162,7 +162,7 @@ class Kernel extends ConsoleKernel
                 $start = Carbon::parse($startProc);
                 $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($start);
-                if ($output == null || $output == '' || empty($output)) {
+                if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
                     DB::table('jobLogs')
                     ->where('processId', '=', $viewClearGUID)
                     ->update([
@@ -213,7 +213,7 @@ class Kernel extends ConsoleKernel
                 $start = Carbon::parse($startProc);
                 $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($start);
-                if ($output == null || $output == '' || empty($output)) {
+                if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
                     DB::table('jobLogs')
                     ->where('processId', '=', $viewCacheGUID)
                     ->update([
