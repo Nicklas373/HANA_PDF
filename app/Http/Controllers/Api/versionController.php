@@ -88,7 +88,7 @@ class versionController extends Controller {
             $appMajorVersionBE = 3;
             $appMinorVersionBE = 2;
             $appPatchVersionBE = 6;
-            $appGitVersionBE = trim(exec('git log --pretty="%h" -n1 HEAD'));
+            $appGitVersionBE = appHelper::instance()->getGitCommitHash();
             $appServicesReferrerBE = "BE";
             $validateBE = false;
             $validateFE = false;

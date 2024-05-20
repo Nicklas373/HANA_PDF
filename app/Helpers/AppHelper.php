@@ -76,6 +76,33 @@ class AppHelper
         ftp_close($ftp_conn);
     }
 
+    function getGitCommitHash()
+    {
+        $gitSourcePath = base_path('.git/');
+
+        if (!file_exists($gitSourcePath)) {
+            return null;
+        }
+
+        $headFile = $gitSourcePath.'HEAD';
+        $head = trim(file_get_contents($headFile));
+
+        if (strpos($head, 'ref: ') === 0) {
+            $ref = substr($head, 5);
+            $commitHashFile = $gitSourcePath . $ref;
+
+            if (!file_exists($commitHashFile)) {
+                return null;
+            }
+
+            $hash = trim(file_get_contents($commitHashFile));
+        } else {
+            $hash = $head;
+        }
+
+        return substr($hash, 0, 7);
+    }
+
     function get_guid() {
         if (function_exists('com_create_guid') === true) {
             return trim(com_create_guid(), '{}');
