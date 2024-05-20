@@ -14,5 +14,5 @@
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" />
 <link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-C1ampFSP.css')}}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('build/assets/app-CHlojooh.css')}}" />
-<link rel="script" type="module" href="{{ asset('build/assets/app-CRqCVQ4N.js') }}" />
+<link rel="script" type="module" href="{{ asset('build/assets/app-BPqf-mwv.js') }}" />
 <link rel="script" type="module" href="{{ asset('build/assets/index-D1AB55dp.js')}}" />
