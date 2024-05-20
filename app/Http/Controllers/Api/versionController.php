@@ -87,7 +87,7 @@ class versionController extends Controller {
             $appServicesReferrerFE = $request->post('appServicesReferrer');
             $appMajorVersionBE = 3;
             $appMinorVersionBE = 2;
-            $appPatchVersionBE = 5;
+            $appPatchVersionBE = 6;
             $appGitVersionBE = trim(exec('git log --pretty="%h" -n1 HEAD'));
             $appServicesReferrerBE = "BE";
             $validateBE = false;
