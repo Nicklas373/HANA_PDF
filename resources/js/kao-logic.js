@@ -7,6 +7,7 @@ const $previewModal = document.getElementById('previewModal')
 const $scsModalNotify = document.getElementById('scsModalNotify')
 const $previewDocumentModal = document.getElementById('previewDocumentModal')
 const $previewImageModal = document.getElementById('previewImgModal')
+const $versioningModal = document.getElementById('versioningModal')
 
 const options = {
     placement: 'bottom-right',
@@ -24,16 +25,29 @@ const options = {
     }
 }
 
+const adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 const appMajorVer = 3
 const appMinorVer = 2
 const appPatchVer = 5
+const apiUrl = "STATIC_CLIENT_ID"
+const bearerToken = "STATIC_BEARER"
 const commitHash = gitHash
 const errModal = new Modal($errModal, options)
+const googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
 const loadingModal = new Modal($loadingModal, options)
-const previewModal = new Modal($previewModal, options)
-const scsModalNotify = new Modal($scsModalNotify, options)
 const previewDocumentModal = new Modal($previewDocumentModal, options)
 const previewImageModal = new Modal($previewImageModal, options)
+const previewModal = new Modal($previewModal, options)
+const procBtn = document.getElementById('submitBtn')
+const scsModalNotify = new Modal($scsModalNotify, options)
+const scsModalBtn = document.getElementById('scsModalBtn')
+const uploadDropzone = document.getElementById("dropzoneArea")
+const uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
+const uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
+const uploadPath = '/storage/upload/'
+const versioningModal = new Modal($versioningModal, options)
+const webContent = document.getElementById('footer')
+const whatsNewBtn = document.getElementById("whatsNew")
 let xhrBalance
 let xhrBalanceRemaining
 var altLoadingMessageModal = document.getElementById("altTitleMessageModal")
@@ -43,17 +57,8 @@ var errSubMessage = document.getElementById("errSubMessageModal")
 var errListMessage = document.getElementById("err-list")
 var errListTitleMessage = document.getElementById("err-list-title")
 var scsMessage = document.getElementById('scsMessageModalNotify')
-var procBtn = document.getElementById('submitBtn')
 var procTitleMessageModal = document.getElementById("titleMessageModal")
 var uploadedFile = []
-var uploadDropzone = document.getElementById("dropzoneArea")
-var uploadDropzoneAlt = document.getElementById("dropzoneAreaCnv")
-var uploadDropzoneSingle = document.getElementById("dropzoneAreaSingle")
-var adobeClientID = "STATIC_CLIENT_ID"
-var apiUrl = 'http://192.168.0.2'
-var bearerToken = "STATIC_BEARER"
-var googleViewerUrl = 'https://docs.google.com/viewerng/viewer?url='
-var uploadPath = '/storage/upload/'
 var uploadStats = false
 var xhrProcStats = true
 var xhrScsUploads = 0
@@ -142,6 +147,68 @@ if (procBtn) {
             loadingModal.hide()
             errModal.show()
         }
+    }
+}
+
+if (scsModalBtn) {
+    scsModalBtn.onclick = function() {
+        if (webContent) {
+            webContent.scrollIntoView({ behavior: 'smooth', block: 'end'})
+        }
+    }
+}
+
+if (whatsNewBtn) {
+    whatsNewBtn.onclick = function() {
+        procTitleMessageModal.innerText = "Fetching latest update..."
+        loadingModal.show()
+        fetchVersion().then(data => {
+            const appVersioning = document.getElementById('versioningTitle')
+            const appReleaseDate = document.getElementById('versioningDate')
+            const listChangelog = document.getElementById('versioningChangelog')
+            if (data.versionFetchResponse.changelog && Array.isArray(data.versionFetchResponse.changelog)) {
+                appVersioning.innerText = ''
+                appReleaseDate.innerText = ''
+                listChangelog.innerText = ''
+
+                appVersioning.innerHTML = 'Hana PDF v'+data.versionFetchResponse.version+`<span class="bg-pc3 text-dt text-sm font-semibold font-quicksand mr-2 mt-0.5 px-2.5 py-0.5 rounded ms-3">Latest</span>`
+                appReleaseDate.innerText = 'Released on ' + data.versionFetchResponse.release_date
+                data.versionFetchResponse.changelog.forEach(change => {
+                    const listItem = document.createElement('li')
+                    listItem.textContent = change
+                    listChangelog.appendChild(listItem)
+                })
+                procTitleMessageModal.innerText = "Preparing document..."
+                loadingModal.hide()
+                versioningModal.show()
+            } else {
+                procTitleMessageModal.innerText = "Preparing document..."
+                loadingModal.hide()
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(data.versionFetchMessage)
+                generateMesssage("Unable to fetch latest changelog")
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
+            }
+        }).catch(function (error) {
+            procTitleMessageModal.innerText = "Preparing document..."
+            loadingModal.hide()
+            errModal.hide()
+            errMessage.innerText  = "There was unexpected error !"
+            errSubMessage.innerText = ""
+            errListTitleMessage.innerText = "Error message"
+            resetErrListMessage()
+            generateMesssage(error.versionFetchMessage)
+            generateMesssage("Unable to fetch latest changelog")
+            errAltSubMessageModal.style = null
+            loadingModal.hide()
+            errModal.show()
+        })
     }
 }
 
@@ -879,49 +946,17 @@ function apiGateway(proc, action) {
         }
         scsModalNotify.show()
     }).catch(function (error) {
-        if (error.xhrRequestStatus == 2 || error.xhrRequestStatus == 4) {
-            console.log(error.xhrRequestMessage)
-            if (error.xhrRequestMessage == 'Internal server error (2)' || error.xhrRequestMessage == 'Internal server error (4)') {
-                xhrProcStats = true
-                closeAltModal(proc)
-                loadingModal.hide()
-                errModal.hide()
-                if (document.getElementById('html') == null && document.getElementById('cnvFrPDF') == null) {
-                    scsMessage.innerText  = "PDF "+proc+"ed success ! "
-                } else {
-                    if (document.getElementById('html') !== null) {
-                        scsMessage.innerText = "URL converted success !"
-                    } else {
-                        scsMessage.innerText = "Document converted success !"
-                    }
-                }
-                scsModalNotify.show()
-            } else {
-                xhrProcStats = false
-                closeAltModal(proc)
-                errModal.hide()
-                errMessage.innerText  = "There was unexpected error !"
-                errSubMessage.innerText = ""
-                errListTitleMessage.innerText = "Error message"
-                resetErrListMessage()
-                generateMesssage(error.xhrRequestMessage)
-                errAltSubMessageModal.style = null
-                loadingModal.hide()
-                errModal.show()
-            }
-        } else {
-            xhrProcStats = false
-            closeAltModal(proc)
-            errModal.hide()
-            errMessage.innerText  = "There was unexpected error !"
-            errSubMessage.innerText = ""
-            errListTitleMessage.innerText = "Error message"
-            resetErrListMessage()
-            generateMesssage(error.xhrRequestMessage)
-            errAltSubMessageModal.style = null
-            loadingModal.hide()
-            errModal.show()
-        }
+        xhrProcStats = true
+        closeAltModal(proc)
+        errModal.hide()
+        errMessage.innerText  = "There was unexpected error !"
+        errSubMessage.innerText = ""
+        errListTitleMessage.innerText = "Error message"
+        resetErrListMessage()
+        generateMesssage(error.xhrRequestMessage)
+        errAltSubMessageModal.style = null
+        loadingModal.hide()
+        errModal.show()
     })
 }
 
@@ -1014,8 +1049,8 @@ function sendToAPI(files, proc, action) {
         } else if (proc == 'watermark') {
             if (document.getElementById('firstRadio').checked == true) {
                 let wmLayoutStyle
-                let wmRotation
                 var imgFile = document.getElementById('wm_file_input').files[0]
+                var wmRotation = document.getElementById('watermarkImageRotation').value
                 var wmPage = document.getElementById('watermarkPageImage').value
                 var wmTransparency = document.getElementById('watermarkImageTransparency').value
                 var wmMosaic = document.getElementById('isMosaicImage').checked
@@ -1025,17 +1060,6 @@ function sendToAPI(files, proc, action) {
                     wmLayoutStyle = document.getElementById('wmRadioImageLayoutStyleB').value
                 } else {
                     wmLayoutStyle = document.getElementById('wmRadioImageLayoutStyleA').value
-                }
-                if (document.getElementById('wmRadioImageRotationA').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationA').value
-                } else if (document.getElementById('wmRadioImageRotationB').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationB').value
-                } else if (document.getElementById('wmRadioImageRotationC').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationC').value
-                } else if (document.getElementById('wmRadioImageRotationD').checked == true) {
-                    wmRotation = document.getElementById('wmRadioImageRotationD').value
-                } else {
-                    wmRotation = document.getElementById('wmRadioImageRotationA').value
                 }
                 formData.append('action', action)
                 formData.append('imgFile', imgFile)
@@ -1050,57 +1074,22 @@ function sendToAPI(files, proc, action) {
                 formData.append('wmTransparency', wmTransparency)
                 formData.append('wmMosaic', wmMosaic.toString())
             } else if (document.getElementById('secondRadio').checked == true) {
-                let wmFontFamily
-                let wmFontStyle
                 let wmLayoutStyle
-                let wmRotation
-                var wmFontSize = document.getElementById('watermarkFontSize').value
                 var wmFontColor = document.getElementById('watermarkFontColor').value
+                var wmFontFamily = document.getElementById('watermarkFontFamily').value
+                var wmFontSize = document.getElementById('watermarkFontSize').value
+                var wmFontStyle = document.getElementById('watermarkFontStyle').value
+                var wmRotation = document.getElementById('watermarkTextRotation').value
                 var wmPage = document.getElementById('watermarkPageText').value
                 var wmText = document.getElementById('watermarkText').value
                 var wmTransparency = document.getElementById('watermarkTextTransparency').value
                 var wmMosaic = document.getElementById('isMosaicText').checked
-                if (document.getElementById('wmRadioFontFamilyA').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyA').value
-                } else if (document.getElementById('wmRadioFontFamilyB').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyB').value
-                } else if (document.getElementById('wmRadioFontFamilyC').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyC').value
-                } else if (document.getElementById('wmRadioFontFamilyD').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyD').value
-                } else if (document.getElementById('wmRadioFontFamilyE').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyE').value
-                } else if (document.getElementById('wmRadioFontFamilyF').checked == true) {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyF').value
-                } else {
-                    wmFontFamily = document.getElementById('wmRadioFontFamilyA').value
-                }
-                if (document.getElementById('wmRadioFontStyleA').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleA').value
-                } else if (document.getElementById('wmRadioFontStyleB').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleB').value
-                } else if (document.getElementById('wmRadioFontStyleC').checked == true) {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleC').value
-                } else {
-                    wmFontStyle = document.getElementById('wmRadioFontStyleA').value
-                }
                 if (document.getElementById('wmRadioLayoutStyleA').checked == true) {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleA').value
                 } else if (document.getElementById('wmRadioLayoutStyleB').checked == true) {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleB').value
                 } else {
                     wmLayoutStyle = document.getElementById('wmRadioLayoutStyleA').value
-                }
-                if (document.getElementById('wmRadioRotationA').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationA').value
-                } else if (document.getElementById('wmRadioRotationB').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationB').value
-                } else if (document.getElementById('wmRadioRotationC').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationC').value
-                } else if (document.getElementById('wmRadioRotationD').checked == true) {
-                    wmRotation = document.getElementById('wmRadioRotationD').value
-                } else {
-                    wmRotation = document.getElementById('wmRadioRotationA').value
                 }
                 formData.append('action', action)
                 formData.append('imgFile', '')
@@ -1200,7 +1189,7 @@ function sendToAPI(files, proc, action) {
                                 document.getElementById("errProcId").innerText = xhrReturn.processId
                                 reject({
                                     xhrRequestCondition: 'ERROR',
-                                    xhrRequestMessage: 'Response are not return 200',
+                                    xhrRequestMessage: xhrReturn.message,
                                     xhrRequestServerMessage: xhrReturn.errors,
                                     xhrRequestStatus: xhr.status
                                 })
@@ -1214,8 +1203,8 @@ function sendToAPI(files, proc, action) {
                             document.getElementById("errProcId").innerText = xhrReturn.processId
                             reject({
                                 xhrRequestCondition: 'ERROR',
-                                xhrRequestMessage: 'Response are not return 200',
-                                xhrRequestServerMessage: xhrReturn.message,
+                                xhrRequestMessage: xhrReturn.message,
+                                xhrRequestServerMessage: xhrReturn.errors,
                                 xhrRequestStatus: xhr.status
                             })
                         }
@@ -1257,18 +1246,6 @@ function sendToAPI(files, proc, action) {
                         xhrRequestStatus: 0
                     })
                 }
-            } else {
-                document.getElementById("alert-scs").classList.add("hidden","opacity-0")
-                document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
-                document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
-                document.getElementById("errProcMain").classList.add("hidden")
-                reject({
-                    xhrRequestCondition: 'ERROR',
-                    xhrRequestMessage: 'Internal server error ('+xhr.readyState+')',
-                    xhrRequestServerMessage: 'Server are not in readyState ('+xhr.readyState+')',
-                    xhrRequestStatus: xhr.readyState
-                })
             }
         }
         xhr.send(formData)
@@ -2160,7 +2137,7 @@ function validateVersion() {
         formData.append('appGitVersion', commitHash)
         formData.append('appServicesReferrer', 'FE')
 
-        xhr.open('POST', apiUrl+'/api/v1/version', true)
+        xhr.open('POST', apiUrl+'/api/v1/version/check', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
 
         var timer = setInterval(function() {
@@ -2225,6 +2202,93 @@ function validateVersion() {
                         versioningStats: 0,
                         versioningMessage: 'Internal server error (0)',
                         versioningError: 'Internal Server Error'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+function fetchVersion() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        formData.append('appServicesReferrer', 'FE')
+
+        xhr.open('POST', apiUrl+'/api/v1/version/fetch', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versionFetchCheck: false,
+                    versionFetchStats: 524,
+                    versionFetchMessage: 'Connection timeout',
+                    versionFetchResponse: null,
+                    versionFetchError: 'Connection timeout'
+                })
+            }
+        }, 1000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.errors == null) {
+                            resolve({
+                                versionFetchCheck: true,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: null
+                            })
+                        } else {
+                            reject({
+                                versionFetchCheck: false,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: xhrReturn.errors
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 429,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 524,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Connection Timeout'
+                        })
+                    } else {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: xhrReturn.status,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Internal Server Error'
+                        })
+                    }
+                } else {
+                    reject({
+                        versionFetchCheck: false,
+                        versionFetchStats: 0,
+                        versionFetchMessage: 'Internal server error (0)',
+                        versionFetchResponse: xhrReturn.response,
+                        versionFetchError: 'Internal Server Error'
                     })
                 }
             }
