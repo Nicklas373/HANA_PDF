@@ -1672,47 +1672,61 @@ function submit(event) {
             }
         }
     } else if (document.getElementById('cnvToPDF') !== null || document.getElementById('merge') !== null) {
-        if (xhrBalance && xhrBalanceRemaining > 0) {
-            procTitleMessageModal.innerText = "Processing PDF..."
-            errMessage.style.visibility = null
-            errSubMessage.style.visibility = null
-            errAltSubMessageModal.style.display = "none"
-            errModal.hide()
-            loadingModal.show()
-            if (document.getElementById('cnvToPDF') !== null) {
-                altLoadingMessageModal.innerText = "Processing Document..."
-                document.getElementById("altLoadingModal").classList.remove('hidden')
-                document.getElementById("dropzoneCnvToPDF").classList.add('animate-pulse')
-                xhrProcStats = false
-                apiGateway("convert","")
-            } else {
-                if (getUploadedFileName().length < 2) {
-                    event.preventDefault()
-                    errMessage.innerText  = "PDF file can not be processed !"
-                    errSubMessage.innerText = ""
-                    errListTitleMessage.innerText = "Required fields:"
-                    errAltSubMessageModal.style = null
-                    resetErrListMessage()
-                    generateMesssage("Minimum PDF to merge is 2 (Total files: "+getUploadedFileName().length+")")
-                    loadingModal.hide()
-                    errModal.show()
-                } else {
-                    altLoadingMessageModal.innerText = "Processing PDF..."
+        if (getUploadedFileName().length > 0) {
+            if (xhrBalance && xhrBalanceRemaining > 0) {
+                procTitleMessageModal.innerText = "Processing PDF..."
+                errMessage.style.visibility = null
+                errSubMessage.style.visibility = null
+                errAltSubMessageModal.style.display = "none"
+                errModal.hide()
+                loadingModal.show()
+                if (document.getElementById('cnvToPDF') !== null) {
+                    altLoadingMessageModal.innerText = "Processing Document..."
                     document.getElementById("altLoadingModal").classList.remove('hidden')
-                    document.getElementById("dropzoneMerge").classList.add('animate-pulse')
+                    document.getElementById("dropzoneCnvToPDF").classList.add('animate-pulse')
                     xhrProcStats = false
-                    apiGateway("merge","")
+                    apiGateway("convert","")
+                } else {
+                    if (getUploadedFileName().length < 2) {
+                        event.preventDefault()
+                        errMessage.innerText  = "PDF file can not be processed !"
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Required fields:"
+                        errAltSubMessageModal.style = null
+                        resetErrListMessage()
+                        generateMesssage("Minimum PDF to merge is 2 (Total files: "+getUploadedFileName().length+")")
+                        loadingModal.hide()
+                        errModal.show()
+                    } else {
+                        altLoadingMessageModal.innerText = "Processing PDF..."
+                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                        document.getElementById("dropzoneMerge").classList.add('animate-pulse')
+                        xhrProcStats = false
+                        apiGateway("merge","")
+                    }
                 }
+            } else {
+                event.preventDefault()
+                errMessage.innerText  = "PDF file can not be processed !"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
             }
-        } else {
-            event.preventDefault()
-            errMessage.innerText  = "Kaori"
-            errSubMessage.innerText = ""
-            errSubMessage.style.visibility = null
-            errAltSubMessageModal.style.display = "none"
-            loadingModal.hide()
-            errModal.show()
-        }
+         } else {
+             event.preventDefault()
+             errMessage.innerText  = "PDF file can not be processed !"
+             errSubMessage.innerText = ""
+             errListTitleMessage.innerText = "Error message"
+             resetErrListMessage()
+             generateMesssage("No file has been chosen")
+             errAltSubMessageModal.style = null
+             loadingModal.hide()
+             errModal.show()
+         }
     } else if (document.getElementById('splitLayout1')) {
         if (document.getElementById("firstRadio").checked) {
             let cusPage = false
@@ -1743,7 +1757,7 @@ function submit(event) {
                                     event.preventDefault()
                                     errMessage.innerText  = "There was unexpected error !"
                                     errSubMessage.innerText = "Please try again later"
-                                    errListTitleMessage.innerText = ""
+                                    errListTitleMessage.innerText = "Failed to get total page from PDF"
                                     resetErrListMessage()
                                     loadingModal.hide()
                                     errModal.show()
@@ -1794,23 +1808,35 @@ function submit(event) {
                                     errAltSubMessageModal.style.display = "none"
                                     errModal.hide()
                                     loadingModal.show()
-                                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                                        altLoadingMessageModal.innerText = "Processing PDF..."
-                                        document.getElementById("altLoadingModal").classList.remove('hidden')
-                                        document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                                        xhrProcStats = false
-                                        apiGateway("split", "split")
-                                     } else {
-                                         event.preventDefault()
-                                         errMessage.innerText  = "PDF file can not be processed !"
-                                         errSubMessage.innerText = ""
-                                         errListTitleMessage.innerText = "Error message"
-                                         resetErrListMessage()
-                                         generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                         errAltSubMessageModal.style = null
-                                         loadingModal.hide()
-                                         errModal.show()
-                                     }
+                                    if (getUploadedFileName().length > 0) {
+                                        if (xhrBalance && xhrBalanceRemaining > 0) {
+                                            altLoadingMessageModal.innerText = "Processing PDF..."
+                                            document.getElementById("altLoadingModal").classList.remove('hidden')
+                                            document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                            xhrProcStats = false
+                                            apiGateway("split", "split")
+                                         } else {
+                                             event.preventDefault()
+                                             errMessage.innerText  = "PDF file can not be processed !"
+                                             errSubMessage.innerText = ""
+                                             errListTitleMessage.innerText = "Error message"
+                                             resetErrListMessage()
+                                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                                             errAltSubMessageModal.style = null
+                                             loadingModal.hide()
+                                             errModal.show()
+                                         }
+                                    } else {
+                                        event.preventDefault()
+                                        errMessage.innerText  = "PDF file can not be processed !"
+                                        errSubMessage.innerText = ""
+                                        errListTitleMessage.innerText = "Error message"
+                                        resetErrListMessage()
+                                        generateMesssage("No file has been chosen")
+                                        errAltSubMessageModal.style = null
+                                        loadingModal.hide()
+                                        errModal.show()
+                                    }
                                 }
                             } else if (!fromPage && !toPage) {
                                 event.preventDefault()
@@ -1876,23 +1902,35 @@ function submit(event) {
                                 errAltSubMessageModal.style.display = "none"
                                 errModal.hide()
                                 loadingModal.show()
-                                if (xhrBalance && xhrBalanceRemaining > 0) {
-                                    altLoadingMessageModal.innerText = "Processing PDF..."
-                                    document.getElementById("altLoadingModal").classList.remove('hidden')
-                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                                    xhrProcStats = false
-                                    apiGateway("split", "split")
-                                 } else {
-                                     event.preventDefault()
-                                     errMessage.innerText  = "PDF file can not be processed !"
-                                     errSubMessage.innerText = ""
-                                     errListTitleMessage.innerText = "Error message"
-                                     resetErrListMessage()
-                                     generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                     errAltSubMessageModal.style = null
-                                     loadingModal.hide()
-                                     errModal.show()
-                                 }
+                                if (getUploadedFileName().length > 0) {
+                                    if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        altLoadingMessageModal.innerText = "Processing PDF..."
+                                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                                        document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                        xhrProcStats = false
+                                        apiGateway("split", "split")
+                                     } else {
+                                         event.preventDefault()
+                                         errMessage.innerText  = "PDF file can not be processed !"
+                                         errSubMessage.innerText = ""
+                                         errListTitleMessage.innerText = "Error message"
+                                         resetErrListMessage()
+                                         generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                                         errAltSubMessageModal.style = null
+                                         loadingModal.hide()
+                                         errModal.show()
+                                     }
+                                } else {
+                                    event.preventDefault()
+                                    errMessage.innerText  = "PDF file can not be processed !"
+                                    errSubMessage.innerText = ""
+                                    errListTitleMessage.innerText = "Error message"
+                                    resetErrListMessage()
+                                    generateMesssage("No file has been chosen")
+                                    errAltSubMessageModal.style = null
+                                    loadingModal.hide()
+                                    errModal.show()
+                                }
                             }
                         } else {
                             event.preventDefault()
@@ -2006,23 +2044,35 @@ function submit(event) {
                         errAltSubMessageModal.style.display = "none"
                         errModal.hide()
                         loadingModal.show()
-                        if (xhrBalance && xhrBalanceRemaining > 0) {
-                            altLoadingMessageModal.innerText = "Processing PDF..."
-                            document.getElementById("altLoadingModal").classList.remove('hidden')
-                            document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                            xhrProcStats = false
-                            apiGateway("split", "delete")
-                         } else {
-                             event.preventDefault()
-                             errMessage.innerText  = "PDF file can not be processed !"
-                             errSubMessage.innerText = ""
-                             errListTitleMessage.innerText = "Error message"
-                             resetErrListMessage()
-                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                             errAltSubMessageModal.style = null
-                             loadingModal.hide()
-                             errModal.show()
-                         }
+                        if (getUploadedFileName().length > 0) {
+                            if (xhrBalance && xhrBalanceRemaining > 0) {
+                                altLoadingMessageModal.innerText = "Processing PDF..."
+                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                xhrProcStats = false
+                                apiGateway("split", "delete")
+                             } else {
+                                 event.preventDefault()
+                                 errMessage.innerText  = "PDF file can not be processed !"
+                                 errSubMessage.innerText = ""
+                                 errListTitleMessage.innerText = "Error message"
+                                 resetErrListMessage()
+                                 generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                                 errAltSubMessageModal.style = null
+                                 loadingModal.hide()
+                                 errModal.show()
+                             }
+                        } else {
+                            event.preventDefault()
+                            errMessage.innerText  = "PDF file can not be processed !"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Error message"
+                            resetErrListMessage()
+                            generateMesssage("No file has been chosen")
+                            errAltSubMessageModal.style = null
+                            loadingModal.hide()
+                            errModal.show()
+                        }
                     } else {
                         event.preventDefault()
                         errMessage.innerText  = "Please fill out these fields!"
@@ -2180,23 +2230,35 @@ function submit(event) {
                     errAltSubMessageModal.style.display = "none"
                     errModal.hide()
                     loadingModal.show()
-                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                        altLoadingMessageModal.innerText = "Processing PDF..."
-                        document.getElementById("altLoadingModal").classList.remove('hidden')
-                        document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
-                        xhrProcStats = false
-                        apiGateway("watermark","txt")
+                    if (getUploadedFileName().length > 0) {
+                        if (xhrBalance && xhrBalanceRemaining > 0) {
+                            altLoadingMessageModal.innerText = "Processing PDF..."
+                            document.getElementById("altLoadingModal").classList.remove('hidden')
+                            document.getElementById("dropzoneWatermark").classList.add('animate-pulse')
+                            xhrProcStats = false
+                            apiGateway("watermark","txt")
+                        } else {
+                             event.preventDefault()
+                             errMessage.innerText  = "PDF file can not be processed !"
+                             errSubMessage.innerText = ""
+                             errListTitleMessage.innerText = "Error message"
+                             resetErrListMessage()
+                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                             errAltSubMessageModal.style = null
+                             loadingModal.hide()
+                             errModal.show()
+                         }
                     } else {
-                         event.preventDefault()
-                         errMessage.innerText  = "PDF file can not be processed !"
-                         errSubMessage.innerText = ""
-                         errListTitleMessage.innerText = "Error message"
-                         resetErrListMessage()
-                         generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                         errAltSubMessageModal.style = null
-                         loadingModal.hide()
-                         errModal.show()
-                     }
+                        event.preventDefault()
+                        errMessage.innerText  = "PDF file can not be processed !"
+                        errSubMessage.innerText = ""
+                        errListTitleMessage.innerText = "Error message"
+                        resetErrListMessage()
+                        generateMesssage("No file has been chosen")
+                        errAltSubMessageModal.style = null
+                        loadingModal.hide()
+                        errModal.show()
+                    }
                 } else {
                     var wmPage = document.getElementById("watermarkPageText")
                     event.preventDefault()
