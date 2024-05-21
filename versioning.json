@@ -9,12 +9,30 @@
         }
     },
     {
+        "appServices": "BE-DEV",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 2,
+            "patchVersion": 6,
+            "gitRevision": "ad90e72"
+        }
+    },
+    {
         "appServices": "FE",
         "versioning": {
             "majorVersion": 3,
             "minorVersion": 2,
             "patchVersion": 6,
             "gitRevision": "c0fb9ee"
+        }
+    },
+    {
+        "appServices": "FE-DEV",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 2,
+            "patchVersion": 6,
+            "gitRevision": "2cd264d"
         }
     }
 ]
