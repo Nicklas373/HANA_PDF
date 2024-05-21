@@ -28,7 +28,7 @@ const options = {
 const adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 const appMajorVer = 3
 const appMinorVer = 2
-const appPatchVer = 5
+const appPatchVer = 6
 const apiUrl = 'http://192.168.0.2'
 const bearerToken = import.meta.env.VITE_JWT_TOKEN
 const commitHash = gitHash
@@ -379,14 +379,11 @@ if (uploadDropzone) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
@@ -438,6 +435,18 @@ if (uploadDropzone) {
                 loadingModal.hide()
                 errModal.show()
             })
+
+            this.on("timeout", function(file) {
+                uploadDropzone.removeFile(file)
+                uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
+                errMessage.innerText  = "Connection timeout !"
+                errSubMessage.innerText = "Please try again later"
+                errListTitleMessage.innerText = "Failed to upload:"
+                resetErrListMessage()
+                generateMesssage(file.name)
+                errAltSubMessageModal.style = null
+                errModal.show()
+            })
         }
     })
 
@@ -445,7 +454,6 @@ if (uploadDropzone) {
         if (procBtn) {
             if (document.getElementById('compress') !== null || document.getElementById('cnvFrPDF') !== null
                 || document.getElementById('merge') !== null) {
-                console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
@@ -602,14 +610,11 @@ if (uploadDropzoneAlt) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
@@ -629,11 +634,9 @@ if (uploadDropzoneAlt) {
                     generateThumbnail(file.name)
                     .then(function(thumbnailURL) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = apiUrl+thumbnailURL
-                        console.log(apiUrl+thumbnailURL)
                     })
                     .catch(function(error) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
-                        console.log(error.message)
                     })
                 }
             })
@@ -684,7 +687,6 @@ if (uploadDropzoneAlt) {
 
     if (!uploadDropzoneAlt) {
         if (procBtn && document.getElementById('cnvToPDF') !== null) {
-            console.log("Dropzone instance are not ready")
             errMessage.innerText  = "There was unexpected error !"
             errSubMessage.innerText = ""
             errListTitleMessage.innerText = "Error message"
@@ -863,20 +865,15 @@ if (uploadDropzoneSingle) {
                     .then(
                         response => response.json()
                     )
-                    .then(data => {
-                        console.log(data)
-                    })
                     .catch(error => {
-                        console.log('Error: Failed to remove file: ', error)
+                        console.error('Error: Failed to remove file: ', error)
                     })
                 } else {
-                    console.log('Error: File object is null or undefined.')
+                    console.error('Error: File object is null or undefined.')
                 }
             })
 
             this.on("success", function (response) {
-                console.log(response)
-
                 var uploadedFileName = response.name
                 uploadedFile.push(uploadedFileName)
 
@@ -924,13 +921,24 @@ if (uploadDropzoneSingle) {
                 loadingModal.hide()
                 errModal.show()
             })
+
+            this.on("timeout", function(file) {
+                uploadDropzone.removeFile(file)
+                uploadedFile = uploadedFile.filter(item => !file.name.includes(item))
+                errMessage.innerText  = "Connection timeout !"
+                errSubMessage.innerText = "Please try again later"
+                errListTitleMessage.innerText = "Failed to upload:"
+                resetErrListMessage()
+                generateMesssage(file.name)
+                errAltSubMessageModal.style = null
+                errModal.show()
+            })
         }
     })
 
     if (!uploadDropzoneSingle) {
         if (procBtn) {
             if (document.getElementById('split') !== null || document.getElementById('watermark') !== null) {
-                console.log("Dropzone instance are not ready")
                 errMessage.innerText  = "There was unexpected error !"
                 errSubMessage.innerText = ""
                 errListTitleMessage.innerText = "Error message"
@@ -942,39 +950,6 @@ if (uploadDropzoneSingle) {
             }
         }
     }
-}
-
-function generatePdfThumbnail(file) {
-    const fileReader = new FileReader()
-    fileReader.onload = function () {
-      const typedArray = new Uint8Array(this.result)
-      pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
-        pdf.getPage(1).then(function (page) {
-          const canvas = document.createElement("canvas")
-          const ctx = canvas.getContext("2d")
-          const viewport = page.getViewport({ scale: 0.5 })
-          canvas.width = viewport.width
-          canvas.height = viewport.height
-
-          const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport,
-          }
-
-          page.render(renderContext).promise.then(function () {
-            const thumbnail = canvas.toDataURL("image/jpeg")
-            const previewElement = file.previewElement
-            const dzImage = previewElement.querySelector(".dz-image-thumbnail")
-            dzImage.src = thumbnail
-          })
-        })
-      })
-    }
-    fileReader.readAsArrayBuffer(file)
-}
-
-function getUploadedFileName() {
-    return uploadedFile
 }
 
 function apiGateway(proc, action) {
@@ -1022,12 +997,149 @@ function closeAltModal(proc) {
             } else {
                 document.getElementById("dropzoneCnvToPDF").classList.remove('animate-pulse')
             }
+        } else if (proc == "merge") {
+            document.getElementById("dropzoneMerge").classList.remove('animate-pulse')
         } else if (proc == "split") {
             document.getElementById("dropzoneSplit").classList.remove('animate-pulse')
         } else {
             document.getElementById("dropzoneWatermark").classList.remove('animate-pulse')
         }
     }
+}
+
+function generatePdfThumbnail(file) {
+    const fileReader = new FileReader()
+    fileReader.onload = function () {
+      const typedArray = new Uint8Array(this.result)
+      pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
+        pdf.getPage(1).then(function (page) {
+          const canvas = document.createElement("canvas")
+          const ctx = canvas.getContext("2d")
+          const viewport = page.getViewport({ scale: 0.5 })
+          canvas.width = viewport.width
+          canvas.height = viewport.height
+
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport,
+          }
+
+          page.render(renderContext).promise.then(function () {
+            const thumbnail = canvas.toDataURL("image/jpeg")
+            const previewElement = file.previewElement
+            const dzImage = previewElement.querySelector(".dz-image-thumbnail")
+            dzImage.src = thumbnail
+          })
+        })
+      })
+    }
+    fileReader.readAsArrayBuffer(file)
+}
+
+function getUploadedFileName() {
+    return uploadedFile
+}
+
+function fetchVersion() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        formData.append('appServicesReferrer', 'FE')
+
+        xhr.open('POST', apiUrl+'/api/v1/version/fetch', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versionFetchCheck: false,
+                    versionFetchStats: 524,
+                    versionFetchMessage: 'Connection timeout',
+                    versionFetchResponse: null,
+                    versionFetchError: 'Connection timeout'
+                })
+            }
+        }, 15000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.errors == null) {
+                            resolve({
+                                versionFetchCheck: true,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: null
+                            })
+                        } else {
+                            reject({
+                                versionFetchCheck: false,
+                                versionFetchStats: xhrReturn.status,
+                                versionFetchMessage: xhrReturn.message,
+                                versionFetchResponse: xhrReturn.response,
+                                versionFetchError: xhrReturn.errors
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 429,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: 524,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Connection Timeout'
+                        })
+                    } else {
+                        reject({
+                            versionFetchCheck: false,
+                            versionFetchStats: xhrReturn.status,
+                            versionFetchMessage: xhrReturn.message,
+                            versionFetchResponse: xhrReturn.response,
+                            versionFetchError: 'Internal Server Error'
+                        })
+                    }
+                } else {
+                    reject({
+                        versionFetchCheck: false,
+                        versionFetchStats: 0,
+                        versionFetchMessage: 'Internal server error (0)',
+                        versionFetchResponse: xhrReturn.response,
+                        versionFetchError: 'Internal Server Error'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+
+function fileNameFormat(fileName) {
+    let trimmedFileName = fileName.trim()
+    let newFileName = trimmedFileName.replace(/\s+/g, '_')
+
+    return newFileName;
+}
+
+function generateMesssage(subMessage) {
+    var ul = document.getElementById("err-list")
+    var li = document.createElement("li")
+    li.appendChild(document.createTextNode(subMessage))
+    ul.appendChild(li)
 }
 
 function generateThumbnail(fileName) {
@@ -1053,6 +1165,128 @@ function generateThumbnail(fileName) {
         }
         xhr.send(formData)
     })
+}
+
+function getTotalPages(url) {
+    return new Promise((resolve, reject) => {
+      const loadingTask = pdfjsLib.getDocument(url)
+
+      loadingTask.promise.then(
+        (pdfDocument) => {
+          const totalPages = pdfDocument.numPages
+          resolve(totalPages)
+        },
+        (error) => {
+          reject(error)
+        }
+      )
+    })
+}
+
+function remainingBalance() {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        var formData = new FormData()
+        var timerStart = Date.now()
+        xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
+        var timer = setInterval(function() {
+            if (Date.now() - timerStart > 30000) {
+                xhr.abort()
+                clearInterval(timer)
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 524,
+                    versioningMessage: 'Connection timeout',
+                    versioningError: 'Connection timeout'
+                })
+            }
+        }, 10000)
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                clearInterval(timerStart)
+	            if (xhr.responseText.trim().startsWith('{')) {
+                    if (xhr.status == 200) {
+                        var xhrReturn = JSON.parse(xhr.responseText)
+                        if (xhrReturn.status == 200) {
+                            if (xhrReturn.remaining > 0) {
+                                xhrBalance = true
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: true,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            } else {
+                                xhrBalance = false
+                                xhrBalanceRemaining = xhrReturn.remaining
+                                resolve({
+                                    xhrBalance: false,
+                                    xhrBalanceRemaining: xhrReturn.remaining,
+                                    xhrBalanceStatus: xhrReturn.status,
+                                    xhrBalanceResponse: xhrReturn.message
+                                })
+                            }
+                            xhrBalanceRemaining = xhrReturn.remaining
+                        } else {
+                            xhrBalance = false
+                            xhrBalanceRemaining = 0
+                            resolve({
+                                xhrBalance: false,
+                                xhrBalanceRemaining: 0,
+                                xhrBalanceStatus: xhrReturn.status,
+                                xhrBalanceResponse: xhrReturn.message
+                            })
+                        }
+                    } else if (xhr.status == 429) {
+                        xhrBalance = false
+                        xhrBalanceRemaining = 0
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: 429,
+                            xhrBalanceResponse: 'Too many request'
+                        })
+                    } else if (xhr.status == 524) {
+                        xhrBalance = false
+                        xhrBalanceRemaining = 0
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: 524,
+                            xhrBalanceResponse: 'Connection timeout'
+                        })
+                    } else {
+                        xhrBalance = false
+                        xhrBalanceRemaining = 0
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: 0,
+                            xhrBalanceStatus: xhr.status,
+                            xhrBalanceResponse: 'Failed to fetch monthly limit'
+                        })
+                    }
+                } else {
+                    reject({
+                        xhrBalance: false,
+                        xhrBalanceRemaining: 0,
+                        xhrBalanceStatus: 0,
+                        xhrBalanceResponse: 'Internal server error (0)'
+                    })
+                }
+            }
+        }
+        xhr.send(formData)
+    })
+}
+
+function resetErrListMessage() {
+    errListMessage.innerHTML = `
+        <ul id="err-list"class="mt-1.5 list-disc list-inside font-bold"></ul>
+    `
 }
 
 function sendToAPI(files, proc, action) {
@@ -1176,6 +1410,9 @@ function sendToAPI(files, proc, action) {
             })
         }
 
+        xhr.open('POST', apiUrl+'/api/v1/core/'+proc, true)
+        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+
         var timer = setInterval(function() {
             if (Date.now() - timerStart > 105000) {
                 xhr.abort()
@@ -1187,10 +1424,8 @@ function sendToAPI(files, proc, action) {
                     xhrRequestStatus: 524
                 })
             }
-        }, 1000)
+        }, 15000)
 
-        xhr.open('POST', apiUrl+'/api/v1/core/'+proc, true)
-        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 clearInterval(timerStart)
@@ -2053,128 +2288,6 @@ function submit(event) {
     }
 }
 
-function fileNameFormat(fileName) {
-    let trimmedFileName = fileName.trim()
-    let newFileName = trimmedFileName.replace(/\s+/g, '_')
-
-    return newFileName;
-}
-
-function generateMesssage(subMessage) {
-    var ul = document.getElementById("err-list")
-    var li = document.createElement("li")
-    li.appendChild(document.createTextNode(subMessage))
-    ul.appendChild(li)
-}
-
-function getTotalPages(url) {
-    return new Promise((resolve, reject) => {
-      const loadingTask = pdfjsLib.getDocument(url)
-
-      loadingTask.promise.then(
-        (pdfDocument) => {
-          const totalPages = pdfDocument.numPages
-          resolve(totalPages)
-        },
-        (error) => {
-          reject(error)
-        }
-      )
-    })
-}
-
-function remainingBalance() {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest()
-        var formData = new FormData()
-        var timerStart = Date.now()
-        xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
-        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    versioningCheck: false,
-                    versioningStats: 524,
-                    versioningMessage: 'Connection timeout',
-                    versioningError: 'Connection timeout',
-                })
-            }
-        }, 1000)
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                clearInterval(timerStart)
-	            if (xhr.responseText.trim().startsWith('{')) {
-                    if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
-                        if (xhrReturn.status == 200) {
-                            if (xhrReturn.remaining > 0) {
-                                xhrBalance = true
-                                xhrBalanceRemaining = xhrReturn.remaining
-                                resolve({
-                                    xhrBalance: true,
-                                    xhrBalanceRemaining: xhrReturn.remaining,
-                                    xhrBalanceStatus: xhrReturn.status,
-                                    xhrBalanceResponse: xhrReturn.message
-                                })
-                            } else {
-                                xhrBalance = false
-                                xhrBalanceRemaining = xhrReturn.remaining
-                                resolve({
-                                    xhrBalance: false,
-                                    xhrBalanceRemaining: xhrReturn.remaining,
-                                    xhrBalanceStatus: xhrReturn.status,
-                                    xhrBalanceResponse: xhrReturn.message
-                                })
-                            }
-                            xhrBalanceRemaining = xhrReturn.remaining
-                        } else {
-                            xhrBalance = false
-                            xhrBalanceRemaining = 0
-                            resolve({
-                                xhrBalance: false,
-                                xhrBalanceRemaining: 0,
-                                xhrBalanceStatus: xhrReturn.status,
-                                xhrBalanceResponse: xhrReturn.message
-                            })
-                        }
-                    } else if (xhr.status == 429) {
-                        xhrBalance = false
-                        xhrBalanceRemaining = 0
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: 429,
-                            xhrBalanceResponse: 'Too many request'
-                        })
-                    } else {
-                        xhrBalance = false
-                        xhrBalanceRemaining = 0
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: xhr.status,
-                            xhrBalanceResponse: 'Failed to fetch monthly limit'
-                        })
-                    }
-                } else {
-                    reject({
-                        xhrBalance: false,
-                        xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: 0,
-                        xhrBalanceResponse: 'Internal server error (0)'
-                    })
-                }
-            }
-        }
-        xhr.send(formData)
-    })
-}
-
 function validateVersion() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
@@ -2200,7 +2313,7 @@ function validateVersion() {
                     versioningError: 'Connection timeout',
                 })
             }
-        }, 1000)
+        }, 15000)
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
@@ -2257,97 +2370,4 @@ function validateVersion() {
         }
         xhr.send(formData)
     })
-}
-
-function fetchVersion() {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest()
-        var formData = new FormData()
-        var timerStart = Date.now()
-        formData.append('appServicesReferrer', 'FE')
-
-        xhr.open('POST', apiUrl+'/api/v1/version/fetch', true)
-        xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
-
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    versionFetchCheck: false,
-                    versionFetchStats: 524,
-                    versionFetchMessage: 'Connection timeout',
-                    versionFetchResponse: null,
-                    versionFetchError: 'Connection timeout'
-                })
-            }
-        }, 1000)
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                clearInterval(timerStart)
-	            if (xhr.responseText.trim().startsWith('{')) {
-                    if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
-                        if (xhrReturn.errors == null) {
-                            resolve({
-                                versionFetchCheck: true,
-                                versionFetchStats: xhrReturn.status,
-                                versionFetchMessage: xhrReturn.message,
-                                versionFetchResponse: xhrReturn.response,
-                                versionFetchError: null
-                            })
-                        } else {
-                            reject({
-                                versionFetchCheck: false,
-                                versionFetchStats: xhrReturn.status,
-                                versionFetchMessage: xhrReturn.message,
-                                versionFetchResponse: xhrReturn.response,
-                                versionFetchError: xhrReturn.errors
-                            })
-                        }
-                    } else if (xhr.status == 429) {
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: 429,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Too many request'
-                        })
-                    } else if (xhr.status == 524) {
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: 524,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Connection Timeout'
-                        })
-                    } else {
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: xhrReturn.status,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Internal Server Error'
-                        })
-                    }
-                } else {
-                    reject({
-                        versionFetchCheck: false,
-                        versionFetchStats: 0,
-                        versionFetchMessage: 'Internal server error (0)',
-                        versionFetchResponse: xhrReturn.response,
-                        versionFetchError: 'Internal Server Error'
-                    })
-                }
-            }
-        }
-        xhr.send(formData)
-    })
-}
-
-function resetErrListMessage() {
-    errListMessage.innerHTML = `
-        <ul id="err-list"class="mt-1.5 list-disc list-inside font-bold"></ul>
-    `
 }
