@@ -35,7 +35,10 @@ class DailyReport extends Command
      */
     public function handle()
     {
-        $currentTime = Carbon::now('Asia/Jakarta')->format('Y-m-d');
+        $currentTime = Carbon::yesterday('Asia/Jakarta')->format('Y-m-d');
+        $currentTime->hour(19);
+        $currentTime->minute(00);
+        $currentTime->second(00);
         try {
             $compTotalScs = compressModel::where('procStartAt', '>=', $currentTime)
                                         ->where('result', '=', true)
