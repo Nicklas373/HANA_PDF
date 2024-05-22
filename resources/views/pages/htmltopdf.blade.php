@@ -33,7 +33,6 @@
                 <option value="A3">A3</option>
                 <option value="A4">A4</option>
                 <option value="A5">A5</option>
-                <option value="A6">A6</option>
                 <option value="Auto">Auto</option>
                 <option value="Letter">Letter</option>
             </select>
