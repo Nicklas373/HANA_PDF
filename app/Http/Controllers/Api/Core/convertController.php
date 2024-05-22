@@ -1924,13 +1924,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -1938,13 +1938,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -1952,13 +1952,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -1988,13 +1988,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2002,13 +2002,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2016,13 +2016,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2052,13 +2052,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2066,13 +2066,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2080,13 +2080,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2116,13 +2116,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2130,13 +2130,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2144,13 +2144,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2180,13 +2180,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2194,13 +2194,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2208,13 +2208,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2244,13 +2244,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2258,13 +2258,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2272,13 +2272,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2308,13 +2308,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2322,13 +2322,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2336,13 +2336,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2372,13 +2372,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2386,13 +2386,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2400,13 +2400,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'imgToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'imgToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2445,13 +2445,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2459,13 +2459,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2473,13 +2473,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2509,13 +2509,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2523,13 +2523,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2537,13 +2537,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2573,13 +2573,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2587,13 +2587,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2601,13 +2601,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2637,13 +2637,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2651,13 +2651,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2665,13 +2665,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2701,13 +2701,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2715,13 +2715,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2729,13 +2729,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2765,13 +2765,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2779,13 +2779,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2793,13 +2793,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2829,13 +2829,13 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2843,13 +2843,13 @@ class convertController extends Controller
                                         $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2857,13 +2857,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2893,27 +2893,27 @@ class convertController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF Conversion Failed',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
                                         null,
-                                        $asposeAPI->getErrorOutput()
+                                        $e->getMessage()
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Database connection error !', $ex->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
@@ -2921,13 +2921,13 @@ class convertController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'pdfToImg', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'docToPDF', 'Eloquent transaction error !', $e->getMessage());
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
                                         $currentFileName,
                                         null,
-                                        'pdfToImg',
+                                        'docToPDF',
                                         $Nuuid,
                                         $newFileSize,
                                         null,
