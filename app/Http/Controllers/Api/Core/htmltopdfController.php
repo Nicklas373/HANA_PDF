@@ -27,7 +27,7 @@ class htmltopdfController extends Controller
         $validator = Validator::make($request->all(),[
 		    'urlToPDF' => 'required',
             'urlMarginValue' => ['required', 'numeric'],
-            'urlSizeValue' => ['required', 'in:A3,A4,A5,A6,Auto,Letter'],
+            'urlSizeValue' => ['required', 'in:A3,A4,A5,Auto,Letter'],
             'urlPageOrientationValue' => ['required', 'in:landscape,portrait'],
             'urlSinglePage' => ['required', 'in:true,false']
 	    ]);
@@ -182,9 +182,7 @@ class htmltopdfController extends Controller
                 $pdfFile = $ilovepdfTask->addUrl($newUrl);
                 $ilovepdfTask->setPageOrientation($pdfOrientation);
                 $ilovepdfTask->setPageMargin($pdfMargin);
-                if ($pdfSize !== 'Auto') {
-                    $ilovepdfTask->setPageSize($pdfSize);
-                }
+                $ilovepdfTask->setPageSize($pdfSize);
                 if ($pdfSinglePage == 'true') {
                     $ilovepdfTask->setSinglePage(true);
                 } else {
