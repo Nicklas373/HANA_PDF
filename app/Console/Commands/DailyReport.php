@@ -35,10 +35,8 @@ class DailyReport extends Command
      */
     public function handle()
     {
-        $currentTime = Carbon::yesterday('Asia/Jakarta')->format('Y-m-d');
+        $currentTime = Carbon::yesterday('Asia/Jakarta');
         $currentTime->hour(19);
-        $currentTime->minute(00);
-        $currentTime->second(00);
         try {
             $compTotalScs = compressModel::where('procStartAt', '>=', $currentTime)
                                         ->where('result', '=', true)
@@ -56,7 +54,7 @@ class DailyReport extends Command
                                         ->count();
             if ($compTotalErr > 0) {
                 compressModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', '=', true)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
