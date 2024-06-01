@@ -43,7 +43,6 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ### Commit History
 - [Old branch - master](https://github.com/Nicklas373/Hana-PDF/tree/master)
-- [Docker Container - docker/master](https://github.com/Nicklas373/Hana-PDF/tree/docker/master)
 - [Frontend Services - fe/master](https://github.com/Nicklas373/Hana-PDF/tree/fe/master)
 - [Backend Services - be/master](https://github.com/Nicklas373/Hana-PDF/tree/be/master)
 - [(DEV) Frontend Services - dev/fe/master](https://github.com/Nicklas373/Hana-PDF/tree/dev/fe/master)
