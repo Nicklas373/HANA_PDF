@@ -3,7 +3,7 @@ FROM php:8.2-fpm
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.0"
+LABEL version="1.1"
 LABEL description="Docker application image for HANA PDF Apps"
 
 # Configure ARG
@@ -13,20 +13,31 @@ ARG DB_PASSWORD
 # Configure work directory
 WORKDIR /var/www/html
 
-# Configure initial updates for instance
-RUN apt-get update && apt-get upgrade -y 
+# Configure timezone
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+    apt-get install -yq tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+ENV TZ="Asia/Jakarta"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Configure initial packages
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     git \
-    && apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    libzip-dev 
+
+# Install PHP extensions
+RUN docker-php-ext-install -j$(nproc) zip
+
+# Configure PostgresSQL PHP Driver
+RUN apt-get update && apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo_pgsql
 
 # Clone App Services
-RUN git clone -b fe/master https://github.com/Nicklas373/Hana-PDF hanaci-pdf
+RUN git clone -b dev/fe/master-live https://github.com/Nicklas373/Hana-PDF hanaci-pdf
 RUN chown -R www-data:www-data hanaci-pdf
 
 # Configure Composer
@@ -34,6 +45,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN cd hanaci-pdf && composer install --no-interaction --no-scripts --no-progress --prefer-dist
 
 # Configure App Service
+COPY module/php/php.ini /usr/local/etc/php/conf.d/99-hana.ini
 RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 RUN cd hanaci-pdf && cp .env.example .env
 RUN cd hanaci-pdf && php artisan key:generate
@@ -53,3 +65,9 @@ RUN cd hanaci-pdf && sed -i "s/DB_USERNAME=root/DB_USERNAME=$DB_USERNAME/" .env
 RUN cd hanaci-pdf && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
 RUN cd hanaci-pdf && echo "TELEGRAM_BOT_ID=xxxx" >> .env
 RUN cd hanaci-pdf && echo "TELEGRAM_CHAT_ID=xxxx" >> .env
+
+# Expose port 9000
+EXPOSE 9000
+
+# Start PHP FPM
+CMD ["php-fpm"]
