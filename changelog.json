@@ -1,14 +1,9 @@
 {
     "release_date": "May, 20 2024",
-    "version": "3.2.6",
+    "version": "3.2.7",
     "changelog": [
-        "After task completed, it will show success notification and scroll automatically to download layout",
-        "Along task processed, almost all component will have pulse animation",
-        "HtmlToPDF and Watermark PDF menu got slightly polish on menu selection",
-        "Loading notification for task process, now are not lock the screen entirely (Click outside notification to unlock)",
-        "Introducing features to check if user was accessed Hana PDF from latest revision or using cached revision",
-        "Introducing features to see recent updates from Hana PDF (What's New)",
-        "Optimize our web resources to maintain speed and efficiency for when loading page",
-        "Upgrade our web framework to latest Laravel 11.x"
+        "Fix issue with 'Internal Server Error(0)' when upload file in several menu",
+        "Fix issue with missing thumbnail when upload PPT or PPTX file on Convert To PDF menu",
+        "Updating our internal libraries to latest version"
     ]
 }
