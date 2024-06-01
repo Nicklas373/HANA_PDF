@@ -633,7 +633,11 @@ if (uploadDropzoneAlt) {
                 if (!file.type.startsWith('image/')) {
                     generateThumbnail(file.name)
                     .then(function(thumbnailURL) {
-                        file.previewElement.querySelector(".dz-image-thumbnail").src = apiUrl+thumbnailURL
+                        console.log(file.type)
+                        if (file.type == 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
+                            file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"
+                        else
+                            file.previewElement.querySelector(".dz-image-thumbnail").src = apiUrl+thumbnailURL
                     })
                     .catch(function(error) {
                         file.previewElement.querySelector(".dz-image-thumbnail").src = "/assets/icons/placeholder_pptx.svg"

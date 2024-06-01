@@ -3,8 +3,8 @@ FROM php:8.2-fpm
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.0"
-LABEL description="Docker container for HANA PDF REST API"
+LABEL version="1.1"
+LABEL description="Docker container for https://gw.hana-ci.com"
 
 # Configure ARG
 ARG DB_USERNAME
@@ -15,8 +15,12 @@ ARG JWT_TTL
 # Configure work directory
 WORKDIR /var/www/html
 
-# Configure updates packages
-RUN apt-get update && apt-get upgrade -y && apt-get upgrade dist -y && apt-get dist-upgrade -y
+# Configure timezone
+ENV TZ="Asia/Jakarta"
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 
 # Configure initial packages
 RUN apt-get update && apt-get install -y \
@@ -28,13 +32,16 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
-    ghostscript
+    ghostscript \
+    python3 \
+    python3-pip
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
         gd \
-        zip
+        zip \
+        ftp
 
 # Install Imagick extension
 RUN pecl install imagick && \
@@ -44,8 +51,12 @@ RUN pecl install imagick && \
 RUN apt-get update && apt-get install -y libpq-dev && \
     docker-php-ext-install pdo_pgsql
 
+# Configure Python modules
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+RUN pip3 install --upgrade pip && pip3 install requests
+
 # Clone App Services
-RUN git clone -b be/master https://github.com/Nicklas373/Hana-PDF hanaci-api
+RUN git clone -b dev/be/master https://github.com/Nicklas373/Hana-PDF hanaci-api
 RUN chown -R www-data:www-data hanaci-api
 
 # Configure Composer
@@ -53,6 +64,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN cd hanaci-api && composer install --no-interaction --no-scripts --no-progress --prefer-dist
 
 # Configure App Service
+COPY module/php/php.ini /usr/local/etc/php/conf.d/99-hana.ini
 RUN mkdir hanaci-api/storage/app/public/batch
 RUN mkdir hanaci-api/storage/app/public/download
 RUN mkdir hanaci-api/storage/app/public/image
@@ -96,3 +108,9 @@ RUN cd hanaci-api && echo "PDF_POOL=pool" >> .env
 RUN cd hanaci-api && echo "TELEGRAM_BOT_ID=xxxx" >> .env
 RUN cd hanaci-api && echo "TELEGRAM_CHAT_ID=xxxx" >> .env
 RUN cd hanaci-api && echo "HANA_UNIQUE_KEY=xxxx" >> .env
+
+# Expose port 9000
+EXPOSE 9000
+
+# Start PHP FPM
+CMD ["php-fpm"]
