@@ -51,6 +51,7 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/file')->group(funct
     Route::post('upload', [uploadController::class, 'upload']);
     Route::post('remove', [uploadController::class, 'remove']);
     Route::post('thumbnail', [thumbnailController::class, 'getThumbnail']);
+    Route::post('getTotalPagesPDF', [uploadController::class, 'getTotalPagesPDF']);
 });
 
 Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/logs')->group(function() {
