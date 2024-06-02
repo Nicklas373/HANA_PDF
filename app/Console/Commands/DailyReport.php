@@ -49,7 +49,7 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $compTotalErr = compressModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($compTotalErr > 0) {
@@ -69,12 +69,12 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $cnvTotalErr = cnvModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($cnvTotalErr > 0) {
                 cnvModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
@@ -89,12 +89,12 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $htmlTotalErr = htmlModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($htmlTotalErr > 0) {
                 htmlModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
@@ -109,12 +109,12 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $mergeTotalErr = mergeModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($mergeTotalErr > 0) {
                 mergeModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
@@ -129,12 +129,12 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $splitTotalErr = splitModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($splitTotalErr > 0) {
                 splitModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
@@ -149,12 +149,12 @@ class DailyReport extends Command
                                         ->update(['isReport' => true]);
             }
             $watermarkTotalErr = watermarkModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($watermarkTotalErr > 0) {
                 watermarkModel::where('procStartAt', '>=', $currentTime)
-                                        ->where('result', false)
+                                        ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }

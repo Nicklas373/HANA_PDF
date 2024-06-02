@@ -180,6 +180,7 @@ class notifyLogController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'logCount' => 'required|int',
+            'logResult' => ['required', 'in:true,false'],
             'logType' =>  ['required', 'in:access,jobs,notify,compress,convert,html,merge,split,watermark'],
             'logOrder' => ['required', 'in:asc,desc']
         ]);
@@ -197,29 +198,30 @@ class notifyLogController extends Controller
             );
         }
         $logCount = $request->input('logCount');
+        $logResult = $request->input('logResult');
         $logModel = $request->input('logType');
         $logOrder = $request->input('logOrder');
         try {
             if ($logModel == 'access') {
-                $datalog = accessLogsModel::take($logCount)->get();
+                $datalog = accessLogsModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'jobs') {
-                $datalog = jobLogsModel::take($logCount)->get();
+                $datalog = jobLogsModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'notify') {
-                $datalog = notifyLogsModel::take($logCount)->get();
+                $datalog = notifyLogsModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'compress') {
-                $datalog = compressModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = compressModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'convert') {
-                $datalog = cnvModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = cnvModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'delete') {
-                $datalog = deleteModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = deleteModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'html') {
-                $datalog = htmlModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = htmlModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'merge') {
-                $datalog = mergeModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = mergeModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'split') {
-                $datalog = splitModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = splitModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'watermark') {
-                $datalog = watermarkModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = watermarkModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             }
             $dataArrayLog = $datalog->toArray();
             return $this->returnDataMesage(

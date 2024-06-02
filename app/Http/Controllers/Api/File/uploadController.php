@@ -107,4 +107,94 @@ class uploadController extends Controller
             }
         }
     }
+
+    public function getTotalPagesPDF(Request $request) {
+		$validator = Validator::make($request->all(),[
+			'fileName' => 'required'
+		]);
+
+		if ($validator->fails()) {
+            return $this->returnFileMesage(
+                401,
+                'Validation failed',
+                null,
+                $validator->messages()->first()
+            );
+		} else {
+			if($request->has('fileName')) {
+                $pdfName = $request->post('fileName');
+                $currentFileName = basename($pdfName);
+                $currentFileNameExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
+                $pdfUpload_Location = env('PDF_UPLOAD');
+                $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                $fileSize = filesize($newFilePath);
+                $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                if (file_exists($newFilePath)) {
+                    if ($currentFileNameExtension == 'pdf') {
+                        try {
+                            $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                            return $this->returnCoreMessage(
+                                200,
+                                $pdfTotalPages,
+                                $currentFileName,
+                                $newFilePath,
+                                'getTotalPDFPages',
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            );
+                        } catch (\Exception $e) {
+                            return $this->returnCoreMessage(
+                                200,
+                                'Failed to count total PDF pages from '.$currentFileName,
+                                $currentFileName,
+                                $newFilePath,
+                                'getTotalPDFPages',
+                                null,
+                                null,
+                                null,
+                                null,
+                                $e->getMessage()
+                            );
+                        }
+                    } else {
+                        return $this->returnCoreMessage(
+                            200,
+                            'File '.$currentFileName.' is not PDF file !',
+                            $currentFileName,
+                            $newFilePath,
+                            'getTotalPDFPages',
+                            null,
+                            null,
+                            null,
+                            null,
+                            'FILE_FORMAT_VALIDATION_EXCEPTION'
+                        );
+                    }
+                } else {
+                    return $this->returnCoreMessage(
+                        200,
+                        'File '.$currentFileName.' not found !',
+                        $currentFileName,
+                        $newFilePath,
+                        'getTotalPDFPages',
+                        null,
+                        null,
+                        null,
+                        null,
+                        'FILE_NOT_FOUND_EXCEPTION'
+                    );
+                }
+            } else {
+                return $this->returnFileMesage(
+                    200,
+                    'Failed to upload file !',
+                    null,
+                    'Requested file could not be found in the server'
+                );
+            }
+        }
+    }
 }
