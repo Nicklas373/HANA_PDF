@@ -187,7 +187,7 @@ if (whatsNewBtn) {
                 versionDiv.appendChild(versionTitle)
                 versionDiv.appendChild(releaseDate)
                 versionDiv.appendChild(changelogList)
-                versionHistoryContainer.appendChild(versionDiv)
+                versionHistoryLayout.appendChild(versionDiv)
             });
 
             procTitleMessageModal.innerText = "Preparing document..."
