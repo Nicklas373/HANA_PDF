@@ -27,7 +27,7 @@ class htmltopdfController extends Controller
         $validator = Validator::make($request->all(),[
 		    'urlToPDF' => 'required',
             'urlMarginValue' => ['required', 'numeric'],
-            'urlSizeValue' => ['required', 'in:A3,A4,A5,Auto,Letter'],
+            'urlSizeValue' => ['required', 'in:A3,A4,A5,Letter'],
             'urlPageOrientationValue' => ['required', 'in:landscape,portrait'],
             'urlSinglePage' => ['required', 'in:true,false']
 	    ]);
