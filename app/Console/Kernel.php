@@ -48,7 +48,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'cache:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $cacheClearGUID,
@@ -99,7 +99,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'optimize:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $optimizeClearGUID,
@@ -150,7 +150,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $viewClearGUID,
@@ -201,7 +201,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:cache',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $viewCacheGUID,
@@ -252,7 +252,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:clear-storage',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'hourly',
                     'jobsResult' => false,
                     'processId' => $hanaClearGUID,
@@ -303,7 +303,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'hana:daily-report',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-be',
                     'jobsRuntime' => 'Daily at 19.00',
                     'jobsResult' => false,
                     'processId' => $hanaReportGUID,
