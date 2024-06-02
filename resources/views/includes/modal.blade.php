@@ -76,14 +76,12 @@
                     <span class="sr-only">Close modal</span>
                 </button data-ripple-light="true">
             </div>
-            <div class="p-4 mx-4 mt-2 md:p-5">
-                <h2 class="flex items-start mb-1 text-lg font-semibold font-quicksand text-pc" id="versioningTitle">Lorem</h2>
-                <time class="block mb-3 text-sm font-normal leading-none font-quicksand text-dt3" id="versioningDate">Lorem</time>
-                <ul class="font-quicksand font-semibold text-sm text-dt1 list-disc list-inside overflow-y-auto mx-2" id="versioningChangelog"></ul>
-                <div class="flex flex-col items-center mt-5">
-                    <button data-modal-hide="versioningModal" type="button" class="text-white bg-pc mx-auto font-semibold font-quicksand rounded-md text-sm px-5 py-2.5 w-4/6" data-ripple-light="true">Close</button>
-                </div>
+            <div class="p-4 mx-4 mt-2 md:p-5 h-4/6 overflow-scroll">
+                <div id="versionHistoryLayout"></div>
             </div>
+        </div>
+        <div class="flex flex-col items-center mt-5">
+            <button data-modal-hide="versioningModal" type="button" class="text-white bg-pc mx-auto font-semibold font-quicksand rounded-md text-sm px-5 py-2.5 w-4/6" data-ripple-light="true">Close</button>
         </div>
     </div>
 </div>
