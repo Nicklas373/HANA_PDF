@@ -174,10 +174,10 @@ if (whatsNewBtn) {
                 versionDiv.className = 'version-entry mb-4'
                 versionTitle.className = 'flex items-start mb-1 text-lg font-semibold font-quicksand text-pc'
                 releaseDate.className = 'block mb-3 text-sm font-normal leading-none font-quicksand text-dt3'
+                versionTitle.innerText = 'Hana PDF v' + versionInfo.version
                 if (index == 0) {
                     versionTitle.innerHTML += '<span class="bg-pc3 text-dt text-sm font-semibold font-quicksand mr-2 mt-0.5 px-2.5 py-0.5 rounded ms-3">Latest</span>'
                 }
-                versionTitle.innerText = 'Hana PDF v' + versionInfo.version
                 releaseDate.innerText = 'Released on ' + versionInfo.release_date
                 versionInfo.changelog.forEach(change => {
                     const listItem = document.createElement('li')
