@@ -1,9 +1,35 @@
-{
-    "release_date": "May, 20 2024",
-    "version": "3.2.7",
-    "changelog": [
-        "Fix issue with 'Internal Server Error(0)' when upload file in several menu",
-        "Fix issue with missing thumbnail when upload PPT or PPTX file on Convert To PDF menu",
-        "Updating our internal libraries to latest version"
-    ]
-}
+[
+    {
+        "release_date": "June, 03 2024",
+        "version": "3.2.7",
+        "changelog": [
+            "Fix issue 'Internal Server Error(0)' when upload file in several menu",
+            "Fix issue missing thumbnail when upload PPT or PPTX file on Convert To PDF menu",
+            "Fix issue on Split PDF that total PDF pages are not counted properly",
+            "Properly describe actually message on upload file, instead only show 'Internal Server Error'",
+            "Updating our internal libraries to latest version"
+        ]
+    },
+    {
+        "release_date": "May, 20 2024",
+        "version": "3.2.6",
+        "changelog": [
+            "After task completed, it will show success notification and scroll automatically to download layout",
+            "Along task processed, almost all component will have pulse animation",
+            "HtmlToPDF and Watermark PDF menu got slightly polish on menu selection",
+            "Loading notification for task process, now are not lock the screen entirely (Click outside notification to unlock)",
+            "Introducing features to check if user was accessed Hana PDF from latest revision or using cached revision",
+            "Introducing features to see recent updates from Hana PDF (What's New)",
+            "Optimize our web resources to maintain speed and efficiency for when loading page"
+        ]
+    },
+    {
+        "release_date": "May, 19 2024",
+        "version": "3.2.5",
+        "changelog": [
+            "Change footer location back to left from center",
+            "Introducing more advanced features for HTML to PDF convert",
+            "Upgrade our web framework to latest Laravel 11.x"
+        ]
+    }
+]
