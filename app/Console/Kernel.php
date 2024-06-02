@@ -41,7 +41,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'cache:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-fe',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $cacheClearGUID,
@@ -92,7 +92,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'optimize:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-fe',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $optimizeClearGUID,
@@ -143,7 +143,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:clear',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-fe',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $viewClearGUID,
@@ -194,7 +194,7 @@ class Kernel extends ConsoleKernel
 					]);
                 DB::table('jobLogs')->insert([
                     'jobsName' => 'view:cache',
-                    'jobsEnv' => 'production',
+                    'jobsEnv' => 'production-fe',
                     'jobsRuntime' => 'weekly',
                     'jobsResult' => false,
                     'processId' => $viewCacheGUID,
