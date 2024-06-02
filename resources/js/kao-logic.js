@@ -163,43 +163,36 @@ if (whatsNewBtn) {
         procTitleMessageModal.innerText = "Fetching latest update..."
         loadingModal.show()
         fetchVersion().then(data => {
-            const versionHistoryContainer = document.getElementById('versionHistoryContainer');
-            versionHistoryContainer.innerHTML = '';
-
-            data.forEach((versionInfo, index) => {
-                const versionDiv = document.createElement('div');
-                versionDiv.className = 'version-entry mb-4';
-
-                const versionTitle = document.createElement('h2');
-                versionTitle.className = 'flex items-start mb-1 text-lg font-semibold font-quicksand text-pc';
-                versionTitle.innerHTML = 'Hana PDF v' + versionInfo.version;
-                if (index === 0) {
-                    versionTitle.innerHTML += '<span class="bg-pc3 text-dt text-sm font-semibold font-quicksand mr-2 mt-0.5 px-2.5 py-0.5 rounded ms-3">Latest</span>';
+            const versionHistoryLayout = document.getElementById('versionHistoryLayout')
+            versionHistoryLayout.innerHTML = ''
+            data.versionFetchResponse.forEach((versionInfo, index) => {
+                const changelogList = document.createElement('ul')
+                const versionDiv = document.createElement('div')
+                const versionTitle = document.createElement('h2')
+                const releaseDate = document.createElement('time')
+                changelogList.className = 'font-quicksand font-semibold text-sm text-dt1 list-disc list-inside overflow-y-auto mx-2'
+                versionDiv.className = 'version-entry mb-4'
+                versionTitle.className = 'flex items-start mb-1 text-lg font-semibold font-quicksand text-pc'
+                releaseDate.className = 'block mb-3 text-sm font-normal leading-none font-quicksand text-dt3'
+                versionTitle.innerText = 'Hana PDF v' + versionInfo.version
+                if (index == 0) {
+                    versionTitle.innerHTML += '<span class="bg-pc3 text-dt text-sm font-semibold font-quicksand mr-2 mt-0.5 px-2.5 py-0.5 rounded ms-3">Latest</span>'
                 }
-
-                const releaseDate = document.createElement('time');
-                releaseDate.className = 'block mb-3 text-sm font-normal leading-none font-quicksand text-dt3';
-                releaseDate.innerText = 'Released on ' + versionInfo.release_date;
-
-                const changelogList = document.createElement('ul');
-                changelogList.className = 'font-quicksand font-semibold text-sm text-dt1 list-disc list-inside overflow-y-auto mx-2';
-
+                releaseDate.innerText = 'Released on ' + versionInfo.release_date
                 versionInfo.changelog.forEach(change => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = change;
-                    changelogList.appendChild(listItem);
-                });
-
-                versionDiv.appendChild(versionTitle);
-                versionDiv.appendChild(releaseDate);
-                versionDiv.appendChild(changelogList);
-
-                versionHistoryContainer.appendChild(versionDiv);
+                    const listItem = document.createElement('li')
+                    listItem.textContent = change
+                    changelogList.appendChild(listItem)
+                })
+                versionDiv.appendChild(versionTitle)
+                versionDiv.appendChild(releaseDate)
+                versionDiv.appendChild(changelogList)
+                versionHistoryLayout.appendChild(versionDiv)
             });
 
-            procTitleMessageModal.innerText = "Preparing document...";
-            loadingModal.hide();
-            versioningModal.show();
+            procTitleMessageModal.innerText = "Preparing document..."
+            loadingModal.hide()
+            versioningModal.show()
         }).catch(function (error) {
             procTitleMessageModal.innerText = "Preparing document..."
             loadingModal.hide()
