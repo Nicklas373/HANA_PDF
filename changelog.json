@@ -1,5 +1,14 @@
 [
     {
+        "release_date": "July, 07 2024",
+        "version": "3.2.8",
+        "changelog": [
+            "Fix issue connection timeout in some case",
+            "Fix issue error message are not show properly",
+            "Updating our internal libraries to latest version"
+        ]
+    },
+    {
         "release_date": "June, 03 2024",
         "version": "3.2.7",
         "changelog": [
