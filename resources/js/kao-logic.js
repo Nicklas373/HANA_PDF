@@ -421,7 +421,7 @@ if (uploadDropzone) {
                     }
                     dzErrorMessage.textContent = newErrMessage
                 } else {
-                    dzErrorMessage.textContent = "Internal server error (0)"
+                    dzErrorMessage.textContent = "Internal server error"
                 }
                 errMessage.innerText  = "Failed to upload " + file.name
                 errSubMessage.innerText = ""
@@ -666,7 +666,7 @@ if (uploadDropzoneAlt) {
                     }
                     dzErrorMessage.textContent = newErrMessage
                 } else {
-                    dzErrorMessage.textContent = "Internal server error (0)"
+                    dzErrorMessage.textContent = "Internal server error"
                 }
                 errMessage.innerText  = "Failed to upload " + file.name
                 errSubMessage.innerText = ""
@@ -911,7 +911,7 @@ if (uploadDropzoneSingle) {
                     }
                     dzErrorMessage.textContent = newErrMessage
                 } else {
-                    dzErrorMessage.textContent = "Internal server error (0)"
+                    dzErrorMessage.textContent = "Internal server error"
                 }
                 errMessage.innerText  = "Failed to upload " + file.name
                 errSubMessage.innerText = ""
@@ -1100,8 +1100,8 @@ function fetchVersion() {
                 } else {
                     reject({
                         versionFetchCheck: false,
-                        versionFetchStats: xhr.status,
-                        versionFetchMessage: xhr.message,
+                        versioningStats: 500,
+                        versioningMessage: 'Internal Server Error',
                         versionFetchResponse: 'Internal Server Error',
                         versionFetchError: 'Internal Server Error'
                     })
@@ -1178,8 +1178,8 @@ function getTotalPages(fileName) {
             if (xhr.readyState == 4) {
                 clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
+                    var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
                         if (xhrReturn.status == 200) {
                             resolve({
                                 totalPages: true,
@@ -1195,34 +1195,20 @@ function getTotalPages(fileName) {
                                 totalPagesError: xhrReturn.errors
                             })
                         }
-                    } else if (xhr.status == 429) {
-                        reject({
-                            totalPages: false,
-                            totalPagesStats: 429,
-                            totalPagesMessage: null,
-                            totalPagesError: 'Too many request'
-                        })
-                    } else if (xhr.status == 524) {
-                        reject({
-                            totalPages: false,
-                            totalPagesStats: 524,
-                            totalPagesMessage: null,
-                            totalPagesError: 'Connection timeout'
-                        })
                     } else {
                         reject({
                             totalPages: false,
-                            totalPagesStats: xhr.status,
-                            totalPagesMessage: null,
-                            totalPagesError: 'Unhandled XHR response'
+                            totalPagesStats: xhrReturn.status,
+                            totalPagesMessage: xhrReturn.message,
+                            totalPagesError: xhrReturn.errors
                         })
                     }
                 } else {
                     reject({
                         totalPages: false,
-                        totalPagesStats: xhr.status,
-                        totalPagesMessage: null,
-                        totalPagesError: 'Internal Server Error (0)'
+                        totalPagesStats: 500,
+                        totalPagesMessage: 'Internal Server Error',
+                        totalPagesError: 'Internal Server Error'
                     })
                 }
             }
@@ -1256,8 +1242,8 @@ function remainingBalance() {
             if (xhr.readyState == 4) {
                 clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
+                    var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
                         if (xhrReturn.status == 200) {
                             if (xhrReturn.remaining > 0) {
                                 xhrBalance = true
@@ -1289,40 +1275,22 @@ function remainingBalance() {
                                 xhrBalanceResponse: xhrReturn.message
                             })
                         }
-                    } else if (xhr.status == 429) {
+                    }else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
                         reject({
                             xhrBalance: false,
                             xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: 429,
-                            xhrBalanceResponse: 'Too many request'
-                        })
-                    } else if (xhr.status == 524) {
-                        xhrBalance = false
-                        xhrBalanceRemaining = 0
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: 524,
-                            xhrBalanceResponse: 'Connection timeout'
-                        })
-                    } else {
-                        xhrBalance = false
-                        xhrBalanceRemaining = 0
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: xhr.status,
-                            xhrBalanceResponse: 'Failed to fetch monthly limit'
+                            xhrBalanceStatus: xhrReturn.status,
+                            xhrBalanceResponse: xhrReturn.message
                         })
                     }
                 } else {
                     reject({
                         xhrBalance: false,
                         xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: 0,
-                        xhrBalanceResponse: 'Internal server error (0)'
+                        xhrBalanceStatus: 500,
+                        xhrBalanceResponse: 'Internal server error'
                     })
                 }
             }
@@ -1468,7 +1436,7 @@ function sendToAPI(files, proc, action) {
                 reject({
                     xhrRequestCondition: 'ERROR',
                     xhrRequestMessage: 'Connection timeout',
-                    xhrRequestServerMessage: '',
+                    xhrRequestServerMessage: 'Connection timeout',
                     xhrRequestStatus: 524
                 })
             }
@@ -1483,35 +1451,35 @@ function sendToAPI(files, proc, action) {
                         if (xhrReturn.status == 200) {
                             if (xhrReturn.errors == null) {
                                 if (proc == 'compress' && xhrTotalUploads == 1)
-                                {
-                                    document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
-                                    document.getElementById("alert-err").classList.add("hidden","opacity-0")
-                                    document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
-                                    document.getElementById("scsMsgResult").innerHTML = `
-                                        PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
-                                    `
-                                    document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
-                                    document.getElementById("scsMsgLink").innerText = "Download PDF"
-                                    resolve({
-                                        xhrRequestCondition: 'OK',
-                                        xhrRequestMessage: xhrReturn.message,
-                                        xhrRequestServerMessage: '',
-                                        xhrRequestStatus: xhr.status
-                                    })
-                                } else {
-                                    document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
-                                    document.getElementById("alert-err").classList.add("hidden","opacity-0")
-                                    document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
-                                    document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
-                                    document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
-                                    document.getElementById("scsMsgLink").innerText = "Download PDF"
-                                    resolve({
-                                        xhrRequestCondition: 'OK',
-                                        xhrRequestMessage: xhrReturn.message,
-                                        xhrRequestServerMessage: '',
-                                        xhrRequestStatus: xhr.status
-                                    })
-                                }
+                                    {
+                                        document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
+                                        document.getElementById("alert-err").classList.add("hidden","opacity-0")
+                                        document.getElementById("scsMsgTitle").innerText = "HANA PDF Process completed !"
+                                        document.getElementById("scsMsgResult").innerHTML = `
+                                            PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
+                                        `
+                                        document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
+                                        document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                        resolve({
+                                            xhrRequestCondition: 'OK',
+                                            xhrRequestMessage: xhrReturn.message,
+                                            xhrRequestServerMessage: '',
+                                            xhrRequestStatus: xhrReturn.status
+                                        })
+                                    } else {
+                                        document.getElementById("alert-scs").classList.remove("hidden","opacity-0")
+                                        document.getElementById("alert-err").classList.add("hidden","opacity-0")
+                                        document.getElementById("scsMsgTitle").innerText = `HANA PDF Process completed !`
+                                        document.getElementById("scsMsgResult").innerText = `Download the file or PDF below.`
+                                        document.getElementById("scsMsgLink").href = apiUrl+xhrReturn.fileSource
+                                        document.getElementById("scsMsgLink").innerText = "Download PDF"
+                                        resolve({
+                                            xhrRequestCondition: 'OK',
+                                            xhrRequestMessage: xhrReturn.message,
+                                            xhrRequestServerMessage: '',
+                                            xhrRequestStatus: xhrReturn.status
+                                        })
+                                    }
                             } else {
                                 document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                                 document.getElementById("alert-err").classList.remove("hidden","opacity-0")
@@ -1523,7 +1491,7 @@ function sendToAPI(files, proc, action) {
                                     xhrRequestCondition: 'ERROR',
                                     xhrRequestMessage: xhrReturn.message,
                                     xhrRequestServerMessage: xhrReturn.errors,
-                                    xhrRequestStatus: xhr.status
+                                    xhrRequestStatus: xhrReturn.status
                                 })
                             }
                         } else {
@@ -1537,21 +1505,9 @@ function sendToAPI(files, proc, action) {
                                 xhrRequestCondition: 'ERROR',
                                 xhrRequestMessage: xhrReturn.message,
                                 xhrRequestServerMessage: xhrReturn.errors,
-                                xhrRequestStatus: xhr.status
+                                xhrRequestStatus: xhrReturn.status
                             })
                         }
-                    } else if (xhr.status == 524) {
-                        document.getElementById("alert-scs").classList.add("hidden","opacity-0")
-                        document.getElementById("alert-err").classList.remove("hidden","opacity-0")
-                        document.getElementById("errMsgTitle").innerText = "HANA PDF Process failed !"
-                        document.getElementById("errMsg").innerText = "There was unexpected error !, please try again later."
-                        document.getElementById("errProcMain").classList.remove("hidden")
-                        reject({
-                            xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Connection Timeout',
-                            xhrRequestServerMessage: '',
-                            xhrRequestStatus: xhr.status
-                        })
                     } else {
                         document.getElementById("alert-scs").classList.add("hidden","opacity-0")
                         document.getElementById("alert-err").classList.remove("hidden","opacity-0")
@@ -1560,9 +1516,9 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errProcMain").classList.remove("hidden")
                         reject({
                             xhrRequestCondition: 'ERROR',
-                            xhrRequestMessage: 'Internal server error',
-                            xhrRequestServerMessage: '',
-                            xhrRequestStatus: xhr.status
+                            xhrRequestMessage: xhrReturn.message,
+                            xhrRequestServerMessage: xhrReturn.errors,
+                            xhrRequestStatus: xhrReturn.status
                         })
                     }
                 } else {
@@ -1573,9 +1529,9 @@ function sendToAPI(files, proc, action) {
                     document.getElementById("errProcMain").classList.remove("hidden")
                     reject({
                         xhrRequestCondition: 'ERROR',
-                        xhrRequestMessage: 'Internal server error (0)',
-                        xhrRequestServerMessage: '',
-                        xhrRequestStatus: 0
+                        xhrRequestMessage: 'Internal server error',
+                        xhrRequestServerMessage: 'Internal server error',
+                        xhrRequestStatus: 500
                     })
                 }
             }
@@ -2447,8 +2403,8 @@ function validateVersion() {
                 } else {
                     reject({
                         versioningCheck: false,
-                        versioningStats: xhr.status,
-                        versioningMessage: xhr.message,
+                        versioningStats: 500,
+                        versioningMessage: 'Internal Server Error',
                         versioningError: 'Internal Server Error'
                     })
                 }
