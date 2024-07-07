@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "853ead0094ec7e821571068344b97f88",
+    "content-hash": "af88a0eac94dc28fcd9518e7df9d7e14",
     "packages": [
         {
             "name": "aspose-cloud/aspose-words-cloud",
@@ -5193,24 +5193,24 @@
         },
         {
             "name": "spatie/pdf-to-image",
-            "version": "2.3.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/pdf-to-image.git",
-                "reference": "7c68cc95c0a5e63d712b705ff55459071c2a7b54"
+                "reference": "b145cf49cd232921e7d13d6d52e72c9f2581f446"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/pdf-to-image/zipball/7c68cc95c0a5e63d712b705ff55459071c2a7b54",
-                "reference": "7c68cc95c0a5e63d712b705ff55459071c2a7b54",
+                "url": "https://api.github.com/repos/spatie/pdf-to-image/zipball/b145cf49cd232921e7d13d6d52e72c9f2581f446",
+                "reference": "b145cf49cd232921e7d13d6d52e72c9f2581f446",
                 "shasum": ""
             },
             "require": {
                 "ext-imagick": "*",
-                "php": "^7.2|^8.0"
+                "php": "^8.2"
             },
             "require-dev": {
-                "pestphp/pest": "^1.21"
+                "pestphp/pest": "^2.34"
             },
             "type": "library",
             "autoload": {
@@ -5228,6 +5228,12 @@
                     "email": "freek@spatie.be",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
+                },
+                {
+                    "name": "Patrick Organ",
+                    "email": "patrick@permafrost.dev",
+                    "homepage": "https://permafrost.dev",
+                    "role": "Developer"
                 }
             ],
             "description": "Convert a pdf to an image",
@@ -5241,15 +5247,19 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/pdf-to-image/issues",
-                "source": "https://github.com/spatie/pdf-to-image/tree/2.3.0"
+                "source": "https://github.com/spatie/pdf-to-image/tree/3.0.0"
             },
             "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/spatie",
                     "type": "github"
                 }
             ],
-            "time": "2024-03-07T09:42:07+00:00"
+            "time": "2024-06-10T18:40:38+00:00"
         },
         {
             "name": "stella-maris/clock",
