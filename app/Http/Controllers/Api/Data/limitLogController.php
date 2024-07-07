@@ -11,7 +11,7 @@ class limitLogController extends Controller
         try {
             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
             $remainingFiles = $ilovepdf->getRemainingFiles();
-            $totalUsage = 250 - $remainingFiles;
+            $totalUsage = 2500 - $remainingFiles;
             return $this->returnDataMesage(
                 200,
                 'Request generated',

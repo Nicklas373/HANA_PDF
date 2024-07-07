@@ -46,7 +46,7 @@ class htmltopdfController extends Controller
                     'errReason' => $validator->messages(),
                     'errStatus' => null
                 ]);
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'htmltopdf', 'Failed to convert HTML to PDF !',$validator->messages());
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'htmltopdf', 'Failed to convert HTML to PDF !',$validator->messages(), true);
                 return $this->returnCoreMessage(
                     200,
                     'Failed to convert HTML to PDF !',
@@ -60,7 +60,7 @@ class htmltopdfController extends Controller
                     $validator->errors()->all()
                 );
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'htmltopdf', 'Database connection error !',$ex->getMessage());
+                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'htmltopdf', 'Database connection error !',$ex->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Database connection error !',
@@ -74,7 +74,7 @@ class htmltopdfController extends Controller
                     $ex->getMessage()
                 );
             } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Eloquent transaction error !',
@@ -131,7 +131,7 @@ class htmltopdfController extends Controller
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'HTML To PDF Conversion Failed !', 'Webpage are not available or not valid');
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'HTML To PDF Conversion Failed !', 'Webpage are not available or not valid', true);
                         return $this->returnCoreMessage(
                             200,
                             'HTML To PDF Conversion Failed !',
@@ -145,7 +145,7 @@ class htmltopdfController extends Controller
                             'Webpage are not available or not valid'
                         );
                     } catch (QueryException $ex) {
-                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                         return $this->returnCoreMessage(
                             200,
                             'Database connection error !',
@@ -159,7 +159,7 @@ class htmltopdfController extends Controller
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
-                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                         return $this->returnCoreMessage(
                             200,
                             'Eloquent transaction error !',
@@ -212,7 +212,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -226,7 +226,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -240,7 +240,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -275,7 +275,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -289,7 +289,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -303,7 +303,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -338,7 +338,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -352,7 +352,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -366,7 +366,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -401,7 +401,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -415,7 +415,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -429,7 +429,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -464,7 +464,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -478,7 +478,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -492,7 +492,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -527,7 +527,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -541,7 +541,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -555,7 +555,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -590,7 +590,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -604,7 +604,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -618,7 +618,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -653,7 +653,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
                     return $this->returnCoreMessage(
                         200,
                         'Failed to convert HTML to PDF !',
@@ -667,7 +667,7 @@ class htmltopdfController extends Controller
                         $e->getMessage()
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -681,7 +681,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -730,7 +730,7 @@ class htmltopdfController extends Controller
                         null
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -744,7 +744,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
@@ -779,7 +779,7 @@ class htmltopdfController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'HTML To PDF Conversion Failed !', null);
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'HTML To PDF Conversion Failed !', null, true);
                     return $this->returnCoreMessage(
                         200,
                         'HTML To PDF Conversion Failed !',
@@ -793,7 +793,7 @@ class htmltopdfController extends Controller
                         null
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -807,7 +807,7 @@ class htmltopdfController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'htmltopdf', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',
