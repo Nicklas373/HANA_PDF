@@ -28,7 +28,7 @@ const options = {
 const adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 const appMajorVer = 3
 const appMinorVer = 2
-const appPatchVer = 7
+const appPatchVer = 8
 const apiUrl = 'http://192.168.0.2'
 const bearerToken = import.meta.env.VITE_JWT_TOKEN
 const commitHash = gitHash
@@ -187,7 +187,7 @@ if (whatsNewBtn) {
                 versionDiv.appendChild(versionTitle)
                 versionDiv.appendChild(releaseDate)
                 versionDiv.appendChild(changelogList)
-                versionHistoryContainer.appendChild(versionDiv)
+                versionHistoryLayout.appendChild(versionDiv)
             });
 
             procTitleMessageModal.innerText = "Preparing document..."
@@ -202,7 +202,6 @@ if (whatsNewBtn) {
             errListTitleMessage.innerText = "Error message"
             resetErrListMessage()
             generateMesssage(error.versionFetchMessage)
-            generateMesssage("Unable to fetch latest changelog")
             errAltSubMessageModal.style = null
             loadingModal.hide()
             errModal.show()
@@ -1070,8 +1069,8 @@ function fetchVersion() {
             if (xhr.readyState == 4) {
                 clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
+                    var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
                         if (xhrReturn.errors == null) {
                             resolve({
                                 versionFetchCheck: true,
@@ -1089,37 +1088,21 @@ function fetchVersion() {
                                 versionFetchError: xhrReturn.errors
                             })
                         }
-                    } else if (xhr.status == 429) {
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: 429,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Too many request'
-                        })
-                    } else if (xhr.status == 524) {
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: 524,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Connection Timeout'
-                        })
                     } else {
                         reject({
                             versionFetchCheck: false,
                             versionFetchStats: xhrReturn.status,
                             versionFetchMessage: xhrReturn.message,
                             versionFetchResponse: xhrReturn.response,
-                            versionFetchError: 'Internal Server Error'
+                            versionFetchError: xhrReturn.errors
                         })
                     }
                 } else {
                     reject({
                         versionFetchCheck: false,
-                        versionFetchStats: 0,
-                        versionFetchMessage: 'Internal server error (0)',
-                        versionFetchResponse: xhrReturn.response,
+                        versionFetchStats: xhr.status,
+                        versionFetchMessage: xhr.message,
+                        versionFetchResponse: 'Internal Server Error',
                         versionFetchError: 'Internal Server Error'
                     })
                 }
@@ -2436,8 +2419,8 @@ function validateVersion() {
             if (xhr.readyState == 4) {
                 clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
+                    var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
-                        var xhrReturn = JSON.parse(xhr.responseText)
                         if (xhrReturn.errors == null) {
                             resolve({
                                 versioningCheck: true,
@@ -2453,33 +2436,19 @@ function validateVersion() {
                                 versioningError: xhrReturn.errors
                             })
                         }
-                    } else if (xhr.status == 429) {
-                        reject({
-                            versioningCheck: false,
-                            versioningStats: 429,
-                            versioningMessage: xhrReturn.message,
-                            versioningError: 'Too many request'
-                        })
-                    } else if (xhr.status == 524) {
-                        reject({
-                            versioningCheck: false,
-                            versioningStats: 524,
-                            versioningMessage: xhrReturn.message,
-                            versioningError: 'Connection Timeout'
-                        })
                     } else {
                         reject({
                             versioningCheck: false,
                             versioningStats: xhrReturn.status,
                             versioningMessage: xhrReturn.message,
-                            versioningError: 'Internal Server Error'
+                            versioningError: xhrReturn.errors
                         })
                     }
                 } else {
                     reject({
                         versioningCheck: false,
-                        versioningStats: 0,
-                        versioningMessage: 'Internal server error (0)',
+                        versioningStats: xhr.status,
+                        versioningMessage: xhr.message,
                         versioningError: 'Internal Server Error'
                     })
                 }
