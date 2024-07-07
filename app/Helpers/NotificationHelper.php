@@ -59,7 +59,7 @@ class NotificationHelper
                     "</b>\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_CHAT_ID'),
@@ -78,7 +78,7 @@ class NotificationHelper
                     DB::table('appLogs')->where('processId', '=', $processId)
                     ->update([
                         'errReason' => $errReason,
-                        'errStatus' => null,
+                        'errStatus' => null
                     ]);
                 }
                 DB::table('notifyLogs')->insert([
@@ -164,7 +164,7 @@ class NotificationHelper
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_CHAT_ID'),
@@ -183,7 +183,7 @@ class NotificationHelper
                     DB::table('appLogs')->where('processId', '=', $processId)
                     ->update([
                         'errReason' => $errReason,
-                        'errStatus' => null,
+                        'errStatus' => null
                     ]);
                 }
                 DB::table('notifyLogs')->insert([
@@ -269,7 +269,7 @@ class NotificationHelper
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_CHAT_ID'),
@@ -391,7 +391,7 @@ class NotificationHelper
                         "</b>\nError Log: <pre><code>".$errCode.
                         "</code></pre>";
         }
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_REPORT_ID'),
@@ -415,7 +415,7 @@ class NotificationHelper
                     DB::table('appLogs')->where('processId', '=', $processId)
                     ->update([
                         'errReason' => $errReason,
-                        'errStatus' => null,
+                        'errStatus' => null
                     ]);
                 }
                 DB::table('notifyLogs')->insert([
@@ -493,7 +493,7 @@ class NotificationHelper
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_CHAT_ID'),
@@ -602,7 +602,7 @@ class NotificationHelper
                     "\n\n</b>Error Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
                     "</code></pre>";
-        $checkValidate = DB::table('appLogs')::where('processId', '=', $processId)->count();
+        $checkValidate = DB::table('appLogs')->where('processId', '=', $processId)->count();
         try {
             $response = Telegram::sendMessage([
                 'chat_id' => env('TELEGRAM_CHAT_ID'),
@@ -621,7 +621,7 @@ class NotificationHelper
                     DB::table('appLogs')->where('processId', '=', $processId)
                     ->update([
                         'errReason' => $errReason,
-                        'errStatus' => null,
+                        'errStatus' => null
                     ]);
                 }
                 DB::table('notifyLogs')->insert([
