@@ -46,7 +46,7 @@ class compressController extends Controller
                     'errReason' => 'Validation Failed!',
                     'errStatus' => $validator->messages()
                 ]);
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','compress','PDF Compression failed !',$validator->messages());
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','compress','PDF Compression failed !',$validator->messages(), true);
                 return $this->returnCoreMessage(
                     200,
                     'PDF Compression failed !',
@@ -60,7 +60,7 @@ class compressController extends Controller
                     $validator->errors()->all()
                 );
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','compress','Database connection error !',$ex->getMessage());
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','compress','Database connection error !',$ex->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Database connection error !',
@@ -74,7 +74,7 @@ class compressController extends Controller
                     $ex->getMessage()
                 );
             } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL','compress','Eloquent transaction error !', $e->getMessage());
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL','compress','Eloquent transaction error !', $e->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Eloquent transaction error !',
@@ -158,7 +158,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -172,7 +172,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -186,7 +186,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -222,7 +222,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -236,7 +236,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -250,7 +250,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -286,7 +286,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -300,7 +300,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -314,7 +314,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -350,7 +350,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -364,7 +364,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -378,7 +378,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -414,7 +414,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -428,7 +428,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -442,7 +442,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -478,7 +478,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -492,7 +492,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -506,7 +506,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -542,7 +542,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -556,7 +556,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -570,7 +570,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -606,7 +606,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -620,7 +620,7 @@ class compressController extends Controller
                                 $e->getMessage()
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -634,7 +634,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -675,7 +675,7 @@ class compressController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), true);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -689,7 +689,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -725,7 +725,7 @@ class compressController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Failed to download file from iLovePDF API !', null);
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Failed to download file from iLovePDF API !', null, true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF Compression failed !',
@@ -739,7 +739,7 @@ class compressController extends Controller
                                 null
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -753,7 +753,7 @@ class compressController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -826,9 +826,9 @@ class compressController extends Controller
                                                 null,
                                                 'File '. $filePath . ' was not found'
                                             );
-                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Failed Compress PDF file !', 'File '. $filePath . ' was not found');
+                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Failed Compress PDF file !', 'File '. $filePath . ' was not found', true);
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Database connection error !',
@@ -842,7 +842,7 @@ class compressController extends Controller
                                                 $ex->getMessage()
                                             );
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Eloquent transaction error !',
@@ -899,7 +899,7 @@ class compressController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -913,7 +913,7 @@ class compressController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -947,7 +947,7 @@ class compressController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Failed archiving PDF files !', null);
+                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Failed archiving PDF files !', null, true);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Failed archiving PDF files !',
@@ -961,7 +961,7 @@ class compressController extends Controller
                                         'Archive processing failure'
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -975,7 +975,7 @@ class compressController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'zip.', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -997,7 +997,7 @@ class compressController extends Controller
                                     'errReason' => 'Archive processing failure',
                                     'errStatus' => $e->getMessage()
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Failed archiving PDF files !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Failed archiving PDF files !', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Failed archiving PDF files !',
@@ -1011,7 +1011,7 @@ class compressController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -1025,7 +1025,7 @@ class compressController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -1048,7 +1048,7 @@ class compressController extends Controller
                             'errReason' => 'PDF Compress failed',
                             'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'PDF Compress failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount);
+                        NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'compress', 'PDF Compress failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount, true);
                         return $this->returnCoreMessage(
                             200,
                             'PDF Compression failed',
@@ -1062,7 +1062,7 @@ class compressController extends Controller
                             'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
                         );
                     } catch (QueryException $ex) {
-                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                         return $this->returnCoreMessage(
                             200,
                             'Database connection error !',
@@ -1076,7 +1076,7 @@ class compressController extends Controller
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
-                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                         return $this->returnCoreMessage(
                             200,
                             'Eloquent transaction error !',
@@ -1111,7 +1111,7 @@ class compressController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'compress', 'PDF failed to upload !', null);
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'compress', 'PDF failed to upload !', null, true);
                     return $this->returnCoreMessage(
                         200,
                         'PDF failed to upload !',
@@ -1125,7 +1125,7 @@ class compressController extends Controller
                         null
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $Nuuid, 'FAIL', 'compress', 'Database connection error !', $ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -1139,7 +1139,7 @@ class compressController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'compress', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',

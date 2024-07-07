@@ -47,7 +47,7 @@ class splitController extends Controller
                     'errReason' => $validator->messages(),
                     'errStatus' => null
                 ]);
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'split','PDF Split failed !',$validator->messages());
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'split','PDF Split failed !',$validator->messages(), true);
                 return $this->returnCoreMessage(
                     200,
                     'PDF Split failed !',
@@ -61,7 +61,7 @@ class splitController extends Controller
                     $validator->errors()->all()
                 );
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Database connection error !',
@@ -75,7 +75,7 @@ class splitController extends Controller
                     $ex->getMessage()
                 );
             } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                 return $this->returnCoreMessage(
                     200,
                     'Eloquent transaction error !',
@@ -157,7 +157,7 @@ class splitController extends Controller
                                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                                 'procDuration' =>  $duration->s.' seconds'
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')');
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')', true);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'PDF split failed!',
@@ -171,7 +171,7 @@ class splitController extends Controller
                                                 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
                                             );
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Database connection error !',
@@ -185,7 +185,7 @@ class splitController extends Controller
                                                 $ex->getMessage()
                                             );
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Eloquent transaction error !',
@@ -226,7 +226,7 @@ class splitController extends Controller
                                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                                 'procDuration' =>  $duration->s.' seconds'
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')');
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')', true);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'PDF split failed!',
@@ -240,7 +240,7 @@ class splitController extends Controller
                                                 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
                                             );
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Database connection error !',
@@ -254,7 +254,7 @@ class splitController extends Controller
                                                 $ex->getMessage()
                                             );
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Eloquent transaction error !',
@@ -295,7 +295,7 @@ class splitController extends Controller
                                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                                 'procDuration' =>  $duration->s.' seconds'
                                             ]);
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')');
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')', true);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'PDF split failed!',
@@ -309,7 +309,7 @@ class splitController extends Controller
                                                 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')'
                                             );
                                         } catch (QueryException $ex) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Database connection error !',
@@ -323,7 +323,7 @@ class splitController extends Controller
                                                 $ex->getMessage()
                                             );
                                         } catch (\Exception $e) {
-                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                             return $this->returnCoreMessage(
                                                 200,
                                                 'Eloquent transaction error !',
@@ -352,7 +352,7 @@ class splitController extends Controller
                                         }
                                     }
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Failed to count total PDF pages from '.$currentFileName, $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Failed to count total PDF pages from '.$currentFileName, $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Failed to count total PDF pages from '.$currentFileName,
@@ -431,7 +431,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on StartException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -445,7 +445,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -459,7 +459,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -500,7 +500,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -514,7 +514,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -528,7 +528,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -569,7 +569,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -583,7 +583,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -597,7 +597,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -638,7 +638,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -652,7 +652,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -666,7 +666,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -707,7 +707,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -721,7 +721,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -735,7 +735,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -776,7 +776,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -790,7 +790,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -804,7 +804,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -845,7 +845,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on PathException', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -859,7 +859,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -873,7 +873,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -914,7 +914,7 @@ class splitController extends Controller
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on Exception', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
                                 return $this->returnCoreMessage(
                                     200,
                                     'PDF split failed !',
@@ -928,7 +928,7 @@ class splitController extends Controller
                                     $e->getMessage()
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Database connection error !',
@@ -942,7 +942,7 @@ class splitController extends Controller
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnCoreMessage(
                                     200,
                                     'Eloquent transaction error !',
@@ -1000,7 +1000,7 @@ class splitController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -1014,7 +1014,7 @@ class splitController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -1070,7 +1070,7 @@ class splitController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.zip', $newFileProcSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.zip', $newFileProcSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -1084,7 +1084,7 @@ class splitController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.zip', $newFileProcSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.zip', $newFileProcSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -1125,7 +1125,7 @@ class splitController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Failed to download file from iLovePDF API !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Failed to download file from iLovePDF API !', 'null', true);
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF split failed!',
@@ -1139,7 +1139,7 @@ class splitController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -1153,7 +1153,7 @@ class splitController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -1211,7 +1211,7 @@ class splitController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split_delete', 'Database connection error !',$ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($newFileNameWithoutExtension.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split_delete', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -1225,7 +1225,7 @@ class splitController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split_delete', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileProcSize, $uuid, 'FAIL', 'split_delete', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -1266,7 +1266,7 @@ class splitController extends Controller
                                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                         'procDuration' =>  $duration->s.' seconds'
                                     ]);
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Failed to download file from iLovePDF API !', 'null');
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Failed to download file from iLovePDF API !', 'null', true);
                                     return $this->returnCoreMessage(
                                         200,
                                         'PDF split failed!',
@@ -1280,7 +1280,7 @@ class splitController extends Controller
                                         null
                                     );
                                 } catch (QueryException $ex) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Database connection error !',$ex->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Database connection error !',
@@ -1294,7 +1294,7 @@ class splitController extends Controller
                                         $ex->getMessage()
                                     );
                                 } catch (\Exception $e) {
-                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Eloquent transaction error !', $e->getMessage());
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split_delete', 'Eloquent transaction error !', $e->getMessage(), false);
                                     return $this->returnCoreMessage(
                                         200,
                                         'Eloquent transaction error !',
@@ -1337,7 +1337,7 @@ class splitController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'Invalid split request method !', null);
+                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'Invalid split request method !', null, true);
                             return $this->returnCoreMessage(
                                 200,
                                 'PDF split failed!',
@@ -1351,7 +1351,7 @@ class splitController extends Controller
                                 null
                             );
                         } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Database connection error !',
@@ -1365,7 +1365,7 @@ class splitController extends Controller
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                            NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                             return $this->returnCoreMessage(
                                 200,
                                 'Eloquent transaction error !',
@@ -1408,7 +1408,7 @@ class splitController extends Controller
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'PDF failed to upload !', null);
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'PDF failed to upload !', null, true);
                     return $this->returnCoreMessage(
                         200,
                         'PDF failed to upload !',
@@ -1422,7 +1422,7 @@ class splitController extends Controller
                         null
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Database connection error !',
@@ -1436,7 +1436,7 @@ class splitController extends Controller
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage());
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                     return $this->returnCoreMessage(
                         200,
                         'Eloquent transaction error !',

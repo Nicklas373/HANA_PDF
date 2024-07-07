@@ -67,7 +67,7 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/version')->group(fu
     Route::post('fetch', [versionController::class, 'versioningFetch']);
 });
 
-Route::fallback(function () {
+Route::fallback(function() {
     try {
         return response()->json(['message' => 'Route not found'], 404);
     } catch (TokenExpiredException $e) {
