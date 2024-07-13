@@ -28,7 +28,7 @@ const options = {
 const adobeClientID = import.meta.env.VITE_ADOBE_CLIENT_ID
 const appMajorVer = 3
 const appMinorVer = 2
-const appPatchVer = 8
+const appPatchVer = 9
 const apiUrl = 'http://192.168.0.2'
 const bearerToken = import.meta.env.VITE_JWT_TOKEN
 const commitHash = gitHash
@@ -85,7 +85,7 @@ if (procBtn) {
         errModal.hide()
         loadingModal.show()
         if (xhrProcStats) {
-            validateVersion().then(function () {
+            //validateVersion().then(function () {
                 remainingBalance().then(function () {
                     loadingModal.hide()
                     if (document.getElementById('html') !== null) {
@@ -126,18 +126,18 @@ if (procBtn) {
                     loadingModal.hide()
                     errModal.show()
                 })
-            }).catch(function (error) {
-                errModal.hide()
-                errMessage.innerText  = "There was unexpected error !"
-                errSubMessage.innerText = ""
-                errListTitleMessage.innerText = "Error message"
-                resetErrListMessage()
-                generateMesssage(error.versioningMessage)
-                generateMesssage("Please clear cache the browser and try again")
-                errAltSubMessageModal.style = null
-                loadingModal.hide()
-                errModal.show()
-            })
+            //}).catch(function (error) {
+            //    errModal.hide()
+            //    errMessage.innerText  = "There was unexpected error !"
+            //    errSubMessage.innerText = ""
+            //    errListTitleMessage.innerText = "Error message"
+            //    resetErrListMessage()
+            //    generateMesssage(error.versioningMessage)
+            //    generateMesssage("Please clear cache the browser and try again")
+            //    errAltSubMessageModal.style = null
+            //    loadingModal.hide()
+            //    errModal.show()
+            //})
         } else {
             event.preventDefault()
             errMessage.innerText  = "Sorry, we're still processing your files"
@@ -405,7 +405,9 @@ if (uploadDropzone) {
                         if (xhr && xhr.readyState == 4) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
+                                if (xhrReturn.message !== '') {
+                                    newErrMessage = xhrReturn.message
+                                } else if (xhrReturn.errors !== '') {
                                     newErrMessage = xhrReturn.errors
                                 } else {
                                     newErrMessage = "There was an unexpected error"
@@ -650,7 +652,9 @@ if (uploadDropzoneAlt) {
                         if (xhr && xhr.readyState == 4) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
+                                if (xhrReturn.message !== '') {
+                                    newErrMessage = xhrReturn.message
+                                } else if (xhrReturn.errors !== '') {
                                     newErrMessage = xhrReturn.errors
                                 } else {
                                     newErrMessage = "There was an unexpected error"
@@ -895,7 +899,9 @@ if (uploadDropzoneSingle) {
                         if (xhr && xhr.readyState == 4) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText)
-                                if (xhrReturn.errors !== '') {
+                                if (xhrReturn.message !== '') {
+                                    newErrMessage = xhrReturn.message
+                                } else if (xhrReturn.errors !== '') {
                                     newErrMessage = xhrReturn.errors
                                 } else {
                                     newErrMessage = "There was an unexpected error"
@@ -1045,29 +1051,13 @@ function fetchVersion() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
-        var timerStart = Date.now()
         formData.append('appServicesReferrer', 'FE')
 
         xhr.open('POST', apiUrl+'/api/v1/version/fetch', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
 
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    versionFetchCheck: false,
-                    versionFetchStats: 524,
-                    versionFetchMessage: 'Connection timeout',
-                    versionFetchResponse: null,
-                    versionFetchError: 'Connection timeout'
-                })
-            }
-        }, 15000)
-
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
@@ -1221,26 +1211,11 @@ function remainingBalance() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
-        var timerStart = Date.now()
         xhr.open('GET', apiUrl+'/api/v1/logs/limit', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
 
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    xhrBalance: false,
-                    xhrBalanceStatus: 524,
-                    xhrBalanceRemaining: 0,
-                    xhrBalanceResponse: 'Connection timeout'
-                })
-            }
-        }, 10000)
-
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
@@ -1309,7 +1284,6 @@ function sendToAPI(files, proc, action) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
-        var timerStart = Date.now()
 
         if (proc == 'compress') {
             var compMethodValue = document.querySelector('input[name="compMethod"]:checked').value
@@ -1330,14 +1304,23 @@ function sendToAPI(files, proc, action) {
             formData.append('convertType', cnvValue)
         } else if (proc == 'split') {
             let mergePdf
+            let usedMethod
             var customPageSplit = document.getElementById('customPageSplit').value
             var customPageDelete = document.getElementById('customPageDelete').value
             var firstPage = document.getElementById('fromPage').value
-            var lastPage = document.getElementById('toPage').value
-            if (firstPage && lastPage) {
+            var lastPage = document.getElementById('toPage').value        
+            if (document.getElementById("thirdRadio").checked) {
                 mergePdf = document.getElementById('mergePDF').checked
-            } else {
+                usedMethod = 'range'
+            } else if (document.getElementById("fourthRadio").checked) {
                 mergePdf = document.getElementById('mergePDF1').checked
+                usedMethod = 'custom'
+            } else if (document.getElementById("secondRadio").checked) {
+                mergePdf = false
+                usedMethod = 'custom'
+            } else {
+                mergePdf = null
+                usedMethod = null
             }
             formData.append('action', action)
             formData.append('fromPage', firstPage)
@@ -1345,6 +1328,7 @@ function sendToAPI(files, proc, action) {
             formData.append('mergePDF', mergePdf.toString())
             formData.append('customPageSplit', customPageSplit)
             formData.append('customPageDelete', customPageDelete)
+            formData.append('usedMethod', usedMethod)
         } else if (proc == 'watermark') {
             if (document.getElementById('firstRadio').checked == true) {
                 let wmLayoutStyle
@@ -1429,22 +1413,8 @@ function sendToAPI(files, proc, action) {
         xhr.open('POST', apiUrl+'/api/v1/core/'+proc, true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
 
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 105000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    xhrRequestCondition: 'ERROR',
-                    xhrRequestMessage: 'Connection timeout',
-                    xhrRequestServerMessage: 'Connection timeout',
-                    xhrRequestStatus: 524
-                })
-            }
-        }, 15000)
-
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                clearInterval(timerStart)
                 if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
@@ -1739,193 +1709,166 @@ function submit(event) {
             var customPage = document.getElementById('customPageSplit')
             var firstPage = document.getElementById('fromPage')
             var lastPage = document.getElementById('toPage')
-            if (document.getElementById("firstRadio").value == "split") {
-                if (document.getElementById("splitRadio")) {
-                   if (document.getElementById("thirdRadio").checked) {
-                        if (document.getElementById("thirdRadio").value == "selPages") {
-                            if (document.getElementById("fromPage").value) {
-                                fromPage = true
-                            } else {
-                                fromPage = false
-                            }
-                            if (document.getElementById("toPage").value) {
-                                toPage = true
-                            } else {
-                                toPage = false
-                            }
-                            getTotalPages(getUploadedFileName()[0].replace(/\s/g, '_'))
-                            .then((totalPages) => {
-                                if (totalPages.totalPages == false) {
-                                    event.preventDefault()
-                                    errMessage.innerText  = "There was unexpected error !"
-                                    errSubMessage.innerText = "Please try again later"
-                                    errListTitleMessage.innerText = "Failed to get total page from PDF"
-                                    resetErrListMessage()
-                                    loadingModal.hide()
-                                    errModal.show()
-                                } else {
-                                    if (fromPage && toPage) {
-                                        if (document.getElementById("fromPage").value.charAt(0) == "-") {
-                                            event.preventDefault()
-                                            errMessage.innerText  = "Invalid page number range!"
-                                            errListTitleMessage.innerText = "Error message"
-                                            errAltSubMessageModal.style = null
-                                            resetErrListMessage()
-                                            generateMesssage("Page number can not use negative number")
-                                            firstPage.style.borderColor = '#A84E4E'
-                                            loadingModal.hide()
-                                            errModal.show()
-                                        } else if (document.getElementById("toPage").value.charAt(0) == "-") {
-                                            event.preventDefault()
-                                            errMessage.innerText  = "Invalid page number range!"
-                                            errListTitleMessage.innerText = "Error message"
-                                            errAltSubMessageModal.style = null
-                                            resetErrListMessage()
-                                            generateMesssage("Page number can not use negative number")
-                                            lastPage.style.borderColor = '#A84E4E'
-                                            loadingModal.hide()
-                                            errModal.show()
-                                        } else {
-                                            if (parseInt(document.getElementById("fromPage").value) > totalPages.totalPagesMessage) {
-                                                event.preventDefault()
-                                                errMessage.innerText  = "Invalid page number range!"
-                                                errListTitleMessage.innerText = "Error message"
-                                                errAltSubMessageModal.style = null
-                                                resetErrListMessage()
-                                                generateMesssage("First page can not be more or same than total page")
-                                                firstPage.style.borderColor = '#A84E4E'
-                                                loadingModal.hide()
-                                                errModal.show()
-                                            } else if (parseInt(document.getElementById("toPage").value) > totalPages.totalPagesMessage) {
-                                                event.preventDefault()
-                                                errMessage.innerText  = "Invalid page number range!"
-                                                errListTitleMessage.innerText = "Error message"
-                                                errAltSubMessageModal.style = null
-                                                resetErrListMessage()
-                                                generateMesssage("Last page can not be more or same than total page")
-                                                lastPage.style.borderColor = '#A84E4E'
-                                                loadingModal.hide()
-                                                errModal.show()
-                                            } else {
-                                                if (parseInt(document.getElementById("fromPage").value) > parseInt(document.getElementById("toPage").value)) {
-                                                    event.preventDefault()
-                                                    errMessage.innerText  = "Invalid page number range!"
-                                                    errListTitleMessage.innerText = "Error message"
-                                                    errAltSubMessageModal.style = null
-                                                    resetErrListMessage()
-                                                    generateMesssage("First page can not be more than last page")
-                                                    firstPage.style.borderColor = '#A84E4E'
-                                                    loadingModal.hide()
-                                                    errModal.show()
-                                                } else if (parseInt(document.getElementById("toPage").value) < parseInt(document.getElementById("fromPage").value)) {
-                                                    event.preventDefault()
-                                                    errMessage.innerText  = "Invalid page number range!"
-                                                    errListTitleMessage.innerText = "Error message"
-                                                    errAltSubMessageModal.style = null
-                                                    resetErrListMessage()
-                                                    generateMesssage("Last page can not be less than first page")
-                                                    firstPage.style.borderColor = '#A84E4E'
-                                                    loadingModal.hide()
-                                                    errModal.show()
-                                                } else {
-                                                    procTitleMessageModal.innerText = "Processing PDF..."
-                                                    errMessage.style.visibility = null
-                                                    errSubMessage.style.visibility = null
-                                                    errAltSubMessageModal.style.display = "none"
-                                                    errModal.hide()
-                                                    loadingModal.show()
-                                                    if (getUploadedFileName().length > 0) {
-                                                        if (xhrBalance && xhrBalanceRemaining > 0) {
-                                                            altLoadingMessageModal.innerText = "Processing PDF..."
-                                                            document.getElementById("altLoadingModal").classList.remove('hidden')
-                                                            document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                                                            xhrProcStats = false
-                                                            apiGateway("split", "split")
-                                                         } else {
-                                                             event.preventDefault()
-                                                             errMessage.innerText  = "PDF file can not be processed !"
-                                                             errSubMessage.innerText = ""
-                                                             errListTitleMessage.innerText = "Error message"
-                                                             resetErrListMessage()
-                                                             generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                                             errAltSubMessageModal.style = null
-                                                             loadingModal.hide()
-                                                             errModal.show()
-                                                         }
-                                                    } else {
-                                                        event.preventDefault()
-                                                        errMessage.innerText  = "PDF file can not be processed !"
-                                                        errSubMessage.innerText = ""
-                                                        errListTitleMessage.innerText = "Error message"
-                                                        resetErrListMessage()
-                                                        generateMesssage("No file has been chosen")
-                                                        errAltSubMessageModal.style = null
-                                                        loadingModal.hide()
-                                                        errModal.show()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else if (!fromPage && !toPage) {
-                                        event.preventDefault()
-                                        errMessage.innerText  = "Please fill out these fields!"
-                                        errSubMessage.innerText = ""
-                                        errListTitleMessage.innerText = "Required fields:"
-                                        errAltSubMessageModal.style = null
-                                        resetErrListMessage()
-                                        generateMesssage("First Pages")
-                                        generateMesssage("Last Pages")
-                                        firstPage.style.borderColor = '#A84E4E'
-                                        lastPage.style.borderColor = '#A84E4E'
-                                        loadingModal.hide()
-                                        errModal.show()
-                                    } else if (!fromPage && toPage) {
-                                        event.preventDefault()
-                                        errMessage.innerText  = "Please fill out these fields!"
-                                        errSubMessage.innerText = ""
-                                        errListTitleMessage.innerText = "Required fields:"
-                                        errAltSubMessageModal.style = null
-                                        resetErrListMessage()
-                                        generateMesssage("First Pages")
-                                        firstPage.style.borderColor = '#A84E4E'
-                                        loadingModal.hide()
-                                        errModal.show()
-                                    } else if (fromPage && !toPage) {
-                                        event.preventDefault()
-                                        errMessage.innerText  = "Please fill out these fields!"
-                                        errSubMessage.innerText = ""
-                                        errListTitleMessage.innerText = "Required fields:"
-                                        errAltSubMessageModal.style = null
-                                        resetErrListMessage()
-                                        generateMesssage("Last Pages")
-                                        lastPage.style.borderColor = '#A84E4E'
-                                        loadingModal.hide()
-                                        errModal.show()
-                                    } else {
-                                        event.preventDefault()
-                                        errMessage.innerText  = "Index out of bound!"
-                                        errSubMessage.innerText = ""
-                                        errAltSubMessageModal.style = null
-                                        errListTitleMessage.innerText = "Error message"
-                                        resetErrListMessage()
-                                        generateMesssage("Split selected page logic error")
-                                        errAltSubMessageModal.style = null
-                                        loadingModal.hide()
-                                        errModal.show()
-                                    }
-                                }
-                            })
-                            .catch((error) => {
+            if (document.getElementById("thirdRadio").checked) {
+                if (document.getElementById("fromPage").value) {
+                    fromPage = true
+                } else {
+                    fromPage = false
+                }
+                if (document.getElementById("toPage").value) {
+                    toPage = true
+                } else {
+                    toPage = false
+                }
+                getTotalPages(getUploadedFileName()[0].replace(/\s/g, '_'))
+                .then((totalPages) => {
+                    if (totalPages.totalPages == false) {
+                        event.preventDefault()
+                        errMessage.innerText  = "There was unexpected error !"
+                        errListTitleMessage.innerText = "Error message"
+                        errAltSubMessageModal.style = null
+                        resetErrListMessage()
+                        generateMesssage("Failed to get total page from PDF")
+                        loadingModal.hide()
+                        errModal.show()
+                    } else {
+                        if (fromPage && toPage) {
+                            if (document.getElementById("fromPage").value.charAt(0) == "-") {
                                 event.preventDefault()
                                 errMessage.innerText  = "Invalid page number range!"
                                 errListTitleMessage.innerText = "Error message"
                                 errAltSubMessageModal.style = null
                                 resetErrListMessage()
-                                generateMesssage("Failed to fetch total PDF pages")
-                                console.log(error)
+                                generateMesssage("Page number can not use negative number")
+                                firstPage.style.borderColor = '#A84E4E'
                                 loadingModal.hide()
                                 errModal.show()
-                            })
+                            } else if (document.getElementById("toPage").value.charAt(0) == "-") {
+                                event.preventDefault()
+                                errMessage.innerText  = "Invalid page number range!"
+                                errListTitleMessage.innerText = "Error message"
+                                errAltSubMessageModal.style = null
+                                resetErrListMessage()
+                                generateMesssage("Page number can not use negative number")
+                                lastPage.style.borderColor = '#A84E4E'
+                                loadingModal.hide()
+                                errModal.show()
+                            } else {
+                                if (parseInt(document.getElementById("fromPage").value) > totalPages.totalPagesMessage) {
+                                    event.preventDefault()
+                                    errMessage.innerText  = "Invalid page number range!"
+                                    errListTitleMessage.innerText = "Error message"
+                                    errAltSubMessageModal.style = null
+                                    resetErrListMessage()
+                                    generateMesssage("First page can not be more or same than total page")
+                                    firstPage.style.borderColor = '#A84E4E'
+                                    loadingModal.hide()
+                                    errModal.show()
+                                } else if (parseInt(document.getElementById("toPage").value) > totalPages.totalPagesMessage) {
+                                    event.preventDefault()
+                                    errMessage.innerText  = "Invalid page number range!"
+                                    errListTitleMessage.innerText = "Error message"
+                                    errAltSubMessageModal.style = null
+                                    resetErrListMessage()
+                                    generateMesssage("Last page can not be more or same than total page")
+                                    lastPage.style.borderColor = '#A84E4E'
+                                    loadingModal.hide()
+                                    errModal.show()
+                                } else {
+                                    if (parseInt(document.getElementById("fromPage").value) > parseInt(document.getElementById("toPage").value)) {
+                                        event.preventDefault()
+                                        errMessage.innerText  = "Invalid page number range!"
+                                        errListTitleMessage.innerText = "Error message"
+                                        errAltSubMessageModal.style = null
+                                        resetErrListMessage()
+                                        generateMesssage("First page can not be more than last page")
+                                        firstPage.style.borderColor = '#A84E4E'
+                                        loadingModal.hide()
+                                        errModal.show()
+                                    } else if (parseInt(document.getElementById("toPage").value) < parseInt(document.getElementById("fromPage").value)) {
+                                        event.preventDefault()
+                                        errMessage.innerText  = "Invalid page number range!"
+                                        errListTitleMessage.innerText = "Error message"
+                                        errAltSubMessageModal.style = null
+                                        resetErrListMessage()
+                                        generateMesssage("Last page can not be less than first page")
+                                        firstPage.style.borderColor = '#A84E4E'
+                                        loadingModal.hide()
+                                        errModal.show()
+                                    } else {
+                                        procTitleMessageModal.innerText = "Processing PDF..."
+                                        errMessage.style.visibility = null
+                                        errSubMessage.style.visibility = null
+                                        errAltSubMessageModal.style.display = "none"
+                                        errModal.hide()
+                                        loadingModal.show()
+                                        if (getUploadedFileName().length > 0) {
+                                            if (xhrBalance && xhrBalanceRemaining > 0) {
+                                                altLoadingMessageModal.innerText = "Processing PDF..."
+                                                document.getElementById("altLoadingModal").classList.remove('hidden')
+                                                document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                                                xhrProcStats = false
+                                                apiGateway("split", "split")
+                                             } else {
+                                                 event.preventDefault()
+                                                 errMessage.innerText  = "PDF file can not be processed !"
+                                                 errSubMessage.innerText = ""
+                                                 errListTitleMessage.innerText = "Error message"
+                                                 resetErrListMessage()
+                                                 generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                                                 errAltSubMessageModal.style = null
+                                                 loadingModal.hide()
+                                                 errModal.show()
+                                             }
+                                        } else {
+                                            event.preventDefault()
+                                            errMessage.innerText  = "PDF file can not be processed !"
+                                            errSubMessage.innerText = ""
+                                            errListTitleMessage.innerText = "Error message"
+                                            resetErrListMessage()
+                                            generateMesssage("No file has been chosen")
+                                            errAltSubMessageModal.style = null
+                                            loadingModal.hide()
+                                            errModal.show()
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (!fromPage && !toPage) {
+                            event.preventDefault()
+                            errMessage.innerText  = "Please fill out these fields!"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Required fields:"
+                            errAltSubMessageModal.style = null
+                            resetErrListMessage()
+                            generateMesssage("First Pages")
+                            generateMesssage("Last Pages")
+                            firstPage.style.borderColor = '#A84E4E'
+                            lastPage.style.borderColor = '#A84E4E'
+                            loadingModal.hide()
+                            errModal.show()
+                        } else if (!fromPage && toPage) {
+                            event.preventDefault()
+                            errMessage.innerText  = "Please fill out these fields!"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Required fields:"
+                            errAltSubMessageModal.style = null
+                            resetErrListMessage()
+                            generateMesssage("First Pages")
+                            firstPage.style.borderColor = '#A84E4E'
+                            loadingModal.hide()
+                            errModal.show()
+                        } else if (fromPage && !toPage) {
+                            event.preventDefault()
+                            errMessage.innerText  = "Please fill out these fields!"
+                            errSubMessage.innerText = ""
+                            errListTitleMessage.innerText = "Required fields:"
+                            errAltSubMessageModal.style = null
+                            resetErrListMessage()
+                            generateMesssage("Last Pages")
+                            lastPage.style.borderColor = '#A84E4E'
+                            loadingModal.hide()
+                            errModal.show()
                         } else {
                             event.preventDefault()
                             errMessage.innerText  = "Index out of bound!"
@@ -1938,159 +1881,129 @@ function submit(event) {
                             loadingModal.hide()
                             errModal.show()
                         }
-                    } else if (document.getElementById("fourthRadio").checked) {
-                        if (document.getElementById("fourthRadio").value == "cusPages") {
-                            if (document.getElementById("customPageSplit").value) {
-                                 cusPage = true
-                            } else {
-                                 cusPage = false
-                            }
-                            if (cusPage) {
-                                procTitleMessageModal.innerText = "Processing PDF..."
-                                errMessage.style.visibility = null
-                                errSubMessage.style.visibility = null
-                                errAltSubMessageModal.style.display = "none"
-                                errModal.hide()
-                                loadingModal.show()
-                                if (xhrBalance && xhrBalanceRemaining > 0) {
-                                    altLoadingMessageModal.innerText = "Processing PDF..."
-                                    document.getElementById("altLoadingModal").classList.remove('hidden')
-                                    document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                                    xhrProcStats = false
-                                    apiGateway("split", "split")
-                                 } else {
-                                     event.preventDefault()
-                                     errMessage.innerText  = "PDF file can not be processed !"
-                                     errSubMessage.innerText = ""
-                                     errListTitleMessage.innerText = "Error message"
-                                     resetErrListMessage()
-                                     generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                     errAltSubMessageModal.style = null
-                                     loadingModal.hide()
-                                     errModal.show()
-                                 }
-                            } else {
-                                event.preventDefault()
-                                errMessage.innerText  = "Please fill out these fields!"
-                                errSubMessage.innerText = ""
-                                errListTitleMessage.innerText = "Required fields:"
-                                errAltSubMessageModal.style = null
-                                resetErrListMessage()
-                                generateMesssage("Custom Pages")
-                                customPage.style.borderColor = '#A84E4E'
-                                loadingModal.hide()
-                                errModal.show()
-                            }
-                        } else {
-                            event.preventDefault()
-                            errMessage.innerText  = "Index out of bound!"
-                            errSubMessage.innerText = ""
-                            errListTitleMessage.innerText = "Error message"
-                            resetErrListMessage()
-                            generateMesssage("Split custom page logic error")
-                            errAltSubMessageModal.style = null
-                            loadingModal.hide()
-                            errModal.show()
-                        }
-                     } else {
+                    }
+                })
+                .catch((error) => {
+                    event.preventDefault()
+                    errMessage.innerText  = "Invalid page number range!"
+                    errListTitleMessage.innerText = "Error message"
+                    errAltSubMessageModal.style = null
+                    resetErrListMessage()
+                    generateMesssage("Failed to fetch total PDF pages")
+                    console.log(error)
+                    loadingModal.hide()
+                    errModal.show()
+                })
+            } else if (document.getElementById("fourthRadio").checked) {
+                if (document.getElementById("customPageSplit").value) {
+                    cusPage = true
+               } else {
+                    cusPage = false
+               }
+               if (cusPage) {
+                   procTitleMessageModal.innerText = "Processing PDF..."
+                   errMessage.style.visibility = null
+                   errSubMessage.style.visibility = null
+                   errAltSubMessageModal.style.display = "none"
+                   errModal.hide()
+                   loadingModal.show()
+                   if (xhrBalance && xhrBalanceRemaining > 0) {
+                       altLoadingMessageModal.innerText = "Processing PDF..."
+                       document.getElementById("altLoadingModal").classList.remove('hidden')
+                       document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                       xhrProcStats = false
+                       apiGateway("split", "split")
+                    } else {
                         event.preventDefault()
-                        errMessage.innerText  = "Index out of bound!"
+                        errMessage.innerText  = "PDF file can not be processed !"
                         errSubMessage.innerText = ""
                         errListTitleMessage.innerText = "Error message"
                         resetErrListMessage()
-                        generateMesssage("Cannot define selected or custom page")
+                        generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
                         errAltSubMessageModal.style = null
                         loadingModal.hide()
                         errModal.show()
                     }
-                } else {
-                    event.preventDefault()
-                    errMessage.innerText  = "Kaori"
-                    errSubMessage.style.visibility = null
-                    errAltSubMessageModal.style.display = "none"
-                    loadingModal.hide()
-                    errModal.show()
-                }
+               } else {
+                   event.preventDefault()
+                   errMessage.innerText  = "Please fill out these fields!"
+                   errSubMessage.innerText = ""
+                   errListTitleMessage.innerText = "Required fields:"
+                   errAltSubMessageModal.style = null
+                   resetErrListMessage()
+                   generateMesssage("Custom Pages")
+                   customPage.style.borderColor = '#A84E4E'
+                   loadingModal.hide()
+                   errModal.show()
+               }
             } else {
                 event.preventDefault()
                 errMessage.innerText  = "Index out of bound!"
                 errSubMessage.innerText = ""
-                errListTitleMessage.innerinnerTextHTML = "Error message"
+                errListTitleMessage.innerText = "Error message"
                 resetErrListMessage()
-                generateMesssage("Split options decision logic error")
+                generateMesssage("Cannot define selected or custom page")
                 errAltSubMessageModal.style = null
                 loadingModal.hide()
                 errModal.show()
             }
         } else if (document.getElementById("secondRadio").checked) {
-            let cusPage = false
+            let cusPage
             var customPage = document.getElementById('customPageDelete')
-            if (document.getElementById("secondRadio").value == "delete") {
-                    if (document.getElementById("customPageDelete").value) {
-                         cusPage = true
-                    } else {
-                         cusPage = false
-                    }
-                    if (cusPage) {
-                        procTitleMessageModal.innerText = "Processing PDF..."
-                        errMessage.style.visibility = null
-                        errSubMessage.style.visibility = null
-                        errAltSubMessageModal.style.display = "none"
-                        errModal.hide()
-                        loadingModal.show()
-                        if (getUploadedFileName().length > 0) {
-                            if (xhrBalance && xhrBalanceRemaining > 0) {
-                                altLoadingMessageModal.innerText = "Processing PDF..."
-                                document.getElementById("altLoadingModal").classList.remove('hidden')
-                                document.getElementById("dropzoneSplit").classList.add('animate-pulse')
-                                xhrProcStats = false
-                                apiGateway("split", "delete")
-                             } else {
-                                 event.preventDefault()
-                                 errMessage.innerText  = "PDF file can not be processed !"
-                                 errSubMessage.innerText = ""
-                                 errListTitleMessage.innerText = "Error message"
-                                 resetErrListMessage()
-                                 generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
-                                 errAltSubMessageModal.style = null
-                                 loadingModal.hide()
-                                 errModal.show()
-                             }
-                        } else {
-                            event.preventDefault()
-                            errMessage.innerText  = "PDF file can not be processed !"
-                            errSubMessage.innerText = ""
-                            errListTitleMessage.innerText = "Error message"
-                            resetErrListMessage()
-                            generateMesssage("No file has been chosen")
-                            errAltSubMessageModal.style = null
-                            loadingModal.hide()
-                            errModal.show()
-                        }
+            if (document.getElementById("customPageDelete").value) {
+                cusPage = true
+            } else {
+                cusPage = false
+            }
+            if (cusPage) {
+                procTitleMessageModal.innerText = "Processing PDF..."
+                errMessage.style.visibility = null
+                errSubMessage.style.visibility = null
+                errAltSubMessageModal.style.display = "none"
+                errModal.hide()
+                loadingModal.show()
+                if (getUploadedFileName().length > 0) {
+                    if (xhrBalance && xhrBalanceRemaining > 0) {
+                        altLoadingMessageModal.innerText = "Processing PDF..."
+                        document.getElementById("altLoadingModal").classList.remove('hidden')
+                        document.getElementById("dropzoneSplit").classList.add('animate-pulse')
+                        xhrProcStats = false
+                        apiGateway("split", "delete")
                     } else {
                         event.preventDefault()
-                        errMessage.innerText  = "Please fill out these fields!"
+                        errMessage.innerText  = "PDF file can not be processed !"
                         errSubMessage.innerText = ""
-                        errListTitleMessage.innerText = "Required fields:"
-                        errAltSubMessageModal.style = null
+                        errListTitleMessage.innerText = "Error message"
                         resetErrListMessage()
-                        generateMesssage("Custom Pages")
-                        errSubMessage.style.visibility = null
-                        customPage.style.borderColor = '#A84E4E'
+                        generateMesssage("Remaining monthly limit ("+xhrBalanceRemaining+" out of 250)")
+                        errAltSubMessageModal.style = null
                         loadingModal.hide()
                         errModal.show()
                     }
                 } else {
                     event.preventDefault()
-                    errMessage.innerText  = "Index out of bound!"
+                    errMessage.innerText  = "PDF file can not be processed !"
                     errSubMessage.innerText = ""
                     errListTitleMessage.innerText = "Error message"
                     resetErrListMessage()
-                    generateMesssage("Delete options decision logic error")
+                    generateMesssage("No file has been chosen")
                     errAltSubMessageModal.style = null
                     loadingModal.hide()
                     errModal.show()
                 }
+            } else {
+                event.preventDefault()
+                errMessage.innerText  = "Please fill out these fields!"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Required fields:"
+                errAltSubMessageModal.style = null
+                resetErrListMessage()
+                generateMesssage("Custom Pages")
+                errSubMessage.style.visibility = null
+                customPage.style.borderColor = '#A84E4E'
+                loadingModal.hide()
+                errModal.show()
+            }
         } else {
             event.preventDefault()
             errMessage.innerText  = "Index out of bound!"
@@ -2348,7 +2261,6 @@ function validateVersion() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest()
         var formData = new FormData()
-        var timerStart = Date.now()
         formData.append('appMajorVersion', appMajorVer)
         formData.append('appMinorVersion', appMinorVer)
         formData.append('appPatchVersion', appPatchVer)
@@ -2358,22 +2270,8 @@ function validateVersion() {
         xhr.open('POST', apiUrl+'/api/v1/version/check', true)
         xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
 
-        var timer = setInterval(function() {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort()
-                clearInterval(timer)
-                reject({
-                    versioningCheck: false,
-                    versioningStats: 524,
-                    versioningMessage: 'Connection timeout',
-                    versioningError: 'Connection timeout',
-                })
-            }
-        }, 15000)
-
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                clearInterval(timerStart)
 	            if (xhr.responseText.trim().startsWith('{')) {
                     var xhrReturn = JSON.parse(xhr.responseText)
                     if (xhr.status == 200) {
