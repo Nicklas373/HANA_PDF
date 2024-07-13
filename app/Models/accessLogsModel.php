@@ -14,8 +14,6 @@ class accessLogsModel extends Model
     protected $fillable = [
         'processId',
         'routePath',
-        'accessIpAddress',
-        'routeExceptionMessage',
-        'routeExceptionLog'
+        'accessIpAddress'
     ];
 }

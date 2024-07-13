@@ -23,6 +23,7 @@ return new class extends Migration
             $table->uuid('processId');
             $table->text('routePath')->nullable();
             $table->text('accessIpAddress')->nullable();
+            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

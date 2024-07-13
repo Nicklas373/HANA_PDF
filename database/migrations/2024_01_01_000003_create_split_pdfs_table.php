@@ -24,9 +24,9 @@ return new class extends Migration
             $table->string('fileSize', 25)->nullable();
             $table->string('fromPage', 5)->nullable();
             $table->string('toPage', 5)->nullable();
-            $table->text('customPage')->nullable();
-            $table->text('fixedPage')->nullable();
-            $table->text('fixedPageRange')->nullable();
+            $table->text('customSplitPage')->nullable();
+            $table->text('customDeletePage')->nullable();
+            $table->text('fixedRange')->nullable();
             $table->string('mergePDF', 25)->nullable();
             $table->string('action', 10)->nullable();
             $table->boolean('result');
@@ -38,6 +38,7 @@ return new class extends Migration
             $table->text('procDuration')->nullable();
             $table->boolean('isReport')->nullable()->default(false);
             $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('updatedAt')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

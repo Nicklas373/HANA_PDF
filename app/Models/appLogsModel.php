@@ -14,6 +14,6 @@ class appLogsModel extends Model
     protected $fillable = [
         'processId',
         'errReason',
-        'errApiReason'
+        'errStatus'
     ];
 }
