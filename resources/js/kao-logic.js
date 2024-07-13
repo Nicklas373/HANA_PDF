@@ -85,7 +85,7 @@ if (procBtn) {
         errModal.hide()
         loadingModal.show()
         if (xhrProcStats) {
-            //validateVersion().then(function () {
+            validateVersion().then(function () {
                 remainingBalance().then(function () {
                     loadingModal.hide()
                     if (document.getElementById('html') !== null) {
@@ -126,18 +126,18 @@ if (procBtn) {
                     loadingModal.hide()
                     errModal.show()
                 })
-            //}).catch(function (error) {
-            //    errModal.hide()
-            //    errMessage.innerText  = "There was unexpected error !"
-            //    errSubMessage.innerText = ""
-            //    errListTitleMessage.innerText = "Error message"
-            //    resetErrListMessage()
-            //    generateMesssage(error.versioningMessage)
-            //    generateMesssage("Please clear cache the browser and try again")
-            //    errAltSubMessageModal.style = null
-            //    loadingModal.hide()
-            //    errModal.show()
-            //})
+            }).catch(function (error) {
+                errModal.hide()
+                errMessage.innerText  = "There was unexpected error !"
+                errSubMessage.innerText = ""
+                errListTitleMessage.innerText = "Error message"
+                resetErrListMessage()
+                generateMesssage(error.versioningMessage)
+                generateMesssage("Please clear cache the browser and try again")
+                errAltSubMessageModal.style = null
+                loadingModal.hide()
+                errModal.show()
+            })
         } else {
             event.preventDefault()
             errMessage.innerText  = "Sorry, we're still processing your files"
@@ -1250,7 +1250,7 @@ function remainingBalance() {
                                 xhrBalanceResponse: xhrReturn.message
                             })
                         }
-                    }else {
+                    } else {
                         xhrBalance = false
                         xhrBalanceRemaining = 0
                         reject({
