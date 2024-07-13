@@ -9,8 +9,8 @@
     <div id="content" class="flex flex-col min-h-screen justify-between">
         @yield('content')
     </div>
-    <script async type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.min.mjs"></script>
-    <script async type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.worker.min.mjs"></script>
+    <script async type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"></script>
+    <script async type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs"></script>
     <script async type="text/javascript" src="{{asset('ext-js/kao-controller.js')}}"></script>
     <script async type="text/javascript" src="{{asset('ext-js/kao-main.js')}}"></script>
     <script async type="text/javascript" src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
