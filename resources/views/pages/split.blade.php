@@ -86,12 +86,12 @@
                     </div>
                     <div class="mb-4 mt-4 lg:mt-6 flex flex-col w-full bg-transparent p-2" id="splitLayout2_delete" style="display: none;">
                         <label for="customPageDelete" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Custom Page</label>
-                        <input type="text" id="customPageDelete" name="customPageDelete" class="font-quicksand mt-2 block w-full lg:w-4/6 rounded-lg border border-lt1 bg-lt1 p-2.5 text-xs text-dt1 focus:border-ac focus:ring-ac" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('extCustomPage')" />
+                        <input type="text" id="customPageDelete" name="customPageDelete" class="font-quicksand mt-2 block w-full lg:w-4/6 rounded-lg border border-lt1 bg-lt1 p-2.5 text-xs text-dt1 focus:border-ac focus:ring-ac" placeholder="Example: 1,2,3 or 1-5 or 1,2-5" onFocusOut="checkValidation('extCustomPage')" />
                     </div>
                     <div class="mb-4 mt-2 flex flex-col w-full bg-transparent" id="splitLayout3Cstm" style="display: none;">
                         <label for="customPageSplit" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Custom Page</label>
                         <div class="mx-2 lg:w-4/6">
-                            <input type="text" id="customPageSplit" name="customPageSplit" class="font-quicksand mt-2 block w-full rounded-lg border border-lt1 bg-lt1 p-2.5 text-xs text-dt1 focus:border-ac focus:ring-ac" placeholder="Example: 1,2,3 or 1-5 or 1,2-5 or all" onFocusOut="checkValidation('splitCustomPage')" />
+                            <input type="text" id="customPageSplit" name="customPageSplit" class="font-quicksand mt-2 block w-full rounded-lg border border-lt1 bg-lt1 p-2.5 text-xs text-dt1 focus:border-ac focus:ring-ac" placeholder="Example: 1,2,3 or 1-5 or 1,2-5" onFocusOut="checkValidation('splitCustomPage')" />
                         </div>
                         <div class="mt-4 mx-2 flex flex-row items-center">
                             <input id="mergePDF1" name="mergePDF" type="checkbox" class="h-4 w-4 rounded-md border-ac text-ac focus:ring-2 focus:ring-ac" />
