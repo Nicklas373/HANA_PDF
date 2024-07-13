@@ -1308,7 +1308,7 @@ function sendToAPI(files, proc, action) {
             var customPageSplit = document.getElementById('customPageSplit').value
             var customPageDelete = document.getElementById('customPageDelete').value
             var firstPage = document.getElementById('fromPage').value
-            var lastPage = document.getElementById('toPage').value        
+            var lastPage = document.getElementById('toPage').value
             if (document.getElementById("thirdRadio").checked) {
                 mergePdf = document.getElementById('mergePDF').checked
                 usedMethod = 'range'
