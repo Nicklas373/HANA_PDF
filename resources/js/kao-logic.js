@@ -85,7 +85,7 @@ if (procBtn) {
         errModal.hide()
         loadingModal.show()
         if (xhrProcStats) {
-            validateVersion().then(function () {
+            //validateVersion().then(function () {
                 remainingBalance().then(function () {
                     loadingModal.hide()
                     if (document.getElementById('html') !== null) {
@@ -126,6 +126,7 @@ if (procBtn) {
                     loadingModal.hide()
                     errModal.show()
                 })
+            /*
             }).catch(function (error) {
                 errModal.hide()
                 errMessage.innerText  = "There was unexpected error !"
@@ -138,6 +139,7 @@ if (procBtn) {
                 loadingModal.hide()
                 errModal.show()
             })
+            */
         } else {
             event.preventDefault()
             errMessage.innerText  = "Sorry, we're still processing your files"
