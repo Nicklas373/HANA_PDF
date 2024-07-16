@@ -106,17 +106,17 @@ jobs:
       - name: Build Instance Docker Image
         run: |
           docker build \
-            -t nicklas373/hana-instance-services-sit:1.1 \
+            -t nicklas373/hana-instance-services-sit:1.2 \
             -f Dockerfile/Dockerfile.hana-instance-services.sit \
             .
           mkdir -p instance_image
-          docker save -o instance_image/instance_image.tar nicklas373/hana-instance-services-sit:1.1
+          docker save -o instance_image/instance_image.tar nicklas373/hana-instance-services-sit:1.2
   
       - name: Load Docker Images
         run: docker load -i instance_image/instance_image.tar
   
       - name: Deploy Docker Image to Docker Hub
-        run: docker push nicklas373/hana-instance-services-sit:1.1
+        run: docker push nicklas373/hana-instance-services-sit:1.2
 
       - name: Docker Success Notifications
         run: |
