@@ -59,7 +59,7 @@ services:
         depends_on:
             - hana-instance-services
     hana-instance-services:
-        image: nicklas373/hana-instance-services-sit:1.1
+        image: nicklas373/hana-instance-services-sit:1.2
         container_name: 'hana-instance-services'
         cpus: 2.0
         mem_limit: 1024M
