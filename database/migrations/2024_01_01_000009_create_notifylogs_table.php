@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('notifyResult');
             $table->text('notifyMessage')->nullable();
             $table->json('notifyResponse')->nullable();
+            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

@@ -146,6 +146,11 @@ class convertController extends Controller
                     $pdfTotalPages = AppHelper::instance()->count($newFilePath);
                     $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                     if ($convertType == 'xlsx') {
+                        if ($loopCount <= 1) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
+                            }
+                        }
                         $asposeAPI = new Process([
                             'python3',
                             public_path().'/ext-python/asposeAPI.py',
@@ -535,6 +540,11 @@ class convertController extends Controller
                             }
                         }
                     } else if ($convertType == 'pptx') {
+                        if ($loopCount <= 1) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
+                            }
+                        }
                         $asposeAPI = new Process([
                             'python3',
                             public_path().'/ext-python/asposeAPI.py',
@@ -924,6 +934,11 @@ class convertController extends Controller
                             }
                         }
                     } else if ($convertType == 'docx') {
+                        if ($loopCount <= 1) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx');
+                            }
+                        }
                         try {
                             $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                             $uploadFileRequest = new UploadFileRequest($newFilePath, $currentFileName);
@@ -1192,6 +1207,13 @@ class convertController extends Controller
                             }
                         }
                     } else if ($convertType == 'jpg') {
+                        if ($loopCount <= 1) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg');
+                            } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg');
+                            }
+                        }
                         try {
                             $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask->setFileEncryption($pdfEncKey);
@@ -1890,6 +1912,11 @@ class convertController extends Controller
                             }
                         }
                     } else if ($convertType == 'pdf') {
+                        if ($loopCount <= 1) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                            }
+                        }
                         if ($pdfNameWithExtension == "jpg" || $pdfNameWithExtension == "jpeg" || $pdfNameWithExtension == "png" || $pdfNameWithExtension == "tiff") {
                             try {
                                 $ilovepdfTask = new ImagepdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));

@@ -123,6 +123,11 @@ class compressController extends Controller
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                     $fileSize = filesize($newFilePath);
                     $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                    if ($loopCount <= 1) {
+                        if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$trimPhase1)) {
+                            Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$trimPhase1);
+                        }
+                    }
                     try {
                         $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                         $ilovepdfTask = $ilovepdf->newTask('compress');
