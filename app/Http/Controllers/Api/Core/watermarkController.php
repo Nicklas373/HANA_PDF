@@ -33,7 +33,7 @@ class watermarkController extends Controller
             'wmFontFamily' => ['required', 'in:Arial,Arial Unicode MS,Comic Sans MS,Courier,Times New Roman,Verdana'],
             'wmLayoutStyle' => ['required', 'in:above,below'],
             'wmRotation' => ['nullable', 'numeric'],
-            'wmPage' => ['nullable', 'regex:/^[0-9a-zA-Z,]+$/'],
+            'wmPage' => ['nullable', 'regex:/^[0-9a-zA-Z,-]+$/'],
             'wmText' => ['nullable','string'],
             'wmTransparency' => ['nullable', 'numeric'],
             'wmMosaic' => ['required', 'in:true,false']
@@ -114,6 +114,9 @@ class watermarkController extends Controller
                     $fileSize = filesize($newFilePath);
                     $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                     $watermarkAction = $request->post('action');
+                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
+                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                    }
                     if ($watermarkAction == 'img') {
                         $watermarkImage = $request->file('imgFile');
                         $currentImageName = basename($watermarkImage);

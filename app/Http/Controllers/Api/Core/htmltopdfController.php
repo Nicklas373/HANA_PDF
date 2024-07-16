@@ -175,6 +175,9 @@ class htmltopdfController extends Controller
                     }
                 }
             }
+            if (Storage::disk('local')->exists('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName)) {
+                Storage::disk('local')->delete('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName);
+            }
             try {
                 $ilovepdfTask = new HtmlpdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                 $ilovepdfTask->setEncryptKey($pdfEncKey);

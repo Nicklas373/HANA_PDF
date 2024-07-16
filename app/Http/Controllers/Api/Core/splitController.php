@@ -116,6 +116,11 @@ class splitController extends Controller
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                     $fileSize = filesize($newFilePath);
                     $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                    if ($tempPDF == 'true') {
+                        if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
+                            Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                        }
+                    }
                     if ($request->has('action')) {
                         if ($tempPDF == 'true') {
                             $mergeDBpdf = "true";
@@ -1048,7 +1053,7 @@ class splitController extends Controller
                                         'fixedRange' => $newPageRanges,
                                         'mergePDF' => $mergeDBpdf,
                                         'action' => $action,
-                                        'result' => false,
+                                        'result' => true,
                                         'isBatch' => $batchValue,
                                         'processId' => $uuid,
                                         'batchId' => $batchId,
