@@ -1,9 +1,9 @@
-# Configure php fpm as base image 
-FROM php:8.2-fpm
+# Use php:8.2-fpm-alpine as base image
+FROM php:8.2-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.1"
+LABEL version="1.2"
 LABEL description="Docker container for https://gw.hana-ci.com"
 
 # Configure ARG
@@ -17,39 +17,34 @@ WORKDIR /var/www/html
 
 # Configure timezone
 ENV TZ="Asia/Jakarta"
-RUN apt-get update && \
-    apt-get install -y tzdata && \
-    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    echo "Asia/Jakarta" > /etc/timezone
 
 # Configure initial packages
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     curl \
     unzip \
     git \
-    libmagickwand-dev \
+    imagemagick-dev \
     libzip-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
     libpng-dev \
     ghostscript \
     python3 \
-    python3-pip
+    py3-pip \
+    postgresql-dev \
+    autoconf \
+    build-base
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j$(nproc) \
-        gd \
-        zip \
-        ftp
+    docker-php-ext-install -j$(nproc) gd zip pdo_pgsql
 
 # Install Imagick extension
 RUN pecl install imagick && \
     docker-php-ext-enable imagick
-
-# Configure PostgresSQL PHP Driver
-RUN apt-get update && apt-get install -y libpq-dev && \
-    docker-php-ext-install pdo_pgsql
 
 # Configure Python modules
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
@@ -65,11 +60,11 @@ RUN cd hanaci-api && composer install --no-interaction --no-scripts --no-progres
 
 # Configure App Service
 COPY module/php/php.ini /usr/local/etc/php/conf.d/99-hana.ini
-RUN mkdir hanaci-api/storage/app/public/batch
-RUN mkdir hanaci-api/storage/app/public/download
-RUN mkdir hanaci-api/storage/app/public/image
-RUN mkdir hanaci-api/storage/app/public/pool
-RUN mkdir hanaci-api/storage/app/public/upload
+RUN mkdir -p hanaci-api/storage/app/public/batch
+RUN mkdir -p hanaci-api/storage/app/public/download
+RUN mkdir -p hanaci-api/storage/app/public/image
+RUN mkdir -p hanaci-api/storage/app/public/pool
+RUN mkdir -p hanaci-api/storage/app/public/upload
 RUN cd hanaci-api && chmod o+w /var/www/html/hanaci-api/storage/ -R
 RUN cd hanaci-api && chmod o+w /var/www/html/hanaci-api/vendor/mpdf/mpdf/tmp/ -R
 RUN cd hanaci-api && cp .env.example .env
@@ -80,8 +75,8 @@ RUN cd hanaci-api && php artisan config:cache
 RUN cd hanaci-api && php artisan config:clear
 
 # Configure Laravel Env
-RUN cd hanaci-api && echo "JWT_SHOW_BLACKLIST_EXCEPTION=$JWT_SHOW_BLACKLIST_EXCEPTION" >> .env
-RUN cd hanaci-api && echo "JWT_TTL=$JWT_TTL" >> .env
+RUN cd hanaci-api && echo "JWT_SHOW_BLACKLIST_EXCEPTION=true" >> .env
+RUN cd hanaci-api && echo "JWT_TTL=null" >> .env
 RUN cd hanaci-api && echo "" >> .env
 RUN cd hanaci-api && sed -i 's/APP_NAME=Laravel/APP_NAME="gw.hana-ci"/' .env
 RUN cd hanaci-api && sed -i "s#APP_URL=http://localhost#APP_URL=http://sit.gw.hana-ci.com#" .env

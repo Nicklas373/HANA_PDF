@@ -1,9 +1,9 @@
-# Configure php fpm as base image 
-FROM php:8.2-fpm
+# Use php:8.2-fpm-alpine as base image
+FROM php:8.2-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.1"
+LABEL version="1.2"
 LABEL description="Docker application image for HANA PDF Apps"
 
 # Configure ARG
@@ -14,27 +14,21 @@ ARG DB_PASSWORD
 WORKDIR /var/www/html
 
 # Configure timezone
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && \
-    apt-get install -yq tzdata && \
-    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
-ENV TZ="Asia/Jakarta"
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apk update && \
+    apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    echo "Asia/Jakarta" > /etc/timezone
 
 # Configure initial packages
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     curl \
     unzip \
     git \
-    libzip-dev 
+    libzip-dev \
+    postgresql-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install -j$(nproc) zip
-
-# Configure PostgresSQL PHP Driver
-RUN apt-get update && apt-get install -y libpq-dev && \
-    docker-php-ext-install pdo_pgsql
+RUN docker-php-ext-install zip pdo_pgsql
 
 # Clone App Services
 RUN git clone -b dev/fe/master-live https://github.com/Nicklas373/Hana-PDF hanaci-pdf
