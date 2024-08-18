@@ -203,11 +203,11 @@ class notifyLogController extends Controller
         $logOrder = $request->input('logOrder');
         try {
             if ($logModel == 'access') {
-                $datalog = accessLogsModel::take($logCount)->get();
+                $datalog = accessLogsModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'jobs') {
                 $datalog = jobLogsModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'notify') {
-                $datalog = notifyLogsModel::take($logCount)->get();
+                $datalog = notifyLogsModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'compress') {
                 $datalog = compressModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'convert') {
