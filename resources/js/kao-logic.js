@@ -2414,22 +2414,228 @@ function submit(event) {
                     cusPage = false;
                 }
                 if (cusPage) {
+                    if (cusPage) {
+                        let isNan;
+                        if (!isNaN(cusPage)) {
+                            getTotalPages(
+                                getUploadedFileName()[0].replace(/\s/g, "_")
+                            )
+                                .then((totalPages) => {
+                                    if (totalPages.totalPages == false) {
+                                        event.preventDefault();
+                                        errMessage.innerText =
+                                            "There was unexpected error !";
+                                        errListTitleMessage.innerText =
+                                            "Error message";
+                                        errAltSubMessageModal.style = null;
+                                        resetErrListMessage();
+                                        generateMesssage(
+                                            "Failed to get total page from PDF"
+                                        );
+                                        loadingModal.hide();
+                                        errModal.show();
+                                    } else {
+                                        if (parseInt(cusPage) >= totalPages) {
+                                            event.preventDefault();
+                                            errMessage.innerText =
+                                                "Invalid page number range!";
+                                            errListTitleMessage.innerText =
+                                                "Error message";
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage(
+                                                "Custom page can not be more or same than total page"
+                                            );
+                                            customPage.style.borderColor =
+                                                "#A84E4E";
+                                            loadingModal.hide();
+                                            errModal.show();
+                                        } else {
+                                            isNan = true;
+                                        }
+                                    }
+                                })
+                                .catch((error) => {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Invalid page number range!";
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage(
+                                        "Failed to fetch total PDF pages"
+                                    );
+                                    console.log(error);
+                                    loadingModal.hide();
+                                    errModal.show();
+                                });
+                        } else {
+                            isNan = true;
+                        }
+                        if (isNan) {
+                            procTitleMessageModal.innerText =
+                                "Processing PDF...";
+                            errMessage.style.visibility = null;
+                            errSubMessage.style.visibility = null;
+                            errAltSubMessageModal.style.display = "none";
+                            errModal.hide();
+                            loadingModal.show();
+                            if (xhrBalance && xhrBalanceRemaining > 0) {
+                                altLoadingMessageModal.innerText =
+                                    "Processing PDF...";
+                                document
+                                    .getElementById("altLoadingModal")
+                                    .classList.remove("hidden");
+                                document
+                                    .getElementById("dropzoneSplit")
+                                    .classList.add("animate-pulse");
+                                xhrProcStats = false;
+                                apiGateway("split", "split");
+                            } else {
+                                event.preventDefault();
+                                errMessage.innerText =
+                                    "PDF file can not be processed !";
+                                errSubMessage.innerText = "";
+                                errListTitleMessage.innerText = "Error message";
+                                resetErrListMessage();
+                                generateMesssage(
+                                    "Remaining monthly limit (" +
+                                        xhrBalanceRemaining +
+                                        " out of 250)"
+                                );
+                                errAltSubMessageModal.style = null;
+                                loadingModal.hide();
+                                errModal.show();
+                            }
+                        } else {
+                            event.preventDefault();
+                            errMessage.innerText =
+                                "Please fill out these fields!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Required fields:";
+                            errAltSubMessageModal.style = null;
+                            resetErrListMessage();
+                            generateMesssage("Custom Pages");
+                            customPage.style.borderColor = "#A84E4E";
+                            loadingModal.hide();
+                            errModal.show();
+                        }
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerText = "Index out of bound!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Error message";
+                        resetErrListMessage();
+                        generateMesssage("Cannot define custom page value !");
+                        errAltSubMessageModal.style = null;
+                        loadingModal.hide();
+                        errModal.show();
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerText = "Index out of bound!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message";
+                    resetErrListMessage();
+                    generateMesssage("Cannot define selected or custom page");
+                    errAltSubMessageModal.style = null;
+                    loadingModal.hide();
+                    errModal.show();
+                }
+            } else if (document.getElementById("secondRadio").checked) {
+                let cusPage;
+                var customPage = document.getElementById("customPageDelete");
+                if (document.getElementById("customPageDelete").value) {
+                    cusPage = true;
+                } else {
+                    cusPage = false;
+                }
+                let isNan;
+                if (!isNaN(cusPage)) {
+                    getTotalPages(getUploadedFileName()[0].replace(/\s/g, "_"))
+                        .then((totalPages) => {
+                            if (totalPages.totalPages == false) {
+                                event.preventDefault();
+                                errMessage.innerText =
+                                    "There was unexpected error !";
+                                errListTitleMessage.innerText = "Error message";
+                                errAltSubMessageModal.style = null;
+                                resetErrListMessage();
+                                generateMesssage(
+                                    "Failed to get total page from PDF"
+                                );
+                                loadingModal.hide();
+                                errModal.show();
+                            } else {
+                                if (parseInt(cusPage) >= totalPages) {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Invalid page number range!";
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage(
+                                        "Custom page can not be more or same than total page"
+                                    );
+                                    customPage.style.borderColor = "#A84E4E";
+                                    loadingModal.hide();
+                                    errModal.show();
+                                } else {
+                                    isNan = true;
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            event.preventDefault();
+                            errMessage.innerText = "Invalid page number range!";
+                            errListTitleMessage.innerText = "Error message";
+                            errAltSubMessageModal.style = null;
+                            resetErrListMessage();
+                            generateMesssage("Failed to fetch total PDF pages");
+                            console.log(error);
+                            loadingModal.hide();
+                            errModal.show();
+                        });
+                } else {
+                    isNan = true;
+                }
+                if (isNan) {
                     procTitleMessageModal.innerText = "Processing PDF...";
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     errModal.hide();
                     loadingModal.show();
-                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                        altLoadingMessageModal.innerText = "Processing PDF...";
-                        document
-                            .getElementById("altLoadingModal")
-                            .classList.remove("hidden");
-                        document
-                            .getElementById("dropzoneSplit")
-                            .classList.add("animate-pulse");
-                        xhrProcStats = false;
-                        apiGateway("split", "split");
+                    if (getUploadedFileName().length > 0) {
+                        if (xhrBalance && xhrBalanceRemaining > 0) {
+                            altLoadingMessageModal.innerText =
+                                "Processing PDF...";
+                            document
+                                .getElementById("altLoadingModal")
+                                .classList.remove("hidden");
+                            document
+                                .getElementById("dropzoneSplit")
+                                .classList.add("animate-pulse");
+                            xhrProcStats = false;
+                            apiGateway("split", "delete");
+                        } else {
+                            event.preventDefault();
+                            errMessage.innerText =
+                                "PDF file can not be processed !";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message";
+                            resetErrListMessage();
+                            generateMesssage(
+                                "Remaining monthly limit (" +
+                                    xhrBalanceRemaining +
+                                    " out of 250)"
+                            );
+                            errAltSubMessageModal.style = null;
+                            loadingModal.hide();
+                            errModal.show();
+                        }
                     } else {
                         event.preventDefault();
                         errMessage.innerText =
@@ -2437,87 +2643,18 @@ function submit(event) {
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Error message";
                         resetErrListMessage();
-                        generateMesssage(
-                            "Remaining monthly limit (" +
-                                xhrBalanceRemaining +
-                                " out of 250)"
-                        );
+                        generateMesssage("No file has been chosen");
                         errAltSubMessageModal.style = null;
                         loadingModal.hide();
                         errModal.show();
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerText = "Please fill out these fields!";
-                    errSubMessage.innerText = "";
-                    errListTitleMessage.innerText = "Required fields:";
-                    errAltSubMessageModal.style = null;
-                    resetErrListMessage();
-                    generateMesssage("Custom Pages");
-                    customPage.style.borderColor = "#A84E4E";
-                    loadingModal.hide();
-                    errModal.show();
-                }
-            } else {
-                event.preventDefault();
-                errMessage.innerText = "Index out of bound!";
-                errSubMessage.innerText = "";
-                errListTitleMessage.innerText = "Error message";
-                resetErrListMessage();
-                generateMesssage("Cannot define selected or custom page");
-                errAltSubMessageModal.style = null;
-                loadingModal.hide();
-                errModal.show();
-            }
-        } else if (document.getElementById("secondRadio").checked) {
-            let cusPage;
-            var customPage = document.getElementById("customPageDelete");
-            if (document.getElementById("customPageDelete").value) {
-                cusPage = true;
-            } else {
-                cusPage = false;
-            }
-            if (cusPage) {
-                procTitleMessageModal.innerText = "Processing PDF...";
-                errMessage.style.visibility = null;
-                errSubMessage.style.visibility = null;
-                errAltSubMessageModal.style.display = "none";
-                errModal.hide();
-                loadingModal.show();
-                if (getUploadedFileName().length > 0) {
-                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                        altLoadingMessageModal.innerText = "Processing PDF...";
-                        document
-                            .getElementById("altLoadingModal")
-                            .classList.remove("hidden");
-                        document
-                            .getElementById("dropzoneSplit")
-                            .classList.add("animate-pulse");
-                        xhrProcStats = false;
-                        apiGateway("split", "delete");
-                    } else {
-                        event.preventDefault();
-                        errMessage.innerText =
-                            "PDF file can not be processed !";
-                        errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
-                        resetErrListMessage();
-                        generateMesssage(
-                            "Remaining monthly limit (" +
-                                xhrBalanceRemaining +
-                                " out of 250)"
-                        );
-                        errAltSubMessageModal.style = null;
-                        loadingModal.hide();
-                        errModal.show();
-                    }
-                } else {
-                    event.preventDefault();
-                    errMessage.innerText = "PDF file can not be processed !";
+                    errMessage.innerText = "Index out of bound!";
                     errSubMessage.innerText = "";
                     errListTitleMessage.innerText = "Error message";
                     resetErrListMessage();
-                    generateMesssage("No file has been chosen");
+                    generateMesssage("Cannot define custom page value !");
                     errAltSubMessageModal.style = null;
                     loadingModal.hide();
                     errModal.show();
