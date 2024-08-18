@@ -356,19 +356,72 @@ class splitController extends Controller
                                             }
                                         }
                                     } catch (\Exception $e) {
-                                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Failed to count total PDF pages from '.$currentFileName, $e->getMessage(), false);
-                                        return $this->returnCoreMessage(
-                                            200,
-                                            'Failed to count total PDF pages from '.$currentFileName,
-                                            $currentFileName,
-                                            $newFilePath,
-                                            'split',
-                                            $uuid,
-                                            $fileSize,
-                                            null,
-                                            null,
-                                            $e->getMessage()
-                                        );
+                                        try {
+                                            DB::table('appLogs')->insert([
+                                                'processId' => $uuid,
+                                                'errReason' => 'Failed to count total PDF pages from '.$currentFileName,
+                                                'errStatus' => $e->getMessage()
+                                            ]);
+                                            DB::table('pdfSplit')->insert([
+                                                'fileName' => $currentFileName,
+                                                'fileSize' => $newFileSize,
+                                                'fromPage' => $fromPage,
+                                                'toPage' => $toPage,
+                                                'customSplitPage' => null,
+                                                'customDeletePage' => null,
+                                                'fixedRange' => null,
+                                                'mergePDF' => $mergeDBpdf,
+                                                'action' => $action,
+                                                'result' => false,
+                                                'isBatch' => $batchValue,
+                                                'processId' => $uuid,
+                                                'batchId' => $batchId,
+                                                'procStartAt' => $startProc,
+                                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                                'procDuration' =>  $duration->s.' seconds'
+                                            ]);
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Failed to count total PDF pages from '.$currentFileName, $e->getMessage(), false);
+                                            return $this->returnCoreMessage(
+                                                200,
+                                                'Failed to count total PDF pages from '.$currentFileName,
+                                                $currentFileName,
+                                                $newFilePath,
+                                                'split',
+                                                $uuid,
+                                                $fileSize,
+                                                null,
+                                                null,
+                                                $e->getMessage()
+                                            );
+                                        } catch (QueryException $ex) {
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
+                                            return $this->returnCoreMessage(
+                                                200,
+                                                'Database connection error !',
+                                                $currentFileName,
+                                                null,
+                                                'split',
+                                                $uuid,
+                                                $fileSize,
+                                                null,
+                                                null,
+                                                $ex->getMessage()
+                                            );
+                                        } catch (\Exception $e) {
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
+                                            return $this->returnCoreMessage(
+                                                200,
+                                                'Eloquent transaction error !',
+                                                $currentFileName,
+                                                null,
+                                                'split',
+                                                $uuid,
+                                                $fileSize,
+                                                null,
+                                                null,
+                                                $e->getMessage()
+                                            );
+                                        }
                                     }
                                 } else {
                                     try {
@@ -439,7 +492,79 @@ class splitController extends Controller
                                     }
                                 }
                             } else if ($usedMethod == 'custom') {
-                                if (is_string($customInputSplitPage)) {
+                                if (is_numeric($customInputSplitPage)) {
+                                    try {
+                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        if ($customInputSplitPage >= $pdfTotalPages) {
+                                            DB::table('appLogs')->insert([
+                                                'processId' => $uuid,
+                                                'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                                'errStatus' => null
+                                            ]);
+                                            DB::table('pdfSplit')->insert([
+                                                'fileName' => $currentFileName,
+                                                'fileSize' => $newFileSize,
+                                                'fromPage' => $fromPage,
+                                                'toPage' => $toPage,
+                                                'customSplitPage' => null,
+                                                'customDeletePage' => null,
+                                                'fixedRange' => null,
+                                                'mergePDF' => $mergeDBpdf,
+                                                'action' => $action,
+                                                'result' => false,
+                                                'isBatch' => $batchValue,
+                                                'processId' => $uuid,
+                                                'batchId' => $batchId,
+                                                'procStartAt' => $startProc,
+                                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                                'procDuration' =>  $duration->s.' seconds'
+                                            ]);
+                                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')', true);
+                                            return $this->returnCoreMessage(
+                                                200,
+                                                'PDF split failed!',
+                                                $currentFileName,
+                                                null,
+                                                'split',
+                                                $uuid,
+                                                $fileSize,
+                                                null,
+                                                null,
+                                                'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
+                                            );
+                                        } else {
+                                            $newPageRanges = $customInputSplitPage;
+                                        }
+                                    } catch (QueryException $ex) {
+                                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
+                                        return $this->returnCoreMessage(
+                                            200,
+                                            'Database connection error !',
+                                            $currentFileName,
+                                            null,
+                                            'split',
+                                            $uuid,
+                                            $fileSize,
+                                            null,
+                                            null,
+                                            $ex->getMessage()
+                                        );
+                                    } catch (\Exception $e) {
+                                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
+                                        return $this->returnCoreMessage(
+                                            200,
+                                            'Eloquent transaction error !',
+                                            $currentFileName,
+                                            null,
+                                            'split',
+                                            $uuid,
+                                            $fileSize,
+                                            null,
+                                            null,
+                                            $e->getMessage()
+                                        );
+                                    }
+                                } else if (is_string($customInputSplitPage)) {
                                     $newPageRanges = strtolower($customInputSplitPage);
                                 } else {
                                     $newPageRanges = $customInputSplitPage;
@@ -449,7 +574,79 @@ class splitController extends Controller
                                 $newFileNameWithoutExtension =  str_replace('.', '_', $trimPhase1.'_page');
                             }
                         } else {
-                            if (is_string($customInputDeletePage)) {
+                            if (is_numeric($customInputDeletePage)) {
+                                try {
+                                    $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                    if ($customInputDeletePage >= $pdfTotalPages) {
+                                        DB::table('appLogs')->insert([
+                                            'processId' => $uuid,
+                                            'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                            'errStatus' => null
+                                        ]);
+                                        DB::table('pdfSplit')->insert([
+                                            'fileName' => $currentFileName,
+                                            'fileSize' => $newFileSize,
+                                            'fromPage' => $fromPage,
+                                            'toPage' => $toPage,
+                                            'customSplitPage' => null,
+                                            'customDeletePage' => null,
+                                            'fixedRange' => null,
+                                            'mergePDF' => $mergeDBpdf,
+                                            'action' => $action,
+                                            'result' => false,
+                                            'isBatch' => $batchValue,
+                                            'processId' => $uuid,
+                                            'batchId' => $batchId,
+                                            'procStartAt' => $startProc,
+                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                            'procDuration' =>  $duration->s.' seconds'
+                                        ]);
+                                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'PDF split failed!', 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')', true);
+                                        return $this->returnCoreMessage(
+                                            200,
+                                            'PDF split failed!',
+                                            $currentFileName,
+                                            null,
+                                            'split',
+                                            $uuid,
+                                            $fileSize,
+                                            null,
+                                            null,
+                                            'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
+                                        );
+                                    } else {
+                                        $newPageRanges = $customInputDeletePage;
+                                    }
+                                } catch (QueryException $ex) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
+                                    return $this->returnCoreMessage(
+                                        200,
+                                        'Database connection error !',
+                                        $currentFileName,
+                                        null,
+                                        'split',
+                                        $uuid,
+                                        $fileSize,
+                                        null,
+                                        null,
+                                        $ex->getMessage()
+                                    );
+                                } catch (\Exception $e) {
+                                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
+                                    return $this->returnCoreMessage(
+                                        200,
+                                        'Eloquent transaction error !',
+                                        $currentFileName,
+                                        null,
+                                        'split',
+                                        $uuid,
+                                        $fileSize,
+                                        null,
+                                        null,
+                                        $e->getMessage()
+                                    );
+                                }
+                            } else if (is_string($customInputDeletePage)) {
                                 $newPageRanges = strtolower($customInputDeletePage);
                             } else {
                                 $newPageRanges = $customInputDeletePage;
