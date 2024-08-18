@@ -12,9 +12,9 @@
         "appServices": "BE-DEV",
         "versioning": {
             "majorVersion": 3,
-            "minorVersion": 2,
-            "patchVersion": 6,
-            "gitRevision": "9a9ae4b"
+            "minorVersion": 3,
+            "patchVersion": 1,
+            "gitRevision": "bdd7096"
         }
     },
     {
@@ -30,9 +30,9 @@
         "appServices": "FE-DEV",
         "versioning": {
             "majorVersion": 3,
-            "minorVersion": 2,
-            "patchVersion": 6,
-            "gitRevision": "2cd264d"
+            "minorVersion": 3,
+            "patchVersion": 0,
+            "gitRevision": "ae2c927"
         }
     }
 ]
