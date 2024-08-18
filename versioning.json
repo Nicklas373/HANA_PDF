@@ -1,38 +1,38 @@
 [
-    {
-        "appServices": "BE",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 3,
-            "patchVersion": 0,
-            "gitRevision": "80c9ebb"
-        }
-    },
-    {
-        "appServices": "BE-DEV",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 2,
-            "patchVersion": 6,
-            "gitRevision": "9a9ae4b"
-        }
-    },
-    {
-        "appServices": "FE",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 2,
-            "patchVersion": 9,
-            "gitRevision": "daaae4e"
-        }
-    },
-    {
-        "appServices": "FE-DEV",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 2,
-            "patchVersion": 6,
-            "gitRevision": "2cd264d"
-        }
+  {
+    "appServices": "BE",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 3,
+      "patchVersion": 1,
+      "gitRevision": "1bc9afb"
     }
+  },
+  {
+    "appServices": "BE-DEV",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 3,
+      "patchVersion": 1,
+      "gitRevision": "bdd7096"
+    }
+  },
+  {
+    "appServices": "FE",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 3,
+      "patchVersion": 0,
+      "gitRevision": "ae2c9d7"
+    }
+  },
+  {
+    "appServices": "FE-DEV",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 3,
+      "patchVersion": 0,
+      "gitRevision": "ae2c9d7"
+    }
+  }
 ]
