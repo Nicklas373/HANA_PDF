@@ -2415,7 +2415,9 @@ function submit(event) {
                 }
                 if (cusPage) {
                     let isNan = false;
-                    if (!isNaN(cusPage)) {
+                    var cusPageValue =
+                        document.getElementById("customPageSplit").value;
+                    if (!isNaN(cusPageValue)) {
                         getTotalPages(
                             getUploadedFileName()[0].replace(/\s/g, "_")
                         )
@@ -2550,7 +2552,9 @@ function submit(event) {
             }
             if (cusPage) {
                 let isNan = false;
-                if (!isNaN(cusPage)) {
+                var cusPageValue =
+                    document.getElementById("customPageDelete").value;
+                if (!isNaN(cusPageValue)) {
                     getTotalPages(getUploadedFileName()[0].replace(/\s/g, "_"))
                         .then((totalPages) => {
                             if (totalPages.totalPages == false) {
