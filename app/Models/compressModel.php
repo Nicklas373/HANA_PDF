@@ -12,6 +12,7 @@ class compressModel extends Model
     protected $table = 'pdfCompress';
 
     protected $fillable = [
+        'compressId',
         'fileName',
         'fileSize',
         'compFileSize',

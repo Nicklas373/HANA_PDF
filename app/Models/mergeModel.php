@@ -12,6 +12,7 @@ class mergeModel extends Model
     protected $table = 'pdfMerge';
 
     protected $fillable = [
+        'mergeId',
         'fileName',
         'fileSize',
         'result',

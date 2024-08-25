@@ -12,6 +12,7 @@ class accessLogsModel extends Model
     protected $table = 'accessLogs';
 
     protected $fillable = [
+        'accessId',
         'processId',
         'routePath',
         'accessIpAddress'

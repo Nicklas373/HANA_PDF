@@ -12,6 +12,7 @@ class jobLogsModel extends Model
     protected $table = 'jobLogs';
 
     protected $fillable = [
+        'jobsId',
         'jobsName',
         'jobsEnv',
         'jobsRuntime',

@@ -12,6 +12,7 @@ class watermarkModel extends Model
     protected $table = 'pdfWatermark';
 
     protected $fillable = [
+        'watermarkId',
         'fileName',
         'fileSize',
         'watermarkFontFamily',

@@ -12,6 +12,7 @@ class splitModel extends Model
     protected $table = 'pdfSplit';
 
     protected $fillable = [
+        'splitId',
         'fileName',
         'fileSize',
         'fromPage',
