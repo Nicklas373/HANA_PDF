@@ -31,8 +31,7 @@ const appMajorVer = 3;
 const appMinorVer = 3;
 const appPatchVer = 1;
 const apiUrl = "http://192.168.0.2";
-const bearerToken =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjIvYXBpL3YxL2F1dGgvdG9rZW4iLCJpYXQiOjE3MjQ1MTM0OTYsIm5iZiI6MTcyNDUxMzQ5NiwianRpIjoicFR5TmdPZXFMMzNWWHE0bCIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.SKHHXe7EhdquwpnHe4FPzF2I4geHx8rsxlejnm2A2iU";
+const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
 const errModal = new Modal($errModal, options);
 const googleViewerUrl = "https://docs.google.com/viewerng/viewer?url=";
