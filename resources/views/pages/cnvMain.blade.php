@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-@extends('layouts.alternate-layout') @section('content')
+@extends('layouts.alternate-layout')
+@section('content')
 <div class="px-4 md:px-12">
     <section class="flex flex-wrap items-center justify-start sub-headline-viewport max-w-lg mb-4 lg:max-w-6xl">
         <div class="text-start mx-6">

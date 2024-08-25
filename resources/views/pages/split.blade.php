@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 @extends('layouts.alternate-layout')
 @section('content')
     <div class="px-4 md:px-12" id="split">

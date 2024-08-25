@@ -1,4 +1,3 @@
-<html lang="en">
 @extends('layouts.main-layout')
 @section('content')
 <div class="px-4 md:px-12" id="home">
