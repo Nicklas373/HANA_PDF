@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 0;
+const appPatchVer = 1;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
@@ -298,7 +298,6 @@ if (uploadDropzone) {
 
             this.on("addedfile", function (file) {
                 xhrTotalUploads = uploadDropzone.files.length;
-
                 var rmvLink = document.getElementsByClassName("dz-remove");
                 var dzFileLayout =
                     document.querySelectorAll('[data-dz-name=""]');
@@ -2414,7 +2413,6 @@ function submit(event) {
                     cusPage = false;
                 }
                 if (cusPage) {
-                    let isNan = false;
                     var cusPageValue =
                         document.getElementById("customPageSplit").value;
                     if (!isNaN(cusPageValue)) {
@@ -2436,7 +2434,10 @@ function submit(event) {
                                     loadingModal.hide();
                                     errModal.show();
                                 } else {
-                                    if (parseInt(cusPage) >= totalPages) {
+                                    if (
+                                        parseInt(cusPageValue) >=
+                                        totalPages.totalPagesMessage
+                                    ) {
                                         event.preventDefault();
                                         errMessage.innerText =
                                             "Invalid page number range!";
@@ -2452,7 +2453,47 @@ function submit(event) {
                                         loadingModal.hide();
                                         errModal.show();
                                     } else {
-                                        isNan = true;
+                                        procTitleMessageModal.innerText =
+                                            "Processing PDF...";
+                                        errMessage.style.visibility = null;
+                                        errSubMessage.style.visibility = null;
+                                        errAltSubMessageModal.style.display =
+                                            "none";
+                                        errModal.hide();
+                                        loadingModal.show();
+                                        if (
+                                            xhrBalance &&
+                                            xhrBalanceRemaining > 0
+                                        ) {
+                                            altLoadingMessageModal.innerText =
+                                                "Processing PDF...";
+                                            document
+                                                .getElementById(
+                                                    "altLoadingModal"
+                                                )
+                                                .classList.remove("hidden");
+                                            document
+                                                .getElementById("dropzoneSplit")
+                                                .classList.add("animate-pulse");
+                                            xhrProcStats = false;
+                                            apiGateway("split", "split");
+                                        } else {
+                                            event.preventDefault();
+                                            errMessage.innerText =
+                                                "PDF file can not be processed !";
+                                            errSubMessage.innerText = "";
+                                            errListTitleMessage.innerText =
+                                                "Error message";
+                                            resetErrListMessage();
+                                            generateMesssage(
+                                                "Remaining monthly limit (" +
+                                                    xhrBalanceRemaining +
+                                                    " out of 250)"
+                                            );
+                                            errAltSubMessageModal.style = null;
+                                            loadingModal.hide();
+                                            errModal.show();
+                                        }
                                     }
                                 }
                             })
@@ -2471,9 +2512,6 @@ function submit(event) {
                                 errModal.show();
                             });
                     } else {
-                        isNan = true;
-                    }
-                    if (isNan) {
                         procTitleMessageModal.innerText = "Processing PDF...";
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
@@ -2507,17 +2545,6 @@ function submit(event) {
                             loadingModal.hide();
                             errModal.show();
                         }
-                    } else {
-                        event.preventDefault();
-                        errMessage.innerText =
-                            "PDF file can not be processed !";
-                        errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
-                        resetErrListMessage();
-                        generateMesssage("Failed to fetch custom page value !");
-                        errAltSubMessageModal.style = null;
-                        loadingModal.hide();
-                        errModal.show();
                     }
                 } else {
                     event.preventDefault();
@@ -2551,7 +2578,6 @@ function submit(event) {
                 cusPage = false;
             }
             if (cusPage) {
-                let isNan = false;
                 var cusPageValue =
                     document.getElementById("customPageDelete").value;
                 if (!isNaN(cusPageValue)) {
@@ -2570,7 +2596,10 @@ function submit(event) {
                                 loadingModal.hide();
                                 errModal.show();
                             } else {
-                                if (parseInt(cusPage) >= totalPages) {
+                                if (
+                                    parseInt(cusPageValue) >=
+                                    totalPages.totalPagesMessage
+                                ) {
                                     event.preventDefault();
                                     errMessage.innerText =
                                         "Invalid page number range!";
@@ -2585,7 +2614,42 @@ function submit(event) {
                                     loadingModal.hide();
                                     errModal.show();
                                 } else {
-                                    isNan = true;
+                                    procTitleMessageModal.innerText =
+                                        "Processing PDF...";
+                                    errMessage.style.visibility = null;
+                                    errSubMessage.style.visibility = null;
+                                    errAltSubMessageModal.style.display =
+                                        "none";
+                                    errModal.hide();
+                                    loadingModal.show();
+                                    if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        altLoadingMessageModal.innerText =
+                                            "Processing PDF...";
+                                        document
+                                            .getElementById("altLoadingModal")
+                                            .classList.remove("hidden");
+                                        document
+                                            .getElementById("dropzoneSplit")
+                                            .classList.add("animate-pulse");
+                                        xhrProcStats = false;
+                                        apiGateway("split", "delete");
+                                    } else {
+                                        event.preventDefault();
+                                        errMessage.innerText =
+                                            "PDF file can not be processed !";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText =
+                                            "Error message";
+                                        resetErrListMessage();
+                                        generateMesssage(
+                                            "Remaining monthly limit (" +
+                                                xhrBalanceRemaining +
+                                                " out of 250)"
+                                        );
+                                        errAltSubMessageModal.style = null;
+                                        loadingModal.hide();
+                                        errModal.show();
+                                    }
                                 }
                             }
                         })
@@ -2596,48 +2660,26 @@ function submit(event) {
                             errAltSubMessageModal.style = null;
                             resetErrListMessage();
                             generateMesssage("Failed to fetch total PDF pages");
-                            console.log(error);
                             loadingModal.hide();
                             errModal.show();
                         });
                 } else {
-                    isNan = true;
-                }
-                if (isNan) {
                     procTitleMessageModal.innerText = "Processing PDF...";
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     errModal.hide();
                     loadingModal.show();
-                    if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceRemaining > 0) {
-                            altLoadingMessageModal.innerText =
-                                "Processing PDF...";
-                            document
-                                .getElementById("altLoadingModal")
-                                .classList.remove("hidden");
-                            document
-                                .getElementById("dropzoneSplit")
-                                .classList.add("animate-pulse");
-                            xhrProcStats = false;
-                            apiGateway("split", "delete");
-                        } else {
-                            event.preventDefault();
-                            errMessage.innerText =
-                                "PDF file can not be processed !";
-                            errSubMessage.innerText = "";
-                            errListTitleMessage.innerText = "Error message";
-                            resetErrListMessage();
-                            generateMesssage(
-                                "Remaining monthly limit (" +
-                                    xhrBalanceRemaining +
-                                    " out of 250)"
-                            );
-                            errAltSubMessageModal.style = null;
-                            loadingModal.hide();
-                            errModal.show();
-                        }
+                    if (xhrBalance && xhrBalanceRemaining > 0) {
+                        altLoadingMessageModal.innerText = "Processing PDF...";
+                        document
+                            .getElementById("altLoadingModal")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("dropzoneSplit")
+                            .classList.add("animate-pulse");
+                        xhrProcStats = false;
+                        apiGateway("split", "delete");
                     } else {
                         event.preventDefault();
                         errMessage.innerText =
@@ -2645,21 +2687,15 @@ function submit(event) {
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Error message";
                         resetErrListMessage();
-                        generateMesssage("No file has been chosen");
+                        generateMesssage(
+                            "Remaining monthly limit (" +
+                                xhrBalanceRemaining +
+                                " out of 250)"
+                        );
                         errAltSubMessageModal.style = null;
                         loadingModal.hide();
                         errModal.show();
                     }
-                } else {
-                    event.preventDefault();
-                    errMessage.innerText = "PDF file can not be processed !";
-                    errSubMessage.innerText = "";
-                    errListTitleMessage.innerText = "Error message";
-                    resetErrListMessage();
-                    generateMesssage("Failed to fetch custom page value !");
-                    errAltSubMessageModal.style = null;
-                    loadingModal.hide();
-                    errModal.show();
                 }
             } else {
                 event.preventDefault();
