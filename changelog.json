@@ -1,5 +1,14 @@
 [
   {
+    "release_date": "August, 25 2024",
+    "version": "3.3.1",
+    "changelog": [
+      "Fix changelog layout positioning are not fix in the same place",
+      "Inform proper message for custom page on split process",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
     "release_date": "August, 18 2024",
     "version": "3.3.0",
     "changelog": [
