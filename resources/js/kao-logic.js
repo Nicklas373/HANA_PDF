@@ -89,57 +89,64 @@ if (procBtn) {
         errModal.hide();
         loadingModal.show();
         if (xhrProcStats) {
-            `validateVersion().then(function () {`;
-            remainingBalance()
+            validateVersion()
                 .then(function () {
-                    loadingModal.hide();
-                    if (document.getElementById("html") !== null) {
-                        submit(event);
-                    } else if (xhrScsUploads > 0 && xhrTotalUploads > 0) {
-                        if (xhrScsUploads == xhrTotalUploads) {
-                            submit(event);
-                        } else {
-                            event.preventDefault();
+                    remainingBalance()
+                        .then(function () {
+                            loadingModal.hide();
+                            if (document.getElementById("html") !== null) {
+                                submit(event);
+                            } else if (
+                                xhrScsUploads > 0 &&
+                                xhrTotalUploads > 0
+                            ) {
+                                if (xhrScsUploads == xhrTotalUploads) {
+                                    submit(event);
+                                } else {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Sorry, we're still uploading your files";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    resetErrListMessage();
+                                    generateMesssage(
+                                        xhrScsUploads +
+                                            " of " +
+                                            xhrTotalUploads +
+                                            " files are still uploading"
+                                    );
+                                    errAltSubMessageModal.style = null;
+                                    loadingModal.hide();
+                                    errModal.show();
+                                }
+                            } else {
+                                event.preventDefault();
+                                errMessage.innerText =
+                                    "PDF file can not be processed !";
+                                errSubMessage.innerText = "";
+                                errListTitleMessage.innerText = "Error message";
+                                resetErrListMessage();
+                                generateMesssage("No file has been chosen");
+                                errAltSubMessageModal.style = null;
+                                loadingModal.hide();
+                                errModal.show();
+                            }
+                        })
+                        .catch(function (error) {
+                            errModal.hide();
                             errMessage.innerText =
-                                "Sorry, we're still uploading your files";
+                                "There was unexpected error !";
                             errSubMessage.innerText = "";
                             errListTitleMessage.innerText = "Error message";
                             resetErrListMessage();
-                            generateMesssage(
-                                xhrScsUploads +
-                                    " of " +
-                                    xhrTotalUploads +
-                                    " files are still uploading"
-                            );
+                            generateMesssage(error.xhrBalanceResponse);
                             errAltSubMessageModal.style = null;
                             loadingModal.hide();
                             errModal.show();
-                        }
-                    } else {
-                        event.preventDefault();
-                        errMessage.innerText =
-                            "PDF file can not be processed !";
-                        errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
-                        resetErrListMessage();
-                        generateMesssage("No file has been chosen");
-                        errAltSubMessageModal.style = null;
-                        loadingModal.hide();
-                        errModal.show();
-                    }
+                        });
                 })
                 .catch(function (error) {
-                    errModal.hide();
-                    errMessage.innerText = "There was unexpected error !";
-                    errSubMessage.innerText = "";
-                    errListTitleMessage.innerText = "Error message";
-                    resetErrListMessage();
-                    generateMesssage(error.xhrBalanceResponse);
-                    errAltSubMessageModal.style = null;
-                    loadingModal.hide();
-                    errModal.show();
-                });
-            `}).catch(function (error) {
                     errModal.hide();
                     errMessage.innerText = "There was unexpected error !";
                     errSubMessage.innerText = "";
@@ -152,7 +159,7 @@ if (procBtn) {
                     errAltSubMessageModal.style = null;
                     loadingModal.hide();
                     errModal.show();
-                });`;
+                });
         } else {
             event.preventDefault();
             errMessage.innerText = "Sorry, we're still processing your files";
