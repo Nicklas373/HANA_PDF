@@ -4,8 +4,8 @@
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 3,
-      "patchVersion": 1,
-      "gitRevision": "1bc9afb"
+      "patchVersion": 2,
+      "gitRevision": "c546a7d"
     }
   },
   {
@@ -22,8 +22,8 @@
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 3,
-      "patchVersion": 0,
-      "gitRevision": "57464c2"
+      "patchVersion": 1,
+      "gitRevision": "e810891"
     }
   },
   {
