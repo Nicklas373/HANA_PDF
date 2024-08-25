@@ -12,6 +12,7 @@ class notifyLogsModel extends Model
     protected $table = 'notifyLogs';
 
     protected $fillable = [
+        'notifyId',
         'processId',
         'notifyName',
         'notifyResult',

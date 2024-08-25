@@ -12,6 +12,7 @@ class htmlModel extends Model
     protected $table = 'pdfHtml';
 
     protected $fillable = [
+        'htmlId',
         'urlName',
         'urlMargin',
         'urlOrientation',

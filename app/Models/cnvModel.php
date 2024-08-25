@@ -12,6 +12,7 @@ class cnvModel extends Model
     protected $table = 'pdfConvert';
 
     protected $fillable = [
+        'cnvId',
         'fileName',
         'fileSize',
         'container',
