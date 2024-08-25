@@ -356,6 +356,8 @@ class splitController extends Controller
                                             }
                                         }
                                     } catch (\Exception $e) {
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $duration = $end->diff($startProc);
                                         try {
                                             DB::table('appLogs')->insert([
                                                 'processId' => $uuid,
@@ -424,6 +426,8 @@ class splitController extends Controller
                                         }
                                     }
                                 } else {
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $duration = $end->diff($startProc);
                                     try {
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
@@ -493,6 +497,8 @@ class splitController extends Controller
                                 }
                             } else if ($usedMethod == 'custom') {
                                 if (is_numeric($customInputSplitPage)) {
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $duration = $end->diff($startProc);
                                     try {
                                         $pdfTotalPages = AppHelper::instance()->count($newFilePath);
                                         if ($customInputSplitPage >= $pdfTotalPages) {
@@ -575,6 +581,8 @@ class splitController extends Controller
                             }
                         } else {
                             if (is_numeric($customInputDeletePage)) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
                                 try {
                                     $pdfTotalPages = AppHelper::instance()->count($newFilePath);
                                     if ($customInputDeletePage >= $pdfTotalPages) {
