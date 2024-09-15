@@ -1,25 +1,22 @@
 <?php
 namespace App\Helpers;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+
 class AppHelper
 {
     function checkWebAvailable($url){
-        if(!filter_var($url, FILTER_VALIDATE_URL)){
+        try {
+            $response = Http::timeout(5)->get($url);
+            if ($response->successful()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
             return false;
         }
-
-        $curlInit = curl_init($url);
-
-        curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
-        curl_setopt($curlInit,CURLOPT_HEADER,true);
-        curl_setopt($curlInit,CURLOPT_NOBODY,true);
-        curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
-
-        $response = curl_exec($curlInit);
-
-        curl_close($curlInit);
-
-        return $response?true:false;
     }
 
     function count($path)
@@ -104,13 +101,8 @@ class AppHelper
     }
 
     function get_guid() {
-        if (function_exists('com_create_guid') === true) {
-            return trim(com_create_guid(), '{}');
-        }
-        $data = PHP_MAJOR_VERSION < 7 ? openssl_random_pseudo_bytes(16) : random_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+        $guid = Str::uuid();
+        return $guid;
     }
 
     function getUserIpAddr(){
