@@ -217,7 +217,7 @@
                     </div>
                 </div>
                 <div dir="ltr">
-                    <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-5/6 h-10" style="display: none" data-ripple-light="true">Watermark PDF</button>
+                    <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-5/6 h-10" style="display: none" data-ripple-light="true">Watermark</button>
                 </div>
                 <div class="flex flex-col">
                     @include('includes.alert')

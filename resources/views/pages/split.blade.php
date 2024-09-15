@@ -114,7 +114,7 @@
                         </div>
                     </div>
                     <div dir="ltl">
-                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-4/6 h-10" style="display: none;" data-ripple-light="true">Split PDF</button>
+                        <button type="submit" id="submitBtn" name="formAction" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-4/6 h-10" style="display: none;" data-ripple-light="true">Split</button>
                     </div>
                 </div>
                 <div class="flex flex-col">

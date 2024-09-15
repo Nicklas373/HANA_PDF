@@ -73,7 +73,7 @@
         </div>
         <div class="flex flex-col mt-2 w-full lg:mx-1.5 lg:w-full">
             <div dir="ltl">
-                <button type="button" id="submitBtn" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-3/6 h-10" data-ripple-light="true">Convert to PDF</button>
+                <button type="button" id="submitBtn" class="mx-auto mt-6 mb-8 sm:mb-6 font-quicksand font-semibold bg-transparent border-2 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 text-lt1 rounded-lg cursor-pointer w-full lg:w-3/6 h-10" data-ripple-light="true">Convert</button>
             </div>
             <div class="flex flex-col">
                 @include('includes.alert')
