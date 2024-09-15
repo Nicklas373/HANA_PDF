@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 1;
+const appPatchVer = 3;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
@@ -67,19 +67,19 @@ var xhrTotalUploads = 0;
 
 if (procBtn) {
     procBtn.onclick = function (event) {
-        if (procTitleMessageModal.innerText !== "Processing Document") {
-            procTitleMessageModal.innerText = "Preparing document...";
+        if (procTitleMessageModal.innerText !== "Processing document") {
+            procTitleMessageModal.innerText = "Preparing document";
         } else {
             if (
                 document.getElementById("html") == null &&
                 document.getElementById("cnvFrPDF") == null
             ) {
-                procTitleMessageModal.innerText = "Processing PDF...";
+                procTitleMessageModal.innerText = "Processing document";
             } else {
                 if (document.getElementById("html") !== null) {
-                    procTitleMessageModal.innerText = "Processing URL...";
+                    procTitleMessageModal.innerText = "Processing URL";
                 } else {
-                    procTitleMessageModal.innerText = "Processing Document...";
+                    procTitleMessageModal.innerText = "Processing document";
                 }
             }
         }
@@ -105,7 +105,7 @@ if (procBtn) {
                                 } else {
                                     event.preventDefault();
                                     errMessage.innerText =
-                                        "Sorry, we're still uploading your files";
+                                        "Sorry, we're still uploading your documents";
                                     errSubMessage.innerText = "";
                                     errListTitleMessage.innerText =
                                         "Error message";
@@ -114,7 +114,7 @@ if (procBtn) {
                                         xhrScsUploads +
                                             " of " +
                                             xhrTotalUploads +
-                                            " files are still uploading"
+                                            " documents are still uploading"
                                     );
                                     errAltSubMessageModal.style = null;
                                     loadingModal.hide();
@@ -123,7 +123,7 @@ if (procBtn) {
                             } else {
                                 event.preventDefault();
                                 errMessage.innerText =
-                                    "PDF file can not be processed !";
+                                    "Document can not be processed !";
                                 errSubMessage.innerText = "";
                                 errListTitleMessage.innerText = "Error message";
                                 resetErrListMessage();
@@ -162,7 +162,8 @@ if (procBtn) {
                 });
         } else {
             event.preventDefault();
-            errMessage.innerText = "Sorry, we're still processing your files";
+            errMessage.innerText =
+                "Sorry, we're still processing your documents";
             errSubMessage.style.visibility = null;
             errAltSubMessageModal.style.visibility = null;
             errAltSubMessageModal.style.display = "none";
@@ -182,7 +183,7 @@ if (scsModalBtn) {
 
 if (whatsNewBtn) {
     whatsNewBtn.onclick = function () {
-        procTitleMessageModal.innerText = "Fetching latest update...";
+        procTitleMessageModal.innerText = "Fetching latest update";
         loadingModal.show();
         fetchVersion()
             .then((data) => {
@@ -220,12 +221,12 @@ if (whatsNewBtn) {
                     versionHistoryLayout.appendChild(versionDiv);
                 });
 
-                procTitleMessageModal.innerText = "Preparing document...";
+                procTitleMessageModal.innerText = "Preparing document";
                 loadingModal.hide();
                 versioningModal.show();
             })
             .catch(function (error) {
-                procTitleMessageModal.innerText = "Preparing document...";
+                procTitleMessageModal.innerText = "Preparing document";
                 loadingModal.hide();
                 errModal.hide();
                 errMessage.innerText = "There was unexpected error !";
@@ -273,6 +274,8 @@ if (uploadDropzone) {
         clickable: true,
         headers: {
             Authorization: "Bearer " + bearerToken,
+            "X-Requested-With": "XMLHttpRequest",
+            Accept: "application/json",
         },
         init: function () {
             document
@@ -445,6 +448,8 @@ if (uploadDropzone) {
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${bearerToken}`,
+                            "X-Requested-With": "XMLHttpRequest",
+                            Accept: "application/json",
                             file: filePath,
                         },
                         body: JSON.stringify({
@@ -482,12 +487,10 @@ if (uploadDropzone) {
                 if (dzErrorMessage) {
                     let newErrMessage;
                     if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr && xhr.readyState == 4) {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.message !== "") {
-                                    newErrMessage = xhrReturn.message;
-                                } else if (xhrReturn.errors !== "") {
+                                if (xhrReturn.errors !== "") {
                                     newErrMessage = xhrReturn.errors;
                                 } else {
                                     newErrMessage =
@@ -586,6 +589,8 @@ if (uploadDropzoneAlt) {
         clickable: true,
         headers: {
             Authorization: "Bearer " + bearerToken,
+            "X-Requested-With": "XMLHttpRequest",
+            Accept: "application/json",
         },
         init: function () {
             document
@@ -668,7 +673,7 @@ if (uploadDropzoneAlt) {
                             uploadPath +
                             uploadedFile1 +
                             "&embedded=true";
-                        if (file.type.startsWith("image/")) {
+                        if (checkImageExtensions(uploadedFile1)) {
                             document.getElementById("imgPrv").src = imageUrl;
                             previewImageModal.show();
                         } else {
@@ -736,6 +741,8 @@ if (uploadDropzoneAlt) {
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${bearerToken}`,
+                            "X-Requested-With": "XMLHttpRequest",
+                            Accept: "application/json",
                             file: filePath,
                         },
                         body: JSON.stringify({
@@ -796,12 +803,10 @@ if (uploadDropzoneAlt) {
                 if (dzErrorMessage) {
                     let newErrMessage;
                     if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr && xhr.readyState == 4) {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.message !== "") {
-                                    newErrMessage = xhrReturn.message;
-                                } else if (xhrReturn.errors !== "") {
+                                if (xhrReturn.errors !== "") {
                                     newErrMessage = xhrReturn.errors;
                                 } else {
                                     newErrMessage =
@@ -888,6 +893,8 @@ if (uploadDropzoneSingle) {
         clickable: true,
         headers: {
             Authorization: "Bearer " + bearerToken,
+            "X-Requested-With": "XMLHttpRequest",
+            Accept: "application/json",
         },
         init: function () {
             document
@@ -1057,6 +1064,8 @@ if (uploadDropzoneSingle) {
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${bearerToken}`,
+                            "X-Requested-With": "XMLHttpRequest",
+                            Accept: "application/json",
                             file: filePath,
                         },
                         body: JSON.stringify({
@@ -1094,12 +1103,10 @@ if (uploadDropzoneSingle) {
                 if (dzErrorMessage) {
                     let newErrMessage;
                     if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr && xhr.readyState == 4) {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
                             if (xhr.response) {
                                 var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.message !== "") {
-                                    newErrMessage = xhrReturn.message;
-                                } else if (xhrReturn.errors !== "") {
+                                if (xhrReturn.errors !== "") {
                                     newErrMessage = xhrReturn.errors;
                                 } else {
                                     newErrMessage =
@@ -1172,16 +1179,11 @@ function apiGateway(proc, action) {
             closeAltModal(proc);
             loadingModal.hide();
             errModal.hide();
-            if (
-                document.getElementById("html") == null &&
-                document.getElementById("cnvFrPDF") == null
-            ) {
-                scsMessage.innerText = "PDF " + proc + "ed success !";
+            if (document.getElementById("html") == null) {
+                scsMessage.innerText = "Document " + proc + " success !";
             } else {
                 if (document.getElementById("html") !== null) {
-                    scsMessage.innerText = "URL converted success !";
-                } else {
-                    scsMessage.innerText = "Document converted success !";
+                    scsMessage.innerText = "URL convert success !";
                 }
             }
             scsModalNotify.show();
@@ -1194,7 +1196,7 @@ function apiGateway(proc, action) {
             errSubMessage.innerText = "";
             errListTitleMessage.innerText = "Error message";
             resetErrListMessage();
-            generateMesssage(error.xhrRequestMessage);
+            generateMesssage(error.xhrRequestServerMessage);
             errAltSubMessageModal.style = null;
             loadingModal.hide();
             errModal.show();
@@ -1236,6 +1238,11 @@ function closeAltModal(proc) {
     }
 }
 
+function checkImageExtensions(url) {
+    const extension = /\.(jpg|jpeg|png|gif|bmp)$/i;
+    return extension.test(url);
+}
+
 function generatePdfThumbnail(file) {
     const fileReader = new FileReader();
     fileReader.onload = function () {
@@ -1274,55 +1281,46 @@ function getUploadedFileName() {
 function fetchVersion() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
-        var formData = new FormData();
-        formData.append("appServicesReferrer", "FE");
 
-        xhr.open("POST", apiUrl + "/api/v1/version/fetch", true);
+        xhr.open("GET", apiUrl + "/api/v1/version/fetch", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.responseText.trim().startsWith("{")) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhr.status == 200) {
-                        if (xhrReturn.errors == null) {
-                            resolve({
-                                versionFetchCheck: true,
-                                versionFetchStats: xhrReturn.status,
-                                versionFetchMessage: xhrReturn.message,
-                                versionFetchResponse: xhrReturn.response,
-                                versionFetchError: null,
-                            });
-                        } else {
-                            reject({
-                                versionFetchCheck: false,
-                                versionFetchStats: xhrReturn.status,
-                                versionFetchMessage: xhrReturn.message,
-                                versionFetchResponse: xhrReturn.response,
-                                versionFetchError: xhrReturn.errors,
-                            });
-                        }
-                    } else {
+                    resolve({
+                        versionFetchCheck: true,
+                        versionFetchStats: xhrReturn.status,
+                        versionFetchMessage: xhrReturn.message,
+                        versionFetchResponse: xhrReturn.data,
+                        versionFetchError: null,
+                    });
+                } else {
+                    try {
+                        var xhrReturn = JSON.parse(xhr.responseText);
                         reject({
                             versionFetchCheck: false,
                             versionFetchStats: xhrReturn.status,
                             versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.response,
+                            versionFetchResponse: xhrReturn.data,
                             versionFetchError: xhrReturn.errors,
                         });
+                    } catch (e) {
+                        reject({
+                            versionFetchCheck: false,
+                            versioningStats: 500,
+                            versioningMessage: "Internal Server Error",
+                            versionFetchResponse: "Internal Server Error",
+                            versionFetchError: "Internal Server Error",
+                        });
                     }
-                } else {
-                    reject({
-                        versionFetchCheck: false,
-                        versioningStats: 500,
-                        versioningMessage: "Internal Server Error",
-                        versionFetchResponse: "Internal Server Error",
-                        versionFetchError: "Internal Server Error",
-                    });
                 }
             }
         };
-        xhr.send(formData);
+        xhr.send();
     });
 }
 
@@ -1347,6 +1345,8 @@ function generateThumbnail(fileName) {
         formData.append("file", fileName);
         xhr.open("POST", apiUrl + "/api/v1/file/thumbnail", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
@@ -1355,9 +1355,7 @@ function generateThumbnail(fileName) {
                         resolve(xhrReturn.files);
                     } else {
                         reject(
-                            new Error(
-                                "API response error: " + xhrReturn.message
-                            )
+                            new Error("API response error: " + xhrReturn.errors)
                         );
                     }
                 } else {
@@ -1375,60 +1373,39 @@ function getTotalPages(fileName) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
-        var timerStart = Date.now();
         formData.append("fileName", fileName);
-        xhr.open("POST", apiUrl + "/api/v1/file/getTotalPagesPDF", true);
+        xhr.open("POST", apiUrl + "/api/v1/pdf/getTotalPagesPDF", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
-
-        var timer = setInterval(function () {
-            if (Date.now() - timerStart > 30000) {
-                xhr.abort();
-                clearInterval(timer);
-                reject({
-                    totalPages: false,
-                    totalPagesStats: 524,
-                    totalPagesMessage: "Connection timeout",
-                    totalPagesError: "Connection timeout",
-                });
-            }
-        }, 10000);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                clearInterval(timerStart);
-                if (xhr.responseText.trim().startsWith("{")) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhr.status == 200) {
-                        if (xhrReturn.status == 200) {
-                            resolve({
-                                totalPages: true,
-                                totalPagesStats: xhrReturn.status,
-                                totalPagesMessage: xhrReturn.message,
-                                totalPagesError: null,
-                            });
-                        } else {
-                            reject({
-                                totalPages: false,
-                                totalPagesStats: xhrReturn.status,
-                                totalPagesMessage: xhrReturn.message,
-                                totalPagesError: xhrReturn.errors,
-                            });
-                        }
-                    } else {
+                    resolve({
+                        totalPages: true,
+                        totalPagesStats: xhrReturn.status,
+                        totalPagesMessage: xhrReturn.data,
+                        totalPagesError: null,
+                    });
+                } else {
+                    try {
+                        var xhrReturn = JSON.parse(xhr.responseText);
                         reject({
                             totalPages: false,
                             totalPagesStats: xhrReturn.status,
                             totalPagesMessage: xhrReturn.message,
                             totalPagesError: xhrReturn.errors,
                         });
+                    } catch (e) {
+                        reject({
+                            totalPages: false,
+                            totalPagesStats: 500,
+                            totalPagesMessage: "Internal Server Error",
+                            totalPagesError: "Internal Server Error",
+                        });
                     }
-                } else {
-                    reject({
-                        totalPages: false,
-                        totalPagesStats: 500,
-                        totalPagesMessage: "Internal Server Error",
-                        totalPagesError: "Internal Server Error",
-                    });
                 }
             }
         };
@@ -1439,67 +1416,60 @@ function getTotalPages(fileName) {
 function remainingBalance() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
-        var formData = new FormData();
-        xhr.open("GET", apiUrl + "/api/v1/logs/limit", true);
+        xhr.open("GET", apiUrl + "/api/v1/ilovepdf/limit", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.responseText.trim().startsWith("{")) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhr.status == 200) {
-                        if (xhrReturn.status == 200) {
-                            if (xhrReturn.remaining > 0) {
-                                xhrBalance = true;
-                                xhrBalanceRemaining = xhrReturn.remaining;
-                                resolve({
-                                    xhrBalance: true,
-                                    xhrBalanceRemaining: xhrReturn.remaining,
-                                    xhrBalanceStatus: xhrReturn.status,
-                                    xhrBalanceResponse: xhrReturn.message,
-                                });
-                            } else {
-                                xhrBalance = false;
-                                xhrBalanceRemaining = xhrReturn.remaining;
-                                resolve({
-                                    xhrBalance: false,
-                                    xhrBalanceRemaining: xhrReturn.remaining,
-                                    xhrBalanceStatus: xhrReturn.status,
-                                    xhrBalanceResponse: xhrReturn.message,
-                                });
-                            }
-                            xhrBalanceRemaining = xhrReturn.remaining;
-                        } else {
-                            xhrBalance = false;
-                            xhrBalanceRemaining = 0;
-                            resolve({
-                                xhrBalance: false,
-                                xhrBalanceRemaining: 0,
-                                xhrBalanceStatus: xhrReturn.status,
-                                xhrBalanceResponse: xhrReturn.message,
-                            });
-                        }
+                    if (xhrReturn.remaining > 0) {
+                        xhrBalance = true;
+                        xhrBalanceRemaining = xhrReturn.remaining;
+                        resolve({
+                            xhrBalance: true,
+                            xhrBalanceRemaining: xhrReturn.remaining,
+                            xhrBalanceStatus: xhrReturn.status,
+                            xhrBalanceResponse: xhrReturn.message,
+                        });
                     } else {
+                        xhrBalance = false;
+                        xhrBalanceRemaining = xhrReturn.remaining;
+                        resolve({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: xhrReturn.remaining,
+                            xhrBalanceStatus: xhrReturn.status,
+                            xhrBalanceResponse: xhrReturn.errors,
+                        });
+                    }
+                    xhrBalanceRemaining = xhrReturn.remaining;
+                } else {
+                    try {
+                        var xhrReturn = JSON.parse(xhr.responseText);
+                        xhrBalance = false;
+                        xhrBalanceRemaining = 0;
+                        reject({
+                            xhrBalance: false,
+                            xhrBalanceRemaining: xhrReturn.remaining,
+                            xhrBalanceStatus: xhrReturn.status,
+                            xhrBalanceResponse: xhrReturn.errors,
+                        });
+                    } catch (e) {
                         xhrBalance = false;
                         xhrBalanceRemaining = 0;
                         reject({
                             xhrBalance: false,
                             xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.message,
+                            xhrBalanceStatus: 500,
+                            xhrBalanceResponse: "Internal Server Error",
                         });
                     }
-                } else {
-                    reject({
-                        xhrBalance: false,
-                        xhrBalanceRemaining: 0,
-                        xhrBalanceStatus: 500,
-                        xhrBalanceResponse: "Internal server error",
-                    });
                 }
             }
         };
-        xhr.send(formData);
+        xhr.send();
     });
 }
 
@@ -1686,125 +1656,64 @@ function sendToAPI(files, proc, action) {
             });
         }
 
-        xhr.open("POST", apiUrl + "/api/v1/core/" + proc, true);
+        xhr.open("POST", apiUrl + "/api/v1/pdf/" + proc, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.responseText.trim().startsWith("{")) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhr.status == 200) {
-                        if (xhrReturn.status == 200) {
-                            if (xhrReturn.errors == null) {
-                                if (
-                                    proc == "compress" &&
-                                    xhrTotalUploads == 1
-                                ) {
-                                    document
-                                        .getElementById("alert-scs")
-                                        .classList.remove(
-                                            "hidden",
-                                            "opacity-0"
-                                        );
-                                    document
-                                        .getElementById("alert-err")
-                                        .classList.add("hidden", "opacity-0");
-                                    document.getElementById(
-                                        "scsMsgTitle"
-                                    ).innerText =
-                                        "HANA PDF Process completed !";
-                                    document.getElementById(
-                                        "scsMsgResult"
-                                    ).innerHTML = `
-                                            PDF has been compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
-                                        `;
-                                    document.getElementById("scsMsgLink").href =
-                                        apiUrl + xhrReturn.fileSource;
-                                    document.getElementById(
-                                        "scsMsgLink"
-                                    ).innerText = "Download PDF";
-                                    resolve({
-                                        xhrRequestCondition: "OK",
-                                        xhrRequestMessage: xhrReturn.message,
-                                        xhrRequestServerMessage: "",
-                                        xhrRequestStatus: xhrReturn.status,
-                                    });
-                                } else {
-                                    document
-                                        .getElementById("alert-scs")
-                                        .classList.remove(
-                                            "hidden",
-                                            "opacity-0"
-                                        );
-                                    document
-                                        .getElementById("alert-err")
-                                        .classList.add("hidden", "opacity-0");
-                                    document.getElementById(
-                                        "scsMsgTitle"
-                                    ).innerText = `HANA PDF Process completed !`;
-                                    document.getElementById(
-                                        "scsMsgResult"
-                                    ).innerText = `Download the file or PDF below.`;
-                                    document.getElementById("scsMsgLink").href =
-                                        apiUrl + xhrReturn.fileSource;
-                                    document.getElementById(
-                                        "scsMsgLink"
-                                    ).innerText = "Download PDF";
-                                    resolve({
-                                        xhrRequestCondition: "OK",
-                                        xhrRequestMessage: xhrReturn.message,
-                                        xhrRequestServerMessage: "",
-                                        xhrRequestStatus: xhrReturn.status,
-                                    });
-                                }
-                            } else {
-                                document
-                                    .getElementById("alert-scs")
-                                    .classList.add("hidden", "opacity-0");
-                                document
-                                    .getElementById("alert-err")
-                                    .classList.remove("hidden", "opacity-0");
-                                document.getElementById(
-                                    "errMsgTitle"
-                                ).innerText = "HANA PDF Process failed !";
-                                document.getElementById("errMsg").innerText =
-                                    xhrReturn.message;
-                                document
-                                    .getElementById("errProcMain")
-                                    .classList.remove("hidden");
-                                document.getElementById("errProcId").innerText =
-                                    xhrReturn.processId;
-                                reject({
-                                    xhrRequestCondition: "ERROR",
-                                    xhrRequestMessage: xhrReturn.message,
-                                    xhrRequestServerMessage: xhrReturn.errors,
-                                    xhrRequestStatus: xhrReturn.status,
-                                });
-                            }
-                        } else {
-                            document
-                                .getElementById("alert-scs")
-                                .classList.add("hidden", "opacity-0");
-                            document
-                                .getElementById("alert-err")
-                                .classList.remove("hidden", "opacity-0");
-                            document.getElementById("errMsgTitle").innerText =
-                                "HANA PDF Process failed !";
-                            document.getElementById("errMsg").innerText =
-                                xhrReturn.message;
-                            document
-                                .getElementById("errProcMain")
-                                .classList.remove("hidden");
-                            document.getElementById("errProcId").innerText =
-                                xhrReturn.processId;
-                            reject({
-                                xhrRequestCondition: "ERROR",
-                                xhrRequestMessage: xhrReturn.message,
-                                xhrRequestServerMessage: xhrReturn.errors,
-                                xhrRequestStatus: xhrReturn.status,
-                            });
-                        }
+                    if (proc == "compress" && xhrTotalUploads == 1) {
+                        document
+                            .getElementById("alert-scs")
+                            .classList.remove("hidden", "opacity-0");
+                        document
+                            .getElementById("alert-err")
+                            .classList.add("hidden", "opacity-0");
+                        document.getElementById("scsMsgTitle").innerText =
+                            "HANA PDF has processed your document !";
+                        document.getElementById("scsMsgResult").innerHTML = `
+                                Compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
+                            `;
+                        document.getElementById("scsMsgLink").href =
+                            apiUrl + xhrReturn.fileSource;
+                        document.getElementById("scsMsgLink").innerText =
+                            "Download PDF";
+                        resolve({
+                            xhrRequestCondition: "OK",
+                            xhrRequestMessage: xhrReturn.message,
+                            xhrRequestServerMessage: "",
+                            xhrRequestStatus: xhrReturn.status,
+                        });
                     } else {
+                        document
+                            .getElementById("alert-scs")
+                            .classList.remove("hidden", "opacity-0");
+                        document
+                            .getElementById("alert-err")
+                            .classList.add("hidden", "opacity-0");
+                        document.getElementById(
+                            "scsMsgTitle"
+                        ).innerText = `HANA PDF has processed your document !`;
+                        document.getElementById(
+                            "scsMsgResult"
+                        ).innerText = `Download the file or PDF below.`;
+                        document.getElementById("scsMsgLink").href =
+                            apiUrl + xhrReturn.fileSource;
+                        document.getElementById("scsMsgLink").innerText =
+                            "Download PDF";
+                        resolve({
+                            xhrRequestCondition: "OK",
+                            xhrRequestMessage: xhrReturn.message,
+                            xhrRequestServerMessage: xhrReturn.message,
+                            xhrRequestStatus: xhrReturn.status,
+                        });
+                    }
+                } else {
+                    try {
+                        var xhrReturn = JSON.parse(xhr.responseText);
                         document
                             .getElementById("alert-scs")
                             .classList.add("hidden", "opacity-0");
@@ -1812,39 +1721,36 @@ function sendToAPI(files, proc, action) {
                             .getElementById("alert-err")
                             .classList.remove("hidden", "opacity-0");
                         document.getElementById("errMsgTitle").innerText =
-                            "HANA PDF Process failed !";
+                            "HANA PDF has processed your document !";
                         document.getElementById("errMsg").innerText =
-                            "There was unexpected error !, please try again later.";
-                        document
-                            .getElementById("errProcMain")
-                            .classList.remove("hidden");
+                            xhrReturn.errors;
                         reject({
                             xhrRequestCondition: "ERROR",
                             xhrRequestMessage: xhrReturn.message,
                             xhrRequestServerMessage: xhrReturn.errors,
                             xhrRequestStatus: xhrReturn.status,
                         });
+                    } catch (e) {
+                        document
+                            .getElementById("alert-scs")
+                            .classList.add("hidden", "opacity-0");
+                        document
+                            .getElementById("alert-err")
+                            .classList.remove("hidden", "opacity-0");
+                        document.getElementById("errMsgTitle").innerText =
+                            "HANA PDF has processed your document !";
+                        document.getElementById("errMsg").innerText =
+                            "There was unexpected error !";
+                        document
+                            .getElementById("errProcMain")
+                            .classList.remove("hidden");
+                        reject({
+                            xhrRequestCondition: "ERROR",
+                            xhrRequestMessage: "Internal Server Error",
+                            xhrRequestServerMessage: "Internal Server Error",
+                            xhrRequestStatus: "Internal Server Error",
+                        });
                     }
-                } else {
-                    document
-                        .getElementById("alert-scs")
-                        .classList.add("hidden", "opacity-0");
-                    document
-                        .getElementById("alert-err")
-                        .classList.remove("hidden", "opacity-0");
-                    document.getElementById("errMsgTitle").innerText =
-                        "HANA PDF Process failed !";
-                    document.getElementById("errMsg").innerText =
-                        "There was unexpected error !, please try again later.";
-                    document
-                        .getElementById("errProcMain")
-                        .classList.remove("hidden");
-                    reject({
-                        xhrRequestCondition: "ERROR",
-                        xhrRequestMessage: "Internal server error",
-                        xhrRequestServerMessage: "Internal server error",
-                        xhrRequestStatus: 500,
-                    });
                 }
             }
         };
@@ -1893,7 +1799,7 @@ function submit(event) {
                     if (getUploadedFileName().length > 0) {
                         if (xhrBalance && xhrBalanceRemaining > 0) {
                             procTitleMessageModal.innerText =
-                                "Processing PDF...";
+                                "Processing document";
                             errMessage.style.visibility = null;
                             errSubMessage.style.visibility = null;
                             errAltSubMessageModal.style.display = "none";
@@ -1901,7 +1807,7 @@ function submit(event) {
                             loadingModal.show();
                             if (document.getElementById("cnvFrPDF") !== null) {
                                 altLoadingMessageModal.innerText =
-                                    "Processing PDF...";
+                                    "Processing document";
                                 document
                                     .getElementById("altLoadingModal")
                                     .classList.remove("hidden");
@@ -1912,7 +1818,7 @@ function submit(event) {
                                 apiGateway("convert", "");
                             } else {
                                 altLoadingMessageModal.innerText =
-                                    "Processing PDF...";
+                                    "Processing document";
                                 document
                                     .getElementById("altLoadingModal")
                                     .classList.remove("hidden");
@@ -1925,7 +1831,7 @@ function submit(event) {
                         } else {
                             event.preventDefault();
                             errMessage.innerText =
-                                "PDF file can not be processed !";
+                                "Document file can not be processed !";
                             errSubMessage.innerText = "";
                             errListTitleMessage.innerText = "Error message";
                             resetErrListMessage();
@@ -1941,7 +1847,7 @@ function submit(event) {
                     } else {
                         event.preventDefault();
                         errMessage.innerText =
-                            "PDF file can not be processed !";
+                            "Document file can not be processed !";
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Error message";
                         resetErrListMessage();
@@ -1980,14 +1886,14 @@ function submit(event) {
                 cnvdocx.style.borderColor = "#4DAAAA";
             }
             if (xhrBalance && xhrBalanceRemaining > 0) {
-                procTitleMessageModal.innerText = "Processing PDF...";
+                procTitleMessageModal.innerText = "Processing document";
                 errMessage.style.visibility = null;
                 errSubMessage.style.visibility = null;
                 errAltSubMessageModal.style.display = "none";
                 errModal.hide();
                 loadingModal.show();
                 if (document.getElementById("cnvFrPDF") !== null) {
-                    altLoadingMessageModal.innerText = "Processing PDF...";
+                    altLoadingMessageModal.innerText = "Processing document";
                     document
                         .getElementById("altLoadingModal")
                         .classList.remove("hidden");
@@ -1997,7 +1903,7 @@ function submit(event) {
                     xhrProcStats = false;
                     apiGateway("convert", "");
                 } else {
-                    altLoadingMessageModal.innerText = "Processing PDF...";
+                    altLoadingMessageModal.innerText = "Processing document";
                     document
                         .getElementById("altLoadingModal")
                         .classList.remove("hidden");
@@ -2009,7 +1915,7 @@ function submit(event) {
                 }
             } else {
                 event.preventDefault();
-                errMessage.innerText = "PDF file can not be processed !";
+                errMessage.innerText = "Document file can not be processed !";
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
@@ -2029,14 +1935,14 @@ function submit(event) {
     ) {
         if (getUploadedFileName().length > 0) {
             if (xhrBalance && xhrBalanceRemaining > 0) {
-                procTitleMessageModal.innerText = "Processing PDF...";
+                procTitleMessageModal.innerText = "Processing document";
                 errMessage.style.visibility = null;
                 errSubMessage.style.visibility = null;
                 errAltSubMessageModal.style.display = "none";
                 errModal.hide();
                 loadingModal.show();
                 if (document.getElementById("cnvToPDF") !== null) {
-                    altLoadingMessageModal.innerText = "Processing Document...";
+                    altLoadingMessageModal.innerText = "Processing document";
                     document
                         .getElementById("altLoadingModal")
                         .classList.remove("hidden");
@@ -2049,20 +1955,21 @@ function submit(event) {
                     if (getUploadedFileName().length < 2) {
                         event.preventDefault();
                         errMessage.innerText =
-                            "PDF file can not be processed !";
+                            "Document file can not be processed !";
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Required fields:";
                         errAltSubMessageModal.style = null;
                         resetErrListMessage();
                         generateMesssage(
-                            "Minimum PDF to merge is 2 (Total files: " +
+                            "Minimum document to merge is 2 (Total files: " +
                                 getUploadedFileName().length +
                                 ")"
                         );
                         loadingModal.hide();
                         errModal.show();
                     } else {
-                        altLoadingMessageModal.innerText = "Processing PDF...";
+                        altLoadingMessageModal.innerText =
+                            "Processing document";
                         document
                             .getElementById("altLoadingModal")
                             .classList.remove("hidden");
@@ -2075,7 +1982,7 @@ function submit(event) {
                 }
             } else {
                 event.preventDefault();
-                errMessage.innerText = "PDF file can not be processed !";
+                errMessage.innerText = "Document file can not be processed !";
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
@@ -2090,7 +1997,7 @@ function submit(event) {
             }
         } else {
             event.preventDefault();
-            errMessage.innerText = "PDF file can not be processed !";
+            errMessage.innerText = "Document file can not be processed !";
             errSubMessage.innerText = "";
             errListTitleMessage.innerText = "Error message";
             resetErrListMessage();
@@ -2185,7 +2092,7 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "First page can not be more or same than total page"
+                                            "First page can not be more than total page"
                                         );
                                         firstPage.style.borderColor = "#A84E4E";
                                         loadingModal.hide();
@@ -2204,7 +2111,7 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "Last page can not be more or same than total page"
+                                            "Last page can not be more than total page"
                                         );
                                         lastPage.style.borderColor = "#A84E4E";
                                         loadingModal.hide();
@@ -2264,7 +2171,7 @@ function submit(event) {
                                             errModal.show();
                                         } else {
                                             procTitleMessageModal.innerText =
-                                                "Processing PDF...";
+                                                "Processing document";
                                             errMessage.style.visibility = null;
                                             errSubMessage.style.visibility =
                                                 null;
@@ -2280,7 +2187,7 @@ function submit(event) {
                                                     xhrBalanceRemaining > 0
                                                 ) {
                                                     altLoadingMessageModal.innerText =
-                                                        "Processing PDF...";
+                                                        "Processing document";
                                                     document
                                                         .getElementById(
                                                             "altLoadingModal"
@@ -2303,7 +2210,7 @@ function submit(event) {
                                                 } else {
                                                     event.preventDefault();
                                                     errMessage.innerText =
-                                                        "PDF file can not be processed !";
+                                                        "Document file can not be processed !";
                                                     errSubMessage.innerText =
                                                         "";
                                                     errListTitleMessage.innerText =
@@ -2322,7 +2229,7 @@ function submit(event) {
                                             } else {
                                                 event.preventDefault();
                                                 errMessage.innerText =
-                                                    "PDF file can not be processed !";
+                                                    "Document file can not be processed !";
                                                 errSubMessage.innerText = "";
                                                 errListTitleMessage.innerText =
                                                     "Error message";
@@ -2401,7 +2308,9 @@ function submit(event) {
                         errListTitleMessage.innerText = "Error message";
                         errAltSubMessageModal.style = null;
                         resetErrListMessage();
-                        generateMesssage("Failed to fetch total PDF pages");
+                        generateMesssage(
+                            "Failed to fetch total document pages"
+                        );
                         console.log(error);
                         loadingModal.hide();
                         errModal.show();
@@ -2435,7 +2344,7 @@ function submit(event) {
                                     errModal.show();
                                 } else {
                                     if (
-                                        parseInt(cusPageValue) >=
+                                        parseInt(cusPageValue) >
                                         totalPages.totalPagesMessage
                                     ) {
                                         event.preventDefault();
@@ -2446,7 +2355,7 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "Custom page can not be more or same than total page"
+                                            "Custom page can not be more than total page"
                                         );
                                         customPage.style.borderColor =
                                             "#A84E4E";
@@ -2454,7 +2363,7 @@ function submit(event) {
                                         errModal.show();
                                     } else {
                                         procTitleMessageModal.innerText =
-                                            "Processing PDF...";
+                                            "Processing document";
                                         errMessage.style.visibility = null;
                                         errSubMessage.style.visibility = null;
                                         errAltSubMessageModal.style.display =
@@ -2466,7 +2375,7 @@ function submit(event) {
                                             xhrBalanceRemaining > 0
                                         ) {
                                             altLoadingMessageModal.innerText =
-                                                "Processing PDF...";
+                                                "Processing document";
                                             document
                                                 .getElementById(
                                                     "altLoadingModal"
@@ -2480,7 +2389,7 @@ function submit(event) {
                                         } else {
                                             event.preventDefault();
                                             errMessage.innerText =
-                                                "PDF file can not be processed !";
+                                                "Document file can not be processed !";
                                             errSubMessage.innerText = "";
                                             errListTitleMessage.innerText =
                                                 "Error message";
@@ -2505,14 +2414,14 @@ function submit(event) {
                                 errAltSubMessageModal.style = null;
                                 resetErrListMessage();
                                 generateMesssage(
-                                    "Failed to fetch total PDF pages"
+                                    "Failed to fetch total document pages"
                                 );
                                 console.log(error);
                                 loadingModal.hide();
                                 errModal.show();
                             });
                     } else {
-                        procTitleMessageModal.innerText = "Processing PDF...";
+                        procTitleMessageModal.innerText = "Processing document";
                         errMessage.style.visibility = null;
                         errSubMessage.style.visibility = null;
                         errAltSubMessageModal.style.display = "none";
@@ -2520,7 +2429,7 @@ function submit(event) {
                         loadingModal.show();
                         if (xhrBalance && xhrBalanceRemaining > 0) {
                             altLoadingMessageModal.innerText =
-                                "Processing PDF...";
+                                "Processing document";
                             document
                                 .getElementById("altLoadingModal")
                                 .classList.remove("hidden");
@@ -2532,7 +2441,7 @@ function submit(event) {
                         } else {
                             event.preventDefault();
                             errMessage.innerText =
-                                "PDF file can not be processed !";
+                                "Document file can not be processed !";
                             errSubMessage.innerText = "";
                             errListTitleMessage.innerText = "Error message";
                             resetErrListMessage();
@@ -2597,7 +2506,7 @@ function submit(event) {
                                 errModal.show();
                             } else {
                                 if (
-                                    parseInt(cusPageValue) >=
+                                    parseInt(cusPageValue) >
                                     totalPages.totalPagesMessage
                                 ) {
                                     event.preventDefault();
@@ -2608,14 +2517,14 @@ function submit(event) {
                                     errAltSubMessageModal.style = null;
                                     resetErrListMessage();
                                     generateMesssage(
-                                        "Custom page can not be more or same than total page"
+                                        "Custom page can not be more than total page"
                                     );
                                     customPage.style.borderColor = "#A84E4E";
                                     loadingModal.hide();
                                     errModal.show();
                                 } else {
                                     procTitleMessageModal.innerText =
-                                        "Processing PDF...";
+                                        "Processing document";
                                     errMessage.style.visibility = null;
                                     errSubMessage.style.visibility = null;
                                     errAltSubMessageModal.style.display =
@@ -2624,7 +2533,7 @@ function submit(event) {
                                     loadingModal.show();
                                     if (xhrBalance && xhrBalanceRemaining > 0) {
                                         altLoadingMessageModal.innerText =
-                                            "Processing PDF...";
+                                            "Processing document";
                                         document
                                             .getElementById("altLoadingModal")
                                             .classList.remove("hidden");
@@ -2636,7 +2545,7 @@ function submit(event) {
                                     } else {
                                         event.preventDefault();
                                         errMessage.innerText =
-                                            "PDF file can not be processed !";
+                                            "Document file can not be processed !";
                                         errSubMessage.innerText = "";
                                         errListTitleMessage.innerText =
                                             "Error message";
@@ -2659,19 +2568,22 @@ function submit(event) {
                             errListTitleMessage.innerText = "Error message";
                             errAltSubMessageModal.style = null;
                             resetErrListMessage();
-                            generateMesssage("Failed to fetch total PDF pages");
+                            generateMesssage(
+                                "Failed to fetch total document pages"
+                            );
                             loadingModal.hide();
                             errModal.show();
                         });
                 } else {
-                    procTitleMessageModal.innerText = "Processing PDF...";
+                    procTitleMessageModal.innerText = "Processing document";
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     errModal.hide();
                     loadingModal.show();
                     if (xhrBalance && xhrBalanceRemaining > 0) {
-                        altLoadingMessageModal.innerText = "Processing PDF...";
+                        altLoadingMessageModal.innerText =
+                            "Processing document";
                         document
                             .getElementById("altLoadingModal")
                             .classList.remove("hidden");
@@ -2683,7 +2595,7 @@ function submit(event) {
                     } else {
                         event.preventDefault();
                         errMessage.innerText =
-                            "PDF file can not be processed !";
+                            "Document file can not be processed !";
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Error message";
                         resetErrListMessage();
@@ -2726,6 +2638,7 @@ function submit(event) {
         var wmTextSwitcher = document.getElementById("wmTypeText");
         if (document.getElementById("firstRadio").checked == true) {
             var wmImage = document.getElementById("wm_file_input");
+            var customPage = document.getElementById("watermarkPageImage");
             wmImageSwitcher.checked = true;
             wmTextSwitcher.checked = false;
             if (document.getElementById("wm_file_input").value) {
@@ -2752,45 +2665,128 @@ function submit(event) {
                             document.getElementById("watermarkPageImage").value
                         ) {
                             procTitleMessageModal.innerText =
-                                "Processing PDF...";
+                                "Processing document";
                             errMessage.style.visibility = null;
                             errSubMessage.style.visibility = null;
                             errAltSubMessageModal.style.display = "none";
                             errModal.hide();
                             loadingModal.show();
                             if (getUploadedFileName().length > 0) {
-                                if (xhrBalance && xhrBalanceRemaining > 0) {
-                                    altLoadingMessageModal.innerText =
-                                        "Processing PDF...";
-                                    document
-                                        .getElementById("altLoadingModal")
-                                        .classList.remove("hidden");
-                                    document
-                                        .getElementById("dropzoneWatermark")
-                                        .classList.add("animate-pulse");
-                                    xhrProcStats = false;
-                                    apiGateway("watermark", "img");
-                                } else {
-                                    event.preventDefault();
-                                    errMessage.innerText =
-                                        "PDF file can not be processed !";
-                                    errSubMessage.innerText = "";
-                                    errListTitleMessage.innerText =
-                                        "Error message";
-                                    resetErrListMessage();
-                                    generateMesssage(
-                                        "Remaining monthly limit (" +
-                                            xhrBalanceRemaining +
-                                            " out of 250)"
-                                    );
-                                    errAltSubMessageModal.style = null;
-                                    loadingModal.hide();
-                                    errModal.show();
+                                var cusPageValue =
+                                    document.getElementById(
+                                        "watermarkPageImage"
+                                    ).value;
+                                if (!isNaN(cusPageValue)) {
+                                    getTotalPages(
+                                        getUploadedFileName()[0].replace(
+                                            /\s/g,
+                                            "_"
+                                        )
+                                    )
+                                        .then((totalPages) => {
+                                            if (
+                                                totalPages.totalPages == false
+                                            ) {
+                                                event.preventDefault();
+                                                errMessage.innerText =
+                                                    "There was unexpected error !";
+                                                errListTitleMessage.innerText =
+                                                    "Error message";
+                                                errAltSubMessageModal.style =
+                                                    null;
+                                                resetErrListMessage();
+                                                generateMesssage(
+                                                    "Failed to get total page from PDF"
+                                                );
+                                                loadingModal.hide();
+                                                errModal.show();
+                                            } else {
+                                                if (
+                                                    parseInt(cusPageValue) >
+                                                    totalPages.totalPagesMessage
+                                                ) {
+                                                    event.preventDefault();
+                                                    errMessage.innerText =
+                                                        "Invalid page number range!";
+                                                    errListTitleMessage.innerText =
+                                                        "Error message";
+                                                    errAltSubMessageModal.style =
+                                                        null;
+                                                    resetErrListMessage();
+                                                    generateMesssage(
+                                                        "Selected page can not be more than total page"
+                                                    );
+                                                    customPage.style.borderColor =
+                                                        "#A84E4E";
+                                                    loadingModal.hide();
+                                                    errModal.show();
+                                                } else {
+                                                    if (
+                                                        xhrBalance &&
+                                                        xhrBalanceRemaining > 0
+                                                    ) {
+                                                        altLoadingMessageModal.innerText =
+                                                            "Processing document";
+                                                        document
+                                                            .getElementById(
+                                                                "altLoadingModal"
+                                                            )
+                                                            .classList.remove(
+                                                                "hidden"
+                                                            );
+                                                        document
+                                                            .getElementById(
+                                                                "dropzoneWatermark"
+                                                            )
+                                                            .classList.add(
+                                                                "animate-pulse"
+                                                            );
+                                                        xhrProcStats = false;
+                                                        apiGateway(
+                                                            "watermark",
+                                                            "img"
+                                                        );
+                                                    } else {
+                                                        event.preventDefault();
+                                                        errMessage.innerText =
+                                                            "Document file can not be processed !";
+                                                        errSubMessage.innerText =
+                                                            "";
+                                                        errListTitleMessage.innerText =
+                                                            "Error message";
+                                                        resetErrListMessage();
+                                                        generateMesssage(
+                                                            "Remaining monthly limit (" +
+                                                                xhrBalanceRemaining +
+                                                                " out of 250)"
+                                                        );
+                                                        errAltSubMessageModal.style =
+                                                            null;
+                                                        loadingModal.hide();
+                                                        errModal.show();
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            event.preventDefault();
+                                            errMessage.innerText =
+                                                "Invalid page number range!";
+                                            errListTitleMessage.innerText =
+                                                "Error message";
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage(
+                                                "Failed to fetch total document pages"
+                                            );
+                                            loadingModal.hide();
+                                            errModal.show();
+                                        });
                                 }
                             } else {
                                 event.preventDefault();
                                 errMessage.innerText =
-                                    "PDF file can not be processed !";
+                                    "Document file can not be processed !";
                                 errSubMessage.innerText = "";
                                 errListTitleMessage.innerText = "Error message";
                                 resetErrListMessage();
@@ -2840,6 +2836,7 @@ function submit(event) {
             }
         } else if (document.getElementById("secondRadio").checked == true) {
             var wmText = document.getElementById("watermarkText");
+            var customPage = document.getElementById("watermarkPageText");
             wmImageSwitcher.checked = false;
             wmTextSwitcher.checked = true;
             if (
@@ -2861,44 +2858,113 @@ function submit(event) {
                 errModal.show();
             } else if (document.getElementById("watermarkText").value) {
                 if (document.getElementById("watermarkPageText").value) {
-                    procTitleMessageModal.innerText = "Processing PDF...";
+                    procTitleMessageModal.innerText = "Processing document";
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     errModal.hide();
                     loadingModal.show();
                     if (getUploadedFileName().length > 0) {
-                        if (xhrBalance && xhrBalanceRemaining > 0) {
-                            altLoadingMessageModal.innerText =
-                                "Processing PDF...";
-                            document
-                                .getElementById("altLoadingModal")
-                                .classList.remove("hidden");
-                            document
-                                .getElementById("dropzoneWatermark")
-                                .classList.add("animate-pulse");
-                            xhrProcStats = false;
-                            apiGateway("watermark", "txt");
-                        } else {
-                            event.preventDefault();
-                            errMessage.innerText =
-                                "PDF file can not be processed !";
-                            errSubMessage.innerText = "";
-                            errListTitleMessage.innerText = "Error message";
-                            resetErrListMessage();
-                            generateMesssage(
-                                "Remaining monthly limit (" +
-                                    xhrBalanceRemaining +
-                                    " out of 250)"
-                            );
-                            errAltSubMessageModal.style = null;
-                            loadingModal.hide();
-                            errModal.show();
+                        var cusPageValue =
+                            document.getElementById("watermarkPageText").value;
+                        if (!isNaN(cusPageValue)) {
+                            getTotalPages(
+                                getUploadedFileName()[0].replace(/\s/g, "_")
+                            )
+                                .then((totalPages) => {
+                                    if (totalPages.totalPages == false) {
+                                        event.preventDefault();
+                                        errMessage.innerText =
+                                            "There was unexpected error !";
+                                        errListTitleMessage.innerText =
+                                            "Error message";
+                                        errAltSubMessageModal.style = null;
+                                        resetErrListMessage();
+                                        generateMesssage(
+                                            "Failed to get total page from PDF"
+                                        );
+                                        loadingModal.hide();
+                                        errModal.show();
+                                    } else {
+                                        if (
+                                            parseInt(cusPageValue) >
+                                            totalPages.totalPagesMessage
+                                        ) {
+                                            event.preventDefault();
+                                            errMessage.innerText =
+                                                "Invalid page number range!";
+                                            errListTitleMessage.innerText =
+                                                "Error message";
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage(
+                                                "Selected page can not be more than total page"
+                                            );
+                                            customPage.style.borderColor =
+                                                "#A84E4E";
+                                            loadingModal.hide();
+                                            errModal.show();
+                                        } else {
+                                            if (
+                                                xhrBalance &&
+                                                xhrBalanceRemaining > 0
+                                            ) {
+                                                altLoadingMessageModal.innerText =
+                                                    "Processing document";
+                                                document
+                                                    .getElementById(
+                                                        "altLoadingModal"
+                                                    )
+                                                    .classList.remove("hidden");
+                                                document
+                                                    .getElementById(
+                                                        "dropzoneWatermark"
+                                                    )
+                                                    .classList.add(
+                                                        "animate-pulse"
+                                                    );
+                                                xhrProcStats = false;
+                                                apiGateway("watermark", "img");
+                                            } else {
+                                                event.preventDefault();
+                                                errMessage.innerText =
+                                                    "Document file can not be processed !";
+                                                errSubMessage.innerText = "";
+                                                errListTitleMessage.innerText =
+                                                    "Error message";
+                                                resetErrListMessage();
+                                                generateMesssage(
+                                                    "Remaining monthly limit (" +
+                                                        xhrBalanceRemaining +
+                                                        " out of 250)"
+                                                );
+                                                errAltSubMessageModal.style =
+                                                    null;
+                                                loadingModal.hide();
+                                                errModal.show();
+                                            }
+                                        }
+                                    }
+                                })
+                                .catch((error) => {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Invalid page number range!";
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage(
+                                        "Failed to fetch total document pages"
+                                    );
+                                    loadingModal.hide();
+                                    errModal.show();
+                                });
                         }
                     } else {
                         event.preventDefault();
                         errMessage.innerText =
-                            "PDF file can not be processed !";
+                            "Document file can not be processed !";
                         errSubMessage.innerText = "";
                         errListTitleMessage.innerText = "Error message";
                         resetErrListMessage();
@@ -2949,13 +3015,13 @@ function submit(event) {
                 document.getElementById("secondRadio").checked
             ) {
                 if (xhrBalance && xhrBalanceRemaining > 0) {
-                    procTitleMessageModal.innerText = "Processing URL...";
+                    procTitleMessageModal.innerText = "Processing URL";
                     errMessage.style.visibility = null;
                     errSubMessage.style.visibility = null;
                     errAltSubMessageModal.style.display = "none";
                     errModal.hide();
                     loadingModal.show();
-                    altLoadingMessageModal.innerText = "Processing URL...";
+                    altLoadingMessageModal.innerText = "Processing URL";
                     document
                         .getElementById("altLoadingModal")
                         .classList.remove("hidden");
@@ -2966,7 +3032,8 @@ function submit(event) {
                     apiGateway("html", "");
                 } else {
                     event.preventDefault();
-                    errMessage.innerText = "PDF file can not be processed !";
+                    errMessage.innerText =
+                        "Document file can not be processed !";
                     errSubMessage.innerText = "";
                     errListTitleMessage.innerText = "Error message";
                     resetErrListMessage();
@@ -3021,42 +3088,37 @@ function validateVersion() {
 
         xhr.open("POST", apiUrl + "/api/v1/version/check", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.responseText.trim().startsWith("{")) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhr.status == 200) {
-                        if (xhrReturn.errors == null) {
-                            resolve({
-                                versioningCheck: true,
-                                versioningStats: xhrReturn.status,
-                                versioningMessage: xhrReturn.message,
-                                versioningError: null,
-                            });
-                        } else {
-                            reject({
-                                versioningCheck: false,
-                                versioningStats: xhrReturn.status,
-                                versioningMessage: xhrReturn.message,
-                                versioningError: xhrReturn.errors,
-                            });
-                        }
-                    } else {
+                    resolve({
+                        versioningCheck: true,
+                        versioningStats: xhrReturn.status,
+                        versioningMessage: xhrReturn.message,
+                        versioningError: null,
+                    });
+                } else {
+                    try {
+                        var xhrReturn = JSON.parse(xhr.responseText);
                         reject({
                             versioningCheck: false,
                             versioningStats: xhrReturn.status,
                             versioningMessage: xhrReturn.message,
                             versioningError: xhrReturn.errors,
                         });
+                    } catch (e) {
+                        console.error("Error parsing JSON:", e);
+                        reject({
+                            versioningCheck: false,
+                            versioningStats: 500,
+                            versioningMessage: "Internal Server Error",
+                            versioningError: "Internal Server Error",
+                        });
                     }
-                } else {
-                    reject({
-                        versioningCheck: false,
-                        versioningStats: 500,
-                        versioningMessage: "Internal Server Error",
-                        versioningError: "Internal Server Error",
-                    });
                 }
             }
         };
