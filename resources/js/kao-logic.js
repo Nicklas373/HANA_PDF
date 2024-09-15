@@ -1741,9 +1741,6 @@ function sendToAPI(files, proc, action) {
                             "HANA PDF has processed your document !";
                         document.getElementById("errMsg").innerText =
                             "There was unexpected error !";
-                        document
-                            .getElementById("errProcMain")
-                            .classList.remove("hidden");
                         reject({
                             xhrRequestCondition: "ERROR",
                             xhrRequestMessage: "Internal Server Error",
