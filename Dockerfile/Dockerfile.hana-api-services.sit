@@ -9,8 +9,6 @@ LABEL description="Docker container for https://gw.hana-ci.com"
 # Configure ARG
 ARG DB_USERNAME
 ARG DB_PASSWORD
-ARG JWT_SHOW_BLACKLIST_EXCEPTION
-ARG JWT_TTL
 
 # Configure work directory
 WORKDIR /var/www/html
@@ -75,17 +73,15 @@ RUN cd hanaci-api && php artisan config:cache
 RUN cd hanaci-api && php artisan config:clear
 
 # Configure Laravel Env
-RUN cd hanaci-api && echo "JWT_SHOW_BLACKLIST_EXCEPTION=true" >> .env
-RUN cd hanaci-api && echo "JWT_TTL=null" >> .env
 RUN cd hanaci-api && echo "" >> .env
 RUN cd hanaci-api && sed -i 's/APP_NAME=Laravel/APP_NAME="gw.hana-ci"/' .env
 RUN cd hanaci-api && sed -i "s#APP_URL=http://localhost#APP_URL=http://sit.gw.hana-ci.com#" .env
-RUN cd hanaci-api && sed -i "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
-RUN cd hanaci-api && sed -i "s/DB_HOST=127.0.0.1/DB_HOST=hana-db-services/" .env
-RUN cd hanaci-api && sed -i "s/DB_PORT=3306/DB_PORT=5432/" .env
-RUN cd hanaci-api && sed -i "s/DB_DATABASE=laravel/DB_DATABASE=postgres/" .env
-RUN cd hanaci-api && sed -i "s/DB_USERNAME=root/DB_USERNAME=$DB_USERNAME/" .env
-RUN cd hanaci-api && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
+RUN cd hanaci-api && sed -i "s/DB_CONNECTION=sqlite/DB_CONNECTION=pgsql/" .env
+RUN cd hanaci-api && sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=hana-db-services/" .env
+RUN cd hanaci-api && sed -i "s/# DB_PORT=3306/DB_PORT=5432/" .env
+RUN cd hanaci-api && sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=postgres/" .env
+RUN cd hanaci-api && sed -i "s/# DB_USERNAME=root/DB_USERNAME=$DB_USERNAME/" .env
+RUN cd hanaci-api && sed -i "s/# DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
 RUN cd hanaci-api && echo "" >> .env
 RUN cd hanaci-api && echo "ASPOSE_CLOUD_CLIENT_ID=xxxx" >> .env
 RUN cd hanaci-api && echo "ASPOSE_CLOUD_TOKEN=xxxx" >> .env
