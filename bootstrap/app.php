@@ -1,55 +1,399 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
-*/
+use App\Helpers\AppHelper;
+use App\Helpers\NotificationHelper;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Tymon\JWTAuth\Facades\JWTAuth; 
 
-$app = new Illuminate\Foundation\Application(
-    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
-);
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo('/up');
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        // Handle AuthenticationException
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->is('up')) {
+                $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->get_guid();
+                try {
+                    $user = JWTAuth::parseToken()->authenticate();
+                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                    $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenExpiredException',
+                            'errStatus' => $message.' '.$isAjax
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenExpiredException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                    $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenInvalidException',
+                            'errStatus' => $message.' '.$isAjax
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenInvalidException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                    $message = 'JWTAuth - JWTException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - JWTException',
+                            'errStatus' => $message.' '.$isAjax
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - JWTException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                }
 
-/*
-|--------------------------------------------------------------------------
-| Bind Important Interfaces
-|--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
-*/
+                $message = 'AuthenticationException: ' . $e->getMessage();
+                Log::error($message);
 
-$app->singleton(
-    Illuminate\Contracts\Http\Kernel::class,
-    App\Http\Kernel::class
-);
+                try {
+                    DB::table('appLogs')->insert([
+                        'processId' => $uuid,
+                        'errReason' => 'Authentication Exception',
+                        'errStatus' => $message
+                    ]);
+                } catch (QueryException $ex) {
+                    Log::error('Query Exception failed with: '. $ex->getMessage());
+                }
+                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '401 - Authentication Exception', $message);
+                return response()->json([
+                    'status' => 401,
+                    'message' => '401 - Authentication Exception',
+                    'info' => $message,
+                ], 401);
+            }
+        });
 
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
+        // Handle NotFoundHttpException
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*') || $request->is('up')) {
+                $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->get_guid();
+                try {
+                    $user = JWTAuth::parseToken()->authenticate();
+                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                    $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenExpiredException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenExpiredException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                    $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenInvalidException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenInvalidException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                    $message = 'JWTAuth - JWTException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - JWTException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - JWTException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                }
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
+                $message = 'NotFoundHttpException: ' . $e->getMessage();
+                Log::error($message);
+                return response()->json([
+                    'status' => 404,
+                    'message' => '404 - Page not found',
+                    'info' => $message
+                ], 404);
+            }
+        });
 
-/*
-|--------------------------------------------------------------------------
-| Return The Application
-|--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
-*/
+        // Handle MethodNotAllowedHttpException
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            if ($request->is('api/*') || $request->is('up')) {
+                $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->get_guid();
+                try {
+                    $user = JWTAuth::parseToken()->authenticate();
+                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                    $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenExpiredException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenExpiredException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                    $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenInvalidException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenInvalidException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                    $message = 'JWTAuth - JWTException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - JWTException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - JWTException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                }
 
-return $app;
+                $message = 'MethodNotAllowedHttpException for route: '. $e->getMessage();
+                Log::error($message);
+                try {
+                    DB::table('appLogs')->insert([
+                        'processId' => $uuid,
+                        'errReason' => '405 - HTTP Method Not Allowed',
+                        'errStatus' => $message
+                    ]);
+                } catch (QueryException $ex) {
+                    Log::error('Query Exception failed with: '. $ex->getMessage());
+                }
+                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '405 - HTTP Method Not Allowed', $message);
+                return response()->json([
+                    'status' => 405,
+                    'message' => '405 - HTTP Method Not Allowed',
+                    'info' => $message,
+                ], 405);
+            }
+        });
+
+        // Handle RouteNotFoundException
+        $exceptions->render(function (RouteNotFoundException $e, Request $request) {
+            if ($request->is('api/*') || $request->is('up')) {
+                $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->get_guid();
+                try {
+                    $user = JWTAuth::parseToken()->authenticate();
+                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                    $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenExpiredException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenExpiredException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                    $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - TokenInvalidException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - TokenInvalidException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                    $message = 'JWTAuth - JWTException: '. $ex->getMessage();
+                    Log::error($message.' test '.$isAjax);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'JWTAuth - JWTException',
+                            'errStatus' => $message
+                        ]);
+                    } catch (QueryException $ex) {
+                        Log::error('Query Exception failed with: '. $ex->getMessage());
+                    }
+                    if ($isAjax) {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => '401 - Authentication Exception',
+                            'info' => $message,
+                            'errors' => 'JWTAuth - JWTException'
+                        ], 401);
+                    } else {
+                        return redirect('/up');
+                    }
+                }
+
+                $message = 'RouteNotFoundException for route: '. $e->getMessage();
+                Log::error($message);
+                try {
+                    DB::table('appLogs')->insert([
+                        'processId' => $uuid,
+                        'errReason' => '404 - Route Not Found',
+                        'errStatus' => $message
+                    ]);
+                } catch (QueryException $ex) {
+                    Log::error('Query Exception failed with: '. $ex->getMessage());
+                }
+                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '404 - Route Not Found', $message);
+                return response()->json([
+                    'status' => 404,
+                    'message' => '404 - Route Not Found',
+                    'info' => $message,
+                ], 404);
+            }
+        });
+        
+    })->create();

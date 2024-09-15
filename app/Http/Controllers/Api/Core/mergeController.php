@@ -39,49 +39,34 @@ class mergeController extends Controller
             try {
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
-                    'errReason' => $validator->messages(),
-                    'errStatus' => null
+                    'errReason' => 'Validation Failed!',
+                    'errStatus' => $validator->messages()->first()
                 ]);
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'merge', 'FAIL','PDF Merged failed !',$validator->messages(), true);
-                return $this->returnCoreMessage(
-                    200,
-                    'PDF Merged failed !',
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','merge','Validation failed',$validator->messages()->first(), true);
+                return $this->returnDataMesage(
+                    401,
+                    'Validation failed',
                     null,
                     null,
-                    'merge',
-                    $uuid,
-                    null,
-                    null,
-                    null,
-                    $validator->errors()->all()
+                    $validator->messages()->first()
                 );
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                return $this->returnCoreMessage(
-                    200,
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','merge','Database connection error !',$ex->getMessage(), false);
+                return $this->returnDataMesage(
+                    500,
                     'Database connection error !',
-                    null,
-                    null,
-                    'merge',
-                    $uuid,
-                    null,
                     null,
                     null,
                     $ex->getMessage()
                 );
             } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                return $this->returnCoreMessage(
-                    200,
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL','merge','Eloquent transaction error !', $e->getMessage(), false);
+                return $this->returnDataMesage(
+                    500,
                     'Eloquent transaction error !',
                     null,
                     null,
-                    'merge',
-                    $uuid,
-                    null,
-                    null,
-                    null,
-                    $e->getMessage()
+                    $ex->getMessage()
                 );
             }
 		} else {
@@ -144,42 +129,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on StartException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -206,42 +176,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on AuthException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -268,42 +223,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on UploadException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -330,42 +270,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on ProcessException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -392,42 +317,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on DownloadException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -454,42 +364,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on TaskException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -516,42 +411,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on PathException'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -578,42 +458,27 @@ class mergeController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
-                        return $this->returnCoreMessage(
-                            200,
-                            'PDF Merged failed !',
-                            $currentFileName,
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
                             null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
-                            null,
-                            null,
-                            $e->getMessage()
+                            'iLovePDF API Error !, Catch on Exception'
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $currentFileName,
-                            null,
-                            'merge',
-                            $uuid,
-                            $newFileSize,
                             null,
                             null,
                             $e->getMessage()
@@ -656,47 +521,70 @@ class mergeController extends Controller
                         );
                     } catch (QueryException $ex) {
                         NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $mergedFileSize, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Database connection error !',
-                            $randomizePdfFileName.'.pdf',
-                            null,
-                            'merge',
-                            $uuid,
-                            $mergedFileSize,
                             null,
                             null,
                             $ex->getMessage()
                         );
                     } catch (\Exception $e) {
                         NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $mergedFileSize, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            500,
                             'Eloquent transaction error !',
-                            $randomizePdfFileName.'.pdf',
-                            null,
-                            'merge',
-                            $uuid,
-                            $mergedFileSize,
                             null,
                             null,
                             $e->getMessage()
                         );
                     }
                 } else {
-                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'merge', 'Failed to download file from iLovePDF API !', 'null');
-                    return $this->returnCoreMessage(
-                        200,
-                        'PDF Merge failed !',
-                        $currentFileName,
-                        null,
-                        'merge',
-                        $uuid,
-                        $newFileSize,
-                        null,
-                        null,
-                        null
-                    );
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
+                    try {
+                        DB::table('appLogs')->insert([
+                            'processId' => $uuid,
+                            'errReason' => 'Failed to download file from iLovePDF API !',
+                            'errStatus' => null
+                        ]);
+                        DB::table('pdfMerge')->insert([
+                            'fileName' => $randomizePdfFileName.'.pdf',
+                            'fileSize' => null,
+                            'result' => true,
+                            'isBatch' => false,
+                            'processId' => $uuid,
+                            'batchId' => null,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'Failed to download file from iLovePDF API !', null, true);
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            null,
+                            null,
+                            'Failed to download file from iLovePDF API !'
+                        );
+                    } catch (QueryException $ex) {
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'merge', 'Database connection error !', $ex->getMessage(), false);
+                        return $this->returnDataMesage(
+                            500,
+                            'Database connection error !',
+                            null,
+                            null,
+                            $ex->getMessage()
+                        );
+                    } catch (\Exception $e) {
+                        NotificationHelper::Instance()->sendErrNotify($pdfUrl, null, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
+                        return $this->returnDataMesage(
+                            500,
+                            'Eloquent transaction error !',
+                            null,
+                            null,
+                            $e->getMessage()
+                        );
+                    }
                 }
             } else {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -719,42 +607,27 @@ class mergeController extends Controller
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'PDF failed to upload !', null);
-                    return $this->returnCoreMessage(
-                        200,
-                        'PDF failed to upload !',
+                    return $this->returnDataMesage(
+                        400,
+                        'PDF Merge failed !',
                         null,
                         null,
-                        'merge',
-                        $uuid,
-                        null,
-                        null,
-                        null,
-                        null
+                        'PDF failed to upload !'
                     );
                 } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'Database connection error !',$ex->getMessage(), false);
-                    return $this->returnCoreMessage(
-                        200,
+                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'Database connection error !', $ex->getMessage(), false);
+                    return $this->returnDataMesage(
+                        500,
                         'Database connection error !',
-                        null,
-                        null,
-                        'merge',
-                        $uuid,
-                        null,
                         null,
                         null,
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'merge', 'Eloquent transaction error !', $e->getMessage(), false);
-                    return $this->returnCoreMessage(
-                        200,
+                    return $this->returnDataMesage(
+                        500,
                         'Eloquent transaction error !',
-                        null,
-                        null,
-                        'merge',
-                        $uuid,
-                        null,
                         null,
                         null,
                         $e->getMessage()

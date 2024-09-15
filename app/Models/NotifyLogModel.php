@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class appLogsModel extends Model
+class NotifyLogModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'appLogs';
+    protected $table = 'notifyLogs';
 
     protected $fillable = [
+        'notifyId',
         'processId',
-        'errReason',
-        'errStatus'
+        'notifyName',
+        'notifyResult',
+        'notifyMessage',
+        'notifyResponse'
     ];
 }

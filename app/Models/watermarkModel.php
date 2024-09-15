@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class watermarkModel extends Model
+class WatermarkModel extends Model
 {
     use HasFactory;
 

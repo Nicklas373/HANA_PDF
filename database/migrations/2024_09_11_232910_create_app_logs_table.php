@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
+     /**
      * The database connection that should be used by the migration.
      *
      * @var string
@@ -36,7 +36,6 @@ return new class extends Migration
             $table->foreign('processId')->references('processId')->on('pdfWatermark')->name('pdf_watermark_fk');
             $table->foreign('processId')->references('processId')->on('pdfHtml')->name('pdf_html_fk');
             $table->foreign('processId')->references('processId')->on('jobLogs')->name('job_logs_fk');
-            $table->foreign('processId')->references('processId')->on('accessLogs')->name('access_logs_fk');
             $table->foreign('processId')->references('processId')->on('notifyLogs')->name('notify_logs_fk');
         });
     }

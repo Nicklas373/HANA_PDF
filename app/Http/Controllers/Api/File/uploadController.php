@@ -12,7 +12,7 @@ class uploadController extends Controller
 {
     public function upload(Request $request) {
 		$validator = Validator::make($request->all(),[
-			'file' => 'required|mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg,tiff|max:25600',
+			'file' => 'required|mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg|max:25600',
 			'fileAlt' => ''
 		]);
 
@@ -43,15 +43,15 @@ class uploadController extends Controller
                     );
                 } else {
                     return $this->returnFileMesage(
-                        200,
+                        400,
                         'Failed to upload file !',
-                        null,
+                        Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfFileName),
                         $pdfFileName.' could not be found in the server'
                     );
                 }
             } else {
                 return $this->returnFileMesage(
-                    200,
+                    400,
                     'Failed to upload file !',
                     null,
                     'Requested file could not be found in the server'
@@ -69,7 +69,6 @@ class uploadController extends Controller
             return $this->returnFileMesage(
                 401,
                 'Validation failed',
-                null,
                 null,
                 $validator->messages()->first()
             );
@@ -91,15 +90,15 @@ class uploadController extends Controller
                     );
                 } else {
                     return $this->returnFileMesage(
-                        200,
+                        400,
                         'Failed to remove file !',
-                        null,
+                        $pdfFileName,
                         $pdfFileName.' could not be found in the server'
                     );
                 }
             } else {
                 return $this->returnFileMesage(
-                    200,
+                    400,
                     'Failed to remove file !',
                     null,
                     'Requested file could not be found in the server'
@@ -133,55 +132,35 @@ class uploadController extends Controller
                     if ($currentFileNameExtension == 'pdf') {
                         try {
                             $pdfTotalPages = AppHelper::instance()->count($newFilePath);
-                            return $this->returnCoreMessage(
+                            return $this->returnDataMesage(
                                 200,
+                                'PDF Page successfully generated',
                                 $pdfTotalPages,
-                                $currentFileName,
-                                $newFilePath,
-                                'getTotalPDFPages',
-                                null,
-                                null,
-                                null,
                                 null,
                                 null
                             );
                         } catch (\Exception $e) {
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'Failed to count total PDF pages from '.$currentFileName,
-                                $currentFileName,
-                                $newFilePath,
-                                'getTotalPDFPages',
-                                null,
-                                null,
                                 null,
                                 null,
                                 $e->getMessage()
                             );
                         }
                     } else {
-                        return $this->returnCoreMessage(
-                            200,
+                        return $this->returnDataMesage(
+                            400,
                             'File '.$currentFileName.' is not PDF file !',
-                            $currentFileName,
-                            $newFilePath,
-                            'getTotalPDFPages',
-                            null,
-                            null,
                             null,
                             null,
                             'FILE_FORMAT_VALIDATION_EXCEPTION'
                         );
                     }
                 } else {
-                    return $this->returnCoreMessage(
-                        200,
+                    return $this->returnDataMesage(
+                        400,
                         'File '.$currentFileName.' not found !',
-                        $currentFileName,
-                        $newFilePath,
-                        'getTotalPDFPages',
-                        null,
-                        null,
                         null,
                         null,
                         'FILE_NOT_FOUND_EXCEPTION'
@@ -189,7 +168,7 @@ class uploadController extends Controller
                 }
             } else {
                 return $this->returnFileMesage(
-                    200,
+                    400,
                     'Failed to upload file !',
                     null,
                     'Requested file could not be found in the server'

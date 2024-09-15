@@ -46,56 +46,41 @@ class watermarkController extends Controller
         $now = Carbon::now('Asia/Jakarta');
         $startProc = $now->format('Y-m-d H:i:s');
 
-		if($validator->fails()) {
+		if ($validator->fails()) {
             try {
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
-                    'errReason' => $validator->messages(),
-                    'errStatus' => null
+                    'errReason' => 'Validation Failed!',
+                    'errStatus' => $validator->messages()->first()
                 ]);
-                NotificationHelper::Instance()->sendErrNotify('','', $uuid, 'FAIL', 'watermark', 'PDF Watermark failed !',$validator->messages(), true);
-                return $this->returnCoreMessage(
-                    200,
-                    'PDF Watermark failed !',
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','watermark','Validation failed',$validator->messages()->first(), true);
+                return $this->returnDataMesage(
+                    401,
+                    'Validation failed',
                     null,
                     null,
-                    'watermark',
-                    $uuid,
-                    null,
-                    null,
-                    null,
-                    $validator->errors()->all()
+                    $validator->messages()->first()
                 );
             } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                return $this->returnCoreMessage(
-                    200,
+                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','watermark','Database connection error !',$ex->getMessage(), false);
+                return $this->returnDataMesage(
+                    500,
                     'Database connection error !',
-                    null,
-                    null,
-                    'watermark',
-                    $uuid,
-                    null,
                     null,
                     null,
                     $ex->getMessage()
                 );
             } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                return $this->returnCoreMessage(
-                    200,
+                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL','watermark','Eloquent transaction error !', $e->getMessage(), false);
+                return $this->returnDataMesage(
+                    500,
                     'Eloquent transaction error !',
                     null,
                     null,
-                    'watermark',
-                    $uuid,
-                    null,
-                    null,
-                    null,
-                    $e->getMessage()
+                    $ex->getMessage()
                 );
             }
-        } else {
+		} else {
             if ($request->has('file')) {
                 $files = $request->post('file');
                 $pdfEncKey = bin2hex(random_bytes(16));
@@ -154,12 +139,13 @@ class watermarkController extends Controller
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
                         NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Invalid request action !', 'Current request: '.$watermarkAction);
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'PDF Watermark failed !',
-                            'error' => 'Current request: '.$watermarkAction,
-                            'processId' => $uuid
-                        ], 400);
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Watermark failed !',
+                            null,
+                            null,
+                            'Invalid request action !'.',Current request: '.$watermarkAction
+                        );
                     }
                     $tempPDF = $request->post('wmMosaic');
                     if ($tempPDF == 'true') {
@@ -262,42 +248,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on StartException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -334,42 +305,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on AuthException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -406,42 +362,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on UploadException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -478,42 +419,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on ProcessException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -550,42 +476,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on DownloadException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -622,42 +533,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on TaskException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -694,42 +590,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on PathException'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -766,42 +647,27 @@ class watermarkController extends Controller
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
+                                $e->getMessage(),
                                 null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
-                                null,
-                                null,
-                                $e->getMessage()
+                                'iLovePDF API Error !, Catch on Exception'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -854,28 +720,18 @@ class watermarkController extends Controller
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $procFileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $randomizePdfFileName.'.pdf',
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newProcFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $procFileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $randomizePdfFileName.'.pdf',
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newProcFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -911,42 +767,27 @@ class watermarkController extends Controller
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                 'procDuration' =>  $duration->s.' seconds'
                             ]);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                400,
                                 'PDF Watermark failed !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
-                                null
+                                'Failed to download file from iLovePDF API !'
                             );
                         } catch (QueryException $ex) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Database connection error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $ex->getMessage()
                             );
                         } catch (\Exception $e) {
                             NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnCoreMessage(
-                                200,
+                            return $this->returnDataMesage(
+                                500,
                                 'Eloquent transaction error !',
-                                $currentFileName,
-                                null,
-                                'watermark',
-                                $uuid,
-                                $newFileSize,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -985,42 +826,27 @@ class watermarkController extends Controller
                         'procDuration' =>  $duration->s.' seconds'
                     ]);
                     NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'watermark', 'PDF failed to upload !', null, true);
-                    return $this->returnCoreMessage(
-                        200,
-                        'PDF failed to upload !',
-                        $currentFileName,
-                        null,
-                        'watermark',
-                        $uuid,
-                        $newFileSize,
+                    return $this->returnDataMesage(
+                        400,
+                        'PDF Watermark failed !',
                         null,
                         null,
-                        null
+                        'PDF failed to upload !'
                     );
                 } catch (QueryException $ex) {
                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                    return $this->returnCoreMessage(
-                        200,
+                    return $this->returnDataMesage(
+                        500,
                         'Database connection error !',
-                        $currentFileName,
-                        null,
-                        'watermark',
-                        $uuid,
-                        $newFileSize,
                         null,
                         null,
                         $ex->getMessage()
                     );
                 } catch (\Exception $e) {
                     NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                    return $this->returnCoreMessage(
-                        200,
+                    return $this->returnDataMesage(
+                        500,
                         'Eloquent transaction error !',
-                        $currentFileName,
-                        null,
-                        'watermark',
-                        $uuid,
-                        $newFileSize,
                         null,
                         null,
                         $e->getMessage()

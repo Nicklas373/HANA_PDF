@@ -28,13 +28,11 @@ class thumbnailController extends Controller
         $uuid = AppHelper::Instance()->get_guid();
 
         if ($validator->fails()) {
-            $errors = $validator->errors()->all();
             return $this->returnFileMesage(
                 401,
                 'Validation failed',
                 null,
-                null,
-                $errors
+                $validator->messages()->first()
             );
         } else {
             if ($request->has('file')) {
@@ -62,10 +60,9 @@ class thumbnailController extends Controller
                         $phpXlsxWriter->save($pdfPath);
                     } else {
                         return $this->returnFileMesage(
-                            200,
+                            400,
                             'Failed to generate thumbnail !',
-                            null,
-                            null,
+                            $pdfFileName,
                             'Invalid or unsupported file extension: '.$pdfRealExtension
                         );
                     }
@@ -74,18 +71,16 @@ class thumbnailController extends Controller
                         ->saveImage($thumbnailFilePath);
 
                     return $this->returnFileMesage(
-                        200,
+                        201,
                         'Thumbnail generated !',
                         Storage::disk('local')->url(env('PDF_IMG_POOL').'/'.$pdfFileName.'.png'),
-                        $pdfFileName,
-                        null
+                        $pdfFileName
                     );
                 } catch (Exception $e) {
                     return $this->returnFileMesage(
-                        200,
+                        500,
                         'Failed to generate thumbnail !',
-                        null,
-                        null,
+                        $pdfFileName,
                         $pdfFileName.' could not generate thumbnail with error: '.$e->getMessage()
                     );
                 }
