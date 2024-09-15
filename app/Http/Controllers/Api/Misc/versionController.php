@@ -110,36 +110,36 @@ class versionController extends Controller {
                                     'errReason' => 'Version Check Failed !',
                                     'errStatus' => $validateMessage
                                 ]);
-                                NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Version Check Failed !',$validateMessage,true);
+                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Version Check Failed !',$validateMessage,true);
                                 return $this->returnVersioningMessage(
                                     400,
                                     'Version Check Failed !',
-                                    null,
-                                    null,
-                                    null,
-                                    null,
+                                    $appVersioningBE,
+                                    $versioningBE,
+                                    $appVersioningFE,
+                                    $versioningFE,
                                     $validateMessage
                                 );
                             } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
+                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
                                 return $this->returnVersioningMessage(
                                     500,
                                     'Database connection error !',
-                                    null,
-                                    null,
-                                    null,
-                                    null,
+                                    $appVersioningBE,
+                                    $versioningBE,
+                                    $appVersioningFE,
+                                    $versioningFE,
                                     $ex->getMessage()
                                 );
                             } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
+                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
                                 return $this->returnVersioningMessage(
                                     500,
                                     'Eloquent transaction error !',
-                                    null,
-                                    null,
-                                    null,
-                                    null,
+                                    $appVersioningBE,
+                                    $versioningBE,
+                                    $appVersioningFE,
+                                    $versioningFE,
                                     $e->getMessage()
                                 );
                             }
