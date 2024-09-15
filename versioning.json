@@ -3,9 +3,9 @@
     "appServices": "BE",
     "versioning": {
       "majorVersion": 3,
-      "minorVersion": 3,
-      "patchVersion": 2,
-      "gitRevision": "63ef1a4"
+      "minorVersion": 4,
+      "patchVersion": 0,
+      "gitRevision": "5e6bf35"
     }
   },
   {
@@ -22,8 +22,8 @@
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 3,
-      "patchVersion": 1,
-      "gitRevision": "e810891"
+      "patchVersion": 3,
+      "gitRevision": "8835c08"
     }
   },
   {
