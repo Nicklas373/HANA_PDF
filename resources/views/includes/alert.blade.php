@@ -1,7 +1,5 @@
 <div id="alert-scs" class="hidden p-4 mb-2 h-auto lg:h-6/6 bg-ac backdrop-filter backdrop-blur-md rounded-md bg-opacity-60" role="alert">
     <div class="flex items-center">
-        <img class="flex-shrink-0 w-7 h-7 mr-2 -mt-1 text-pc4" src="{{ asset('assets/icons/information.svg') }}" alt="information">
-        <span class="sr-only">Info</span>
         <div id="scsMsgTitle" class="text-md lg:text-lg font-medium font-quicksand text-pc4">HANA PDF</div>
     </div>
     <div class="mt-2 mb-4 text-xs text-lt1 font-normal font-quicksand" id="scsMsgResult"></div>
@@ -22,8 +20,6 @@
         <span class="text-md lg:text-lg font-medium font-quicksand text-pc4" id="errMsgTitle"><b>HANA PDF</b></span>
         <br>
         <span class="text-xs text-lt1 font-normal font-quicksand"><b>Error Reason:</b> <span id="errMsg"></span></span>
-        <br>
-        <span id="errProcMain" class="text-xs text-lt1 font-normal font-quicksand"><b>Process ID:</b> <span id="errProcId"></span></span>
         <br>
         <button type="button" class="mt-2 bg-lt1 text-rt1 rounded-lg font-normal font-quicksand text-sm px-3 py-1.5 text-center inline-flex items-center" data-dismiss-target="#alert-err" aria-label="Close" data-ripple-light="true">
             <b>Dismiss</b>
