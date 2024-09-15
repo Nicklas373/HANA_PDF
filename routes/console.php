@@ -223,7 +223,7 @@ Schedule::command('view:cache')
         }
     });
 
-Schedule::command('hana:clear-storage')
+Schedule::command('hana:CleanUp')
     ->hourly()
     ->timezone('Asia/Jakarta')
     ->environments(['production'])
@@ -235,7 +235,7 @@ Schedule::command('hana:clear-storage')
                 'errStatus' => null,
             ]);
         DB::table('jobLogs')->insert([
-            'jobsName' => 'hana:clear-storage',
+            'jobsName' => 'hana:CleanUp',
             'jobsEnv' => 'production-be',
             'jobsRuntime' => 'hourly',
             'jobsResult' => false,
@@ -270,7 +270,7 @@ Schedule::command('hana:clear-storage')
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output,
             ]);
-            NotificationHelper::Instance()->sendSchedErrNotify('hana:clear-storage','hourly', $hanaClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
+            NotificationHelper::Instance()->sendSchedErrNotify('hana:CleanUp','hourly', $hanaClearGUID, 'FAIL','Laravel Scheduler Error !',$output);
         }
     });
 
