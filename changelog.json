@@ -1,5 +1,16 @@
 [
   {
+    "release_date": "September, 16 2024",
+    "version": "3.3.3",
+    "changelog": [
+      "Fix image preview are not show correctly when the last file was uploaded is not image on convert to pdf menu",
+      "Fix thumbnail image from document are not show properly",
+      "Fix some issue that lead crashing when backend sometimes return 'Internal Server Error'",
+      "Enhance connection security to backend services",
+      "Migrate our backend base to Laravel 11.x from Laravel 10.x (Backend version 3.4.1)",
+      "Updating our internal libraries to latest version"
+    ]
+  },{
     "release_date": "August, 25 2024",
     "version": "3.3.1",
     "changelog": [
