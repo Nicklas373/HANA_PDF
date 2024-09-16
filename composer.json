@@ -17,10 +17,10 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-ftp": "^3.28",
         "mpdf/mpdf": "^8.2",
+        "php-open-source-saver/jwt-auth": "^2.3",
         "phpoffice/phppresentation": "^1.1",
         "phpoffice/phpword": "^1.3",
-        "spatie/pdf-to-image": "^3.0",
-        "tymon/jwt-auth": "^2.1"
+        "spatie/pdf-to-image": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
