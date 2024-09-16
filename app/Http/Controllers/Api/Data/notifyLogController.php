@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api\Data;
 
 use App\Http\Controllers\Controller;
-use App\Models\appLogModel;
-use App\Models\jobLogModel;
-use App\Models\notifyLogModel;
-use App\Models\compressModel;
-use App\Models\cnvModel;
-use App\Models\htmlModel;
-use App\Models\mergeModel;
-use App\Models\splitModel;
-use App\Models\watermarkModel;
+use App\Models\AppLogModel;
+use App\Models\JobLogModel;
+use App\Models\NotifyLogModel;
+use App\Models\CompressModel;
+use App\Models\CnvModel;
+use App\Models\HtmlModel;
+use App\Models\MergeModel;
+use App\Models\SplitModel;
+use App\Models\WatermarkModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
