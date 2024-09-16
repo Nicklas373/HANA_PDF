@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -20,7 +19,7 @@ class AuthController extends Controller
         $uuid = AppHelper::Instance()->get_guid();
         $credentials = request(['email', 'password']);
 
-        if (!$token = $this->guard()->attempt($credentials)) {
+        if (!$token = auth('api')->attempt($credentials)) {
             try {
                 DB::table('appLogs')->insert([
                     'processId' => $uuid,
@@ -55,6 +54,9 @@ class AuthController extends Controller
                 );
             }
         }
+
+        $user = User::where('email', request('email'))->first();
+        $token = auth('api')->login($user);
 
         return $this->respondWithToken($token);
     }
@@ -106,36 +108,33 @@ class AuthController extends Controller
 
     public function refreshToken()
     {
-        return $this->respondWithToken($this->guard()->refresh());
+        return $this->respondWithToken(auth('api')->refresh());
     }
 
     public function revokeToken()
     {
-        $token = JWTAuth::getToken();
-        Log::INFO($token);
-        $invalidate = JWTAuth::invalidate($token);
-
-        $this->guard()->logout();
-
-        if ($invalidate) {
-            return $this->returnTokenMessage(
-                200,
-                'Token revoked',
-                $token,
-                null,
-                null,
-                $invalidate
-            );
-        }  else {
+        try {
+            auth('api')->logout(true);
+            auth('api')->invalidate(true);
+        } catch (\Exception $e) {
             return $this->returnTokenMessage(
                 400,
                 'Failed to revoked token',
                 null,
                 null,
                 null,
-                null
+                $e->getMessage()
             );
-       }
+        }
+
+        return $this->returnTokenMessage(
+            200,
+            'Token revoked',
+            null,
+            null,
+            null,
+            null
+        );
     }
 
     protected function respondWithToken($token)
@@ -146,12 +145,7 @@ class AuthController extends Controller
             Auth::user(),
             'bearer',
             $token,
-            $this->guard()->factory()->getTTL() * 60
+            auth()->factory()->getTTL() * 60
         );
-    }
-    
-    public function guard()
-    {
-        return Auth::guard();
     }
 }

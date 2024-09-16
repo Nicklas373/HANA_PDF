@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Tymon\JWTAuth\Facades\JWTAuth; 
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth; 
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -32,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
-                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -54,7 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -76,7 +76,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -128,7 +128,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
-                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -150,7 +150,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -172,7 +172,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -213,7 +213,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
-                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -235,7 +235,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -257,7 +257,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -308,7 +308,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
-                } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -330,7 +330,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
@@ -352,7 +352,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     } else {
                         return redirect('/up');
                     }
-                } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+                } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message.' test '.$isAjax);
                     try {
