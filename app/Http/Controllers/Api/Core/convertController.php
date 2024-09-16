@@ -2204,7 +2204,7 @@ class convertController extends Controller
                             'errReason' => 'PDF convert failed',
                             'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'convert', 'PDF Compress failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount, true);
+                        NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.zip', null, $uuid, 'FAIL', 'convert', 'PDF Convert failed !', 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount, true);
                         return $this->returnDataMesage(
                             400,
                             'PDF Convert failed !',

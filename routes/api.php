@@ -49,8 +49,8 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/ilovepdf')->group(f
 
 Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/logs')->group(function() {
     // API v1 Backend Logging Route
-    Route::get('/single', [notifyLogController::class, 'getLogs']);
-    Route::get('/all', [notifyLogController::class, 'getAllLogs']);
+    Route::post('/single', [notifyLogController::class, 'getLogs']);
+    Route::post('/all', [notifyLogController::class, 'getAllLogs']);
 });
 
 Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/version')->group(function() {
