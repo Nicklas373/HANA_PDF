@@ -38,81 +38,81 @@ class notifyLogController extends Controller
         $telegramModel = $request->input('telegramLogs');
         try {
             if ($logModel == 'app') {
-                $applog = appLogModel::where('processId', $processId)->get();
+                $applog = AppLogModel::where('processId', $processId)->get();
                 $datalog = null;
                 $telegramlog = null;
             } else if ($logModel == 'jobs') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = jobLogModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = JobLogModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = jobLogModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = JobLogModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'notify') {
-                $applog = appLogModel::where('processId', $processId)->get();
+                $applog = AppLogModel::where('processId', $processId)->get();
                 $datalog = null;
-                $telegramlog = notifyLogModel::where('processId', $processId)->get();
+                $telegramlog = NotifyLogModel::where('processId', $processId)->get();
             } else if ($logModel == 'compress') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = compressModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = CompressModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = compressModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = CompressModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'convert') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = cnvModel::where('processId', $processId) ->get();
-                    $telegramlog = notifyLogsModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = CnvModel::where('processId', $processId) ->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = cnvModel::where('processId', $processId) ->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = CnvModel::where('processId', $processId) ->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'html') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = htmlModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogsModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = HtmlModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = htmlModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = HtmlModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'merge') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = mergeModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogsModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = MergeModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = mergeModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = MergeModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'split') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = splitModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogsModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = SplitModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = splitModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = SplitModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             } else if ($logModel == 'watermark') {
                 if ($telegramModel) {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = watermarkModel::where('processId', $processId)->get();
-                    $telegramlog = notifyLogsModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = WatermarkModel::where('processId', $processId)->get();
+                    $telegramlog = NotifyLogModel::where('processId', $processId)->get();
                 } else {
-                    $applog = appLogModel::where('processId', $processId)->get();
-                    $datalog = watermarkModel::where('processId', $processId)->get();
+                    $applog = AppLogModel::where('processId', $processId)->get();
+                    $datalog = WatermarkModel::where('processId', $processId)->get();
                     $telegramlog = null;
                 }
             }
@@ -179,23 +179,23 @@ class notifyLogController extends Controller
         $logOrder = $request->input('logOrder');
         try {
             if ($logModel == 'app') {
-                $datalog = appLogModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
+                $datalog = AppLogModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'jobs') {
-                $datalog = jobLogModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = JobLogModel::orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'notify') {
-                $datalog = notifyLogModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
+                $datalog = NotifyLogModel::orderBy('createdAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'compress') {
-                $datalog = compressModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = CompressModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'convert') {
-                $datalog = cnvModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = CnvModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'html') {
-                $datalog = htmlModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = HtmlModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'merge') {
-                $datalog = mergeModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = MergeModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'split') {
-                $datalog = splitModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = SplitModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             } else if ($logModel == 'watermark') {
-                $datalog = watermarkModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
+                $datalog = WatermarkModel::where('result', '=', $logResult)->orderBy('procStartAt', $logOrder)->take($logCount)->get();
             }
             $dataArrayLog = $datalog->toArray();
             return $this->returnDataMesage(
