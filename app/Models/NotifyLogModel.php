@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NotifyLogModel extends Model
+class notifyLogModel extends Model
 {
     use HasFactory;
 

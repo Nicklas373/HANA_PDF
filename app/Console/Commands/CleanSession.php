@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
-use Carbon\Carbon;
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
 
@@ -31,7 +30,6 @@ class CleanSession extends Command
      */
     public function handle()
     {
-        $time = Carbon::now(AppHelper::instance()->getCurrentTimeZone());
         $sessionCount = DB::table('sessions')
             ->where('ip_address', 'NOT LIKE', '172.18.0.%')
             ->count();
@@ -42,7 +40,7 @@ class CleanSession extends Command
                     ->where('ip_address', 'NOT LIKE', '172.18.0.%')
                     ->delete();
 
-                Log::info($sessionCount . ' sessions have been removed at: ' . $time);
+                Log::info($sessionCount . ' sessions have been removed');
             } catch (QueryException $e) {
                 NotificationHelper::Instance()->sendErrGlobalNotify(
                     'Console Command',

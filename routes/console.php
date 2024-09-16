@@ -373,6 +373,6 @@ Schedule::command('hana:daily-report')
                         'errReason' => 'Laravel Scheduler Error !',
                         'errStatus' => $output,
                 ]);
-                NotificationHelper::Instance()->sendSchedErrNotify('view:cache','every 15 minutes', $hanaClearSessionGUID, 'FAIL','Laravel Scheduler Error !',$output);
+                NotificationHelper::Instance()->sendSchedErrNotify('hana:clean-session','every 15 minutes', $hanaClearSessionGUID, 'FAIL','Laravel Scheduler Error !',$output);
             }
         });
