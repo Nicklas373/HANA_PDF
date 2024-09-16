@@ -790,6 +790,7 @@ if (uploadDropzoneAlt) {
                                 ).src = apiUrl + thumbnailURL;
                         })
                         .catch(function (error) {
+                            console.log(error);
                             file.previewElement.querySelector(
                                 ".dz-image-thumbnail"
                             ).src = "/assets/icons/placeholder_pptx.svg";
@@ -1349,9 +1350,9 @@ function generateThumbnail(fileName) {
         xhr.setRequestHeader("Accept", "application/json");
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
+                if (xhr.status == 201) {
                     var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhrReturn.status == 200) {
+                    if (xhrReturn.status == 201) {
                         resolve(xhrReturn.files);
                     } else {
                         reject(
