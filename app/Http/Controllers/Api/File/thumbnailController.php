@@ -67,9 +67,10 @@ class thumbnailController extends Controller
                         );
                     }
                     $pdf = new Pdf($pdfPath);
-                    $pdf->setPage(1)
-                        ->saveImage($thumbnailFilePath);
-
+                    $pdf->selectPage(1)
+                        ->format(\Spatie\PdfToImage\Enums\OutputFormat::Png)
+                        ->quality(90)
+                        ->save($thumbnailFilePath);
                     return $this->returnFileMesage(
                         201,
                         'Thumbnail generated !',
