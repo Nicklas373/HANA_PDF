@@ -1,9 +1,9 @@
-# Use php:8.2-fpm-alpine as base image
-FROM php:8.2-fpm-alpine
+# Use php:8.3-fpm-alpine as base image
+FROM php:8.3-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.2"
+LABEL version="1.3"
 LABEL description="Docker application image for HANA PDF Apps"
 
 # Configure ARG
