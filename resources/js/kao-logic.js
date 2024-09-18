@@ -2922,7 +2922,7 @@ function submit(event) {
                                                         "animate-pulse"
                                                     );
                                                 xhrProcStats = false;
-                                                apiGateway("watermark", "img");
+                                                apiGateway("watermark", "txt");
                                             } else {
                                                 event.preventDefault();
                                                 errMessage.innerText =
