@@ -93,6 +93,37 @@ class splitController extends Controller
                 $batchValue = false;
                 $batchId = null;
                 $str = rand(1000,10000000);
+                if ($action == 'split' && $usedMethod == 'range') {
+                    if (empty($fromPage) || empty($toPage)) {
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Split failed !',
+                            null,
+                            null,
+                            'First or last page can not be empty !'
+                        );
+                    }
+                } else if ($action == 'split' && $usedMethod == 'custom') {
+                    if (empty($customInputSplitPage)) {
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Split failed !',
+                            null,
+                            null,
+                            'Custom or selected page can not be empty !'
+                        );
+                    }
+                }  else if ($action == 'delete' && $usedMethod == 'custom') {
+                    if (empty($customInputDeletePage)) {
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Split failed !',
+                            null,
+                            null,
+                            'Custom or selected page can not be empty !'
+                        );
+                    }
+                }
                 foreach ($files as $file) {
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);

@@ -27,15 +27,15 @@ class watermarkController extends Controller
             'file' => '',
             'imgFile' => '',
             'action' => ['required', 'in:img,txt'],
-            'wmFontColor' => ['nullable','regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'wmFontSize' => ['nullable', 'numeric'],
+            'wmFontColor' => ['required','regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'wmFontSize' => ['required', 'numeric'],
             'wmFontStyle' => ['required', 'in:Regular,Bold,Italic'],
             'wmFontFamily' => ['required', 'in:Arial,Arial Unicode MS,Comic Sans MS,Courier,Times New Roman,Verdana'],
             'wmLayoutStyle' => ['required', 'in:above,below'],
-            'wmRotation' => ['nullable', 'numeric'],
-            'wmPage' => ['nullable', 'regex:/^[0-9a-zA-Z,-]+$/'],
+            'wmRotation' => ['required', 'numeric'],
+            'wmPage' => ['required', 'regex:/^[0-9a-zA-Z,-]+$/'],
             'wmText' => ['nullable','string'],
-            'wmTransparency' => ['nullable', 'numeric'],
+            'wmTransparency' => ['required', 'numeric'],
             'wmMosaic' => ['required', 'in:true,false']
 		]);
 
@@ -104,6 +104,15 @@ class watermarkController extends Controller
                     }
                     if ($watermarkAction == 'img') {
                         $watermarkImage = $request->file('imgFile');
+                        if (empty($watermarkImage)) {
+                            return $this->returnDataMesage(
+                                400,
+                                'PDF Watermark failed !',
+                                null,
+                                null,
+                                'Image file for watermark can not be empty !'
+                            );
+                        }
                         $currentImageName = basename($watermarkImage);
                         $trimPhase1 = str_replace(' ', '_', $currentImageName);
                         $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
@@ -111,6 +120,16 @@ class watermarkController extends Controller
                         $watermarkImage->storeAs('public/upload', $wmImageName);
                     } else if ($watermarkAction == 'txt') {
                         $wmImageName = '';
+                        $watermarkText = $request->post('wmText');
+                        if (empty($watermarkImage)) {
+                            return $this->returnDataMesage(
+                                400,
+                                'PDF Watermark failed !',
+                                null,
+                                null,
+                                'Text for watermark can not be empty !'
+                            );
+                        }
                     } else {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -178,7 +197,6 @@ class watermarkController extends Controller
                     }
                     $watermarkRotation = $request->post('wmRotation');
                     $watermarkTransparency = $request->post('wmTransparency');
-                    $watermarkText = $request->post('wmText');
                     try {
                         $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                         $ilovepdfTask = $ilovepdf->newTask('watermark');
