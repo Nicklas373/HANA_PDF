@@ -34,12 +34,12 @@ return Application::configure(basePath: dirname(__DIR__))
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => 'JWTAuth - TokenExpiredException',
-                            'errStatus' => $message.' '.$isAjax
+                            'errStatus' => $message
                         ]);
                     } catch (QueryException $ex) {
                         Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -56,12 +56,12 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => 'JWTAuth - TokenInvalidException',
-                            'errStatus' => $message.' '.$isAjax
+                            'errStatus' => $message
                         ]);
                     } catch (QueryException $ex) {
                         Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -78,12 +78,12 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
                             'errReason' => 'JWTAuth - JWTException',
-                            'errStatus' => $message.' '.$isAjax
+                            'errStatus' => $message
                         ]);
                     } catch (QueryException $ex) {
                         Log::error('Query Exception failed with: '. $ex->getMessage());
@@ -130,7 +130,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -152,7 +152,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -174,7 +174,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -215,7 +215,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -237,7 +237,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -259,7 +259,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -310,7 +310,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -332,7 +332,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,
@@ -354,7 +354,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     }
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
-                    Log::error($message.' test '.$isAjax);
+                    Log::error($message);
                     try {
                         DB::table('appLogs')->insert([
                             'processId' => $uuid,

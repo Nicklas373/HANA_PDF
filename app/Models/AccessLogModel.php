@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class appLogModel extends Model
+class accessLogModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'appLogs';
+    protected $table = 'accessLogs';
 
     protected $fillable = [
+        'accessId',
         'processId',
-        'errReason',
-        'errStatus'
+        'routePath',
+        'accessIpAddress'
     ];
 }

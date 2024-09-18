@@ -12,7 +12,7 @@ class CleanUp extends Command
      *
      * @var string
      */
-    protected $signature = 'hana:CleanUp';
+    protected $signature = 'hana:clean-storage';
 
     /**
      * The console command description.

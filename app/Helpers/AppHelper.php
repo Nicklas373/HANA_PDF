@@ -19,13 +19,6 @@ class AppHelper
         }
     }
 
-    function count($path)
-    {
-        $pdf = file_get_contents($path);
-        $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
-        return $number;
-    }
-
     function convert($size,$unit)
     {
         if ($unit == "KB") {
@@ -103,17 +96,6 @@ class AppHelper
     function get_guid() {
         $guid = Str::uuid();
         return $guid;
-    }
-
-    function getUserIpAddr(){
-        if( !empty($_SERVER['HTTP_CLIENT_IP'])){
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-        }
-        return $ip;
     }
 
     public static function instance()
