@@ -2,9 +2,9 @@ services:
     hana-app-pdf:
         image: nicklas373/hana-app-pdf-sit:1.3
         container_name: "hana-app-pdf"
-        cpus: 1.0
-        mem_limit: 256m
-        mem_reservation: 128M
+        cpus: 2.0
+        mem_limit: 512M
+        mem_reservation: 256M
         restart: unless-stopped
         working_dir: /var/www/html/hanaci-pdf
         environment:
@@ -17,11 +17,11 @@ services:
             - hana-api-services
             - hana-instance-services
     hana-api-services:
-        image: nicklas373/hana-api-services-sit:1.4
+        image: nicklas373/hana-api-services-sit:1.5
         container_name: "hana-api-services"
         cpus: 2.0
-        mem_limit: 1024M
-        mem_reservation: 512M
+        mem_limit: 512M
+        mem_reservation: 256M
         restart: always
         working_dir: /var/www/html/hanaci-api
         environment:
@@ -61,7 +61,7 @@ services:
         image: nicklas373/hana-instance-services-sit:1.3
         container_name: "hana-instance-services"
         cpus: 2.0
-        mem_limit: 1024M
+        mem_limit: 1G
         mem_reservation: 512M
         restart: always
         ports:
