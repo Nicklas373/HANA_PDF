@@ -3,7 +3,7 @@ FROM php:8.3-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.4"
+LABEL version="1.5"
 LABEL description="Docker container for https://gw.hana-ci.com"
 
 # Configure ARG
@@ -42,8 +42,14 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) gd zip pdo_pgsql ftp sodium
 
 # Install Imagick extension
-RUN pecl install imagick && \
-    docker-php-ext-enable imagick
+RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz \
+    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && rm -rf /tmp/*
 
 # Configure Python modules
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
