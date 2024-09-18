@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Spatie\PdfToImage\Pdf;
 
 class uploadController extends Controller
 {
@@ -36,7 +37,7 @@ class uploadController extends Controller
                 $file->storeAs('public/upload', $pdfFileName);
                 if (Storage::disk('local')->exists('public/'.$pdfUpload_Location.'/'.$pdfFileName)) {
                     return $this->returnFileMesage(
-                        200,
+                        201,
                         'File uploaded successfully !',
                         Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$pdfFileName),
                         null
@@ -126,15 +127,14 @@ class uploadController extends Controller
                 $currentFileNameExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                 $pdfUpload_Location = env('PDF_UPLOAD');
                 $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                $fileSize = filesize($newFilePath);
-                $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                 if (file_exists($newFilePath)) {
                     if ($currentFileNameExtension == 'pdf') {
                         try {
-                            $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                            $pdf = new Pdf($pdfNewPath);
+                            $pdfTotalPages = $pdf->pageCount();
                             return $this->returnDataMesage(
                                 200,
-                                'PDF Page successfully generated',
+                                'PDF Page successfully counted',
                                 $pdfTotalPages,
                                 null,
                                 null
