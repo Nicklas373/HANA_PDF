@@ -69,23 +69,23 @@
                                 <li id="wmColImageLayoutStyleA" class="bg-transparent border-2 lg:w-2/6 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2">
                                     <input type="text" id="wmColImageLayoutStyleInputA" style="display: none;" value="wmImage">
                                     <div class="flex" id="wmChkImageLayoutStyleA">
-                                    <div class="flex h-5 items-center">
-                                        <input id="wmRadioImageLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioImageLayoutStyleTextA" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
-                                    </div>
-                                    <div class="ml-4">
-                                        <label for="wmRadioImageLayoutStyleA" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioImageLayoutStyleTextA">Above content</label>
-                                    </div>
+                                        <div class="flex h-5 items-center">
+                                            <input id="wmRadioImageLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioImageLayoutStyleTextA" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
+                                        </div>
+                                        <div class="ml-4">
+                                            <label for="wmRadioImageLayoutStyleA" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioImageLayoutStyleTextA">Above content</label>
+                                        </div>
                                     </div>
                                 </li>
                                 <li id="wmColImageLayoutStyleB" class="bg-transparent border-2 lg:w-2/6 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2">
                                     <input type="text" id="wmColImageLayoutStyleInputB" style="display: none;" value="wmImage">
                                     <div class="flex" id="wmChkImageLayoutStyleB">
-                                    <div class="flex h-5 items-center">
-                                        <input id="wmRadioImageLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioImageLayoutStyleTextB" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
-                                    </div>
-                                    <div class="ml-4">
-                                        <label for="wmRadioImageLayoutStyleB" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioImageLayoutStyleTextB">Below content</label>
-                                    </div>
+                                        <div class="flex h-5 items-center">
+                                            <input id="wmRadioImageLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioImageLayoutStyleTextB" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
+                                        </div>
+                                        <div class="ml-4">
+                                            <label for="wmRadioImageLayoutStyleB" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioImageLayoutStyleTextB">Below content</label>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -161,31 +161,31 @@
                                 <option value="Italic">Italic</option>
                             </select>
                         </div>
-                        <div class="mb-8 mt-4">
+                        <div class="mb-6">
                             <label for="wmRadioLayoutStyleA" class="block mb-2 font-quicksand text-xl font-bold text-pc4">Layer</label>
-                            <ul class="grid grid-cols-1 gap-2 xl:grid-cols-3 xl:gap-4">
-                            <li id="wmColLayoutStyleA" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
-                                <input type="text" id="wmRadioLayoutStyleInputA" style="display: none;" value="wmText">
-                                <div class="flex" id="wmChkLayoutStyleA">
-                                    <div class="flex h-5 items-center">
-                                        <input id="wmRadioLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioLayoutStyleTextA" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0"/>
+                            <ul class="flex flex-col lg:flex-row mt-2">
+                                <li id="wmColLayoutStyleA" class="bg-transparent border-2 lg:w-2/6 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2">
+                                    <input type="text" id="wmRadioLayoutStyleInputA" style="display: none;" value="wmText">
+                                    <div class="flex" id="wmChkLayoutStyleA">
+                                        <div class="flex h-5 items-center">
+                                            <input id="wmRadioLayoutStyleA" name="watermarkLayoutStyle" value="above" aria-describedby="helper-wmRadioLayoutStyleTextA" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
+                                        </div>
+                                        <div class="ml-4">
+                                            <label for="wmRadioLayoutStyleA" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioLayoutStyleTextA">Above content</label>
+                                        </div>
                                     </div>
-                                    <div class="ml-4">
-                                        <label for="wmRadioLayoutStyleA" class="font-quicksand text-sm font-semibold text-pc4 mt-4 h-10 w-10 ms-4" id="wmRadioLayoutStyleTextA">Above content</label>
+                                </li>
+                                <li id="wmColLayoutStyleB" class="bg-transparent border-2 lg:w-2/6 border-lt backdrop-filter backdrop-blur-md rounded-lg bg-opacity-50 p-2 mt-2 mx-2">
+                                    <input type="text" id="wmRadioLayoutSytleInputB" style="display: none;" value="wmText">
+                                    <div class="flex" id="wmChkLayoutStyleB">
+                                        <div class="flex h-5 items-center">
+                                            <input id="wmRadioLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioLayoutStyleTextB" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0">
+                                        </div>
+                                        <div class="ml-4">
+                                            <label for="wmRadioLayoutStyleB" class="font-semibold text-md text-lt1 font-quicksand" id="wmRadioLayoutStyleTextB">Below content</label>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                            <li id="wmColLayoutStyleB" class="border border-slate-200 p-2 mt-2 rounded hover:border-sky-400">
-                                <input type="text" id="wmRadioLayoutSytleInputB" style="display: none;" value="wmText">
-                                <div class="flex" id="wmChkLayoutStyleB">
-                                    <div class="flex h-5 items-center">
-                                        <input id="wmRadioLayoutStyleB" name="watermarkLayoutStyle" value="below" aria-describedby="helper-wmRadioLayoutStyleTextB" type="radio" class="w-4 h-4 mt-1.5 text-ac border-ac ring-ac ring-0 hover:ring-2 hover:ring-ac focus:ring-0"/>
-                                    </div>
-                                    <div class="ml-4">
-                                        <label for="wmRadioLayoutStyleB" class="font-quicksand text-sm font-semibold text-pc4 mt-4 h-10 w-10 ms-4" id="wmRadioLayoutStyleTextB">Below content</label>
-                                    </div>
-                                </div>
-                            </li>
+                                </li>
                             </ul>
                         </div>
                         <div class="mb-8 mt-4">
