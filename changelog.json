@@ -1,5 +1,14 @@
 [
   {
+    "release_date": "September, 21 2024",
+    "version": "3.3.4",
+    "changelog": [
+      "Fix issue undefinite loading process for watermark PDF",
+      "Fix issue when doing split or watermark that use custom page options",
+      "Reduce respons time to pop up notification, when file are not uploaded"
+    ]
+  },
+  {
     "release_date": "September, 16 2024",
     "version": "3.3.3",
     "changelog": [
@@ -10,7 +19,8 @@
       "Migrate our backend base to Laravel 11.x from Laravel 10.x (Backend version 3.4.1)",
       "Updating our internal libraries to latest version"
     ]
-  },{
+  },
+  {
     "release_date": "August, 25 2024",
     "version": "3.3.1",
     "changelog": [
