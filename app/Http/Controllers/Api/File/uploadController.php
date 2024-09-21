@@ -130,7 +130,7 @@ class uploadController extends Controller
                 if (file_exists($newFilePath)) {
                     if ($currentFileNameExtension == 'pdf') {
                         try {
-                            $pdf = new Pdf($pdfNewPath);
+                            $pdf = new Pdf($newFilePath);
                             $pdfTotalPages = $pdf->pageCount();
                             return $this->returnDataMesage(
                                 200,
