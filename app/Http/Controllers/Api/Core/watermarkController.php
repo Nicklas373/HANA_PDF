@@ -27,13 +27,13 @@ class watermarkController extends Controller
             'file' => '',
             'imgFile' => '',
             'action' => ['required', 'in:img,txt'],
-            'wmFontColor' => ['required','regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'wmFontSize' => ['required', 'numeric'],
+            'wmFontColor' => ['nullable','regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'wmFontSize' => ['nullable', 'numeric'],
             'wmFontStyle' => ['required', 'in:Regular,Bold,Italic'],
             'wmFontFamily' => ['required', 'in:Arial,Arial Unicode MS,Comic Sans MS,Courier,Times New Roman,Verdana'],
             'wmLayoutStyle' => ['required', 'in:above,below'],
             'wmRotation' => ['required', 'numeric'],
-            'wmPage' => ['required', 'regex:/^[0-9a-zA-Z,-]+$/'],
+            'wmPage' => ['required', 'regex:/^(all|[0-9,-]+)$/'],
             'wmText' => ['nullable','string'],
             'wmTransparency' => ['required', 'numeric'],
             'wmMosaic' => ['required', 'in:true,false']
@@ -118,10 +118,11 @@ class watermarkController extends Controller
                         $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
                         $wmImageName = $newFileNameWithoutExtension.'.'.$randomizeImageExtension;
                         $watermarkImage->storeAs('public/upload', $wmImageName);
+                        $watermarkText = null;
                     } else if ($watermarkAction == 'txt') {
-                        $wmImageName = '';
                         $watermarkText = $request->post('wmText');
-                        if (empty($watermarkImage)) {
+                        $wmImageName = null;
+                        if (empty($watermarkText)) {
                             return $this->returnDataMesage(
                                 400,
                                 'PDF Watermark failed !',
