@@ -4,35 +4,17 @@
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 4,
-      "patchVersion": 1,
-      "gitRevision": "15b0c56"
+      "patchVersion": 2,
+      "gitRevision": "cfa987e"
     }
-  },
-  {
-    "appServices": "BE-DEV",
-    "versioning": {
-      "majorVersion": 3,
-      "minorVersion": 3,
-      "patchVersion": 1,
-      "gitRevision": "bdd7096"
-    }
-  },
+  }
   {
     "appServices": "FE",
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 3,
-      "patchVersion": 3,
-      "gitRevision": "6f44ef8"
-    }
-  },
-  {
-    "appServices": "FE-DEV",
-    "versioning": {
-      "majorVersion": 3,
-      "minorVersion": 3,
-      "patchVersion": 0,
-      "gitRevision": "ae2c9d7"
+      "patchVersion": 4,
+      "gitRevision": "6fbd0e5"
     }
   }
 ]
