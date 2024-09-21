@@ -1,20 +1,20 @@
 [
-  {
-    "appServices": "BE",
-    "versioning": {
-      "majorVersion": 3,
-      "minorVersion": 4,
-      "patchVersion": 2,
-      "gitRevision": "cfa987e"
+    {
+        "appServices": "BE",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 4,
+            "patchVersion": 2,
+            "gitRevision": "cfa987e"
+        }
+    },
+    {
+        "appServices": "FE",
+        "versioning": {
+            "majorVersion": 3,
+            "minorVersion": 3,
+            "patchVersion": 4,
+            "gitRevision": "6fbd0e5"
+        }
     }
-  }
-  {
-    "appServices": "FE",
-    "versioning": {
-      "majorVersion": 3,
-      "minorVersion": 3,
-      "patchVersion": 4,
-      "gitRevision": "6fbd0e5"
-    }
-  }
 ]
