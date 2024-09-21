@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 3;
+const appPatchVer = 4;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
@@ -152,10 +152,8 @@ if (procBtn) {
                     errSubMessage.innerText = "";
                     errListTitleMessage.innerText = "Error message";
                     resetErrListMessage();
+                    generateMesssage("Versioning validation failed");
                     generateMesssage(error.versioningMessage);
-                    generateMesssage(
-                        "Please clear cache the browser and try again"
-                    );
                     errAltSubMessageModal.style = null;
                     loadingModal.hide();
                     errModal.show();
@@ -790,7 +788,6 @@ if (uploadDropzoneAlt) {
                                 ).src = apiUrl + thumbnailURL;
                         })
                         .catch(function (error) {
-                            console.log(error);
                             file.previewElement.querySelector(
                                 ".dz-image-thumbnail"
                             ).src = "/assets/icons/placeholder_pptx.svg";
@@ -1839,7 +1836,7 @@ function submit(event) {
                             generateMesssage(
                                 "Remaining monthly limit (" +
                                     xhrBalanceRemaining +
-                                    " out of 250)"
+                                    " out of 2500)"
                             );
                             errAltSubMessageModal.style = null;
                             loadingModal.hide();
@@ -1886,33 +1883,52 @@ function submit(event) {
                 var cnvdocx = document.getElementById("fourthRadio");
                 cnvdocx.style.borderColor = "#4DAAAA";
             }
-            if (xhrBalance && xhrBalanceRemaining > 0) {
-                procTitleMessageModal.innerText = "Processing document";
-                errMessage.style.visibility = null;
-                errSubMessage.style.visibility = null;
-                errAltSubMessageModal.style.display = "none";
-                errModal.hide();
-                loadingModal.show();
-                if (document.getElementById("cnvFrPDF") !== null) {
-                    altLoadingMessageModal.innerText = "Processing document";
-                    document
-                        .getElementById("altLoadingModal")
-                        .classList.remove("hidden");
-                    document
-                        .getElementById("dropzoneCnvFrPDF")
-                        .classList.add("animate-pulse");
-                    xhrProcStats = false;
-                    apiGateway("convert", "");
+            if (getUploadedFileName().length > 0) {
+                if (xhrBalance && xhrBalanceRemaining > 0) {
+                    procTitleMessageModal.innerText = "Processing document";
+                    errMessage.style.visibility = null;
+                    errSubMessage.style.visibility = null;
+                    errAltSubMessageModal.style.display = "none";
+                    errModal.hide();
+                    loadingModal.show();
+                    if (document.getElementById("cnvFrPDF") !== null) {
+                        altLoadingMessageModal.innerText =
+                            "Processing document";
+                        document
+                            .getElementById("altLoadingModal")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("dropzoneCnvFrPDF")
+                            .classList.add("animate-pulse");
+                        xhrProcStats = false;
+                        apiGateway("convert", "");
+                    } else {
+                        altLoadingMessageModal.innerText =
+                            "Processing document";
+                        document
+                            .getElementById("altLoadingModal")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("dropzoneCmp")
+                            .classList.add("animate-pulse");
+                        xhrProcStats = false;
+                        apiGateway("compress", "");
+                    }
                 } else {
-                    altLoadingMessageModal.innerText = "Processing document";
-                    document
-                        .getElementById("altLoadingModal")
-                        .classList.remove("hidden");
-                    document
-                        .getElementById("dropzoneCmp")
-                        .classList.add("animate-pulse");
-                    xhrProcStats = false;
-                    apiGateway("compress", "");
+                    event.preventDefault();
+                    errMessage.innerText =
+                        "Document file can not be processed !";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message";
+                    resetErrListMessage();
+                    generateMesssage(
+                        "Remaining monthly limit (" +
+                            xhrBalanceRemaining +
+                            " out of 2500)"
+                    );
+                    errAltSubMessageModal.style = null;
+                    loadingModal.hide();
+                    errModal.show();
                 }
             } else {
                 event.preventDefault();
@@ -1920,11 +1936,7 @@ function submit(event) {
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
-                generateMesssage(
-                    "Remaining monthly limit (" +
-                        xhrBalanceRemaining +
-                        " out of 250)"
-                );
+                generateMesssage("No file has been chosen");
                 errAltSubMessageModal.style = null;
                 loadingModal.hide();
                 errModal.show();
@@ -1990,7 +2002,7 @@ function submit(event) {
                 generateMesssage(
                     "Remaining monthly limit (" +
                         xhrBalanceRemaining +
-                        " out of 250)"
+                        " out of 2500)"
                 );
                 errAltSubMessageModal.style = null;
                 loadingModal.hide();
@@ -2008,82 +2020,44 @@ function submit(event) {
             errModal.show();
         }
     } else if (document.getElementById("splitLayout1")) {
-        if (document.getElementById("firstRadio").checked) {
-            let cusPage = false;
-            let fromPage = false;
-            let toPage = false;
-            var customPage = document.getElementById("customPageSplit");
-            var firstPage = document.getElementById("fromPage");
-            var lastPage = document.getElementById("toPage");
-            if (document.getElementById("thirdRadio").checked) {
-                if (document.getElementById("fromPage").value) {
-                    fromPage = true;
-                } else {
-                    fromPage = false;
-                }
-                if (document.getElementById("toPage").value) {
-                    toPage = true;
-                } else {
-                    toPage = false;
-                }
-                getTotalPages(getUploadedFileName()[0].replace(/\s/g, "_"))
-                    .then((totalPages) => {
-                        if (totalPages.totalPages == false) {
-                            event.preventDefault();
-                            errMessage.innerText =
-                                "There was unexpected error !";
-                            errListTitleMessage.innerText = "Error message";
-                            errAltSubMessageModal.style = null;
-                            resetErrListMessage();
-                            generateMesssage(
-                                "Failed to get total page from PDF"
-                            );
-                            loadingModal.hide();
-                            errModal.show();
-                        } else {
-                            if (fromPage && toPage) {
-                                if (
-                                    document
-                                        .getElementById("fromPage")
-                                        .value.charAt(0) == "-"
-                                ) {
-                                    event.preventDefault();
-                                    errMessage.innerText =
-                                        "Invalid page number range!";
-                                    errListTitleMessage.innerText =
-                                        "Error message";
-                                    errAltSubMessageModal.style = null;
-                                    resetErrListMessage();
-                                    generateMesssage(
-                                        "Page number can not use negative number"
-                                    );
-                                    firstPage.style.borderColor = "#A84E4E";
-                                    loadingModal.hide();
-                                    errModal.show();
-                                } else if (
-                                    document
-                                        .getElementById("toPage")
-                                        .value.charAt(0) == "-"
-                                ) {
-                                    event.preventDefault();
-                                    errMessage.innerText =
-                                        "Invalid page number range!";
-                                    errListTitleMessage.innerText =
-                                        "Error message";
-                                    errAltSubMessageModal.style = null;
-                                    resetErrListMessage();
-                                    generateMesssage(
-                                        "Page number can not use negative number"
-                                    );
-                                    lastPage.style.borderColor = "#A84E4E";
-                                    loadingModal.hide();
-                                    errModal.show();
-                                } else {
+        if (getUploadedFileName().length > 0) {
+            if (document.getElementById("firstRadio").checked) {
+                let cusPage = false;
+                let fromPage = false;
+                let toPage = false;
+                var customPage = document.getElementById("customPageSplit");
+                var firstPage = document.getElementById("fromPage");
+                var lastPage = document.getElementById("toPage");
+                if (document.getElementById("thirdRadio").checked) {
+                    if (document.getElementById("fromPage").value) {
+                        fromPage = true;
+                    } else {
+                        fromPage = false;
+                    }
+                    if (document.getElementById("toPage").value) {
+                        toPage = true;
+                    } else {
+                        toPage = false;
+                    }
+
+                    getTotalPages(getUploadedFileName()[0].replace(/\s/g, "_"))
+                        .then((totalPages) => {
+                            if (totalPages.totalPages == false) {
+                                event.preventDefault();
+                                errMessage.innerText =
+                                    "There was unexpected error !";
+                                errListTitleMessage.innerText = "Error message";
+                                errAltSubMessageModal.style = null;
+                                resetErrListMessage();
+                                generateMesssage(totalPages.totalPagesError);
+                                loadingModal.hide();
+                                errModal.show();
+                            } else {
+                                if (fromPage && toPage) {
                                     if (
-                                        parseInt(
-                                            document.getElementById("fromPage")
-                                                .value
-                                        ) > totalPages.totalPagesMessage
+                                        document
+                                            .getElementById("fromPage")
+                                            .value.charAt(0) == "-"
                                     ) {
                                         event.preventDefault();
                                         errMessage.innerText =
@@ -2093,16 +2067,15 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "First page can not be more than total page"
+                                            "Page number can not use negative number"
                                         );
                                         firstPage.style.borderColor = "#A84E4E";
                                         loadingModal.hide();
                                         errModal.show();
                                     } else if (
-                                        parseInt(
-                                            document.getElementById("toPage")
-                                                .value
-                                        ) > totalPages.totalPagesMessage
+                                        document
+                                            .getElementById("toPage")
+                                            .value.charAt(0) == "-"
                                     ) {
                                         event.preventDefault();
                                         errMessage.innerText =
@@ -2112,7 +2085,7 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "Last page can not be more than total page"
+                                            "Page number can not use negative number"
                                         );
                                         lastPage.style.borderColor = "#A84E4E";
                                         loadingModal.hide();
@@ -2123,12 +2096,7 @@ function submit(event) {
                                                 document.getElementById(
                                                     "fromPage"
                                                 ).value
-                                            ) >
-                                            parseInt(
-                                                document.getElementById(
-                                                    "toPage"
-                                                ).value
-                                            )
+                                            ) > totalPages.totalPagesMessage
                                         ) {
                                             event.preventDefault();
                                             errMessage.innerText =
@@ -2138,7 +2106,7 @@ function submit(event) {
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage(
-                                                "First page can not be more than last page"
+                                                "First page can not be more than total page"
                                             );
                                             firstPage.style.borderColor =
                                                 "#A84E4E";
@@ -2149,12 +2117,7 @@ function submit(event) {
                                                 document.getElementById(
                                                     "toPage"
                                                 ).value
-                                            ) <
-                                            parseInt(
-                                                document.getElementById(
-                                                    "fromPage"
-                                                ).value
-                                            )
+                                            ) > totalPages.totalPagesMessage
                                         ) {
                                             event.preventDefault();
                                             errMessage.innerText =
@@ -2164,29 +2127,82 @@ function submit(event) {
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage(
-                                                "Last page can not be less than first page"
+                                                "Last page can not be more than total page"
                                             );
-                                            firstPage.style.borderColor =
+                                            lastPage.style.borderColor =
                                                 "#A84E4E";
                                             loadingModal.hide();
                                             errModal.show();
                                         } else {
-                                            procTitleMessageModal.innerText =
-                                                "Processing document";
-                                            errMessage.style.visibility = null;
-                                            errSubMessage.style.visibility =
-                                                null;
-                                            errAltSubMessageModal.style.display =
-                                                "none";
-                                            errModal.hide();
-                                            loadingModal.show();
                                             if (
-                                                getUploadedFileName().length > 0
+                                                parseInt(
+                                                    document.getElementById(
+                                                        "fromPage"
+                                                    ).value
+                                                ) >
+                                                parseInt(
+                                                    document.getElementById(
+                                                        "toPage"
+                                                    ).value
+                                                )
                                             ) {
+                                                event.preventDefault();
+                                                errMessage.innerText =
+                                                    "Invalid page number range!";
+                                                errListTitleMessage.innerText =
+                                                    "Error message";
+                                                errAltSubMessageModal.style =
+                                                    null;
+                                                resetErrListMessage();
+                                                generateMesssage(
+                                                    "First page can not be more than last page"
+                                                );
+                                                firstPage.style.borderColor =
+                                                    "#A84E4E";
+                                                loadingModal.hide();
+                                                errModal.show();
+                                            } else if (
+                                                parseInt(
+                                                    document.getElementById(
+                                                        "toPage"
+                                                    ).value
+                                                ) <
+                                                parseInt(
+                                                    document.getElementById(
+                                                        "fromPage"
+                                                    ).value
+                                                )
+                                            ) {
+                                                event.preventDefault();
+                                                errMessage.innerText =
+                                                    "Invalid page number range!";
+                                                errListTitleMessage.innerText =
+                                                    "Error message";
+                                                errAltSubMessageModal.style =
+                                                    null;
+                                                resetErrListMessage();
+                                                generateMesssage(
+                                                    "Last page can not be less than first page"
+                                                );
+                                                firstPage.style.borderColor =
+                                                    "#A84E4E";
+                                                loadingModal.hide();
+                                                errModal.show();
+                                            } else {
                                                 if (
                                                     xhrBalance &&
                                                     xhrBalanceRemaining > 0
                                                 ) {
+                                                    procTitleMessageModal.innerText =
+                                                        "Processing document";
+                                                    errMessage.style.visibility =
+                                                        null;
+                                                    errSubMessage.style.visibility =
+                                                        null;
+                                                    errAltSubMessageModal.style.display =
+                                                        "none";
+                                                    errModal.hide();
+                                                    loadingModal.show();
                                                     altLoadingMessageModal.innerText =
                                                         "Processing document";
                                                     document
@@ -2220,13 +2236,162 @@ function submit(event) {
                                                     generateMesssage(
                                                         "Remaining monthly limit (" +
                                                             xhrBalanceRemaining +
-                                                            " out of 250)"
+                                                            " out of 2500)"
                                                     );
                                                     errAltSubMessageModal.style =
                                                         null;
                                                     loadingModal.hide();
                                                     errModal.show();
                                                 }
+                                            }
+                                        }
+                                    }
+                                } else if (!fromPage && !toPage) {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Please fill out these fields!";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText =
+                                        "Required fields:";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage("First Pages");
+                                    generateMesssage("Last Pages");
+                                    firstPage.style.borderColor = "#A84E4E";
+                                    lastPage.style.borderColor = "#A84E4E";
+                                    loadingModal.hide();
+                                    errModal.show();
+                                } else if (!fromPage && toPage) {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Please fill out these fields!";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText =
+                                        "Required fields:";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage("First Pages");
+                                    firstPage.style.borderColor = "#A84E4E";
+                                    loadingModal.hide();
+                                    errModal.show();
+                                } else if (fromPage && !toPage) {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Please fill out these fields!";
+                                    errSubMessage.innerText = "";
+                                    errListTitleMessage.innerText =
+                                        "Required fields:";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage("Last Pages");
+                                    lastPage.style.borderColor = "#A84E4E";
+                                    loadingModal.hide();
+                                    errModal.show();
+                                } else {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Index out of bound!";
+                                    errSubMessage.innerText = "";
+                                    errAltSubMessageModal.style = null;
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    resetErrListMessage();
+                                    generateMesssage(
+                                        "Split selected page logic error"
+                                    );
+                                    errAltSubMessageModal.style = null;
+                                    loadingModal.hide();
+                                    errModal.show();
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            event.preventDefault();
+                            errMessage.innerText = "Invalid page number range!";
+                            errListTitleMessage.innerText = "Error message";
+                            errAltSubMessageModal.style = null;
+                            resetErrListMessage();
+                            generateMesssage(error.totalPagesError);
+                            loadingModal.hide();
+                            errModal.show();
+                        });
+                } else if (document.getElementById("fourthRadio").checked) {
+                    if (document.getElementById("customPageSplit").value) {
+                        cusPage = true;
+                    } else {
+                        cusPage = false;
+                    }
+                    if (cusPage) {
+                        var cusPageValue =
+                            document.getElementById("customPageSplit").value;
+                        if (!isNaN(cusPageValue)) {
+                            getTotalPages(
+                                getUploadedFileName()[0].replace(/\s/g, "_")
+                            )
+                                .then((totalPages) => {
+                                    if (totalPages.totalPages == false) {
+                                        event.preventDefault();
+                                        errMessage.innerText =
+                                            "There was unexpected error !";
+                                        errListTitleMessage.innerText =
+                                            "Error message";
+                                        errAltSubMessageModal.style = null;
+                                        resetErrListMessage();
+                                        generateMesssage(
+                                            totalPages.totalPagesError
+                                        );
+                                        loadingModal.hide();
+                                        errModal.show();
+                                    } else {
+                                        if (
+                                            parseInt(cusPageValue) >
+                                            totalPages.totalPagesMessage
+                                        ) {
+                                            event.preventDefault();
+                                            errMessage.innerText =
+                                                "Invalid page number range!";
+                                            errListTitleMessage.innerText =
+                                                "Error message";
+                                            errAltSubMessageModal.style = null;
+                                            resetErrListMessage();
+                                            generateMesssage(
+                                                "Custom page can not be more than total page"
+                                            );
+                                            customPage.style.borderColor =
+                                                "#A84E4E";
+                                            loadingModal.hide();
+                                            errModal.show();
+                                        } else {
+                                            if (
+                                                xhrBalance &&
+                                                xhrBalanceRemaining > 0
+                                            ) {
+                                                procTitleMessageModal.innerText =
+                                                    "Processing document";
+                                                errMessage.style.visibility =
+                                                    null;
+                                                errSubMessage.style.visibility =
+                                                    null;
+                                                errAltSubMessageModal.style.display =
+                                                    "none";
+                                                errModal.hide();
+                                                loadingModal.show();
+                                                altLoadingMessageModal.innerText =
+                                                    "Processing document";
+                                                document
+                                                    .getElementById(
+                                                        "altLoadingModal"
+                                                    )
+                                                    .classList.remove("hidden");
+                                                document
+                                                    .getElementById(
+                                                        "dropzoneSplit"
+                                                    )
+                                                    .classList.add(
+                                                        "animate-pulse"
+                                                    );
+                                                xhrProcStats = false;
+                                                apiGateway("split", "split");
                                             } else {
                                                 event.preventDefault();
                                                 errMessage.innerText =
@@ -2236,7 +2401,9 @@ function submit(event) {
                                                     "Error message";
                                                 resetErrListMessage();
                                                 generateMesssage(
-                                                    "No file has been chosen"
+                                                    "Remaining monthly limit (" +
+                                                        xhrBalanceRemaining +
+                                                        " out of 2500)"
                                                 );
                                                 errAltSubMessageModal.style =
                                                     null;
@@ -2245,86 +2412,89 @@ function submit(event) {
                                             }
                                         }
                                     }
-                                }
-                            } else if (!fromPage && !toPage) {
-                                event.preventDefault();
-                                errMessage.innerText =
-                                    "Please fill out these fields!";
-                                errSubMessage.innerText = "";
-                                errListTitleMessage.innerText =
-                                    "Required fields:";
-                                errAltSubMessageModal.style = null;
-                                resetErrListMessage();
-                                generateMesssage("First Pages");
-                                generateMesssage("Last Pages");
-                                firstPage.style.borderColor = "#A84E4E";
-                                lastPage.style.borderColor = "#A84E4E";
-                                loadingModal.hide();
-                                errModal.show();
-                            } else if (!fromPage && toPage) {
-                                event.preventDefault();
-                                errMessage.innerText =
-                                    "Please fill out these fields!";
-                                errSubMessage.innerText = "";
-                                errListTitleMessage.innerText =
-                                    "Required fields:";
-                                errAltSubMessageModal.style = null;
-                                resetErrListMessage();
-                                generateMesssage("First Pages");
-                                firstPage.style.borderColor = "#A84E4E";
-                                loadingModal.hide();
-                                errModal.show();
-                            } else if (fromPage && !toPage) {
-                                event.preventDefault();
-                                errMessage.innerText =
-                                    "Please fill out these fields!";
-                                errSubMessage.innerText = "";
-                                errListTitleMessage.innerText =
-                                    "Required fields:";
-                                errAltSubMessageModal.style = null;
-                                resetErrListMessage();
-                                generateMesssage("Last Pages");
-                                lastPage.style.borderColor = "#A84E4E";
-                                loadingModal.hide();
-                                errModal.show();
+                                })
+                                .catch((error) => {
+                                    event.preventDefault();
+                                    errMessage.innerText =
+                                        "Invalid page number range!";
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    errAltSubMessageModal.style = null;
+                                    resetErrListMessage();
+                                    generateMesssage(error.totalPagesError);
+                                    loadingModal.hide();
+                                    errModal.show();
+                                });
+                        } else {
+                            procTitleMessageModal.innerText =
+                                "Processing document";
+                            errMessage.style.visibility = null;
+                            errSubMessage.style.visibility = null;
+                            errAltSubMessageModal.style.display = "none";
+                            errModal.hide();
+                            loadingModal.show();
+                            if (xhrBalance && xhrBalanceRemaining > 0) {
+                                altLoadingMessageModal.innerText =
+                                    "Processing document";
+                                document
+                                    .getElementById("altLoadingModal")
+                                    .classList.remove("hidden");
+                                document
+                                    .getElementById("dropzoneSplit")
+                                    .classList.add("animate-pulse");
+                                xhrProcStats = false;
+                                apiGateway("split", "split");
                             } else {
                                 event.preventDefault();
-                                errMessage.innerText = "Index out of bound!";
+                                errMessage.innerText =
+                                    "Document file can not be processed !";
                                 errSubMessage.innerText = "";
-                                errAltSubMessageModal.style = null;
                                 errListTitleMessage.innerText = "Error message";
                                 resetErrListMessage();
                                 generateMesssage(
-                                    "Split selected page logic error"
+                                    "Remaining monthly limit (" +
+                                        xhrBalanceRemaining +
+                                        " out of 2500)"
                                 );
                                 errAltSubMessageModal.style = null;
                                 loadingModal.hide();
                                 errModal.show();
                             }
                         }
-                    })
-                    .catch((error) => {
+                    } else {
                         event.preventDefault();
-                        errMessage.innerText = "Invalid page number range!";
-                        errListTitleMessage.innerText = "Error message";
+                        errMessage.innerText = "Please fill out these fields!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Required fields:";
                         errAltSubMessageModal.style = null;
                         resetErrListMessage();
-                        generateMesssage(
-                            "Failed to fetch total document pages"
-                        );
-                        console.log(error);
+                        generateMesssage("Custom Pages");
+                        customPage.style.borderColor = "#A84E4E";
                         loadingModal.hide();
                         errModal.show();
-                    });
-            } else if (document.getElementById("fourthRadio").checked) {
-                if (document.getElementById("customPageSplit").value) {
+                    }
+                } else {
+                    event.preventDefault();
+                    errMessage.innerText = "Index out of bound!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Error message";
+                    resetErrListMessage();
+                    generateMesssage("Cannot define selected or custom page");
+                    errAltSubMessageModal.style = null;
+                    loadingModal.hide();
+                    errModal.show();
+                }
+            } else if (document.getElementById("secondRadio").checked) {
+                let cusPage;
+                var customPage = document.getElementById("customPageDelete");
+                if (document.getElementById("customPageDelete").value) {
                     cusPage = true;
                 } else {
                     cusPage = false;
                 }
                 if (cusPage) {
                     var cusPageValue =
-                        document.getElementById("customPageSplit").value;
+                        document.getElementById("customPageDelete").value;
                     if (!isNaN(cusPageValue)) {
                         getTotalPages(
                             getUploadedFileName()[0].replace(/\s/g, "_")
@@ -2339,7 +2509,7 @@ function submit(event) {
                                     errAltSubMessageModal.style = null;
                                     resetErrListMessage();
                                     generateMesssage(
-                                        "Failed to get total page from PDF"
+                                        totalPages.totalPagesError
                                     );
                                     loadingModal.hide();
                                     errModal.show();
@@ -2386,7 +2556,7 @@ function submit(event) {
                                                 .getElementById("dropzoneSplit")
                                                 .classList.add("animate-pulse");
                                             xhrProcStats = false;
-                                            apiGateway("split", "split");
+                                            apiGateway("split", "delete");
                                         } else {
                                             event.preventDefault();
                                             errMessage.innerText =
@@ -2398,7 +2568,7 @@ function submit(event) {
                                             generateMesssage(
                                                 "Remaining monthly limit (" +
                                                     xhrBalanceRemaining +
-                                                    " out of 250)"
+                                                    " out of 2500)"
                                             );
                                             errAltSubMessageModal.style = null;
                                             loadingModal.hide();
@@ -2414,10 +2584,7 @@ function submit(event) {
                                 errListTitleMessage.innerText = "Error message";
                                 errAltSubMessageModal.style = null;
                                 resetErrListMessage();
-                                generateMesssage(
-                                    "Failed to fetch total document pages"
-                                );
-                                console.log(error);
+                                generateMesssage(error.totalPagesError);
                                 loadingModal.hide();
                                 errModal.show();
                             });
@@ -2438,7 +2605,7 @@ function submit(event) {
                                 .getElementById("dropzoneSplit")
                                 .classList.add("animate-pulse");
                             xhrProcStats = false;
-                            apiGateway("split", "split");
+                            apiGateway("split", "delete");
                         } else {
                             event.preventDefault();
                             errMessage.innerText =
@@ -2449,7 +2616,7 @@ function submit(event) {
                             generateMesssage(
                                 "Remaining monthly limit (" +
                                     xhrBalanceRemaining +
-                                    " out of 250)"
+                                    " out of 2500)"
                             );
                             errAltSubMessageModal.style = null;
                             loadingModal.hide();
@@ -2464,6 +2631,7 @@ function submit(event) {
                     errAltSubMessageModal.style = null;
                     resetErrListMessage();
                     generateMesssage("Custom Pages");
+                    errSubMessage.style.visibility = null;
                     customPage.style.borderColor = "#A84E4E";
                     loadingModal.hide();
                     errModal.show();
@@ -2474,205 +2642,62 @@ function submit(event) {
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
-                generateMesssage("Cannot define selected or custom page");
+                generateMesssage("Split decision logic error");
                 errAltSubMessageModal.style = null;
-                loadingModal.hide();
-                errModal.show();
-            }
-        } else if (document.getElementById("secondRadio").checked) {
-            let cusPage;
-            var customPage = document.getElementById("customPageDelete");
-            if (document.getElementById("customPageDelete").value) {
-                cusPage = true;
-            } else {
-                cusPage = false;
-            }
-            if (cusPage) {
-                var cusPageValue =
-                    document.getElementById("customPageDelete").value;
-                if (!isNaN(cusPageValue)) {
-                    getTotalPages(getUploadedFileName()[0].replace(/\s/g, "_"))
-                        .then((totalPages) => {
-                            if (totalPages.totalPages == false) {
-                                event.preventDefault();
-                                errMessage.innerText =
-                                    "There was unexpected error !";
-                                errListTitleMessage.innerText = "Error message";
-                                errAltSubMessageModal.style = null;
-                                resetErrListMessage();
-                                generateMesssage(
-                                    "Failed to get total page from PDF"
-                                );
-                                loadingModal.hide();
-                                errModal.show();
-                            } else {
-                                if (
-                                    parseInt(cusPageValue) >
-                                    totalPages.totalPagesMessage
-                                ) {
-                                    event.preventDefault();
-                                    errMessage.innerText =
-                                        "Invalid page number range!";
-                                    errListTitleMessage.innerText =
-                                        "Error message";
-                                    errAltSubMessageModal.style = null;
-                                    resetErrListMessage();
-                                    generateMesssage(
-                                        "Custom page can not be more than total page"
-                                    );
-                                    customPage.style.borderColor = "#A84E4E";
-                                    loadingModal.hide();
-                                    errModal.show();
-                                } else {
-                                    procTitleMessageModal.innerText =
-                                        "Processing document";
-                                    errMessage.style.visibility = null;
-                                    errSubMessage.style.visibility = null;
-                                    errAltSubMessageModal.style.display =
-                                        "none";
-                                    errModal.hide();
-                                    loadingModal.show();
-                                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                                        altLoadingMessageModal.innerText =
-                                            "Processing document";
-                                        document
-                                            .getElementById("altLoadingModal")
-                                            .classList.remove("hidden");
-                                        document
-                                            .getElementById("dropzoneSplit")
-                                            .classList.add("animate-pulse");
-                                        xhrProcStats = false;
-                                        apiGateway("split", "delete");
-                                    } else {
-                                        event.preventDefault();
-                                        errMessage.innerText =
-                                            "Document file can not be processed !";
-                                        errSubMessage.innerText = "";
-                                        errListTitleMessage.innerText =
-                                            "Error message";
-                                        resetErrListMessage();
-                                        generateMesssage(
-                                            "Remaining monthly limit (" +
-                                                xhrBalanceRemaining +
-                                                " out of 250)"
-                                        );
-                                        errAltSubMessageModal.style = null;
-                                        loadingModal.hide();
-                                        errModal.show();
-                                    }
-                                }
-                            }
-                        })
-                        .catch((error) => {
-                            event.preventDefault();
-                            errMessage.innerText = "Invalid page number range!";
-                            errListTitleMessage.innerText = "Error message";
-                            errAltSubMessageModal.style = null;
-                            resetErrListMessage();
-                            generateMesssage(
-                                "Failed to fetch total document pages"
-                            );
-                            loadingModal.hide();
-                            errModal.show();
-                        });
-                } else {
-                    procTitleMessageModal.innerText = "Processing document";
-                    errMessage.style.visibility = null;
-                    errSubMessage.style.visibility = null;
-                    errAltSubMessageModal.style.display = "none";
-                    errModal.hide();
-                    loadingModal.show();
-                    if (xhrBalance && xhrBalanceRemaining > 0) {
-                        altLoadingMessageModal.innerText =
-                            "Processing document";
-                        document
-                            .getElementById("altLoadingModal")
-                            .classList.remove("hidden");
-                        document
-                            .getElementById("dropzoneSplit")
-                            .classList.add("animate-pulse");
-                        xhrProcStats = false;
-                        apiGateway("split", "delete");
-                    } else {
-                        event.preventDefault();
-                        errMessage.innerText =
-                            "Document file can not be processed !";
-                        errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
-                        resetErrListMessage();
-                        generateMesssage(
-                            "Remaining monthly limit (" +
-                                xhrBalanceRemaining +
-                                " out of 250)"
-                        );
-                        errAltSubMessageModal.style = null;
-                        loadingModal.hide();
-                        errModal.show();
-                    }
-                }
-            } else {
-                event.preventDefault();
-                errMessage.innerText = "Please fill out these fields!";
-                errSubMessage.innerText = "";
-                errListTitleMessage.innerText = "Required fields:";
-                errAltSubMessageModal.style = null;
-                resetErrListMessage();
-                generateMesssage("Custom Pages");
-                errSubMessage.style.visibility = null;
-                customPage.style.borderColor = "#A84E4E";
                 loadingModal.hide();
                 errModal.show();
             }
         } else {
             event.preventDefault();
-            errMessage.innerText = "Index out of bound!";
+            errMessage.innerText = "Document file can not be processed !";
             errSubMessage.innerText = "";
             errListTitleMessage.innerText = "Error message";
             resetErrListMessage();
-            generateMesssage("Split decision logic error");
+            generateMesssage("No file has been chosen");
             errAltSubMessageModal.style = null;
             loadingModal.hide();
             errModal.show();
         }
     } else if (document.getElementById("wmMainLayout")) {
-        var wmImageSwitcher = document.getElementById("wmTypeImage");
-        var wmTextSwitcher = document.getElementById("wmTypeText");
-        if (document.getElementById("firstRadio").checked == true) {
-            var wmImage = document.getElementById("wm_file_input");
-            var customPage = document.getElementById("watermarkPageImage");
-            wmImageSwitcher.checked = true;
-            wmTextSwitcher.checked = false;
-            if (document.getElementById("wm_file_input").value) {
-                var imgFile = document.getElementById("wm_file_input");
-                let fileSize = imgFile.files[0].size;
-                if (
-                    imgFile.files[0].type == "image/jpeg" ||
-                    imgFile.files[0].type == "image/png" ||
-                    imgFile.files[0].type == "image/jpg"
-                ) {
-                    if (fileSize >= 5242880) {
-                        event.preventDefault();
-                        errMessage.innerText =
-                            "Uploaded file has exceeds the limit!";
-                        errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
-                        resetErrListMessage();
-                        generateMesssage("Maximum file size 5 MB");
-                        errAltSubMessageModal.style = null;
-                        loadingModal.hide();
-                        errModal.show();
-                    } else {
-                        if (
-                            document.getElementById("watermarkPageImage").value
-                        ) {
-                            procTitleMessageModal.innerText =
-                                "Processing document";
-                            errMessage.style.visibility = null;
-                            errSubMessage.style.visibility = null;
-                            errAltSubMessageModal.style.display = "none";
-                            errModal.hide();
-                            loadingModal.show();
-                            if (getUploadedFileName().length > 0) {
+        if (getUploadedFileName().length > 0) {
+            var wmImageSwitcher = document.getElementById("wmTypeImage");
+            var wmTextSwitcher = document.getElementById("wmTypeText");
+            if (document.getElementById("firstRadio").checked == true) {
+                var wmImage = document.getElementById("wm_file_input");
+                var customPage = document.getElementById("watermarkPageImage");
+                wmImageSwitcher.checked = true;
+                wmTextSwitcher.checked = false;
+                if (document.getElementById("wm_file_input").value) {
+                    var imgFile = document.getElementById("wm_file_input");
+                    let fileSize = imgFile.files[0].size;
+                    if (
+                        imgFile.files[0].type == "image/jpeg" ||
+                        imgFile.files[0].type == "image/png" ||
+                        imgFile.files[0].type == "image/jpg"
+                    ) {
+                        if (fileSize >= 5242880) {
+                            event.preventDefault();
+                            errMessage.innerText =
+                                "Uploaded file has exceeds the limit!";
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message";
+                            resetErrListMessage();
+                            generateMesssage("Maximum file size 5 MB");
+                            errAltSubMessageModal.style = null;
+                            loadingModal.hide();
+                            errModal.show();
+                        } else {
+                            if (
+                                document.getElementById("watermarkPageImage")
+                                    .value
+                            ) {
+                                procTitleMessageModal.innerText =
+                                    "Processing document";
+                                errMessage.style.visibility = null;
+                                errSubMessage.style.visibility = null;
+                                errAltSubMessageModal.style.display = "none";
+                                errModal.hide();
+                                loadingModal.show();
                                 var cusPageValue =
                                     document.getElementById(
                                         "watermarkPageImage"
@@ -2697,7 +2722,7 @@ function submit(event) {
                                                     null;
                                                 resetErrListMessage();
                                                 generateMesssage(
-                                                    "Failed to get total page from PDF"
+                                                    totalPages.totalPagesError
                                                 );
                                                 loadingModal.hide();
                                                 errModal.show();
@@ -2759,7 +2784,7 @@ function submit(event) {
                                                         generateMesssage(
                                                             "Remaining monthly limit (" +
                                                                 xhrBalanceRemaining +
-                                                                " out of 250)"
+                                                                " out of 2500)"
                                                         );
                                                         errAltSubMessageModal.style =
                                                             null;
@@ -2778,94 +2803,116 @@ function submit(event) {
                                             errAltSubMessageModal.style = null;
                                             resetErrListMessage();
                                             generateMesssage(
-                                                "Failed to fetch total document pages"
+                                                error.totalPagesError
                                             );
+                                            generateMesssage(error);
                                             loadingModal.hide();
                                             errModal.show();
                                         });
+                                } else {
+                                    if (xhrBalance && xhrBalanceRemaining > 0) {
+                                        altLoadingMessageModal.innerText =
+                                            "Processing document";
+                                        document
+                                            .getElementById("altLoadingModal")
+                                            .classList.remove("hidden");
+                                        document
+                                            .getElementById("dropzoneWatermark")
+                                            .classList.add("animate-pulse");
+                                        xhrProcStats = false;
+                                        apiGateway("watermark", "img");
+                                    } else {
+                                        event.preventDefault();
+                                        errMessage.innerText =
+                                            "Document file can not be processed !";
+                                        errSubMessage.innerText = "";
+                                        errListTitleMessage.innerText =
+                                            "Error message";
+                                        resetErrListMessage();
+                                        generateMesssage(
+                                            "Remaining monthly limit (" +
+                                                xhrBalanceRemaining +
+                                                " out of 2500)"
+                                        );
+                                        errAltSubMessageModal.style = null;
+                                        loadingModal.hide();
+                                        errModal.show();
+                                    }
                                 }
                             } else {
+                                var wmPage =
+                                    document.getElementById(
+                                        "watermarkPageImage"
+                                    );
                                 event.preventDefault();
                                 errMessage.innerText =
-                                    "Document file can not be processed !";
+                                    "Please fill out these fields!";
                                 errSubMessage.innerText = "";
-                                errListTitleMessage.innerText = "Error message";
+                                errListTitleMessage.innerText =
+                                    "Required fields:";
                                 resetErrListMessage();
-                                generateMesssage("No file has been chosen");
+                                generateMesssage("Pages");
                                 errAltSubMessageModal.style = null;
+                                wmPage.style.borderColor = "#A84E4E";
                                 loadingModal.hide();
                                 errModal.show();
                             }
-                        } else {
-                            var wmPage =
-                                document.getElementById("watermarkPageImage");
-                            event.preventDefault();
-                            errMessage.innerText =
-                                "Please fill out these fields!";
-                            errSubMessage.innerText = "";
-                            errListTitleMessage.innerText = "Required fields:";
-                            resetErrListMessage();
-                            generateMesssage("Pages");
-                            errAltSubMessageModal.style = null;
-                            wmPage.style.borderColor = "#A84E4E";
-                            loadingModal.hide();
-                            errModal.show();
                         }
+                    } else {
+                        event.preventDefault();
+                        errMessage.innerText = "Unsupported file format!";
+                        errSubMessage.innerText = "";
+                        errListTitleMessage.innerText = "Error message";
+                        resetErrListMessage();
+                        generateMesssage(
+                            "Supported file format: JPG, PNG, JPEG"
+                        );
+                        errAltSubMessageModal.style = null;
+                        loadingModal.hide();
+                        errModal.show();
                     }
                 } else {
                     event.preventDefault();
-                    errMessage.innerText = "Unsupported file format!";
+                    errMessage.innerText = "Please fill out these fields!";
                     errSubMessage.innerText = "";
-                    errListTitleMessage.innerText = "Error message";
+                    errListTitleMessage.innerText = "Required fields:";
                     resetErrListMessage();
-                    generateMesssage("Supported file format: JPG, PNG");
+                    generateMesssage("Image");
                     errAltSubMessageModal.style = null;
+                    wmImage.style.borderColor = "#A84E4E";
                     loadingModal.hide();
                     errModal.show();
                 }
-            } else {
-                event.preventDefault();
-                errMessage.innerText = "Please fill out these fields!";
-                errSubMessage.innerText = "";
-                errListTitleMessage.innerText = "Required fields:";
-                resetErrListMessage();
-                generateMesssage("Image");
-                errAltSubMessageModal.style = null;
-                wmImage.style.borderColor = "#A84E4E";
-                loadingModal.hide();
-                errModal.show();
-            }
-        } else if (document.getElementById("secondRadio").checked == true) {
-            var wmText = document.getElementById("watermarkText");
-            var customPage = document.getElementById("watermarkPageText");
-            wmImageSwitcher.checked = false;
-            wmTextSwitcher.checked = true;
-            if (
-                !document.getElementById("watermarkText").value &&
-                !document.getElementById("watermarkPageText").value
-            ) {
-                var wmPage = document.getElementById("watermarkPageText");
-                event.preventDefault();
-                errMessage.innerText = "Please fill out these fields!";
-                errSubMessage.innerText = "";
-                errListTitleMessage.innerText = "Required fields:";
-                resetErrListMessage();
-                generateMesssage("Pages");
-                generateMesssage("Text");
-                errAltSubMessageModal.style = null;
-                wmText.style.borderColor = "#A84E4E";
-                wmPage.style.borderColor = "#A84E4E";
-                loadingModal.hide();
-                errModal.show();
-            } else if (document.getElementById("watermarkText").value) {
-                if (document.getElementById("watermarkPageText").value) {
-                    procTitleMessageModal.innerText = "Processing document";
-                    errMessage.style.visibility = null;
-                    errSubMessage.style.visibility = null;
-                    errAltSubMessageModal.style.display = "none";
-                    errModal.hide();
-                    loadingModal.show();
-                    if (getUploadedFileName().length > 0) {
+            } else if (document.getElementById("secondRadio").checked == true) {
+                var wmText = document.getElementById("watermarkText");
+                var customPage = document.getElementById("watermarkPageText");
+                wmImageSwitcher.checked = false;
+                wmTextSwitcher.checked = true;
+                if (
+                    !document.getElementById("watermarkText").value &&
+                    !document.getElementById("watermarkPageText").value
+                ) {
+                    var wmPage = document.getElementById("watermarkPageText");
+                    event.preventDefault();
+                    errMessage.innerText = "Please fill out these fields!";
+                    errSubMessage.innerText = "";
+                    errListTitleMessage.innerText = "Required fields:";
+                    resetErrListMessage();
+                    generateMesssage("Pages");
+                    generateMesssage("Text");
+                    errAltSubMessageModal.style = null;
+                    wmText.style.borderColor = "#A84E4E";
+                    wmPage.style.borderColor = "#A84E4E";
+                    loadingModal.hide();
+                    errModal.show();
+                } else if (document.getElementById("watermarkText").value) {
+                    if (document.getElementById("watermarkPageText").value) {
+                        procTitleMessageModal.innerText = "Processing document";
+                        errMessage.style.visibility = null;
+                        errSubMessage.style.visibility = null;
+                        errAltSubMessageModal.style.display = "none";
+                        errModal.hide();
+                        loadingModal.show();
                         var cusPageValue =
                             document.getElementById("watermarkPageText").value;
                         if (!isNaN(cusPageValue)) {
@@ -2882,7 +2929,7 @@ function submit(event) {
                                         errAltSubMessageModal.style = null;
                                         resetErrListMessage();
                                         generateMesssage(
-                                            "Failed to get total page from PDF"
+                                            totalPages.totalPagesError
                                         );
                                         loadingModal.hide();
                                         errModal.show();
@@ -2937,7 +2984,7 @@ function submit(event) {
                                                 generateMesssage(
                                                     "Remaining monthly limit (" +
                                                         xhrBalanceRemaining +
-                                                        " out of 250)"
+                                                        " out of 2500)"
                                                 );
                                                 errAltSubMessageModal.style =
                                                     null;
@@ -2955,56 +3002,82 @@ function submit(event) {
                                         "Error message";
                                     errAltSubMessageModal.style = null;
                                     resetErrListMessage();
-                                    generateMesssage(
-                                        "Failed to fetch total document pages"
-                                    );
+                                    generateMesssage(error.totalPagesError);
                                     loadingModal.hide();
                                     errModal.show();
                                 });
+                        } else {
+                            if (xhrBalance && xhrBalanceRemaining > 0) {
+                                altLoadingMessageModal.innerText =
+                                    "Processing document";
+                                document
+                                    .getElementById("altLoadingModal")
+                                    .classList.remove("hidden");
+                                document
+                                    .getElementById("dropzoneWatermark")
+                                    .classList.add("animate-pulse");
+                                xhrProcStats = false;
+                                apiGateway("watermark", "txt");
+                            } else {
+                                event.preventDefault();
+                                errMessage.innerText =
+                                    "Document file can not be processed !";
+                                errSubMessage.innerText = "";
+                                errListTitleMessage.innerText = "Error message";
+                                resetErrListMessage();
+                                generateMesssage(
+                                    "Remaining monthly limit (" +
+                                        xhrBalanceRemaining +
+                                        " out of 2500)"
+                                );
+                                errAltSubMessageModal.style = null;
+                                loadingModal.hide();
+                                errModal.show();
+                            }
                         }
                     } else {
+                        var wmPage =
+                            document.getElementById("watermarkPageText");
                         event.preventDefault();
-                        errMessage.innerText =
-                            "Document file can not be processed !";
+                        errMessage.innerText = "Please fill out these fields!";
                         errSubMessage.innerText = "";
-                        errListTitleMessage.innerText = "Error message";
+                        errListTitleMessage.innerText = "Required fields:";
                         resetErrListMessage();
-                        generateMesssage("No file has been chosen");
+                        generateMesssage("Pages");
                         errAltSubMessageModal.style = null;
+                        wmPage.style.borderColor = "#A84E4E";
                         loadingModal.hide();
                         errModal.show();
                     }
                 } else {
-                    var wmPage = document.getElementById("watermarkPageText");
                     event.preventDefault();
                     errMessage.innerText = "Please fill out these fields!";
                     errSubMessage.innerText = "";
                     errListTitleMessage.innerText = "Required fields:";
                     resetErrListMessage();
-                    generateMesssage("Pages");
+                    generateMesssage("Text");
                     errAltSubMessageModal.style = null;
-                    wmPage.style.borderColor = "#A84E4E";
+                    wmText.style.borderColor = "#A84E4E";
                     loadingModal.hide();
                     errModal.show();
                 }
             } else {
                 event.preventDefault();
-                errMessage.innerText = "Please fill out these fields!";
+                errMessage.innerText = "Please choose watermark options!";
                 errSubMessage.innerText = "";
-                errListTitleMessage.innerText = "Required fields:";
-                resetErrListMessage();
-                generateMesssage("Text");
-                errAltSubMessageModal.style = null;
-                wmText.style.borderColor = "#A84E4E";
+                errSubMessage.style.visibility = null;
+                errAltSubMessageModal.style.display = "none";
                 loadingModal.hide();
                 errModal.show();
             }
         } else {
             event.preventDefault();
-            errMessage.innerText = "Please choose watermark options!";
+            errMessage.innerText = "Document file can not be processed !";
             errSubMessage.innerText = "";
-            errSubMessage.style.visibility = null;
-            errAltSubMessageModal.style.display = "none";
+            errListTitleMessage.innerText = "Error message";
+            resetErrListMessage();
+            generateMesssage("No file has been chosen");
+            errAltSubMessageModal.style = null;
             loadingModal.hide();
             errModal.show();
         }
@@ -3041,7 +3114,7 @@ function submit(event) {
                     generateMesssage(
                         "Remaining monthly limit (" +
                             xhrBalanceRemaining +
-                            " out of 250)"
+                            " out of 2500)"
                     );
                     errAltSubMessageModal.style = null;
                     loadingModal.hide();
