@@ -30,8 +30,8 @@ class splitController extends Controller
             'fromPage' => ['nullable', 'numeric'],
             'toPage' => ['nullable', 'numeric'],
             'mergePDF' => ['required', 'in:true,false'],
-            'customPageSplit' => ['required', 'regex:/^(all|[0-9,-]+)$/'],
-            'customPageDelete' => ['required', 'regex:/^(all|[0-9,-]+)$/'],
+            'customPageSplit' => ['nullable', 'regex:/^(all|[0-9,-]+)$/'],
+            'customPageDelete' => ['nullable', 'regex:/^(all|[0-9,-]+)$/'],
             'usedMethod' => ['required', 'in:range,custom']
 		]);
 
