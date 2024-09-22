@@ -19,6 +19,7 @@ use Ilovepdf\Exceptions\ProcessException;
 use Ilovepdf\Exceptions\DownloadException;
 use Ilovepdf\Exceptions\TaskException;
 use Ilovepdf\Exceptions\PathException;
+use Spatie\PdfToImage\Pdf;
 
 class splitController extends Controller
 {

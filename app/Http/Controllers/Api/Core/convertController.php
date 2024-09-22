@@ -25,6 +25,7 @@ use Ilovepdf\Exceptions\ProcessException;
 use Ilovepdf\Exceptions\DownloadException;
 use Ilovepdf\Exceptions\TaskException;
 use Ilovepdf\Exceptions\PathException;
+use Spatie\PdfToImage\Pdf;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
