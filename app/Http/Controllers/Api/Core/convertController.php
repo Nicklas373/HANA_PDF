@@ -128,7 +128,8 @@ class convertController extends Controller
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                     $fileSize = filesize($newFilePath);
                     $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                    $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                    $pdf = new Pdf($newFilePath);
+                    $pdfTotalPages = $pdf->pageCount();
                     $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                     if ($convertType == 'xlsx') {
                         if ($loopCount <= 1) {
@@ -184,7 +185,7 @@ class convertController extends Controller
                                     null,
                                     'Symfony runtime process out of time exception !'
                                 );
-                                
+
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToXls', 'Database connection error !', $ex->getMessage(), false);
                                 return $this->returnDataMesage(
@@ -501,7 +502,7 @@ class convertController extends Controller
                                     $message->getMessage(),
                                     null,
                                     'Symfony runtime process fail exception !'
-                                );                                
+                                );
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToPptx', 'Database connection error !', $ex->getMessage(), false);
                                 return $this->returnDataMesage(
@@ -1032,7 +1033,7 @@ class convertController extends Controller
                                     null,
                                     'iLovePDF API Error !, Catch on UploadException'
                                 );
-                                
+
                             } catch (QueryException $ex) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $newFileSize, $Nuuid, 'FAIL', 'cnvToImg', 'Database connection error !', $ex->getMessage(), false);
                                 return $this->returnDataMesage(
