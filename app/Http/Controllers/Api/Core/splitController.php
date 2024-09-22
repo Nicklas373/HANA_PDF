@@ -444,7 +444,8 @@ class splitController extends Controller
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
-                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        $pdf = new Pdf($newFilePath);
+                                        $pdfTotalPages = $pdf->pageCount();
                                         if ($customInputSplitPage > $pdfTotalPages) {
                                             DB::table('appLogs')->insert([
                                                 'processId' => $uuid,
@@ -513,7 +514,8 @@ class splitController extends Controller
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
-                                    $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                    $pdf = new Pdf($newFilePath);
+                                    $pdfTotalPages = $pdf->pageCount();
                                     if ($customInputDeletePage > $pdfTotalPages) {
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
