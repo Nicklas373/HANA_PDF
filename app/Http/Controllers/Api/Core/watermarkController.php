@@ -705,7 +705,7 @@ class watermarkController extends Controller
                                 'errStatus' => null
                             ]);
                             DB::table('pdfWatermark')->insert([
-                                'fileName' => $randomizePdfFileName.'.pdf',
+                                'fileName' => $currentFileName,
                                 'fileSize' => $newProcFileSize,
                                 'watermarkFontFamily' => $watermarkFontFamily,
                                 'watermarkFontStyle' => $watermarkFontStyle,
