@@ -19,6 +19,7 @@ use Ilovepdf\Exceptions\ProcessException;
 use Ilovepdf\Exceptions\DownloadException;
 use Ilovepdf\Exceptions\TaskException;
 use Ilovepdf\Exceptions\PathException;
+use Spatie\PdfToImage\Pdf;
 
 class splitController extends Controller
 {
@@ -29,8 +30,8 @@ class splitController extends Controller
             'fromPage' => ['nullable', 'numeric'],
             'toPage' => ['nullable', 'numeric'],
             'mergePDF' => ['required', 'in:true,false'],
-            'customPageSplit' => ['required', 'regex:/^(all|[0-9,-]+)$/'],
-            'customPageDelete' => ['required', 'regex:/^(all|[0-9,-]+)$/'],
+            'customPageSplit' => ['nullable', 'regex:/^(all|[0-9,-]+)$/'],
+            'customPageDelete' => ['nullable', 'regex:/^(all|[0-9,-]+)$/'],
             'usedMethod' => ['required', 'in:range,custom']
 		]);
 
@@ -149,7 +150,8 @@ class splitController extends Controller
                             if ($usedMethod == 'range') {
                                 if ($fromPage != '' && $toPage != '') {
                                     try {
-                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        $pdf = new Pdf($newFilePath);
+                                        $pdfTotalPages = $pdf->pageCount();
                                         if ($toPage > $pdfTotalPages) {
                                             $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                             $duration = $end->diff($startProc);
@@ -185,7 +187,7 @@ class splitController extends Controller
                                                     null,
                                                     'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
                                                 );
-                                                
+
                                             } catch (QueryException $ex) {
                                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                                 return $this->returnDataMesage(
@@ -442,7 +444,8 @@ class splitController extends Controller
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     try {
-                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        $pdf = new Pdf($newFilePath);
+                                        $pdfTotalPages = $pdf->pageCount();
                                         if ($customInputSplitPage > $pdfTotalPages) {
                                             DB::table('appLogs')->insert([
                                                 'processId' => $uuid,
@@ -511,7 +514,8 @@ class splitController extends Controller
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 try {
-                                    $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                    $pdf = new Pdf($newFilePath);
+                                    $pdfTotalPages = $pdf->pageCount();
                                     if ($customInputDeletePage > $pdfTotalPages) {
                                         DB::table('appLogs')->insert([
                                             'processId' => $uuid,
@@ -746,7 +750,7 @@ class splitController extends Controller
                                     null,
                                     null,
                                     $ex->getMessage()
-                                ); 
+                                );
                             } catch (\Exception $e) {
                                 NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'split', 'Eloquent transaction error !', $e->getMessage(), false);
                                 return $this->returnDataMesage(
@@ -1184,7 +1188,7 @@ class splitController extends Controller
                                         null,
                                         'Failed to download file from iLovePDF API !'
                                     );
-                                    
+
                                 } catch (QueryException $ex) {
                                     NotificationHelper::Instance()->sendErrNotify($currentFileName.'.pdf', $newFileSize, $uuid, 'FAIL', 'split', 'Database connection error !',$ex->getMessage(), false);
                                     return $this->returnDataMesage(
