@@ -114,9 +114,10 @@ class watermarkController extends Controller
                             );
                         }
                         $currentImageName = basename($watermarkImage);
-                        $trimPhase1 = str_replace(' ', '_', $currentImageName);
+                        $trimImagePhase1 = str_replace(' ', '_', $currentImageName);
+                        $newImageNameWithoutExtension = str_replace('.', '_', $trimImagePhase1);
                         $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
-                        $wmImageName = $newFileNameWithoutExtension.'.'.$randomizeImageExtension;
+                        $wmImageName = $newImageNameWithoutExtension.'.'.$randomizeImageExtension;
                         $watermarkImage->storeAs('public/upload', $wmImageName);
                         $watermarkText = null;
                     } else if ($watermarkAction == 'txt') {
