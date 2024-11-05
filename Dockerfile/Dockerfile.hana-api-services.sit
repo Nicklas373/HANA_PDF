@@ -3,7 +3,7 @@ FROM php:8.3-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.5"
+LABEL version="1.6"
 LABEL description="Docker container for https://gw.hana-ci.com"
 
 # Configure ARG
