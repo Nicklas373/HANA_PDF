@@ -1,5 +1,15 @@
 [
   {
+    "release_date": "November, 05 2024",
+    "version": "3.3.6",
+    "changelog": [
+      "Overhaul changes in database schema on our end",
+      "Re-introduce unique ID that will show when error on process",
+      "Show more notification on final process instead of 'Server Error'",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
     "release_date": "September, 21 2024",
     "version": "3.3.4",
     "changelog": [
