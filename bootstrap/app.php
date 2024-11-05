@@ -2,6 +2,7 @@
 
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
+use App\Models\appLogModel;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth; 
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,8 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle AuthenticationException
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
@@ -124,8 +125,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle NotFoundHttpException
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
@@ -209,8 +210,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle MethodNotAllowedHttpException
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
@@ -304,8 +305,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle RouteNotFoundException
         $exceptions->render(function (RouteNotFoundException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->get_guid();
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
@@ -395,5 +396,5 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404);
             }
         });
-        
+
     })->create();
