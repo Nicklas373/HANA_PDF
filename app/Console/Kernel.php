@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
+use App\Models\appLogModel;
 use App\Models\jobLogModel;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
