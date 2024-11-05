@@ -31,7 +31,7 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/file')->group(funct
     Route::post('/thumbnail', [thumbnailController::class, 'getThumbnail']);
 });
 
-Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/pdf')->group(function() {
+Route::middleware(['auth:api'],['throttle:api'])->prefix('v2/pdf')->group(function() {
     // API v1 Backend PDF Management Route
     Route::post('/compress', [compressController::class, 'compress']);
     Route::post('/convert', [convertController::class, 'convert']);
