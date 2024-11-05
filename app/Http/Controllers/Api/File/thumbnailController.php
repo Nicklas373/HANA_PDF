@@ -25,11 +25,9 @@ class thumbnailController extends Controller
             'file' => 'required'
         ]);
 
-        $uuid = AppHelper::Instance()->get_guid();
-
         if ($validator->fails()) {
             return $this->returnFileMesage(
-                401,
+                400,
                 'Validation failed',
                 null,
                 $validator->messages()->first()

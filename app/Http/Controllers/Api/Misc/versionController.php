@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Misc;
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
+use App\Models\appLogModel;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,17 +23,13 @@ class versionController extends Controller {
             'appServicesReferrer' => ['required', 'in:FE,BE']
 		]);
 
-        $uuid = AppHelper::Instance()->get_guid();
-
-        // Carbon timezone
-        date_default_timezone_set('Asia/Jakarta');
-        $now = Carbon::now('Asia/Jakarta');
-        $startProc = $now->format('Y-m-d H:i:s');
+        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
 
 		if ($validator->fails()) {
             return $this->returnDataMesage(
-                401,
+                400,
                 'Validation failed',
+                null,
                 null,
                 null,
                 $validator->messages()->first()
@@ -45,7 +41,7 @@ class versionController extends Controller {
             $appGitVersionFE = $request->post('appGitVersion');
             $appServicesReferrerFE = $request->post('appServicesReferrer');
             $appMajorVersionBE = 3;
-            $appMinorVersionBE = 4;
+            $appMinorVersionBE = 5;
             $appPatchVersionBE = 2;
             $appGitVersionBE = appHelper::instance()->getGitCommitHash();
             $appVersioningBE = null;
@@ -104,120 +100,52 @@ class versionController extends Controller {
                                 null
                             );
                         } else {
-                            try {
-                                DB::table('appLogs')->insert([
-                                    'processId' => $uuid,
-                                    'errReason' => 'Version Check Failed !',
-                                    'errStatus' => $validateMessage
-                                ]);
-                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Version Check Failed !',$validateMessage,true);
-                                return $this->returnVersioningMessage(
-                                    400,
-                                    'Version Check Failed !',
-                                    $appVersioningBE,
-                                    $versioningBE,
-                                    $appVersioningFE,
-                                    $versioningFE,
-                                    $validateMessage
-                                );
-                            } catch (QueryException $ex) {
-                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
-                                return $this->returnVersioningMessage(
-                                    500,
-                                    'Database connection error !',
-                                    $appVersioningBE,
-                                    $versioningBE,
-                                    $appVersioningFE,
-                                    $versioningFE,
-                                    $ex->getMessage()
-                                );
-                            } catch (\Exception $e) {
-                                NotificationHelper::Instance()->sendVersioningErrNotify($appVersioningFE, $versioningFE, $appVersioningBE, $versioningBE, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
-                                return $this->returnVersioningMessage(
-                                    500,
-                                    'Eloquent transaction error !',
-                                    $appVersioningBE,
-                                    $versioningBE,
-                                    $appVersioningFE,
-                                    $versioningFE,
-                                    $e->getMessage()
-                                );
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        try {
-                            DB::table('appLogs')->insert([
+                            appLogModel::create([
                                 'processId' => $uuid,
-                                'errReason' => 'Unable to parsing JSON versioning !',
-                                'errStatus' => $e->getMessage()
+                                'groupId' => $uuid,
+                                'errReason' => 'Version Check Failed !',
+                                'errStatus' => $validateMessage
                             ]);
-                            NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Unable to parsing JSON versioning !',$e->getMessage(),true);
-                            return $this->returnVersioningMessage(
-                                500,
-                                'Unable to parsing JSON versioning !',
-                                null,
-                                null,
-                                null,
-                                null,
-                                $e->getMessage()
+                            NotificationHelper::Instance()->sendVersioningErrNotify(
+                                $appVersioningFE,
+                                $versioningFE,
+                                $appVersioningBE,
+                                $versioningBE,
+                                'FAIL',
+                                $uuid,
+                                'Version Check Failed !',
+                                $validateMessage
                             );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
                             return $this->returnVersioningMessage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
-                            return $this->returnVersioningMessage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                null,
-                                null,
-                                $e->getMessage()
+                                400,
+                                'Version Check Failed !',
+                                $appVersioningBE,
+                                $versioningBE,
+                                $appVersioningFE,
+                                $versioningFE,
+                                $validateMessage
                             );
                         }
-                    }
-                } else {
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'Version Check Failed !',
-                            'errStatus' => 'Cannot establish response with the server'
-                        ]);
-                        NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Version Check failed !','Cannot establish response with the server',true);
-                        return $this->returnVersioningMessage(
-                            400,
-                            'Version Check Failed !',
-                            null,
-                            null,
-                            null,
-                            null,
-                            'Cannot establish response with the server'
-                        );
-                    } catch (QueryException $ex) {
-                        NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
-                        return $this->returnVersioningMessage(
-                            500,
-                            'Database connection error !',
-                            null,
-                            null,
-                            null,
-                            null,
-                            $ex->getMessage()
-                        );
                     } catch (\Exception $e) {
-                        NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
+                        appLogModel::create([
+                            'processId' => $uuid,
+                            'groupId' => $uuid,
+                            'errReason' => 'Unable to parsing JSON versioning !',
+                            'errStatus' => $e->getMessage()
+                        ]);
+                        NotificationHelper::Instance()->sendVersioningErrNotify(
+                            null,
+                            null,
+                            null,
+                            null,
+                            'FAIL',
+                            $uuid,
+                            'Unable to parsing JSON versioning !',
+                            $e->getMessage()
+                        );
                         return $this->returnVersioningMessage(
                             500,
-                            'Eloquent transaction error !',
+                            'Unable to parsing JSON versioning !',
                             null,
                             null,
                             null,
@@ -225,15 +153,23 @@ class versionController extends Controller {
                             $e->getMessage()
                         );
                     }
-                }
-            } else {
-                try {
-                    DB::table('appLogs')->insert([
+                } else {
+                    appLogModel::create([
                         'processId' => $uuid,
+                        'groupId' => $uuid,
                         'errReason' => 'Version Check Failed !',
-                        'errStatus' => 'Cannot establish connection with the server'
+                        'errStatus' => 'Cannot establish response with the server'
                     ]);
-                    NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Version Check Failed !','Cannot establish connection with the server',true);
+                    NotificationHelper::Instance()->sendVersioningErrNotify(
+                        null,
+                        null,
+                        null,
+                        null,
+                        'FAIL',
+                        $uuid,
+                        'Version Check failed !',
+                        'Cannot establish response with the server'
+                    );
                     return $this->returnVersioningMessage(
                         400,
                         'Version Check Failed !',
@@ -241,44 +177,43 @@ class versionController extends Controller {
                         null,
                         null,
                         null,
-                        'Cannot establish connection with the server'
-                    );
-                } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Database connection error !',$ex->getMessage(),false);
-                    return $this->returnVersioningMessage(
-                        500,
-                        'Database connection error !',
-                        null,
-                        null,
-                        null,
-                        null,
-                        $ex->getMessage()
-                    );
-                } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendVersioningErrNotify(null, null, null, null, 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(),false);
-                    return $this->returnVersioningMessage(
-                        500,
-                        'Eloquent transaction error !',
-                        null,
-                        null,
-                        null,
-                        null,
-                        $e->getMessage()
+                        'Cannot establish response with the server'
                     );
                 }
+            } else {
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $uuid,
+                    'errReason' => 'Version Check Failed !',
+                    'errStatus' => 'Cannot establish connection with the server'
+                ]);
+                NotificationHelper::Instance()->sendVersioningErrNotify(
+                    null,
+                    null,
+                    null,
+                    null,
+                    'FAIL',
+                    $uuid,
+                    'Version Check Failed !',
+                    'Cannot establish connection with the server'
+                );
+                return $this->returnVersioningMessage(
+                    400,
+                    'Version Check Failed !',
+                    null,
+                    null,
+                    null,
+                    null,
+                    'Cannot establish connection with the server'
+                );
             }
         }
     }
 
     public function versioningFetch(Request $request) {
-        $uuid = AppHelper::Instance()->get_guid();
+        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
         $endpoint = 'api/v1/version/fetch';
         $versionFetch = 'https://raw.githubusercontent.com/Nicklas373/Hana-PDF/versioning/changelog.json';
-
-        // Carbon timezone
-        date_default_timezone_set('Asia/Jakarta');
-        $now = Carbon::now('Asia/Jakarta');
-        $startProc = $now->format('Y-m-d H:i:s');
 
 		if (appHelper::instance()->checkWebAvailable($versionFetch)) {
             $response = Http::get($versionFetch);
@@ -290,6 +225,7 @@ class versionController extends Controller {
                         'OK',
                         $data,
                         null,
+                        null,
                         null
                     );
                 } catch (\Exception $e) {
@@ -299,78 +235,57 @@ class versionController extends Controller {
                         'Failed to parsing JSON !',
                         null,
                         null,
+                        null,
                         $e->getMessage()
                     );
                 }
             } else {
-                try {
-                    DB::table('appLogs')->insert([
-                        'processId' => $uuid,
-                        'errReason' => 'Versioning Fetch Failed !',
-                        'errStatus' => 'Failed to fetch response with the server'
-                    ]);
-                    NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Version fetch failed !','Failed to fetch response with the server', true);
-                    return $this->returnDataMesage(
-                        400,
-                        'Version fetch failed !',
-                        null,
-                        null,
-                        'Failed to fetch response with the server'
-                    );
-                } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Database connection error !',$ex->getMessage(), false);
-                    return $this->returnDataMesage(
-                        500,
-                        'Database connection error !',
-                        null,
-                        null,
-                        $ex->getMessage()
-                    );
-                } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(), false);
-                    return $this->returnDataMesage(
-                        500,
-                        'Eloquent transaction error !',
-                        null,
-                        null,
-                        $ex->getMessage()
-                    );
-                }
-            }
-        } else {
-            try {
-                DB::table('appLogs')->insert([
+                appLogModel::create([
                     'processId' => $uuid,
+                    'groupId' => $uuid,
                     'errReason' => 'Versioning Fetch Failed !',
                     'errStatus' => 'Failed to fetch response with the server'
                 ]);
-                NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Version fetch failed !','Cannot establish connection with the server', true);
+                NotificationHelper::Instance()->sendErrGlobalNotify(
+                    $endpoint,
+                    'Version Fetch',
+                    'FAIL',
+                    $uuid,
+                    'Version fetch failed !',
+                    'Failed to fetch response with the server'
+                );
                 return $this->returnDataMesage(
                     400,
                     'Version fetch failed !',
                     null,
                     null,
-                    'Cannot establish response with the server'
-                );
-            } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Database connection error !',$ex->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Database connection error !',
                     null,
-                    null,
-                    $ex->getMessage()
-                );
-            } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Eloquent transaction error !', $e->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Eloquent transaction error !',
-                    null,
-                    null,
-                    $ex->getMessage()
+                    'Failed to fetch response with the server'
                 );
             }
+        } else {
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $uuid,
+                'errReason' => 'Versioning Fetch Failed !',
+                'errStatus' => 'Failed to fetch response with the server'
+            ]);
+            NotificationHelper::Instance()->sendErrGlobalNotify(
+                $endpoint,
+                'Version Fetch',
+                'FAIL',
+                $uuid,
+                'Version fetch failed !',
+                'Cannot establish connection with the server'
+            );
+            return $this->returnDataMesage(
+                400,
+                'Version fetch failed !',
+                null,
+                null,
+                null,
+                'Cannot establish response with the server'
+            );
         }
     }
 }
