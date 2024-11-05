@@ -12,7 +12,7 @@ abstract class Controller
                 'fileName' => $fileName,
                 'fileSource' => $fileSource,
                 'proc' => $proc,
-                'processId' => $procId,
+                'groupId' => $procId,
                 'curFileSize' => $curFileSize,
                 'newFileSize' => $newFileSize,
                 'compMethod' => $compMethod,
@@ -25,18 +25,19 @@ abstract class Controller
                 'fileName' => $fileName,
                 'fileSource' => $fileSource,
                 'proc' => $proc,
-                'processId' => $procId,
+                'groupId' => $procId,
                 'errors' => $errors
             ], $status);
         }
     }
 
-    protected function returnDataMesage($status, $message, $data, $notification, $errors)
+    protected function returnDataMesage($status, $message, $data, $groupId, $notification, $errors)
     {
         return response()->json([
             'status' => $status,
             'message'=> $message,
             'data' => $data,
+            'groupId' => $groupId,
             'notification' => $notification,
             'errors' => $errors
         ], $status);
