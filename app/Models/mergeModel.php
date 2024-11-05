@@ -9,18 +9,21 @@ class mergeModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'pdfMerge';
+    protected $primaryKey = 'mergeId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'mergeId',
         'fileName',
         'fileSize',
         'result',
         'isBatch',
-        'batchId',
+        'batchName',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }

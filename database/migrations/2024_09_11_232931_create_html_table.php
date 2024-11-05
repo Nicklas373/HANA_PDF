@@ -19,19 +19,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pdfHtml', function (Blueprint $table) {
-            $table->id('htmlId');
+            $table->id('htmlId')->primary()->unique();
             $table->text('urlName')->nullable();
-            $table->text('urlMargin')->nullable();
-            $table->text('urlOrientation')->nullable();
+            $table->integer('urlMargin')->nullable();
+            $table->enum('urlOrientation', ['landscape','portrait'])->nullable();
             $table->boolean('urlSinglePage')->nullable();
-            $table->text('urlSize')->nullable();
+            $table->enum('urlSize', ['A3','A4','A5','Letter'])->nullable();
             $table->boolean('result');
-            $table->uuid('processId');
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
-            $table->text('procDuration')->nullable();
+            $table->char('procDuration', length: 25)->nullable();
             $table->boolean('isReport')->nullable()->default(false);
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key

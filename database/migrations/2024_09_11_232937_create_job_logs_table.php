@@ -19,16 +19,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('jobLogs', function (Blueprint $table) {
-            $table->id('jobsId');
-            $table->string('jobsName', 25);
-            $table->string('jobsEnv', 25);
-            $table->string('jobsRuntime', 25);
+            $table->id('jobsId')->primary()->unique();
+            $table->char('jobsName', length: 25);
+            $table->enum('jobsEnv', ['production', 'local']);
+            $table->char('jobsRuntime', length: 25);
             $table->boolean('jobsResult');
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
-            $table->text('procDuration')->nullable();
-            $table->uuid('processId');
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->char('procDuration', length: 25)->nullable();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

@@ -19,13 +19,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifyLogs', function (Blueprint $table) {
-            $table->id('notifyId');
-            $table->uuid('processId');
-            $table->string('notifyName', 25);
+            $table->id('notifyId')->primary()->unique();
+            $table->uuid('processId')->unique();
+            $table->char('notifyName', length: 25);
             $table->boolean('notifyResult');
             $table->text('notifyMessage')->nullable();
             $table->json('notifyResponse')->nullable();
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key
             $table->foreign('processId')->references('processId')->on('appLogs');

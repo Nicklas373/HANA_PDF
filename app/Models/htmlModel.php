@@ -9,19 +9,22 @@ class htmlModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'pdfHtml';
+    protected $primaryKey = 'htmlId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'htmlId',
         'urlName',
         'urlMargin',
         'urlOrientation',
         'urlSinglePage',
         'urlSize',
         'result',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }

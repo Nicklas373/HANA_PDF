@@ -9,10 +9,12 @@ class splitModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'pdfSplit';
+    protected $primaryKey = 'splitId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'splitId',
         'fileName',
         'fileSize',
         'fromPage',
@@ -24,10 +26,11 @@ class splitModel extends Model
         'action',
         'result',
         'isBatch',
-        'batchId',
+        'batchName',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }

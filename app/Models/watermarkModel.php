@@ -9,10 +9,12 @@ class watermarkModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'pdfWatermark';
+    protected $primaryKey = 'watermarkId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'watermarkId',
         'fileName',
         'fileSize',
         'watermarkFontFamily',
@@ -28,10 +30,11 @@ class watermarkModel extends Model
         'watermarkPage',
         'result',
         'isBatch',
-        'batchId',
+        'batchName',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }

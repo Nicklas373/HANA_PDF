@@ -19,20 +19,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pdfConvert', function (Blueprint $table) {
-            $table->id('cnvId');
+            $table->id('cnvId')->primary()->unique();
             $table->text('fileName')->nullable();
-            $table->string('fileSize', 25)->nullable();
-            $table->string('container', 25)->nullable();
+            $table->char('fileSize', length: 25)->nullable();
+            $table->enum('container', ['jpg','docx','pptx','xlsx','pdf'])->nullable();
             $table->boolean('imgExtract');
             $table->boolean('result');
             $table->boolean('isBatch');
-            $table->uuid('processId');
-            $table->uuid('batchId')->nullable();
+            $table->text('batchName')->nullable();
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
-            $table->text('procDuration')->nullable();
+            $table->char('procDuration', length: 25)->nullable();
             $table->boolean('isReport')->nullable()->default(false);
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key
