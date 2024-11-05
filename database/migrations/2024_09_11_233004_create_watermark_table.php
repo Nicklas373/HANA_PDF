@@ -19,29 +19,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pdfWatermark', function (Blueprint $table) {
-            $table->id('watermarkId');
+            $table->id('watermarkId')->primary()->unique();
             $table->text('fileName')->nullable();
-            $table->string('fileSize', 25)->nullable();
-            $table->string('watermarkFontFamily', 25)->nullable();
-            $table->string('watermarkFontStyle', 25)->nullable();
-            $table->string('watermarkFontSize', 5)->nullable();
-            $table->string('watermarkFontTransparency', 5)->nullable();
+            $table->char('fileSize', length: 25)->nullable();
+            $table->enum('watermarkFontFamily', ['Arial','Arial Unicode MS','Comic Sans MS','Courier','Times New Roman','Verdana'])->nullable();
+            $table->enum('watermarkFontStyle', ['Regular','Bold','Italic'])->nullable();
+            $table->integer('watermarkFontSize')->nullable();
+            $table->integer('watermarkFontTransparency')->nullable();
             $table->text('watermarkImage')->nullable();
-            $table->string('watermarkLayout', 25)->nullable();
-            $table->string('watermarkMosaic', 25)->nullable();
-            $table->string('watermarkRotation', 25)->nullable();
-            $table->string('watermarkStyle', 25)->nullable();
+            $table->enum('watermarkLayout', ['above','below'])->nullable();
+            $table->boolean('watermarkMosaic')->nullable();
+            $table->integer('watermarkRotation')->nullable();
+            $table->enum('watermarkStyle', ['img','txt'])->nullable();
             $table->text('watermarkText')->nullable();
-            $table->string('watermarkPage', 25)->nullable();
+            $table->char('watermarkPage', length: 25)->nullable();
             $table->boolean('result');
             $table->boolean('isBatch');
-            $table->uuid('processId');
-            $table->uuid('batchId')->nullable();
+            $table->text('batchName')->nullable();
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
             $table->text('procDuration')->nullable();
             $table->boolean('isReport')->nullable()->default(false);
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key

@@ -9,10 +9,12 @@ class notifyLogModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'notifyLogs';
+    protected $primaryKey = 'notifyId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'notifyId',
         'processId',
         'notifyName',
         'notifyResult',

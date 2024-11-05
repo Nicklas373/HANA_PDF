@@ -19,25 +19,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pdfSplit', function (Blueprint $table) {
-            $table->id('splitId');
+            $table->id('splitId')->primary()->unique();
             $table->text('fileName')->nullable();
-            $table->string('fileSize', 25)->nullable();
-            $table->string('fromPage', 5)->nullable();
-            $table->string('toPage', 5)->nullable();
-            $table->text('customSplitPage')->nullable();
-            $table->text('customDeletePage')->nullable();
-            $table->text('fixedRange')->nullable();
-            $table->string('mergePDF', 25)->nullable();
-            $table->string('action', 10)->nullable();
+            $table->char('fileSize', length: 25)->nullable();
+            $table->integer('fromPage')->nullable();
+            $table->integer('toPage')->nullable();
+            $table->char('customSplitPage', length: 25)->nullable();
+            $table->char('customDeletePage', length: 25)->nullable();
+            $table->char('fixedRange', length: 25)->nullable();
+            $table->enum('mergePDF', ['true', 'false'])->nullable();
+            $table->enum('action', ['delete','split'])->nullable();
             $table->boolean('result');
             $table->boolean('isBatch');
-            $table->uuid('processId');
-            $table->uuid('batchId')->nullable();
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
+            $table->text('batchName')->nullable();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
-            $table->text('procDuration')->nullable();
+            $table->char('procDuration', length: 25)->nullable();
             $table->boolean('isReport')->nullable()->default(false);
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key

@@ -19,7 +19,7 @@ class uploadController extends Controller
 
 		if ($validator->fails()) {
             return $this->returnFileMesage(
-                401,
+                400,
                 'Validation failed',
                 null,
                 $validator->messages()->first()
@@ -68,7 +68,7 @@ class uploadController extends Controller
 
 		if ($validator->fails()) {
             return $this->returnFileMesage(
-                401,
+                400,
                 'Validation failed',
                 null,
                 $validator->messages()->first()
@@ -115,7 +115,7 @@ class uploadController extends Controller
 
 		if ($validator->fails()) {
             return $this->returnFileMesage(
-                401,
+                400,
                 'Validation failed',
                 null,
                 $validator->messages()->first()
@@ -137,12 +137,14 @@ class uploadController extends Controller
                                 'PDF Page successfully counted',
                                 $pdfTotalPages,
                                 null,
+                                null,
                                 null
                             );
                         } catch (\Exception $e) {
                             return $this->returnDataMesage(
                                 400,
                                 'Failed to count total PDF pages from '.$currentFileName,
+                                null,
                                 null,
                                 null,
                                 $e->getMessage()
@@ -154,6 +156,7 @@ class uploadController extends Controller
                             'File '.$currentFileName.' is not PDF file !',
                             null,
                             null,
+                            null,
                             'FILE_FORMAT_VALIDATION_EXCEPTION'
                         );
                     }
@@ -161,6 +164,7 @@ class uploadController extends Controller
                     return $this->returnDataMesage(
                         400,
                         'File '.$currentFileName.' not found !',
+                        null,
                         null,
                         null,
                         'FILE_NOT_FOUND_EXCEPTION'

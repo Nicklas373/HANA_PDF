@@ -38,122 +38,122 @@ class DailyReport extends Command
         $currentTime = Carbon::yesterday('Asia/Jakarta');
         $currentTime->hour(19);
         try {
-            $compTotalScs = compressModel::where('procStartAt', '>=', $currentTime)
+            $compTotalScs = compressModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($compTotalScs > 0) {
-                compressModel::where('procStartAt', '>=', $currentTime)
+                compressModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $compTotalErr = compressModel::where('procStartAt', '>=', $currentTime)
+            $compTotalErr = compressModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($compTotalErr > 0) {
-                compressModel::where('procStartAt', '>=', $currentTime)
+                compressModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $cnvTotalScs = cnvModel::where('procStartAt', '>=', $currentTime)
+            $cnvTotalScs = cnvModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($cnvTotalScs > 0) {
-                cnvModel::where('procStartAt', '>=', $currentTime)
+                cnvModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $cnvTotalErr = cnvModel::where('procStartAt', '>=', $currentTime)
+            $cnvTotalErr = cnvModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($cnvTotalErr > 0) {
-                cnvModel::where('procStartAt', '>=', $currentTime)
+                cnvModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $htmlTotalScs = htmlModel::where('procStartAt', '>=', $currentTime)
+            $htmlTotalScs = htmlModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($htmlTotalScs > 0) {
-                htmlModel::where('procStartAt', '>=', $currentTime)
+                htmlModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $htmlTotalErr = htmlModel::where('procStartAt', '>=', $currentTime)
+            $htmlTotalErr = htmlModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($htmlTotalErr > 0) {
-                htmlModel::where('procStartAt', '>=', $currentTime)
+                htmlModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $mergeTotalScs = mergeModel::where('procStartAt', '>=', $currentTime)
+            $mergeTotalScs = mergeModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($mergeTotalScs > 0) {
-                mergeModel::where('procStartAt', '>=', $currentTime)
+                mergeModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $mergeTotalErr = mergeModel::where('procStartAt', '>=', $currentTime)
+            $mergeTotalErr = mergeModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($mergeTotalErr > 0) {
-                mergeModel::where('procStartAt', '>=', $currentTime)
+                mergeModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $splitTotalScs = splitModel::where('procStartAt', '>=', $currentTime)
+            $splitTotalScs = splitModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($splitTotalScs > 0) {
-                splitModel::where('procStartAt', '>=', $currentTime)
+                splitModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $splitTotalErr = splitModel::where('procStartAt', '>=', $currentTime)
+            $splitTotalErr = splitModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($splitTotalErr > 0) {
-                splitModel::where('procStartAt', '>=', $currentTime)
+                splitModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $watermarkTotalScs = watermarkModel::where('procStartAt', '>=', $currentTime)
+            $watermarkTotalScs = watermarkModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($watermarkTotalScs > 0) {
-                watermarkModel::where('procStartAt', '>=', $currentTime)
+                watermarkModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', true)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);
             }
-            $watermarkTotalErr = watermarkModel::where('procStartAt', '>=', $currentTime)
+            $watermarkTotalErr = watermarkModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->count();
             if ($watermarkTotalErr > 0) {
-                watermarkModel::where('procStartAt', '>=', $currentTime)
+                watermarkModel::where('created_at', '>=', $currentTime)
                                         ->where('result', '=', false)
                                         ->where('isReport', '=', false)
                                         ->update(['isReport' => true]);

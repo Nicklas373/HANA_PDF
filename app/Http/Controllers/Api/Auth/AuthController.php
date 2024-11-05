@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
+use App\Models\appLogModel;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,43 +17,33 @@ class AuthController extends Controller
 {
     public function getToken()
     {
-        $uuid = AppHelper::Instance()->get_guid();
         $credentials = request(['email', 'password']);
+        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
 
         if (!$token = auth('api')->attempt($credentials)) {
-            try {
-                DB::table('appLogs')->insert([
-                    'processId' => $uuid,
-                    'errReason' => 'Auth breach detected, requested with '.json_encode($credentials),
-                    'errStatus' => 'Access unauthorized'
-                ]);
-                NotificationHelper::Instance()->sendErrGlobalNotify('api/v1/auth/getToken', 'Auth', 'FAIL', $uuid,'Access unauthorized', 'Auth breach detected, requested with '.json_encode($credentials), false);
-                return $this->returnDataMesage(
-                    401,
-                    'Access unauthorized',
-                    null,
-                    null,
-                    'Auth breach detected'
-                );
-            } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrGlobalNotify('api/v1/auth/getToken', 'Auth', 'FAIL', $uuid,'Database connection error', $ex->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Database connection error',
-                    null,
-                    null,
-                    $ex->getMessage()
-                );
-            } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrGlobalNotify('api/v1/auth/getToken', 'Auth', 'FAIL', $uuid,'Unknown Exception', $e->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Unknown Exception',
-                    null,
-                    null,
-                    $e->getMessage()
-                );
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $Muuid,
+                'errReason' => 'Auth breach detected, requested with '.json_encode($credentials),
+                'errStatus' => 'Access unauthorized'
+            ]);
+            NotificationHelper::Instance()->sendErrGlobalNotify(
+                'api/v1/auth/getToken',
+                'Auth',
+                'FAIL',
+                $Muuid,
+                'Access unauthorized',
+                'Auth breach detected, requested with '.json_encode($credentials),
+                false
+            );
+            return $this->returnDataMesage(
+                401,
+                'Access unauthorized',
+                null,
+                null,
+                'Auth breach detected'
+            );
         }
 
         $user = User::where('email', request('email'))->first();

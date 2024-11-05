@@ -1,10 +1,10 @@
 <?php
 namespace App\Helpers;
 
-use Telegram\Bot\Laravel\Facades\Telegram;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
+use App\Models\appLogModel;
+use App\Models\notifyLogModel;
 use Illuminate\Support\Facades\Log;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class NotificationHelper
 {
@@ -13,7 +13,7 @@ class NotificationHelper
          return new NotificationHelper();
     }
 
-    function sendErrNotify($procFile, $fileSize, $processId, $status, $proc, $errReason, $errCode, $foreign) {
+    function sendErrNotify($procFile, $fileSize, $processId, $status, $proc, $errReason, $errCode) {
         if ($procFile == null || $procFile == "") {
             $newProcFile = 'null';
         } else {
@@ -29,22 +29,23 @@ class NotificationHelper
         }
 
         if ($proc == "compress") {
-            $newRoute = 'api/v1/core/compress';
+            $newRoute = 'api/v2/core/compress';
         } else if ($proc == "convert" || $proc == "cnvToXls" || $proc == "cnvToPptx" || $proc == "cnvToDocx" || $proc == "cnvToImg" || $proc == "pdfToImg") {
-            $newRoute = 'api/v1/core/convert';
+            $newRoute = 'api/v2/core/convert';
         } else if ($proc == "htmltopdf") {
-            $newRoute = 'api/v1/core/html';
+            $newRoute = 'api/v2/core/html';
         } else if ($proc == "merge") {
-            $newRoute = 'api/v1/core/merge';
+            $newRoute = 'api/v2/core/merge';
         } else if ($proc == "split" || $proc == "split_delete") {
-            $newRoute = 'api/v1/core/split';
+            $newRoute = 'api/v2/core/split';
         } else if ($proc == "watermark") {
-            $newRoute = 'api/v1/core/watermark';
+            $newRoute = 'api/v2/core/watermark';
         } else {
             $newRoute = 'undefined';
         }
 
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $uuid = AppHelper::Instance()->generateUniqueUuid(notifyLogModel::class, 'processId');
         $message = "<b>HANA API Alert</b>
                     \nStatus: <b>".$status."</b>".
                     "\nStart At: <b>".$CurrentTime.
@@ -53,7 +54,7 @@ class NotificationHelper
                     "\nSource: <b>https://gw.hana-ci.com</b>".
                     "\nEndpoint: <b>".$newRoute.
                     "</b>\n\nProcess: <b>".$proc.
-                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nGroup Id: <b>".$processId.
                     "</b>\nType: <b>Process Error</b>".
                     "\n\nFilename: <b>".$newProcFile.
                     "</b>\nFileSize: <b>".$newFileSize.
@@ -67,67 +68,52 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => 'TelegramResponseException',
-                        'errStatus' => $errReason
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $processId,
+                'errReason' => 'Message has been sent !',
+                'errStatus' => $errReason
+            ]);
+            notifyLogModel::create([
+                'processId' => $uuid,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => 'TelegramResponseException',
-                        'errStatus' => $errReason
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            if ($e->getHttpStatusCode() == null) {
+                $httpStatus = null;
+              } else {
+                $httpStatus = $e->getHttpStatusCode();
+              }
+              appLogModel::create([
+                  'processId' => $uuid,
+                  'groupId' => $processId,
+                  'errReason' => 'TelegramResponseException',
+                  'errStatus' => $errReason
+              ]);
+              notifyLogModel::create([
+                  'processId' => $uuid,
+                  'notifyName' => 'Telegram SDK',
+                  'notifyResult' => false,
+                  'notifyMessage' => 'TelegramResponseException',
+                  'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+              ]);
         } catch (\Exception $e) {
-            try {
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => 'TelegramResponseException',
-                        'errStatus' => $errReason
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => $e->getMessage()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $processId,
+                'errReason' => 'TelegramResponseException',
+                'errStatus' => $errReason
+            ]);
+            notifyLogModel::create([
+                'processId' => $uuid,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'Unexpected handling exception !',
+                'notifyResponse' => $e->getMessage()
+            ]);
         }
     }
 
@@ -139,7 +125,7 @@ class NotificationHelper
                     "</b>\nEnvironment: <b>".env('APP_ENV').
                     "\n\n</b>Services: <b>Backend Services</b>".
                     "\nSource: <b>https://gw.hana-ci.com</b>".
-                    "\nProcess Id: <b>".$processId.
+                    "\nGroup Id: <b>".$processId.
                     "</b>\n\nError Type: <b>Route Error</b>".
                     "\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
@@ -151,46 +137,34 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            } 
+            if ($e->getHttpStatusCode() == null) {
+                $httpStatus = null;
+              } else {
+                $httpStatus = $e->getHttpStatusCode();
+              }
+              notifyLogModel::create([
+                  'processId' => $processId,
+                  'notifyName' => 'Telegram SDK',
+                  'notifyResult' => false,
+                  'notifyMessage' => 'TelegramResponseException',
+                  'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+              ]);
         } catch (\Exception $e) {
-            try {
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => $e->getMessage()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'Unexpected handling exception !',
+                'notifyResponse' => $e->getMessage()
+            ]);
         }
     }
 
@@ -204,7 +178,7 @@ class NotificationHelper
                     "\nSource: <b>https://gw.hana-ci.com</b>".
                     "\nJobs Name: <b>".$schedName.
                     "</b>\n\nProcess: <b>".$schedRuntime.
-                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nGroup Id: <b>".$processId.
                     "</b>\nType: <b>Jobs Error</b>".
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
@@ -216,46 +190,29 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'TelegramResponseException',
+                'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+            ]);
         } catch (\Exception $e) {
-            try {
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => $e->getMessage()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'Unexpected handling exception !',
+                'notifyResponse' => $e->getMessage()
+            ]);
         }
     }
 
@@ -263,7 +220,8 @@ class NotificationHelper
                                 $mergeTotalScs, $mergeTotalErr, $splitTotalScs, $splitTotalErr, $watermarkTotalScs,
                                 $watermarkTotalErr, $taskStatus, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
-        $processId = AppHelper::instance()->get_guid();
+        $uuid = AppHelper::Instance()->generateUniqueUuid(notifyLogModel::class, 'processId');
+        $Suuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
         if ($taskStatus) {
             $CountTotalScsProc = $compTotalScs + $cnvTotalScs + $htmlTotalScs + $mergeTotalScs + $splitTotalScs + $watermarkTotalScs;
             $CountTotalErrProc = $compTotalErr + $cnvTotalErr + $htmlTotalErr + $mergeTotalErr + $splitTotalErr + $watermarkTotalErr;
@@ -298,66 +256,58 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => $errReason,
-                    'errStatus' => null
-                ]);
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $Suuid,
+                'errReason' => $errReason,
+                'errStatus' => null
+            ]);
+            notifyLogModel::create([
+                'processId' => $uuid,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
+            if ($e->getHttpStatusCode() == null) {
+                $httpStatus = null;
+            } else {
+                $httpStatus = $e->getHttpStatusCode();
             }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $Suuid,
+                'errReason' => 'TelegramResponseException',
+                'errStatus' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+            ]);
+            notifyLogModel::create([
+                'processId' => $uuid,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'TelegramResponseException',
+                'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+            ]);
         } catch (\Exception $e) {
-            try {
-                DB::table('appLogs')->insert([
-                    'processId' => $processId,
-                    'errReason' => 'Unexpected handling exception !',
-                    'errStatus' => $e->getMessage()
-				]);
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => $e->getMessage()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $Suuid,
+                'errReason' => 'Unexpected handling exception !',
+                'errStatus' => $e->getMessage()
+            ]);
+            notifyLogModel::create([
+                'processId' => $uuid,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'Unexpected handling exception !',
+                'notifyResponse' => $e->getMessage()
+            ]);
         }
     }
 
-    function sendErrGlobalNotify($processEndpoint, $processName, $status, $processId, $errReason, $errCode, $foreign) {
+    function sendErrGlobalNotify($processEndpoint, $processName, $status, $processId, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $uuid = AppHelper::Instance()->generateUniqueUuid(notifyLogModel::class, 'processId');
         $message = "<b>HANA API Alert</b>
                     \nStatus: <b>".$status."</b>".
                     "\nStart At: <b>".$CurrentTime.
@@ -366,7 +316,7 @@ class NotificationHelper
                     "\nSource: <b>https://gw.hana-ci.com</b>".
                     "\nEndpoint: <b>".$processEndpoint.
                     "</b>\n\nProcess: <b>".$processName.
-                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nGroup Id: <b>".$processId.
                     "</b>\nType: <b>Universal Notify</b>".
                     "\n\nError Reason: <b>".$errReason.
                     "</b>\nError Log: <pre><code>".$errCode.
@@ -378,64 +328,53 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => 'TelegramResponseException',
-                        'errStatus' => $errReason
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $processId,
+                'groupId' => $uuid,
+                'errReason' => 'TelegramResponseException',
+                'errStatus' => $errReason
+            ]);
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => 'TelegramResponseException',
-                        'errStatus' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
-        } catch (QueryException $exc) {
-            Log::error('Query Exception failed with: '. $ex->getMessage());
+            if ($e->getHttpStatusCode() == null) {
+                $httpStatus = null;
+              } else {
+                $httpStatus = $e->getHttpStatusCode();
+              }
+              appLogModel::create([
+                  'processId' => $processId,
+                  'groupId' => $uuid,
+                  'errReason' => 'TelegramResponseException',
+                  'errStatus' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+              ]);
+              notifyLogModel::create([
+                  'processId' => $processId,
+                  'notifyName' => 'Telegram SDK',
+                  'notifyResult' => false,
+                  'notifyMessage' => 'TelegramResponseException',
+                  'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+              ]);
         }
     }
 
-    function sendVersioningErrNotify($versioningFE, $versioningGitFE, $versioningBE , $versioningGitBE, $status, $processId, $errReason, $errCode, $foreign) {
+    function sendVersioningErrNotify($versioningFE, $versioningGitFE, $versioningBE , $versioningGitBE, $status, $processId, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $uuid = AppHelper::Instance()->generateUniqueUuid(notifyLogModel::class, 'processId');
         $message = "<b>HANA API Alert</b>
                     \nStatus: <b>".$status."</b>".
                     "\nStart At: <b>".$CurrentTime.
                     "</b>\nEnvironment: <b>".env('APP_ENV').
                     "\n\n</b>Services: <b>Backend Services</b>".
                     "\nSource: <b>https://gw.hana-ci.com</b>".
-                    "\nEndpoint: <b>api/v1/version</b>".
+                    "\nEndpoint: <b>api/v2/version</b>".
                     "\n\nProcess: <b>Versioning".
-                    "</b>\nProcess Id: <b>".$processId.
+                    "</b>\nGroup Id: <b>".$processId.
                     "</b>\nType: <b>Versioning Check</b>".
                     "\n\nBE Version: <b>".$versioningBE.
                     "</b>\nBE Version GIT: <b>".$versioningGitBE.
@@ -451,67 +390,47 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
-            try {
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => $errReason,
-                        'errStatus' => null
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => true,
-                    'notifyMessage' => 'Message has been sent !',
-                    'notifyResponse' => $response
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $processId,
+                'groupId' => $uuid,
+                'errReason' => $errReason,
+                'errStatus' => null
+            ]);
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => true,
+                'notifyMessage' => 'Message has been sent !',
+                'notifyResponse' => $response
+            ]);
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-            try {
-                if ($e->getHttpStatusCode() == null) {
-                  $httpStatus = null;
-                } else {
-                  $httpStatus = $e->getHttpStatusCode();
-                }
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => $errReason,
-                        'errStatus' => null
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'TelegramResponseException',
-                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $processId,
+                'groupId' => $uuid,
+                'errReason' => $errReason,
+                'errStatus' => null
+            ]);
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'TelegramResponseException',
+                'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+            ]);
         } catch (\Exception $e) {
-            try {
-                if (!$foreign) {
-                    DB::table('appLogs')->insert([
-                        'processId' => $processId,
-                        'errReason' => $errReason,
-                        'errStatus' => null
-                    ]);
-                }
-                DB::table('notifyLogs')->insert([
-                    'processId' => $processId,
-                    'notifyName' => 'Telegram SDK',
-                    'notifyResult' => false,
-                    'notifyMessage' => 'Unexpected handling exception !',
-                    'notifyResponse' => $e->getMessage()
-                ]);
-            } catch (QueryException $ex) {
-                Log::error('Query Exception failed with: '. $ex->getMessage());
-            }
+            appLogModel::create([
+                'processId' => $processId,
+                'groupId' => $uuid,
+                'errReason' => $errReason,
+                'errStatus' => null
+            ]);
+            notifyLogModel::create([
+                'processId' => $processId,
+                'notifyName' => 'Telegram SDK',
+                'notifyResult' => false,
+                'notifyMessage' => 'Unexpected handling exception !',
+                'notifyResponse' => $e->getMessage()
+            ]);
         }
     }
 }

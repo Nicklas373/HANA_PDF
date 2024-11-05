@@ -9,20 +9,23 @@ class compressModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
+    protected $primaryKey = 'compressId';
     protected $table = 'pdfCompress';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'compressId',
         'fileName',
         'fileSize',
         'compFileSize',
         'compMethod',
         'result',
         'isBatch',
-        'batchId',
+        'batchName',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }

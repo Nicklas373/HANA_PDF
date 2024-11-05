@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Core;
 use App\Helpers\AppHelper;
 use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
+use App\Models\appLogModel;
+use App\Models\watermarkModel;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -12,13 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use Ilovepdf\Exceptions\StartException;
-use Ilovepdf\Exceptions\AuthException;
-use Ilovepdf\Exceptions\UploadException;
-use Ilovepdf\Exceptions\ProcessException;
-use Ilovepdf\Exceptions\DownloadException;
-use Ilovepdf\Exceptions\TaskException;
-use Ilovepdf\Exceptions\PathException;
 
 class watermarkController extends Controller
 {
@@ -39,7 +34,9 @@ class watermarkController extends Controller
             'wmMosaic' => ['required', 'in:true,false']
 		]);
 
-        $uuid = AppHelper::Instance()->get_guid();
+        // Generate Uni UUID
+        $uuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
+        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(watermarkModel::class, 'groupId');
 
         // Carbon timezone
         date_default_timezone_set('Asia/Jakarta');
@@ -47,39 +44,29 @@ class watermarkController extends Controller
         $startProc = $now->format('Y-m-d H:i:s');
 
 		if ($validator->fails()) {
-            try {
-                DB::table('appLogs')->insert([
-                    'processId' => $uuid,
-                    'errReason' => 'Validation Failed!',
-                    'errStatus' => $validator->messages()->first()
-                ]);
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','watermark','Validation failed',$validator->messages()->first(), true);
-                return $this->returnDataMesage(
-                    401,
-                    'Validation failed',
-                    null,
-                    null,
-                    $validator->messages()->first()
-                );
-            } catch (QueryException $ex) {
-                NotificationHelper::Instance()->sendErrNotify(null,null, $uuid, 'FAIL','watermark','Database connection error !',$ex->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Database connection error !',
-                    null,
-                    null,
-                    $ex->getMessage()
-                );
-            } catch (\Exception $e) {
-                NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL','watermark','Eloquent transaction error !', $e->getMessage(), false);
-                return $this->returnDataMesage(
-                    500,
-                    'Eloquent transaction error !',
-                    null,
-                    null,
-                    $ex->getMessage()
-                );
-            }
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $batchId,
+                'errReason' => 'Validation Failed!',
+                'errStatus' => $validator->messages()->first()
+            ]);
+            NotificationHelper::Instance()->sendErrNotify(
+                null,
+                null,
+                $batchId,
+                'FAIL',
+                'watermark',
+                'Validation failed',
+                $validator->messages()->first()
+            );
+            return $this->returnDataMesage(
+                400,
+                'Validation failed',
+                null,
+                $batchId,
+                null,
+                $validator->messages()->first()
+            );
 		} else {
             if ($request->has('file')) {
                 $files = $request->post('file');
@@ -88,626 +75,194 @@ class watermarkController extends Controller
                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                 $pdfDownload_Location = $pdfProcessed_Location;
                 $batchValue = false;
-                $batchId = null;
                 $str = rand(1000,10000000);
+                $randomizePdfFileName = 'pdfWatermark_'.substr(md5(uniqid($str)), 0, 8);
                 foreach ($files as $file) {
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    $randomizePdfFileName = 'pdfWatermark_'.substr(md5(uniqid($str)), 0, 8);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    $fileSize = filesize($newFilePath);
-                    $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                    $watermarkAction = $request->post('action');
-                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
-                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
-                    }
-                    if ($watermarkAction == 'img') {
-                        $watermarkImage = $request->file('imgFile');
-                        if (empty($watermarkImage)) {
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                null,
-                                null,
-                                'Image file for watermark can not be empty !'
-                            );
+                    if (file_exists($newFilePath)) {
+                        $fileSize = filesize($newFilePath);
+                        $procUuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                        $watermarkAction = $request->post('action');
+                        if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
+                            Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
                         }
-                        $currentImageName = basename($watermarkImage);
-                        $trimImagePhase1 = str_replace(' ', '_', $currentImageName);
-                        $newImageNameWithoutExtension = str_replace('.', '_', $trimImagePhase1);
-                        $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
-                        $wmImageName = $newImageNameWithoutExtension.'.'.$randomizeImageExtension;
-                        $watermarkImage->storeAs('public/upload', $wmImageName);
-                        $watermarkText = null;
-                    } else if ($watermarkAction == 'txt') {
-                        $watermarkText = $request->post('wmText');
-                        $wmImageName = null;
-                        if (empty($watermarkText)) {
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                null,
-                                null,
-                                'Text for watermark can not be empty !'
-                            );
-                        }
-                    } else {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'Invalid request action !',
-                            'errStatus' => 'Current request: '.$watermarkAction
-                        ]);
-                        DB::table('pdfWatermark')->insert([
-                            'fileName' => $currentFileName,
-                            'fileSize' => $newFileSize,
-                            'watermarkFontFamily' => null,
-                            'watermarkFontStyle' => null,
-                            'watermarkFontSize' => null,
-                            'watermarkFontTransparency' => null,
-                            'watermarkImage' => null,
-                            'watermarkLayout' => null,
-                            'watermarkMosaic' => null,
-                            'watermarkRotation' => null,
-                            'watermarkStyle' => null,
-                            'watermarkText' => null,
-                            'watermarkPage' => null,
-                            'result' => false,
-                            'isBatch' => $batchValue,
-                            'processId' => $uuid,
-                            'procStartAt' => $startProc,
-                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' =>  $duration->s.' seconds'
-                        ]);
-                        NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'Invalid request action !', 'Current request: '.$watermarkAction);
-                        return $this->returnDataMesage(
-                            400,
-                            'PDF Watermark failed !',
-                            null,
-                            null,
-                            'Invalid request action !'.',Current request: '.$watermarkAction
-                        );
-                    }
-                    $tempPDF = $request->post('wmMosaic');
-                    if ($tempPDF == 'true') {
-                        $isMosaicDB = "true";
-                        $isMosaic = true;
-                    } else {
-                        $isMosaicDB = "false";
-                        $isMosaic = false;
-                    }
-                    $watermarkFontColorTemp = $request->post('wmFontColor');
-                    if ($watermarkFontColorTemp == '') {
-                        $watermarkFontColor = '#000000';
-                    } else {
-                        $watermarkFontColor = $watermarkFontColorTemp;
-                    }
-                    $watermarkFontFamily = $request->post('wmFontFamily');
-                    $watermarkFontSizeTemp = $request->post('wmFontSize');
-                    if ($watermarkFontSizeTemp == '') {
-                        $watermarkFontSize = '12';
-                    } else {
-                        $watermarkFontSize = $watermarkFontSizeTemp;
-                    }
-                    $watermarkFontStyle = $request->post('wmFontStyle');
-                    $watermarkLayout = $request->post('wmLayoutStyle');
-                    $watermarkTempPage = $request->post('wmPage');
-                    if (is_string($watermarkTempPage)) {
-                        $watermarkPage = strtolower($watermarkTempPage);
-                    } else {
-                        $watermarkPage = $watermarkTempPage;
-                    }
-                    $watermarkRotation = $request->post('wmRotation');
-                    $watermarkTransparency = $request->post('wmTransparency');
-                    try {
-                        $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                        $ilovepdfTask = $ilovepdf->newTask('watermark');
                         if ($watermarkAction == 'img') {
-                            $ilovepdfTask->setEncryption(true);
-                            $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$wmImageName));
-                            $pdfFile = $ilovepdfTask->addFile($newFilePath);
-                            $ilovepdfTask->setMode("image");
-                            $ilovepdfTask->setImageFile($wmImage);
-                            $ilovepdfTask->setTransparency($watermarkTransparency);
-                            $ilovepdfTask->setRotation($watermarkRotation);
-                            $ilovepdfTask->setLayer($watermarkLayout);
-                            $ilovepdfTask->setPages($watermarkPage);
-                            $ilovepdfTask->setMosaic($isMosaic);
-                            $ilovepdfTask->setVerticalPosition("middle");
+                            $watermarkImage = $request->file('imgFile');
+                            if (empty($watermarkImage)) {
+                                appLogModel::create([
+                                    'processId' => $uuid,
+                                    'groupId' => $batchId,
+                                    'errReason' => 'PDF Watermark failed !',
+                                    'errStatus' => 'Image file for watermark can not be empty !'
+                                ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    null,
+                                    null,
+                                    $batchId,
+                                    'FAIL',
+                                    'watermark',
+                                    'PDF Watermark failed !',
+                                    'Image file for watermark can not be empty !'
+                                );
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Watermark failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Image file for watermark can not be empty !'
+                                );
+                            }
+                            $currentImageName = basename($watermarkImage);
+                            $trimImagePhase1 = str_replace(' ', '_', $currentImageName);
+                            $newImageNameWithoutExtension = str_replace('.', '_', $trimImagePhase1);
+                            $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
+                            $wmImageName = $newImageNameWithoutExtension.'.'.$randomizeImageExtension;
+                            $watermarkImage->storeAs('public/upload', $wmImageName);
+                            $watermarkText = null;
                         } else if ($watermarkAction == 'txt') {
-                            $ilovepdfTask->setFileEncryption($pdfEncKey);
-                            $ilovepdfTask->setEncryptKey($pdfEncKey);
-                            $ilovepdfTask->setEncryption(true);
-                            $pdfFile = $ilovepdfTask->addFile($newFilePath);
-                            $ilovepdfTask->setMode("text");
-                            $ilovepdfTask->setText($watermarkText);
-                            $ilovepdfTask->setPages($watermarkPage);
-                            $ilovepdfTask->setVerticalPosition("middle");
-                            $ilovepdfTask->setRotation($watermarkRotation);
-                            $ilovepdfTask->setFontColor($watermarkFontColor);
-                            $ilovepdfTask->setFontFamily($watermarkFontFamily);
-                            $ilovepdfTask->setFontStyle($watermarkFontStyle);
-                            $ilovepdfTask->setFontSize($watermarkFontSize);
-                            $ilovepdfTask->setTransparency($watermarkTransparency);
-                            $ilovepdfTask->setLayer($watermarkLayout);
-                            $ilovepdfTask->setMosaic($isMosaic);
-                        }
-                        $ilovepdfTask->setOutputFileName($randomizePdfFileName);
-                        $ilovepdfTask->execute();
-                        $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                        $ilovepdfTask->delete();
-                    }
-                    catch (StartException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on StartException',
-                                'errStatus' => $e->getMessage()
+                            $watermarkText = $request->post('wmText');
+                            $wmImageName = null;
+                            if (empty($watermarkText)) {
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Watermark failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Text for watermark can not be empty !'
+                                );
+                            }
+                        } else {
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            appLogModel::create([
+                                'processId' => $procUuid,
+                                'groupId' => $batchId,
+                                'errReason' => 'Invalid request action !',
+                                'errStatus' => 'Current request: '.$watermarkAction
                             ]);
-                            DB::table('pdfWatermark')->insert([
+                            watermarkModel::create([
                                 'fileName' => $currentFileName,
                                 'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
+                                'watermarkFontFamily' => null,
+                                'watermarkFontStyle' => null,
+                                'watermarkFontSize' => null,
+                                'watermarkFontTransparency' => null,
+                                'watermarkImage' => null,
+                                'watermarkLayout' => null,
+                                'watermarkMosaic' => null,
+                                'watermarkRotation' => null,
+                                'watermarkStyle' => null,
+                                'watermarkText' => null,
+                                'watermarkPage' => null,
                                 'result' => false,
                                 'isBatch' => $batchValue,
-                                'processId' => $uuid,
+                                'batchName' => $randomizePdfFileName.'.pdf',
+                                'groupId' => $batchId,
+                                'processId' => $procUuid,
                                 'procStartAt' => $startProc,
                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
+                                'procDuration' => $duration->s.' seconds'
                             ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on StartException', $e->getMessage(), false);
+                            NotificationHelper::Instance()->sendErrNotify(
+                                $currentFileName,
+                                $fileSize,
+                                $batchId,
+                                'FAIL',
+                                'Invalid request action !',
+                                'Current request: '.$watermarkAction
+                            );
                             return $this->returnDataMesage(
                                 400,
                                 'PDF Watermark failed !',
-                                $e->getMessage(),
                                 null,
-                                'iLovePDF API Error !, Catch on StartException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
+                                $batchId,
                                 null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
+                                'Invalid request action !'.',Current request: '.$watermarkAction
                             );
                         }
-                    } catch (AuthException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on AuthException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on AuthException', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on AuthException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
+                        $tempPDF = $request->post('wmMosaic');
+                        if ($tempPDF == 'true') {
+                            $isMosaicDB = "true";
+                            $isMosaic = true;
+                        } else {
+                            $isMosaicDB = "false";
+                            $isMosaic = false;
                         }
-                    } catch (UploadException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on UploadException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on UploadException', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on UploadException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
+                        $watermarkFontColorTemp = $request->post('wmFontColor');
+                        if ($watermarkFontColorTemp == '') {
+                            $watermarkFontColor = '#000000';
+                        } else {
+                            $watermarkFontColor = $watermarkFontColorTemp;
                         }
-                    } catch (ProcessException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on ProcessException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on ProcessException', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on ProcessException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
+                        $watermarkFontFamily = $request->post('wmFontFamily');
+                        $watermarkFontSizeTemp = $request->post('wmFontSize');
+                        if ($watermarkFontSizeTemp == '') {
+                            $watermarkFontSize = '12';
+                        } else {
+                            $watermarkFontSize = $watermarkFontSizeTemp;
                         }
-                    } catch (DownloadException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on DownloadException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on DownloadException', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on DownloadException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
+                        $watermarkFontStyle = $request->post('wmFontStyle');
+                        $watermarkLayout = $request->post('wmLayoutStyle');
+                        $watermarkTempPage = $request->post('wmPage');
+                        if (is_string($watermarkTempPage)) {
+                            $watermarkPage = strtolower($watermarkTempPage);
+                        } else {
+                            $watermarkPage = $watermarkTempPage;
                         }
-                    } catch (TaskException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
+                        $watermarkRotation = $request->post('wmRotation');
+                        $watermarkTransparency = $request->post('wmTransparency');
                         try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on TaskException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on TaskException', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on TaskException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
-                        }
-                    } catch (PathException $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on PathException',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on PathException', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on PathException'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
-                        }
-                    } catch (\Exception $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                'errStatus' => $e->getMessage()
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'iLovePDF API Error !, Catch on Exception', $e->getMessage(), true);
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Watermark failed !',
-                                $e->getMessage(),
-                                null,
-                                'iLovePDF API Error !, Catch on Exception'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
-                        }
-                    }
-                    if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
-                        $procFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
-                        $newProcFileSize = AppHelper::instance()->convert($procFileSize, "MB");
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
+                            $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                            $ilovepdfTask = $ilovepdf->newTask('watermark');
+                            if ($watermarkAction == 'img') {
+                                $ilovepdfTask->setEncryption(true);
+                                $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$wmImageName));
+                                $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                                $ilovepdfTask->setMode("image");
+                                $ilovepdfTask->setImageFile($wmImage);
+                                $ilovepdfTask->setTransparency($watermarkTransparency);
+                                $ilovepdfTask->setRotation($watermarkRotation);
+                                $ilovepdfTask->setLayer($watermarkLayout);
+                                $ilovepdfTask->setPages($watermarkPage);
+                                $ilovepdfTask->setMosaic($isMosaic);
+                                $ilovepdfTask->setVerticalPosition("middle");
+                            } else if ($watermarkAction == 'txt') {
+                                $ilovepdfTask->setFileEncryption($pdfEncKey);
+                                $ilovepdfTask->setEncryptKey($pdfEncKey);
+                                $ilovepdfTask->setEncryption(true);
+                                $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                                $ilovepdfTask->setMode("text");
+                                $ilovepdfTask->setText($watermarkText);
+                                $ilovepdfTask->setPages($watermarkPage);
+                                $ilovepdfTask->setVerticalPosition("middle");
+                                $ilovepdfTask->setRotation($watermarkRotation);
+                                $ilovepdfTask->setFontColor($watermarkFontColor);
+                                $ilovepdfTask->setFontFamily($watermarkFontFamily);
+                                $ilovepdfTask->setFontStyle($watermarkFontStyle);
+                                $ilovepdfTask->setFontSize($watermarkFontSize);
+                                $ilovepdfTask->setTransparency($watermarkTransparency);
+                                $ilovepdfTask->setLayer($watermarkLayout);
+                                $ilovepdfTask->setMosaic($isMosaic);
+                            }
+                            $ilovepdfTask->setOutputFileName($randomizePdfFileName);
+                            $ilovepdfTask->execute();
+                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
+                            $ilovepdfTask->delete();
+                            appLogModel::create([
+                                'processId' => $procUuid,
+                                'groupId' => $batchId,
                                 'errReason' => null,
                                 'errStatus' => null
                             ]);
-                            DB::table('pdfWatermark')->insert([
+                            watermarkModel::create([
                                 'fileName' => $currentFileName,
-                                'fileSize' => $newProcFileSize,
+                                'fileSize' => $newFileSize,
                                 'watermarkFontFamily' => $watermarkFontFamily,
                                 'watermarkFontStyle' => $watermarkFontStyle,
                                 'watermarkFontSize' => $watermarkFontSize,
@@ -719,159 +274,158 @@ class watermarkController extends Controller
                                 'watermarkStyle' => $watermarkAction,
                                 'watermarkText' => $watermarkText,
                                 'watermarkPage' => $watermarkPage,
-                                'result' => true,
+                                'result' => false,
                                 'isBatch' => $batchValue,
-                                'processId' => $uuid,
+                                'batchName' => $randomizePdfFileName.'.pdf',
+                                'groupId' => $batchId,
+                                'processId' => $procUuid,
                                 'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
+                                'procDuration' => null
                             ]);
+                        } catch (\Exception $e) {
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            appLogModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'errReason' => 'iLovePDF API Error !, Catch on Exception',
+                                    'errStatus' => $e->getMessage()
+                                ]);
+                            watermarkModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'result' => false,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' => $duration->s.' seconds'
+                                ]);
+                            NotificationHelper::Instance()->sendErrNotify(
+                                $currentFileName,
+                                $fileSize,
+                                $batchId,
+                                'FAIL',
+                                'watermark',
+                                'iLovePDF API Error !, Catch on Exception',
+                                $e->getMessage()
+                            );
+                            return $this->returnDataMesage(
+                                400,
+                                'PDF Watermark failed !',
+                                $e->getMessage(),
+                                $batchId,
+                                null,
+                                'iLovePDF API Error !, Catch on Exception'
+                            );
+                        }
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
+                            $procFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
+                            $newProcFileSize = AppHelper::instance()->convert($procFileSize, "MB");
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            appLogModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'errReason' => null,
+                                    'errStatus' => null
+                                ]);
+                            watermarkModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'result' => true,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' => $duration->s.' seconds'
+                                ]);
                             return $this->returnCoreMessage(
                                 200,
                                 'OK',
                                 $randomizePdfFileName.'.pdf',
                                 Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'),
                                 'watermark',
-                                $uuid,
+                                $batchId,
                                 $newFileSize,
                                 null,
                                 null,
                                 null
                             );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $procFileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
+                        } else {
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
+                            appLogModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'errReason' => 'Failed to download file from iLovePDF API !',
+                                    'errStatus' => null
+                                ]);
+                            watermarkModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'result' => false,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' => $duration->s.' seconds'
+                                ]);
+                            NotificationHelper::Instance()->sendErrNotify(
+                                $currentFileName.'.pdf',
+                                $newFileSize,
+                                $batchId,
+                                'FAIL',
+                                'watermark',
+                                'Failed to download file from iLovePDF API !',
                                 null,
-                                null,
-                                $ex->getMessage()
+                                true
                             );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($randomizePdfFileName.'.pdf', $procFileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
-                        }
-                    } else {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        try {
-                            DB::table('appLogs')->insert([
-                                'processId' => $uuid,
-                                'errReason' => 'Failed to download file from iLovePDF API !',
-                                'errStatus' => null
-                            ]);
-                            DB::table('pdfWatermark')->insert([
-                                'fileName' => $newFileNameWithoutExtension.'.pdf',
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'processId' => $uuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' =>  $duration->s.' seconds'
-                            ]);
                             return $this->returnDataMesage(
                                 400,
                                 'PDF Watermark failed !',
                                 null,
+                                $batchId,
                                 null,
                                 'Failed to download file from iLovePDF API !'
-                            );
-                        } catch (QueryException $ex) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Database connection error !',
-                                null,
-                                null,
-                                $ex->getMessage()
-                            );
-                        } catch (\Exception $e) {
-                            NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                            return $this->returnDataMesage(
-                                500,
-                                'Eloquent transaction error !',
-                                null,
-                                null,
-                                $e->getMessage()
                             );
                         }
                     }
                 }
             } else {
-                try {
-                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                    $duration = $end->diff($startProc);
-                    DB::table('appLogs')->insert([
-                        'processId' => $uuid,
-                        'errReason' => 'PDF failed to upload !',
-                        'errStatus' => null
-                    ]);
-                    DB::table('pdfWatermark')->insert([
-                        'fileName' => null,
-                        'fileSize' => null,
-                        'watermarkFontFamily' => null,
-                        'watermarkFontStyle' => null,
-                        'watermarkFontSize' => null,
-                        'watermarkFontTransparency' => null,
-                        'watermarkImage' => null,
-                        'watermarkLayout' => null,
-                        'watermarkMosaic' => null,
-                        'watermarkRotation' => null,
-                        'watermarkStyle' => null,
-                        'watermarkText' => null,
-                        'watermarkPage' => null,
-                        'result' => false,
-                        'isBatch' => null,
-                        'processId' => $uuid,
-                        'procStartAt' => $startProc,
-                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' =>  $duration->s.' seconds'
-                    ]);
-                    NotificationHelper::Instance()->sendErrNotify(null, null, $uuid, 'FAIL', 'watermark', 'PDF failed to upload !', null, true);
-                    return $this->returnDataMesage(
-                        400,
-                        'PDF Watermark failed !',
-                        null,
-                        null,
-                        'PDF failed to upload !'
-                    );
-                } catch (QueryException $ex) {
-                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Database connection error !',$ex->getMessage(), false);
-                    return $this->returnDataMesage(
-                        500,
-                        'Database connection error !',
-                        null,
-                        null,
-                        $ex->getMessage()
-                    );
-                } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrNotify($currentFileName, $fileSize, $uuid, 'FAIL', 'watermark', 'Eloquent transaction error !', $e->getMessage(), false);
-                    return $this->returnDataMesage(
-                        500,
-                        'Eloquent transaction error !',
-                        null,
-                        null,
-                        $e->getMessage()
-                    );
-                }
+                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                $duration = $end->diff($startProc);
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $batchId,
+                    'errReason' => 'PDF failed to upload !',
+                    'errStatus' => null
+                ]);
+                watermarkModel::create([
+                    'fileName' => null,
+                    'fileSize' => null,
+                    'watermarkFontFamily' => null,
+                    'watermarkFontStyle' => null,
+                    'watermarkFontSize' => null,
+                    'watermarkFontTransparency' => null,
+                    'watermarkImage' => null,
+                    'watermarkLayout' => null,
+                    'watermarkMosaic' => null,
+                    'watermarkRotation' => null,
+                    'watermarkStyle' => null,
+                    'watermarkText' => null,
+                    'watermarkPage' => null,
+                    'result' => false,
+                    'isBatch' => $batchValue,
+                    'batchName' => null,
+                    'groupId' => $batchId,
+                    'processId' => $uuid,
+                    'procStartAt' => $startProc,
+                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                    'procDuration' => $duration->s.' seconds'
+                ]);
+                NotificationHelper::Instance()->sendErrNotify(
+                    null,
+                    null,
+                    $batchId,
+                    'FAIL',
+                    'watermark',
+                    'PDF failed to upload !',
+                    null
+                );
+                return $this->returnDataMesage(
+                    400,
+                    'PDF Watermark failed !',
+                    null,
+                    $batchId,
+                    null,
+                    'PDF failed to upload !'
+                );
             }
         }
     }

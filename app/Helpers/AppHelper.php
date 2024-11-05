@@ -1,8 +1,12 @@
 <?php
 namespace App\Helpers;
 
-use Illuminate\Support\Str;
+use App\Models\appLogModel;
+use App\Models\notifyLogModel;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Ramsey\Uuid\Uuid;
 
 class AppHelper
 {
@@ -93,9 +97,33 @@ class AppHelper
         return substr($hash, 0, 7);
     }
 
-    function get_guid() {
-        $guid = Str::uuid();
-        return $guid;
+    function generateSingleUniqueUuid($customModel, $customColumn) {
+        $startProc = Carbon::now()->format('Y-m-d H:i:s');
+        // $uniqueID = Uuid::uuid4(); --> Need to know how to avoid unrelated relation on first migration !
+        do {
+            $uniqueID = Uuid::uuid4();
+        } while (
+            $customModel::where($customColumn, $uniqueID)->exists()
+        );
+        $end = Carbon::now();
+        $duration = $end->diffInSeconds(Carbon::parse($startProc));
+        Log::Info('New single unique UUID has been generated with response time: '.$duration.' seconds');
+        return $uniqueID->toString();
+    }
+
+    function generateUniqueUuid($customModel, $customColumn) {
+        $startProc = Carbon::now()->format('Y-m-d H:i:s');
+        // $uniqueID = Uuid::uuid4(); --> Need to know how to avoid unrelated relation on first migration !
+        do {
+            $uniqueID = Uuid::uuid4();
+        } while (
+            appLogModel::where($customColumn, $uniqueID)->exists() ||
+            $customModel::where($customColumn, $uniqueID)->exists()
+        );
+        $end = Carbon::now();
+        $duration = $end->diffInSeconds(Carbon::parse($startProc));
+        Log::Info('New unique UUID has been generated with response time: '.$duration.' seconds');
+        return $uniqueID->toString();
     }
 
     public static function instance()

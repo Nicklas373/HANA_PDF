@@ -19,20 +19,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pdfCompress', function (Blueprint $table) {
-            $table->id('compressId');
+            $table->id('compressId')->primary()->unique();
             $table->text('fileName')->nullable();
-            $table->string('fileSize', 25)->nullable();
-            $table->string('compFileSize', 25)->nullable();
-            $table->string('compMethod', 25)->nullable();
+            $table->char('fileSize', length: 25)->nullable();
+            $table->char('compFileSize', length: 25)->nullable();
+            $table->enum('compMethod', ['low','recommended','extreme'])->nullable();
             $table->boolean('result');
             $table->boolean('isBatch');
-            $table->uuid('processId');
-            $table->uuid('batchId')->nullable();
+            $table->text('batchName')->nullable();
+            $table->uuid('groupId');
+            $table->uuid('processId')->unique();
             $table->timestamp('procStartAt')->nullable();
             $table->timestamp('procEndAt')->nullable();
-            $table->text('procDuration')->nullable();
+            $table->char('procDuration', length: 25)->nullable();
             $table->boolean('isReport')->nullable()->default(false);
-            $table->timestamp('createdAt')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('created_at')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Configure foreign key

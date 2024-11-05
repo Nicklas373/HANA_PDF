@@ -9,20 +9,23 @@ class cnvModel extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'pdfConvert';
+    protected $primaryKey = 'cnvId';
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'cnvId',
         'fileName',
         'fileSize',
         'container',
         'imgExtract',
         'result',
         'isBatch',
-        'batchId',
+        'batchName',
+        'groupId',
+        'processId',
         'procStartAt',
         'procEndAt',
-        'procDuration',
-        'isReport'
+        'procDuration'
     ];
 }
