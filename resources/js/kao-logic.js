@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 4;
+const appPatchVer = 6;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
@@ -1299,20 +1299,31 @@ function fetchVersion() {
                 } else {
                     try {
                         var xhrReturn = JSON.parse(xhr.responseText);
+                        let errMessage;
+                        if (xhrReturn.errors == null) {
+                            if (xhrReturn.message == null) {
+                                errMessage = "Internal Server Error";
+                            } else {
+                                errMessage = xhrReturn.message;
+                            }
+                        } else {
+                            errMessage = xhrReturn.errors;
+                        }
                         reject({
                             versionFetchCheck: false,
                             versionFetchStats: xhrReturn.status,
                             versionFetchMessage: xhrReturn.message,
                             versionFetchResponse: xhrReturn.data,
-                            versionFetchError: xhrReturn.errors,
+                            versionFetchError: errMessage,
                         });
                     } catch (e) {
+                        console.error("Error parsing JSON:", e);
                         reject({
                             versionFetchCheck: false,
-                            versioningStats: 500,
-                            versioningMessage: "Internal Server Error",
-                            versionFetchResponse: "Internal Server Error",
-                            versionFetchError: "Internal Server Error",
+                            versionFetchStats: 500,
+                            versionFetchMessage: "Internal Server Error",
+                            versionFetchResponse: e,
+                            versioningError: "Error parsing JSON: " + e,
                         });
                     }
                 }
@@ -1390,18 +1401,29 @@ function getTotalPages(fileName) {
                 } else {
                     try {
                         var xhrReturn = JSON.parse(xhr.responseText);
+                        let errMessage;
+                        if (xhrReturn.errors == null) {
+                            if (xhrReturn.message == null) {
+                                errMessage = "Internal Server Error";
+                            } else {
+                                errMessage = xhrReturn.message;
+                            }
+                        } else {
+                            errMessage = xhrReturn.errors;
+                        }
                         reject({
                             totalPages: false,
                             totalPagesStats: xhrReturn.status,
                             totalPagesMessage: xhrReturn.message,
-                            totalPagesError: xhrReturn.errors,
+                            totalPagesError: errMessage,
                         });
                     } catch (e) {
+                        console.error("Error parsing JSON:", e);
                         reject({
                             totalPages: false,
                             totalPagesStats: 500,
                             totalPagesMessage: "Internal Server Error",
-                            totalPagesError: "Internal Server Error",
+                            totalPagesError: "Error parsing JSON: " + e,
                         });
                     }
                 }
@@ -1439,20 +1461,30 @@ function remainingBalance() {
                             xhrBalance: false,
                             xhrBalanceRemaining: xhrReturn.remaining,
                             xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.errors,
+                            xhrBalanceResponse: errMessage,
                         });
                     }
                     xhrBalanceRemaining = xhrReturn.remaining;
                 } else {
                     try {
                         var xhrReturn = JSON.parse(xhr.responseText);
+                        let errMessage;
+                        if (xhrReturn.errors == null) {
+                            if (xhrReturn.message == null) {
+                                errMessage = "Internal Server Error";
+                            } else {
+                                errMessage = xhrReturn.message;
+                            }
+                        } else {
+                            errMessage = xhrReturn.errors;
+                        }
                         xhrBalance = false;
                         xhrBalanceRemaining = 0;
                         reject({
                             xhrBalance: false,
                             xhrBalanceRemaining: xhrReturn.remaining,
                             xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.errors,
+                            xhrBalanceResponse: errMessage,
                         });
                     } catch (e) {
                         xhrBalance = false;
@@ -1654,7 +1686,7 @@ function sendToAPI(files, proc, action) {
             });
         }
 
-        xhr.open("POST", apiUrl + "/api/v1/pdf/" + proc, true);
+        xhr.open("POST", apiUrl + "/api/v2/pdf/" + proc, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
@@ -1712,6 +1744,16 @@ function sendToAPI(files, proc, action) {
                 } else {
                     try {
                         var xhrReturn = JSON.parse(xhr.responseText);
+                        var errMessage;
+                        if (xhrReturn.errors == null) {
+                            if (xhrReturn.message == null) {
+                                errMessage = "Internal Server Error";
+                            } else {
+                                errMessage = xhrReturn.message;
+                            }
+                        } else {
+                            errMessage = xhrReturn.errors;
+                        }
                         document
                             .getElementById("alert-scs")
                             .classList.add("hidden", "opacity-0");
@@ -1721,11 +1763,13 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errMsgTitle").innerText =
                             "HANA PDF has processed your document !";
                         document.getElementById("errMsg").innerText =
-                            xhrReturn.errors;
+                            errMessage;
+                        document.getElementById("errProcId").innerText =
+                            xhrReturn.groupId;
                         reject({
                             xhrRequestCondition: "ERROR",
                             xhrRequestMessage: xhrReturn.message,
-                            xhrRequestServerMessage: xhrReturn.errors,
+                            xhrRequestServerMessage: errMessage,
                             xhrRequestStatus: xhrReturn.status,
                         });
                     } catch (e) {
@@ -1738,15 +1782,15 @@ function sendToAPI(files, proc, action) {
                         document.getElementById("errMsgTitle").innerText =
                             "HANA PDF has processed your document !";
                         document.getElementById("errMsg").innerText =
-                            "There was unexpected error !";
+                            "Error parsing JSON: " + e;
                         document
-                            .getElementById("errProcMain")
-                            .classList.remove("hidden");
+                            .getElementById("errProcId")
+                            .classList.add("hidden", "opacity-0");
                         reject({
-                            xhrRequestCondition: "ERROR",
-                            xhrRequestMessage: "Internal Server Error",
-                            xhrRequestServerMessage: "Internal Server Error",
-                            xhrRequestStatus: "Internal Server Error",
+                            xhrRequestCondition: "Internal Server Error",
+                            xhrRequestMessage: "Error parsing JSON: " + e,
+                            xhrRequestServerMessage: e,
+                            xhrRequestStatus: 500,
                         });
                     }
                 }
@@ -3178,11 +3222,21 @@ function validateVersion() {
                 } else {
                     try {
                         var xhrReturn = JSON.parse(xhr.responseText);
+                        let errMessage;
+                        if (xhrReturn.errors == null) {
+                            if (xhrReturn.message == null) {
+                                errMessage = "Internal Server Error";
+                            } else {
+                                errMessage = xhrReturn.message;
+                            }
+                        } else {
+                            errMessage = xhrReturn.errors;
+                        }
                         reject({
                             versioningCheck: false,
                             versioningStats: xhrReturn.status,
                             versioningMessage: xhrReturn.message,
-                            versioningError: xhrReturn.errors,
+                            versioningError: errMessage,
                         });
                     } catch (e) {
                         console.error("Error parsing JSON:", e);
@@ -3190,7 +3244,7 @@ function validateVersion() {
                             versioningCheck: false,
                             versioningStats: 500,
                             versioningMessage: "Internal Server Error",
-                            versioningError: "Internal Server Error",
+                            versioningError: "Error parsing JSON: " + e,
                         });
                     }
                 }
