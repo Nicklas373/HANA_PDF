@@ -42,7 +42,8 @@ class AuthController extends Controller
                 'Access unauthorized',
                 null,
                 null,
-                'Auth breach detected'
+                null,
+                'Auth breach detected, requested with '.json_encode($credentials)
             );
         }
 
