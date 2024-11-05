@@ -24,6 +24,7 @@ class versionController extends Controller {
 		]);
 
         $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
 
 		if ($validator->fails()) {
             return $this->returnDataMesage(
@@ -51,6 +52,13 @@ class versionController extends Controller {
             $validateFE = false;
             $validateMessage = '';
             $url = 'https://raw.githubusercontent.com/Nicklas373/Hana-PDF/versioning/versioning.json';
+
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $Muuid,
+                'errReason' => null,
+                'errStatus' => null
+            ]);
 
             if (appHelper::instance()->checkWebAvailable($url)) {
                 $response = Http::get($url);
@@ -100,19 +108,18 @@ class versionController extends Controller {
                                 null
                             );
                         } else {
-                            appLogModel::create([
-                                'processId' => $uuid,
-                                'groupId' => $uuid,
-                                'errReason' => 'Version Check Failed !',
-                                'errStatus' => $validateMessage
-                            ]);
+                            appLogModel::where('groupId', '=', $Muuid)
+                                ->update([
+                                    'errReason' => 'Version Check Failed !',
+                                    'errStatus' => $validateMessage
+                                ]);
                             NotificationHelper::Instance()->sendVersioningErrNotify(
                                 $appVersioningFE,
                                 $versioningFE,
                                 $appVersioningBE,
                                 $versioningBE,
                                 'FAIL',
-                                $uuid,
+                                $Muuid,
                                 'Version Check Failed !',
                                 $validateMessage
                             );
@@ -127,19 +134,18 @@ class versionController extends Controller {
                             );
                         }
                     } catch (\Exception $e) {
-                        appLogModel::create([
-                            'processId' => $uuid,
-                            'groupId' => $uuid,
-                            'errReason' => 'Unable to parsing JSON versioning !',
-                            'errStatus' => $e->getMessage()
-                        ]);
+                        appLogModel::where('groupId', '=', $Muuid)
+                            ->update([
+                                'errReason' => 'Unable to parsing JSON versioning !',
+                                'errStatus' => $e->getMessage()
+                            ]);
                         NotificationHelper::Instance()->sendVersioningErrNotify(
                             null,
                             null,
                             null,
                             null,
                             'FAIL',
-                            $uuid,
+                            $Muuid,
                             'Unable to parsing JSON versioning !',
                             $e->getMessage()
                         );
@@ -154,19 +160,18 @@ class versionController extends Controller {
                         );
                     }
                 } else {
-                    appLogModel::create([
-                        'processId' => $uuid,
-                        'groupId' => $uuid,
-                        'errReason' => 'Version Check Failed !',
-                        'errStatus' => 'Cannot establish response with the server'
-                    ]);
+                    appLogModel::where('groupId', '=', $Muuid)
+                        ->update([
+                            'errReason' => 'Version Check Failed !',
+                            'errStatus' => 'Cannot establish response with the server'
+                        ]);
                     NotificationHelper::Instance()->sendVersioningErrNotify(
                         null,
                         null,
                         null,
                         null,
                         'FAIL',
-                        $uuid,
+                        $Muuid,
                         'Version Check failed !',
                         'Cannot establish response with the server'
                     );
@@ -181,12 +186,11 @@ class versionController extends Controller {
                     );
                 }
             } else {
-                appLogModel::create([
-                    'processId' => $uuid,
-                    'groupId' => $uuid,
-                    'errReason' => 'Version Check Failed !',
-                    'errStatus' => 'Cannot establish connection with the server'
-                ]);
+                appLogModel::where('groupId', '=', $Muuid)
+                    ->update([
+                        'errReason' => 'Version Check Failed !',
+                        'errStatus' => 'Cannot establish response with the server'
+                    ]);
                 NotificationHelper::Instance()->sendVersioningErrNotify(
                     null,
                     null,
@@ -212,8 +216,16 @@ class versionController extends Controller {
 
     public function versioningFetch(Request $request) {
         $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
         $endpoint = 'api/v1/version/fetch';
         $versionFetch = 'https://raw.githubusercontent.com/Nicklas373/Hana-PDF/versioning/changelog.json';
+
+        appLogModel::create([
+            'processId' => $uuid,
+            'groupId' => $Muuid,
+            'errReason' => null,
+            'errStatus' => null
+        ]);
 
 		if (appHelper::instance()->checkWebAvailable($versionFetch)) {
             $response = Http::get($versionFetch);
@@ -229,7 +241,12 @@ class versionController extends Controller {
                         null
                     );
                 } catch (\Exception $e) {
-                    NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $uuid,'Failed to parsing JSON !', $e->getMessage(), false);
+                    appLogModel::where('groupId', '=', $Muuid)
+                        ->update([
+                            'errReason' => 'Failed to parsing JSON !',
+                            'errStatus' =>  $e->getMessage()
+                        ]);
+                    NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $Muuid,'Failed to parsing JSON !', $e->getMessage(), false);
                     return $this->returnDataMesage(
                         400,
                         'Failed to parsing JSON !',
@@ -240,12 +257,11 @@ class versionController extends Controller {
                     );
                 }
             } else {
-                appLogModel::create([
-                    'processId' => $uuid,
-                    'groupId' => $uuid,
-                    'errReason' => 'Versioning Fetch Failed !',
-                    'errStatus' => 'Failed to fetch response with the server'
-                ]);
+                appLogModel::where('groupId', '=', $Muuid)
+                    ->update([
+                        'Version fetch failed !',
+                        'Failed to fetch response with the server'
+                    ]);
                 NotificationHelper::Instance()->sendErrGlobalNotify(
                     $endpoint,
                     'Version Fetch',
@@ -264,12 +280,11 @@ class versionController extends Controller {
                 );
             }
         } else {
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $uuid,
-                'errReason' => 'Versioning Fetch Failed !',
-                'errStatus' => 'Failed to fetch response with the server'
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'Version fetch failed !',
+                    'Failed to fetch response with the server'
+                ]);
             NotificationHelper::Instance()->sendErrGlobalNotify(
                 $endpoint,
                 'Version Fetch',
