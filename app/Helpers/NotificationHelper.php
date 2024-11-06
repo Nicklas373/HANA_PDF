@@ -19,7 +19,7 @@ class NotificationHelper
                     \nStatus: <b>".$status."</b>".
                     "\nStart At: <b>".$CurrentTime.
                     "</b>\nEnvironment: <b>".env('APP_ENV').
-                    "\n\n</b>Services: <b>Backend Services</b>".
+                    "\n\n</b>Services: <b>Frontend Services</b>".
                     "\nSource: <b>https://gw.hana-ci.com</b>".
                     "\nGroup Id: <b>".$processId.
                     "</b>\n\nError Type: <b>Route Error</b>".

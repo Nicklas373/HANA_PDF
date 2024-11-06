@@ -44,6 +44,13 @@ class Handler extends ExceptionHandler
         $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
         $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
 
+        appLogModel::create([
+            'processId' => $uuid,
+            'groupId' => $Muuid,
+            'errReason' => null,
+            'errStatus' => null
+        ]);
+
         try {
             $currentRoute = $request->route();
             $currentRouteInfo = $currentRoute ? $currentRoute->uri() : 'No route information available';
@@ -58,43 +65,38 @@ class Handler extends ExceptionHandler
             if ($route && method_exists($route, 'methods')) {
                 $methods = $route->methods();
                 $message = 'MethodNotAllowedHttpException for route: ' . $uri . ' (' . implode(', ', $methods) . ')';
-                appLogModel::create([
-                    'processId' => $uuid,
-                    'groupId' => $Muuid,
-                    'errReason' => 'Method not allowed exception!',
-                    'errStatus' => $message
-                ]);
                 Log::error($message);
+                appLogModel::where('groupId', '=', $Muuid)
+                    ->update([
+                        'errReason' => 'Method not allowed exception!',
+                        'errStatus' => $message,
+                    ]);
             } else {
                 $message = 'MethodNotAllowedHttpException for route: ' . $uri;
-                appLogModel::create([
-                    'processId' => $uuid,
-                    'groupId' => $Muuid,
-                    'errReason' => 'Method not allowed exception!',
-                    'errStatus' => $message
-                ]);
+                appLogModel::where('groupId', '=', $Muuid)
+                    ->update([
+                        'errReason' => 'Method not allowed exception!',
+                        'errStatus' => $message,
+                    ]);
                 Log::error($message);
             }
             abort(403);
         } else if ($exception instanceof TokenMismatchException || ($exception instanceof HttpException && $exception->getStatusCode() == 419)) {
              $message = 'TokenMismatchException: ' . $exception->getMessage();
-             appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => 'Token Mismatch exception!',
-                'errStatus' => $message
-            ]);
             Log::error($message);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => 'TokenMismatchException',
+                    'errStatus' => $message,
+                ]);
             abort(401);
         } else if ($exception instanceof RouteNotFoundException) {
             $message = 'RouteNotFoundException: ' . $exception->getMessage();
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => 'Route not found exception!',
-                'errStatus' => $message
-            ]);
-            Log::error($message);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => 'Route not found exception!',
+                    'errStatus' => $message,
+                ]);
             return response()->json([
                 'status' => 404,
                 'message' => 'Route not found exception!',
@@ -102,57 +104,51 @@ class Handler extends ExceptionHandler
         } else if ($exception instanceof NotFoundHttpException || ($exception instanceof HttpException && $exception->getStatusCode() == 404)) {
             $message = 'NotFoundHttpException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '404 - Page not found',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '404 - Page not found',
+                    'errStatus' => $message,
+                ]);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 403) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '403 - Forbidden',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '403 - Forbidden',
+                    'errStatus' => $message,
+                ]);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 419) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '419 - Page Expired',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '419 - Page Expired',
+                    'errStatus' => $message
+                ]);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 429) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '429 - Too Many Requests',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '429 - Too Many Requests',
+                    'errStatus' => $message
+                ]);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 500) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '500 - Internal Server Error',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '500 - Internal Server Error',
+                    'errStatus' => $message
+                ]);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 503) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
-            appLogModel::create([
-                'processId' => $uuid,
-                'groupId' => $Muuid,
-                'errReason' => '503 - Service Temporary Unavailable',
-                'errStatus' => $message
-            ]);
+            appLogModel::where('groupId', '=', $Muuid)
+                ->update([
+                    'errReason' => '503 - Service Temporary Unavailable',
+                    'errStatus' => $message
+                ]);
         }
         return parent::render($request, $exception);
     }
