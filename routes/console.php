@@ -11,6 +11,7 @@ use Illuminate\Support\Stringable;
 
 // Generate unique UUID
 $uuid = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$suuid = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
 $muuid = AppHelper::Instance()->generateSingleUniqueUuid(jobLogModel::class, 'groupId');
 
 // Carbon timezone
@@ -352,9 +353,9 @@ Schedule::command('hana:daily-report')
         ->everyFifteenMinutes()
         ->environments(env('APP_ENV'))
         ->timezone('Asia/Jakarta')
-        ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+        ->before(function(AppHelper $helper) use($suuid, $muuid, $startProc) {
             appLogModel::create([
-                'processId' => $uuid,
+                'processId' => $suuid,
                 'groupId' => $muuid,
                 'errReason' => null,
                 'errStatus' => null
@@ -365,28 +366,28 @@ Schedule::command('hana:daily-report')
                 'jobsRuntime' => 'every 15 minutes',
                 'jobsResult' => false,
                 'groupId' => $muuid,
-                'processId' => $uuid,
+                'processId' => $suuid,
                 'procStartAt' => $startProc
             ]);
         })
-        ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+        ->after(function(AppHelper $helper, Stringable $output) use($suuid, $muuid, $startProc)  {
             $start = Carbon::parse($startProc);
             $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
             $duration = $end->diff($start);
             if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
-                jobLogModel::where('processId', '=', $uuid)
+                jobLogModel::where('processId', '=', $suuid)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
             } else {
-                appLogModel::where('processId', '=', $uuid)
+                appLogModel::where('processId', '=', $suuid)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output,
                 ]);
-                jobLogModel::where('processId', '=', $uuid)
+                jobLogModel::where('processId', '=', $suuid)
                     ->update([
                         'jobsResult' => false,
                         'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
