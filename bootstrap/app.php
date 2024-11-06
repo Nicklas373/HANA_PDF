@@ -29,22 +29,25 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle AuthenticationException
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $guid,
+                    'errReason' => null,
+                    'errStatus' => null
+                ]);
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenExpiredException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenExpiredException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -58,15 +61,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenInvalidException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenInvalidException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -80,15 +79,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - JWTException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - JWTException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -104,16 +99,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 $message = 'AuthenticationException: ' . $e->getMessage();
                 Log::error($message);
 
-                try {
-                    DB::table('appLogs')->insert([
-                        'processId' => $uuid,
-                        'errReason' => 'Authentication Exception',
-                        'errStatus' => $message
+                appLogModel::where('groupId', '=', $guid)
+                    ->update([
+                        'errReason' => $message,
+                        'errStatus' => '401 - Authentication Exception'
                     ]);
-                } catch (QueryException $ex) {
-                    Log::error('Query Exception failed with: '. $ex->getMessage());
-                }
-                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '401 - Authentication Exception', $message);
+                NotificationHelper::Instance()->sendRouteErrNotify($guid, 'FAIL', '401 - Authentication Exception', $message);
                 return response()->json([
                     'status' => 401,
                     'message' => '401 - Authentication Exception',
@@ -125,22 +116,25 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle NotFoundHttpException
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $guid,
+                    'errReason' => null,
+                    'errStatus' => null
+                ]);
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenExpiredException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenExpiredException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -154,15 +148,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenInvalidException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenInvalidException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -176,15 +166,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - JWTException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - JWTException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -199,6 +185,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 $message = 'NotFoundHttpException: ' . $e->getMessage();
                 Log::error($message);
+                appLogModel::where('groupId', '=', $guid)
+                    ->update([
+                        'errReason' => $message,
+                        'errStatus' => '404 - Page not found'
+                    ]);
                 return response()->json([
                     'status' => 404,
                     'message' => '404 - Page not found',
@@ -210,22 +201,25 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle MethodNotAllowedHttpException
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $guid,
+                    'errReason' => null,
+                    'errStatus' => null
+                ]);
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenExpiredException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenExpiredException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -239,15 +233,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenInvalidException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenInvalidException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -261,15 +251,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - JWTException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - JWTException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -284,16 +270,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 $message = 'MethodNotAllowedHttpException for route: '. $e->getMessage();
                 Log::error($message);
-                try {
-                    DB::table('appLogs')->insert([
-                        'processId' => $uuid,
-                        'errReason' => '405 - HTTP Method Not Allowed',
-                        'errStatus' => $message
+                appLogModel::where('groupId', '=', $guid)
+                    ->update([
+                        'errReason' => $message,
+                        'errStatus' => '405 - HTTP Method Not Allowed'
                     ]);
-                } catch (QueryException $ex) {
-                    Log::error('Query Exception failed with: '. $ex->getMessage());
-                }
-                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '405 - HTTP Method Not Allowed', $message);
+                NotificationHelper::Instance()->sendRouteErrNotify($guid, 'FAIL', '405 - HTTP Method Not Allowed', $message);
                 return response()->json([
                     'status' => 405,
                     'message' => '405 - HTTP Method Not Allowed',
@@ -305,22 +287,25 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle RouteNotFoundException
         $exceptions->render(function (RouteNotFoundException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
                 $isAjax = $request->ajax();
+                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                appLogModel::create([
+                    'processId' => $uuid,
+                    'groupId' => $guid,
+                    'errReason' => null,
+                    'errStatus' => null
+                ]);
                 try {
                     $user = JWTAuth::parseToken()->authenticate();
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $ex) {
                     $message = 'JWTAuth - TokenExpiredException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenExpiredException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenExpiredException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -334,15 +319,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException $ex) {
                     $message = 'JWTAuth - TokenInvalidException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - TokenInvalidException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - TokenInvalidException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -356,15 +337,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException $ex) {
                     $message = 'JWTAuth - JWTException: '. $ex->getMessage();
                     Log::error($message);
-                    try {
-                        DB::table('appLogs')->insert([
-                            'processId' => $uuid,
-                            'errReason' => 'JWTAuth - JWTException',
-                            'errStatus' => $message
+                    appLogModel::where('groupId', '=', $guid)
+                        ->update([
+                            'errReason' => $message,
+                            'errStatus' => 'JWTAuth - JWTException'
                         ]);
-                    } catch (QueryException $ex) {
-                        Log::error('Query Exception failed with: '. $ex->getMessage());
-                    }
                     if ($isAjax) {
                         return response()->json([
                             'status' => 401,
@@ -379,16 +356,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 $message = 'RouteNotFoundException for route: '. $e->getMessage();
                 Log::error($message);
-                try {
-                    DB::table('appLogs')->insert([
-                        'processId' => $uuid,
-                        'errReason' => '404 - Route Not Found',
-                        'errStatus' => $message
+                appLogModel::where('groupId', '=', $guid)
+                    ->update([
+                        'errReason' => $message,
+                        'errStatus' => '404 - Route Not Found'
                     ]);
-                } catch (QueryException $ex) {
-                    Log::error('Query Exception failed with: '. $ex->getMessage());
-                }
-                NotificationHelper::Instance()->sendRouteErrNotify($uuid, 'FAIL', '404 - Route Not Found', $message);
+                NotificationHelper::Instance()->sendRouteErrNotify($guid, 'FAIL', '404 - Route Not Found', $message);
                 return response()->json([
                     'status' => 404,
                     'message' => '404 - Route Not Found',
