@@ -1383,7 +1383,7 @@ function getTotalPages(fileName) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
         formData.append("fileName", fileName);
-        xhr.open("POST", apiUrl + "/api/v1/pdf/getTotalPagesPDF", true);
+        xhr.open("POST", apiUrl + "/api/v2/pdf/getTotalPagesPDF", true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
