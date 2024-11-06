@@ -152,7 +152,7 @@ class convertController extends Controller
                                 }
                             }
                             $asposeAPI = new Process([
-                                'py',
+                                'python3',
                                 public_path().'/ext-python/asposeAPI.py',
                                 env('ASPOSE_CLOUD_CLIENT_ID'),
                                 env('ASPOSE_CLOUD_TOKEN'),
@@ -308,7 +308,7 @@ class convertController extends Controller
                                 }
                             }
                             $asposeAPI = new Process([
-                                'py',
+                                'python3',
                                 public_path().'/ext-python/asposeAPI.py',
                                 env('ASPOSE_CLOUD_CLIENT_ID'),
                                 env('ASPOSE_CLOUD_TOKEN'),
@@ -805,6 +805,8 @@ class convertController extends Controller
                                         $relativePath = $file.'.zip';
                                         $zip->addFile($filePath, $relativePath);
                                     } else {
+                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                        $duration = $end->diff($startProc);
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
                                                 'errReason' => 'Failed convert PDF file !',
@@ -851,6 +853,8 @@ class convertController extends Controller
                                    unlink($file);
                                 }
                             }
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
                                     'errReason' => null,
@@ -875,6 +879,8 @@ class convertController extends Controller
                                 null
                             );
                         } else {
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
                                     'errReason' => 'Failed archiving PDF files !',
@@ -905,6 +911,8 @@ class convertController extends Controller
                         }
                     }
                 } else {
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
                             'errReason' => 'PDF convert failed',
