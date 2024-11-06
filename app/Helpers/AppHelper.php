@@ -99,12 +99,12 @@ class AppHelper
 
     function generateSingleUniqueUuid($customModel, $customColumn) {
         $startProc = Carbon::now()->format('Y-m-d H:i:s');
-        // $uniqueID = Uuid::uuid4();
-        do {
-            $uniqueID = Uuid::uuid4();
-        } while (
-            $customModel::where($customColumn, $uniqueID)->exists()
-        );
+        $uniqueID = Uuid::uuid4();
+        // do {
+        //     $uniqueID = Uuid::uuid4();
+        // } while (
+        //     $customModel::where($customColumn, $uniqueID)->exists()
+        // );
         $end = Carbon::now();
         $duration = $end->diffInSeconds(Carbon::parse($startProc));
         Log::Info('New single unique UUID has been generated with response time: '.$duration.' seconds');
@@ -113,13 +113,13 @@ class AppHelper
 
     function generateUniqueUuid($customModel, $customColumn) {
         $startProc = Carbon::now()->format('Y-m-d H:i:s');
-        //$uniqueID = Uuid::uuid4();
-        do {
-            $uniqueID = Uuid::uuid4();
-        } while (
-            appLogModel::where($customColumn, $uniqueID)->exists() ||
-            $customModel::where($customColumn, $uniqueID)->exists()
-        );
+        $uniqueID = Uuid::uuid4();
+        // do {
+        //     $uniqueID = Uuid::uuid4();
+        // } while (
+        //     appLogModel::where($customColumn, $uniqueID)->exists() ||
+        //     $customModel::where($customColumn, $uniqueID)->exists()
+        // );
         $end = Carbon::now();
         $duration = $end->diffInSeconds(Carbon::parse($startProc));
         Log::Info('New unique UUID has been generated with response time: '.$duration.' seconds');
