@@ -73,6 +73,25 @@ class htmltopdfController extends Controller
             $pdfSize = $request->post('urlSizeValue');
             $pdfSinglePage = $request->post('urlSinglePage');
             $newUrl = '';
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $batchId,
+                'errReason' => null,
+                'errStatus' => null
+            ]);
+            htmlModel::create([
+                'urlName' => $request->post('urlToPDF'),
+                'urlMargin' => $pdfMargin,
+                'urlOrientation' => $pdfOrientation,
+                'urlSinglePage' => $pdfSinglePage,
+                'urlSize' => $pdfSize,
+                'result' => false,
+                'groupId' => $batchId,
+                'processId' => $uuid,
+                'procStartAt' => $startProc,
+                'procEndAt' => null,
+                'procDuration' => null
+            ]);
             if (AppHelper::Instance()->checkWebAvailable($pdfUrl)) {
                 $newUrl = $pdfUrl;
             } else {
@@ -85,34 +104,17 @@ class htmltopdfController extends Controller
                 } else {
                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                     $duration = $end->diff($startProc);
-                    appLogModel::create([
-                        'processId' => $uuid,
-                        'groupId' => $batchId,
-                        'errReason' => '404',
-                        'errStatus' => 'Webpage are not available or not valid'
-                    ]);
-                    htmlModel::create([
-                        'urlName' => $request->post('urlToPDF'),
-                        'urlMargin' => $pdfMargin,
-                        'urlOrientation' => $pdfOrientation,
-                        'urlSinglePage' => $pdfSinglePage,
-                        'urlSize' => $pdfSize,
-                        'result' => false,
-                        'groupId' => $batchId,
-                        'processId' => $uuid,
-                        'procStartAt' => $startProc,
-                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' => $duration->s.' seconds'
-                    ]);
-                    NotificationHelper::Instance()->sendErrNotify(
-                        $pdfUrl,
-                        null,
-                        $batchId,
-                        'FAIL',
-                        'htmltopdf',
-                        'HTML To PDF Conversion Failed !',
-                        'Webpage are not available or not valid'
-                    );
+                    appLogModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'errReason' => '404',
+                            'errStatus' => 'Webpage are not available or not valid'
+                        ]);
+                    htmlModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'result' => false,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' => $duration->s.' seconds'
+                        ]);
                     return $this->returnDataMesage(
                         400,
                         'HTML To PDF failed !',
@@ -142,25 +144,6 @@ class htmltopdfController extends Controller
                 $ilovepdfTask->setOutputFileName($pdfDefaultFileName);
                 $ilovepdfTask->execute();
                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfProcessed_Location));
-                appLogModel::create([
-                    'processId' => $uuid,
-                    'groupId' => $batchId,
-                    'errReason' => null,
-                    'errStatus' => null
-                ]);
-                htmlModel::create([
-                    'urlName' => $request->post('urlToPDF'),
-                    'urlMargin' => $pdfMargin,
-                    'urlOrientation' => $pdfOrientation,
-                    'urlSinglePage' => $pdfSinglePage,
-                    'urlSize' => $pdfSize,
-                    'result' => false,
-                    'groupId' => $batchId,
-                    'processId' => $uuid,
-                    'procStartAt' => $startProc,
-                    'procEndAt' => null,
-                    'procDuration' => null
-                ]);
             } catch (\Exception $e) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);

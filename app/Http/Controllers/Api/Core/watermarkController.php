@@ -87,18 +87,52 @@ class watermarkController extends Controller
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $watermarkAction = $request->post('action');
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => null,
+                            'errStatus' => null
+                        ]);
+                        watermarkModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => $newFileSize,
+                            'watermarkFontFamily' => null,
+                            'watermarkFontStyle' => null,
+                            'watermarkFontSize' => null,
+                            'watermarkFontTransparency' => null,
+                            'watermarkImage' => null,
+                            'watermarkLayout' => null,
+                            'watermarkMosaic' => null,
+                            'watermarkRotation' => null,
+                            'watermarkStyle' => null,
+                            'watermarkText' => null,
+                            'watermarkPage' => null,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'batchName' => $randomizePdfFileName.'.pdf',
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => null,
+                            'procDuration' => null
+                        ]);
                         if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
                             Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
                         }
                         if ($watermarkAction == 'img') {
                             $watermarkImage = $request->file('imgFile');
                             if (empty($watermarkImage)) {
-                                appLogModel::create([
-                                    'processId' => $uuid,
-                                    'groupId' => $batchId,
-                                    'errReason' => 'PDF Watermark failed !',
-                                    'errStatus' => 'Image file for watermark can not be empty !'
-                                ]);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                          'errReason' => 'PDF Watermark failed !',
+                                            'errStatus' => 'Image file for watermark can not be empty !'
+                                    ]);
+                                watermarkModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
                                 NotificationHelper::Instance()->sendErrNotify(
                                     null,
                                     null,
@@ -128,6 +162,17 @@ class watermarkController extends Controller
                             $watermarkText = $request->post('wmText');
                             $wmImageName = null;
                             if (empty($watermarkText)) {
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => 'PDF Watermark failed !',
+                                        'errStatus' => 'Text for watermark can not be empty !'
+                                    ]);
+                                watermarkModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
                                 return $this->returnDataMesage(
                                     400,
                                     'PDF Watermark failed !',
@@ -140,35 +185,17 @@ class watermarkController extends Controller
                         } else {
                             $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
-                            appLogModel::create([
-                                'processId' => $procUuid,
-                                'groupId' => $batchId,
-                                'errReason' => 'Invalid request action !',
-                                'errStatus' => 'Current request: '.$watermarkAction
-                            ]);
-                            watermarkModel::create([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => null,
-                                'watermarkFontStyle' => null,
-                                'watermarkFontSize' => null,
-                                'watermarkFontTransparency' => null,
-                                'watermarkImage' => null,
-                                'watermarkLayout' => null,
-                                'watermarkMosaic' => null,
-                                'watermarkRotation' => null,
-                                'watermarkStyle' => null,
-                                'watermarkText' => null,
-                                'watermarkPage' => null,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'batchName' => $randomizePdfFileName.'.pdf',
-                                'groupId' => $batchId,
-                                'processId' => $procUuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' => $duration->s.' seconds'
-                            ]);
+                            appLogModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'errReason' => 'PDF Watermark failed !',
+                                    'errStatus' =>  'Invalid request action !,Current request: '.$watermarkAction
+                                ]);
+                            watermarkModel::where('groupId', '=', $batchId)
+                                ->update([
+                                    'result' => false,
+                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                    'procDuration' => $duration->s.' seconds'
+                                ]);
                             NotificationHelper::Instance()->sendErrNotify(
                                 $currentFileName,
                                 $fileSize,
@@ -254,34 +281,20 @@ class watermarkController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                             $ilovepdfTask->delete();
-                            appLogModel::create([
-                                'processId' => $procUuid,
-                                'groupId' => $batchId,
-                                'errReason' => null,
-                                'errStatus' => null
-                            ]);
-                            watermarkModel::create([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'watermarkFontFamily' => $watermarkFontFamily,
-                                'watermarkFontStyle' => $watermarkFontStyle,
-                                'watermarkFontSize' => $watermarkFontSize,
-                                'watermarkFontTransparency' => $watermarkTransparency,
-                                'watermarkImage' => $wmImageName,
-                                'watermarkLayout' => $watermarkLayout,
-                                'watermarkMosaic' => $isMosaicDB,
-                                'watermarkRotation' => $watermarkRotation,
-                                'watermarkStyle' => $watermarkAction,
-                                'watermarkText' => $watermarkText,
-                                'watermarkPage' => $watermarkPage,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'batchName' => $randomizePdfFileName.'.pdf',
-                                'groupId' => $batchId,
-                                'processId' => $procUuid,
-                                'procStartAt' => $startProc,
-                                'procDuration' => null
-                            ]);
+                            watermarkModel::where('processId', '=', $procUuid)
+                                ->update([
+                                    'watermarkFontFamily' => $watermarkFontFamily,
+                                    'watermarkFontStyle' => $watermarkFontStyle,
+                                    'watermarkFontSize' => $watermarkFontSize,
+                                    'watermarkFontTransparency' => $watermarkTransparency,
+                                    'watermarkImage' => $wmImageName,
+                                    'watermarkLayout' => $watermarkLayout,
+                                    'watermarkMosaic' => $isMosaicDB,
+                                    'watermarkRotation' => $watermarkRotation,
+                                    'watermarkStyle' => $watermarkAction,
+                                    'watermarkText' => $watermarkText,
+                                    'watermarkPage' => $watermarkPage
+                                ]);
                         } catch (\Exception $e) {
                             $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
