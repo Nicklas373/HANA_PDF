@@ -1,4 +1,4 @@
-<div id="altLoadingModal" tabindex="-1" aria-hidden="true" class="fixed flex top-full w-full p-4 z-50 hidden overflow-x-hidden overflow-y-auto md:inset-0 h-full justify-center items-center pointer-events-none">
+<div id="altLoadingModal" tabindex="-1" aria-hidden="true" class="fixed flex top-0 w-full p-4 z-50 hidden overflow-x-hidden overflow-y-auto md:inset-0 h-full justify-center items-center pointer-events-none">
     <div class="relative w-full max-w-2xl max-h-full pointer-events-auto">
         <div class="relative bg-pc4 rounded-lg shadow">
             <div class="p-6 space-y-6 text-center">
