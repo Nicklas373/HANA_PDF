@@ -15,6 +15,7 @@ class NotificationHelper
 
     function sendRouteErrNotify($processId, $status, $errReason, $errCode) {
         $CurrentTime = AppHelper::instance()->getCurrentTimeZone();
+        $uuid = AppHelper::Instance()->generateUniqueUuid(notifyLogModel::class, 'processId');
         $message = "<b>HANA API Alert</b>
                     \nStatus: <b>".$status."</b>".
                     "\nStart At: <b>".$CurrentTime.
@@ -34,8 +35,14 @@ class NotificationHelper
                 'parse_mode' => 'HTML'
             ]);
             $messageId = $response->getMessageId();
+            appLogModel::create([
+                'processId' => $uuid,
+                'groupId' => $processId,
+                'errReason' => null,
+                'errStatus' => null
+            ]);
             notifyLogModel::create([
-                'processId' => $processId,
+                'processId' => $uuid,
                 'notifyName' => 'Telegram SDK',
                 'notifyResult' => true,
                 'notifyMessage' => 'Message has been sent !',
@@ -44,24 +51,32 @@ class NotificationHelper
         } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
             if ($e->getHttpStatusCode() == null) {
                 $httpStatus = null;
-              } else {
+            } else {
                 $httpStatus = $e->getHttpStatusCode();
-              }
-              notifyLogModel::create([
-                  'processId' => $processId,
-                  'notifyName' => 'Telegram SDK',
-                  'notifyResult' => false,
-                  'notifyMessage' => 'TelegramResponseException',
-                  'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
-              ]);
+            }
+            appLogModel::where('processId', '=', $uuid)
+                ->update([
+                    'errReason' => 'TelegramResponseException',
+                    'errStatus' => $errReason
+                ]);
+            notifyLogModel::where('processId', '=', $uuid)
+                ->update([
+                    'notifyResult' => false,
+                    'notifyMessage' => 'TelegramResponseException',
+                    'notifyResponse' => $e->getMessage().' | '.$httpStatus.' | '.$e->getErrorType()
+                ]);
         } catch (\Exception $e) {
-            notifyLogModel::create([
-                'processId' => $processId,
-                'notifyName' => 'Telegram SDK',
-                'notifyResult' => false,
-                'notifyMessage' => 'Unexpected handling exception !',
-                'notifyResponse' => $e->getMessage()
-            ]);
+            appLogModel::where('processId', '=', $uuid)
+                ->update([
+                    'errReason' => 'TelegramResponseException',
+                    'errStatus' => $errReason
+                ]);
+            notifyLogModel::where('processId', '=', $uuid)
+                ->update([
+                    'notifyResult' => false,
+                    'notifyMessage' => 'Unexpected handling exception !',
+                    'notifyResponse' => $e->getMessage()
+                ]);
         }
     }
 }
