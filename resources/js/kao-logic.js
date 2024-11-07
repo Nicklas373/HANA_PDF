@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 6;
+const appPatchVer = 8;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const commitHash = gitHash;
@@ -241,7 +241,7 @@ if (whatsNewBtn) {
 
 if (uploadDropzone) {
     let uploadDropzone = new Dropzone("#dropzoneArea", {
-        url: apiUrl + "/api/v1/file/upload",
+        url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 5,
@@ -313,8 +313,10 @@ if (uploadDropzone) {
                 }
 
                 dzFileLayout.forEach(function (element) {
-                    element.style.borderColor = "transparent";
-                    element.style.backgroundColor = "transparent";
+                    Object.assign(element.style, {
+                        backgroundColor: "transparent",
+                        borderColor: "transparent",
+                    });
                 });
 
                 if (file.type === "application/pdf") {
@@ -338,8 +340,10 @@ if (uploadDropzone) {
                         );
                     }
 
-                    procBtn.style.backgroundColor = "#4DAAAA";
-                    procBtn.style.borderColor = "transparent";
+                    Object.assign(procBtn.style, {
+                        backgroundColor: "#4DAAAA",
+                        borderColor: "transparent",
+                    });
 
                     var prvBtn = document.querySelectorAll(".prvBtn");
                     var rmvBtn = document.querySelectorAll(".rmvBtn");
@@ -416,9 +420,11 @@ if (uploadDropzone) {
                     document
                         .getElementById("dropzoneUiExt")
                         .classList.add("hidden");
-                    procBtn.style.backgroundColor = null;
-                    procBtn.style.borderColor = "#E0E4E5";
-                    procBtn.style.color = null;
+                    Object.assign(procBtn.style, {
+                        backgroundColor: null,
+                        borderColor: "#E0E4E5",
+                        color: null,
+                    });
                 }
 
                 if (file) {
@@ -441,7 +447,7 @@ if (uploadDropzone) {
                         xhrTotalUploads = xhrTotalUploads - 1;
                     }
 
-                    fetch(apiUrl + "/api/v1/file/remove", {
+                    fetch(`${apiUrl}/api/v1/file/remove`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -480,39 +486,36 @@ if (uploadDropzone) {
             });
 
             this.on("error", function (file, dropzoneErrMessage, xhr) {
-                let dzErrorMessage =
+                const dzErrorMessage =
                     file.previewElement.querySelector(".dz-error-message");
+                let newErrMessage = "Internal server error";
+
                 if (dzErrorMessage) {
-                    let newErrMessage;
-                    if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr.readyState == XMLHttpRequest.DONE) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.errors !== "") {
-                                    newErrMessage = xhrReturn.errors;
-                                } else {
-                                    newErrMessage =
-                                        "There was an unexpected error";
-                                }
-                            } else {
-                                newErrMessage =
-                                    "Failed to fetch response from the server";
-                            }
-                        } else {
-                            newErrMessage = "Server was not on readyState";
+                    if (
+                        dropzoneErrMessage === "[object Object]" &&
+                        xhr.readyState === XMLHttpRequest.DONE
+                    ) {
+                        try {
+                            const xhrResponse = JSON.parse(xhr.responseText);
+                            newErrMessage =
+                                xhrResponse.errors ||
+                                "There was an unexpected error";
+                        } catch (error) {
+                            newErrMessage = "Failed to parse server response";
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage;
+                        newErrMessage =
+                            dropzoneErrMessage || "Server was not ready";
                     }
+
                     dzErrorMessage.textContent = newErrMessage;
-                } else {
-                    dzErrorMessage.textContent = "Internal server error";
                 }
-                errMessage.innerText = "Failed to upload " + file.name;
+
+                errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
-                generateMesssage(dzErrorMessage.textContent);
+                generateMesssage(dzErrorMessage?.textContent || newErrMessage);
                 errAltSubMessageModal.style = null;
                 loadingModal.hide();
                 errModal.show();
@@ -556,7 +559,7 @@ if (uploadDropzone) {
 
 if (uploadDropzoneAlt) {
     let uploadDropzoneAlt = new Dropzone("#dropzoneAreaCnv", {
-        url: apiUrl + "/api/v1/file/upload",
+        url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 5,
@@ -629,8 +632,10 @@ if (uploadDropzoneAlt) {
                 }
 
                 dzFileLayout.forEach(function (element) {
-                    element.style.borderColor = "transparent";
-                    element.style.backgroundColor = "transparent";
+                    Object.assign(element.element, {
+                        backgroundColor: "#transparent",
+                        borderColor: "transparent",
+                    });
                 });
 
                 if (uploadDropzoneAlt.files.length >= 4) {
@@ -642,8 +647,10 @@ if (uploadDropzoneAlt) {
                         "disabled"
                     );
                 } else {
-                    procBtn.style.backgroundColor = "#4DAAAA";
-                    procBtn.style.borderColor = "transparent";
+                    Object.assign(procBtn.style, {
+                        backgroundColor: "#4DAAAA",
+                        borderColor: "transparent",
+                    });
                     document
                         .getElementById("dropzoneUiExt")
                         .classList.remove("hidden");
@@ -709,9 +716,11 @@ if (uploadDropzoneAlt) {
                     document
                         .getElementById("dropzoneUiExt")
                         .classList.add("hidden");
-                    procBtn.style.backgroundColor = null;
-                    procBtn.style.borderColor = "#E0E4E5";
-                    procBtn.style.color = null;
+                    Object.assign(procBtn.style, {
+                        backgroundColor: null,
+                        borderColor: "#E0E4E5",
+                        color: null,
+                    });
                 }
 
                 if (file) {
@@ -734,7 +743,7 @@ if (uploadDropzoneAlt) {
                         xhrTotalUploads = xhrTotalUploads - 1;
                     }
 
-                    fetch(apiUrl + "/api/v1/file/remove", {
+                    fetch(`${apiUrl}/api/v1/file/remove`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -787,7 +796,7 @@ if (uploadDropzoneAlt) {
                                     ".dz-image-thumbnail"
                                 ).src = apiUrl + thumbnailURL;
                         })
-                        .catch(function (error) {
+                        .catch(function () {
                             file.previewElement.querySelector(
                                 ".dz-image-thumbnail"
                             ).src = "/assets/icons/placeholder_pptx.svg";
@@ -796,39 +805,36 @@ if (uploadDropzoneAlt) {
             });
 
             this.on("error", function (file, dropzoneErrMessage, xhr) {
-                let dzErrorMessage =
+                const dzErrorMessage =
                     file.previewElement.querySelector(".dz-error-message");
+                let newErrMessage = "Internal server error";
+
                 if (dzErrorMessage) {
-                    let newErrMessage;
-                    if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr.readyState == XMLHttpRequest.DONE) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.errors !== "") {
-                                    newErrMessage = xhrReturn.errors;
-                                } else {
-                                    newErrMessage =
-                                        "There was an unexpected error";
-                                }
-                            } else {
-                                newErrMessage =
-                                    "Failed to fetch response from the server";
-                            }
-                        } else {
-                            newErrMessage = "Server was not on readyState";
+                    if (
+                        dropzoneErrMessage === "[object Object]" &&
+                        xhr.readyState === XMLHttpRequest.DONE
+                    ) {
+                        try {
+                            const xhrResponse = JSON.parse(xhr.responseText);
+                            newErrMessage =
+                                xhrResponse.errors ||
+                                "There was an unexpected error";
+                        } catch (error) {
+                            newErrMessage = "Failed to parse server response";
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage;
+                        newErrMessage =
+                            dropzoneErrMessage || "Server was not ready";
                     }
+
                     dzErrorMessage.textContent = newErrMessage;
-                } else {
-                    dzErrorMessage.textContent = "Internal server error";
                 }
-                errMessage.innerText = "Failed to upload " + file.name;
+
+                errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
-                generateMesssage(dzErrorMessage.textContent);
+                generateMesssage(dzErrorMessage?.textContent || newErrMessage);
                 errAltSubMessageModal.style = null;
                 loadingModal.hide();
                 errModal.show();
@@ -860,7 +866,7 @@ if (uploadDropzoneAlt) {
 
 if (uploadDropzoneSingle) {
     let uploadDropzoneSingle = new Dropzone("#dropzoneAreaSingle", {
-        url: apiUrl + "/api/v1/file/upload",
+        url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
         maxFilesize: 25,
         maxFiles: 1,
@@ -933,8 +939,10 @@ if (uploadDropzoneSingle) {
                 }
 
                 dzFileLayout.forEach(function (element) {
-                    element.style.borderColor = "transparent";
-                    element.style.backgroundColor = "transparent";
+                    Object.assign(element.style, {
+                        backgroundColor: "#4DAAAA",
+                        borderColor: "transparent",
+                    });
                 });
 
                 if (file.type === "application/pdf") {
@@ -958,8 +966,10 @@ if (uploadDropzoneSingle) {
                         );
                     }
 
-                    procBtn.style.backgroundColor = "#4DAAAA";
-                    procBtn.style.color = "#E0E4E5";
+                    Object.assign(procBtn.style, {
+                        backgroundColor: "#4DAAAA",
+                        color: "#E0E4E5",
+                    });
 
                     var prvBtn = document.querySelectorAll(".prvBtn");
                     var rmvBtn = document.querySelectorAll(".rmvBtn");
@@ -1033,8 +1043,10 @@ if (uploadDropzoneSingle) {
                     document
                         .getElementById("dropzoneUiExt")
                         .classList.add("hidden");
-                    procBtn.style.backgroundColor = null;
-                    procBtn.style.color = null;
+                    Object.assign(procBtn.style, {
+                        backgroundColor: null,
+                        color: null,
+                    });
                 }
 
                 if (file) {
@@ -1057,7 +1069,7 @@ if (uploadDropzoneSingle) {
                         xhrTotalUploads = xhrTotalUploads - 1;
                     }
 
-                    fetch(apiUrl + "/api/v1/file/remove", {
+                    fetch(`${apiUrl}/api/v1/file/upload`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -1096,39 +1108,36 @@ if (uploadDropzoneSingle) {
             });
 
             this.on("error", function (file, dropzoneErrMessage, xhr) {
-                let dzErrorMessage =
+                const dzErrorMessage =
                     file.previewElement.querySelector(".dz-error-message");
+                let newErrMessage = "Internal server error";
+
                 if (dzErrorMessage) {
-                    let newErrMessage;
-                    if (dropzoneErrMessage == "[object Object]") {
-                        if (xhr.readyState == XMLHttpRequest.DONE) {
-                            if (xhr.response) {
-                                var xhrReturn = JSON.parse(xhr.responseText);
-                                if (xhrReturn.errors !== "") {
-                                    newErrMessage = xhrReturn.errors;
-                                } else {
-                                    newErrMessage =
-                                        "There was an unexpected error";
-                                }
-                            } else {
-                                newErrMessage =
-                                    "Failed to fetch response from the server";
-                            }
-                        } else {
-                            newErrMessage = "Server was not on readyState";
+                    if (
+                        dropzoneErrMessage === "[object Object]" &&
+                        xhr.readyState === XMLHttpRequest.DONE
+                    ) {
+                        try {
+                            const xhrResponse = JSON.parse(xhr.responseText);
+                            newErrMessage =
+                                xhrResponse.errors ||
+                                "There was an unexpected error";
+                        } catch (error) {
+                            newErrMessage = "Failed to parse server response";
                         }
                     } else {
-                        newErrMessage = dropzoneErrMessage;
+                        newErrMessage =
+                            dropzoneErrMessage || "Server was not ready";
                     }
+
                     dzErrorMessage.textContent = newErrMessage;
-                } else {
-                    dzErrorMessage.textContent = "Internal server error";
                 }
-                errMessage.innerText = "Failed to upload " + file.name;
+
+                errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
                 resetErrListMessage();
-                generateMesssage(dzErrorMessage.textContent);
+                generateMesssage(dzErrorMessage?.textContent || newErrMessage);
                 errAltSubMessageModal.style = null;
                 loadingModal.hide();
                 errModal.show();
@@ -1280,15 +1289,15 @@ function fetchVersion() {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open("GET", apiUrl + "/api/v1/version/fetch", true);
+        xhr.open("GET", `${apiUrl}/api/v1/version/fetch`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 200) {
                     resolve({
                         versionFetchCheck: true,
                         versionFetchStats: xhrReturn.status,
@@ -1297,39 +1306,41 @@ function fetchVersion() {
                         versionFetchError: null,
                     });
                 } else {
-                    try {
-                        var xhrReturn = JSON.parse(xhr.responseText);
-                        let errMessage;
-                        if (xhrReturn.errors == null) {
-                            if (xhrReturn.message == null) {
-                                errMessage = "Internal Server Error";
-                            } else {
-                                errMessage = xhrReturn.message;
-                            }
-                        } else {
-                            errMessage = xhrReturn.errors;
-                        }
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: xhrReturn.status,
-                            versionFetchMessage: xhrReturn.message,
-                            versionFetchResponse: xhrReturn.data,
-                            versionFetchError: errMessage,
-                        });
-                    } catch (e) {
-                        console.error("Error parsing JSON:", e);
-                        reject({
-                            versionFetchCheck: false,
-                            versionFetchStats: 500,
-                            versionFetchMessage: "Internal Server Error",
-                            versionFetchResponse: e,
-                            versioningError: "Error parsing JSON: " + e,
-                        });
-                    }
+                    reject({
+                        versionFetchCheck: false,
+                        versionFetchStats: xhrReturn.status,
+                        versionFetchMessage:
+                            xhrReturn.message || "An error occurred",
+                        versionFetchResponse:
+                            xhrReturn.data || "Something went wrong on our end",
+                        versionFetchError:
+                            xhrReturn.errors ||
+                            xhrReturn.message ||
+                            "Internal Server Error",
+                    });
                 }
+            } catch (e) {
+                reject({
+                    versionFetchCheck: false,
+                    versionFetchStats: 500,
+                    versionFetchMessage: "Internal Server Error",
+                    versionFetchResponse: e,
+                    versioningError: `Error parsing JSON: ${e}`,
+                });
             }
         };
-        xhr.send();
+
+        xhr.onerror = () => {
+            reject({
+                versionFetchCheck: false,
+                versionFetchStats: xhr.status || 500,
+                versionFetchMessage: "Network error occurred",
+                versionFetchResponse: "Undefined",
+                versioningError: "Network error",
+            });
+        };
+
+        xhr.onreadystatechange = xhr.send();
     });
 }
 
@@ -1352,28 +1363,33 @@ function generateThumbnail(fileName) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
         formData.append("file", fileName);
-        xhr.open("POST", apiUrl + "/api/v1/file/thumbnail", true);
+        xhr.open("POST", `${apiUrl}/api/v1/file/thumbnail`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 201) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhrReturn.status == 201) {
-                        resolve(xhrReturn.files);
-                    } else {
-                        reject(
-                            new Error("API response error: " + xhrReturn.errors)
-                        );
-                    }
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 201) {
+                    resolve(xhrReturn.files);
                 } else {
                     reject(
-                        new Error("API response error! Status: " + xhr.status)
+                        new Error(
+                            "API response error: " + xhrReturn.errors ||
+                                xhrReturn.message ||
+                                "Internal Server Error"
+                        )
                     );
                 }
+            } catch (e) {
+                new Error(`Error parsing JSON: ${e}`);
             }
         };
+
+        xhr.onerror = () => {
+            new Error("Network error occurred");
+        };
+
         xhr.send(formData);
     });
 }
@@ -1383,15 +1399,16 @@ function getTotalPages(fileName) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
         formData.append("fileName", fileName);
-        xhr.open("POST", apiUrl + "/api/v1/pdf/getTotalPagesPDF", true);
+
+        xhr.open("POST", `${apiUrl}/api/v2/pdf/getTotalPagesPDF`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 200) {
                     resolve({
                         totalPages: true,
                         totalPagesStats: xhrReturn.status,
@@ -1399,106 +1416,93 @@ function getTotalPages(fileName) {
                         totalPagesError: null,
                     });
                 } else {
-                    try {
-                        var xhrReturn = JSON.parse(xhr.responseText);
-                        let errMessage;
-                        if (xhrReturn.errors == null) {
-                            if (xhrReturn.message == null) {
-                                errMessage = "Internal Server Error";
-                            } else {
-                                errMessage = xhrReturn.message;
-                            }
-                        } else {
-                            errMessage = xhrReturn.errors;
-                        }
-                        reject({
-                            totalPages: false,
-                            totalPagesStats: xhrReturn.status,
-                            totalPagesMessage: xhrReturn.message,
-                            totalPagesError: errMessage,
-                        });
-                    } catch (e) {
-                        console.error("Error parsing JSON:", e);
-                        reject({
-                            totalPages: false,
-                            totalPagesStats: 500,
-                            totalPagesMessage: "Internal Server Error",
-                            totalPagesError: "Error parsing JSON: " + e,
-                        });
-                    }
+                    reject({
+                        totalPages: false,
+                        totalPagesStats: xhrReturn.status,
+                        totalPagesMessage:
+                            xhrReturn.message || "An error occurred",
+                        totalPagesError:
+                            xhrReturn.errors ||
+                            xhrReturn.message ||
+                            "Internal Server Error",
+                    });
                 }
+            } catch (e) {
+                reject({
+                    totalPages: false,
+                    totalPagesMessage: "Internal server error",
+                    totalPagesStats: 500,
+                    totalPagesError: `Error parsing JSON: ${e}`,
+                });
             }
         };
+
+        xhr.onerror = () => {
+            reject({
+                totalPages: false,
+                totalPagesMessage: "Network error occurred",
+                totalPagesStats: xhr.status || 500,
+                totalPagesError: "Network error",
+            });
+        };
+
         xhr.send(formData);
     });
 }
 
 function remainingBalance() {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", apiUrl + "/api/v1/ilovepdf/limit", true);
-        xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `${apiUrl}/api/v1/ilovepdf/limit`, true);
+        xhr.setRequestHeader("Authorization", `Bearer ${bearerToken}`);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
-                    if (xhrReturn.remaining > 0) {
-                        xhrBalance = true;
-                        xhrBalanceRemaining = xhrReturn.remaining;
-                        resolve({
-                            xhrBalance: true,
-                            xhrBalanceRemaining: xhrReturn.remaining,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: xhrReturn.message,
-                        });
-                    } else {
-                        xhrBalance = false;
-                        xhrBalanceRemaining = xhrReturn.remaining;
-                        resolve({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: xhrReturn.remaining,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: errMessage,
-                        });
-                    }
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 200) {
+                    const hasBalance = xhrReturn.remaining > 0;
+                    xhrBalance = true;
                     xhrBalanceRemaining = xhrReturn.remaining;
+                    resolve({
+                        xhrBalance: hasBalance,
+                        xhrBalanceRemaining: xhrReturn.remaining,
+                        xhrBalanceStatus: xhrReturn.status,
+                        xhrBalanceResponse: hasBalance
+                            ? xhrReturn.message
+                            : errMessage,
+                    });
                 } else {
-                    try {
-                        var xhrReturn = JSON.parse(xhr.responseText);
-                        let errMessage;
-                        if (xhrReturn.errors == null) {
-                            if (xhrReturn.message == null) {
-                                errMessage = "Internal Server Error";
-                            } else {
-                                errMessage = xhrReturn.message;
-                            }
-                        } else {
-                            errMessage = xhrReturn.errors;
-                        }
-                        xhrBalance = false;
-                        xhrBalanceRemaining = 0;
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: xhrReturn.remaining,
-                            xhrBalanceStatus: xhrReturn.status,
-                            xhrBalanceResponse: errMessage,
-                        });
-                    } catch (e) {
-                        xhrBalance = false;
-                        xhrBalanceRemaining = 0;
-                        reject({
-                            xhrBalance: false,
-                            xhrBalanceRemaining: 0,
-                            xhrBalanceStatus: 500,
-                            xhrBalanceResponse: "Internal Server Error",
-                        });
-                    }
+                    reject({
+                        xhrBalance: false,
+                        xhrBalanceRemaining: xhrReturn.remaining || 0,
+                        xhrBalanceStatus: xhrReturn.status,
+                        xhrBalanceResponse:
+                            xhrReturn.errors ||
+                            xhrReturn.message ||
+                            "Internal Server Error",
+                    });
                 }
+            } catch (e) {
+                reject({
+                    xhrBalance: false,
+                    xhrBalanceRemaining: 0,
+                    xhrBalanceStatus: 500,
+                    xhrBalanceResponse: `Error parsing JSON: ${e}`,
+                });
             }
         };
+
+        xhr.onerror = () => {
+            reject({
+                xhrBalance: false,
+                xhrBalanceRemaining: 0,
+                xhrBalanceStatus: xhr.status || 500,
+                xhrBalanceResponse: "Network error",
+            });
+        };
+
         xhr.send();
     });
 }
@@ -1512,292 +1516,262 @@ function resetErrListMessage() {
 function sendToAPI(files, proc, action) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
-        var formData = new FormData();
-
-        if (proc == "compress") {
-            var compMethodValue = document.querySelector(
-                'input[name="compMethod"]:checked'
-            ).value;
-            formData.append("compMethod", compMethodValue);
-        } else if (proc == "convert") {
-            if (document.getElementById("cnvToPDF") !== null) {
-                var cnvValue = "pdf";
-                formData.append("extImage", false.toString());
-            } else if (document.getElementById("cnvFrPDF") !== null) {
-                var cnvValue = document.querySelector(
-                    'input[name="convertType"]:checked'
-                ).value;
-                var imgValue = document.getElementById("extImage");
-                if (imgValue.checked) {
-                    formData.append("extImage", true.toString());
-                } else {
-                    formData.append("extImage", false.toString());
-                }
-            }
-            formData.append("convertType", cnvValue);
-        } else if (proc == "split") {
-            let mergePdf;
-            let usedMethod;
-            var customPageSplit =
-                document.getElementById("customPageSplit").value;
-            var customPageDelete =
-                document.getElementById("customPageDelete").value;
-            var firstPage = document.getElementById("fromPage").value;
-            var lastPage = document.getElementById("toPage").value;
-            if (document.getElementById("thirdRadio").checked) {
-                mergePdf = document.getElementById("mergePDF").checked;
-                usedMethod = "range";
-            } else if (document.getElementById("fourthRadio").checked) {
-                mergePdf = document.getElementById("mergePDF1").checked;
-                usedMethod = "custom";
-            } else if (document.getElementById("secondRadio").checked) {
-                mergePdf = false;
-                usedMethod = "custom";
-            } else {
-                mergePdf = null;
-                usedMethod = null;
-            }
-            formData.append("action", action);
-            formData.append("fromPage", firstPage);
-            formData.append("toPage", lastPage);
-            formData.append("mergePDF", mergePdf.toString());
-            formData.append("customPageSplit", customPageSplit);
-            formData.append("customPageDelete", customPageDelete);
-            formData.append("usedMethod", usedMethod);
-        } else if (proc == "watermark") {
-            if (document.getElementById("firstRadio").checked == true) {
-                let wmLayoutStyle;
-                var imgFile = document.getElementById("wm_file_input").files[0];
-                var wmRotation = document.getElementById(
-                    "watermarkImageRotation"
-                ).value;
-                var wmPage =
-                    document.getElementById("watermarkPageImage").value;
-                var wmTransparency = document.getElementById(
-                    "watermarkImageTransparency"
-                ).value;
-                var wmMosaic = document.getElementById("isMosaicImage").checked;
-                if (
-                    document.getElementById("wmRadioImageLayoutStyleA")
-                        .checked == true
-                ) {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioImageLayoutStyleA"
-                    ).value;
-                } else if (
-                    document.getElementById("wmRadioImageLayoutStyleB")
-                        .checked == true
-                ) {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioImageLayoutStyleB"
-                    ).value;
-                } else {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioImageLayoutStyleA"
-                    ).value;
-                }
-                formData.append("action", action);
-                formData.append("imgFile", imgFile);
-                formData.append("wmFontColor", "");
-                formData.append("wmFontSize", "");
-                formData.append("wmFontStyle", "Regular");
-                formData.append("wmFontFamily", "Arial");
-                formData.append("wmLayoutStyle", wmLayoutStyle);
-                formData.append("wmRotation", wmRotation);
-                formData.append("wmPage", wmPage);
-                formData.append("wmText", "");
-                formData.append("wmTransparency", wmTransparency);
-                formData.append("wmMosaic", wmMosaic.toString());
-            } else if (document.getElementById("secondRadio").checked == true) {
-                let wmLayoutStyle;
-                var wmFontColor =
-                    document.getElementById("watermarkFontColor").value;
-                var wmFontFamily = document.getElementById(
-                    "watermarkFontFamily"
-                ).value;
-                var wmFontSize =
-                    document.getElementById("watermarkFontSize").value;
-                var wmFontStyle =
-                    document.getElementById("watermarkFontStyle").value;
-                var wmRotation = document.getElementById(
-                    "watermarkTextRotation"
-                ).value;
-                var wmPage = document.getElementById("watermarkPageText").value;
-                var wmText = document.getElementById("watermarkText").value;
-                var wmTransparency = document.getElementById(
-                    "watermarkTextTransparency"
-                ).value;
-                var wmMosaic = document.getElementById("isMosaicText").checked;
-                if (
-                    document.getElementById("wmRadioLayoutStyleA").checked ==
-                    true
-                ) {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioLayoutStyleA"
-                    ).value;
-                } else if (
-                    document.getElementById("wmRadioLayoutStyleB").checked ==
-                    true
-                ) {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioLayoutStyleB"
-                    ).value;
-                } else {
-                    wmLayoutStyle = document.getElementById(
-                        "wmRadioLayoutStyleA"
-                    ).value;
-                }
-                formData.append("action", action);
-                formData.append("imgFile", "");
-                formData.append("wmFontColor", wmFontColor);
-                formData.append("wmFontSize", wmFontSize);
-                formData.append("wmFontStyle", wmFontStyle);
-                formData.append("wmFontFamily", wmFontFamily);
-                formData.append("wmLayoutStyle", wmLayoutStyle);
-                formData.append("wmRotation", wmRotation);
-                formData.append("wmPage", wmPage);
-                formData.append("wmText", wmText);
-                formData.append("wmTransparency", wmTransparency);
-                formData.append("wmMosaic", wmMosaic.toString());
-            }
-        } else if (proc == "html") {
-            var urlValue = document.getElementById("urlToPDF").value;
-            var urlMarginValue = document.getElementById("pageMargin").value;
-            var urlSizeValue = document.getElementById("pageSize").value;
-            var urlPageOrientation = document.querySelector(
-                'input[name="pageOrientation"]:checked'
-            ).value;
-            var urlSinglePage =
-                document.getElementById("isSinglePageText").checked;
-            formData.append("urlToPDF", urlValue);
-            formData.append("urlMarginValue", urlMarginValue);
-            formData.append("urlSizeValue", urlSizeValue);
-            formData.append("urlPageOrientationValue", urlPageOrientation);
-            formData.append("urlSinglePage", urlSinglePage);
-        }
-        if (proc !== "html") {
-            if (files.length > 1) {
-                formData.append("batch", true.toString());
-            } else {
-                formData.append("batch", false.toString());
-            }
-            files.forEach(function (file, index) {
-                formData.append("file[" + index + "]", file);
-            });
-        }
+        const formData = handleFormDataSTA(files, proc, action);
 
         xhr.open("POST", apiUrl + "/api/v2/pdf/" + proc, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
-                    if (proc == "compress" && xhrTotalUploads == 1) {
-                        document
-                            .getElementById("alert-scs")
-                            .classList.remove("hidden", "opacity-0");
-                        document
-                            .getElementById("alert-err")
-                            .classList.add("hidden", "opacity-0");
-                        document.getElementById("scsMsgTitle").innerText =
-                            "HANA PDF has processed your document !";
-                        document.getElementById("scsMsgResult").innerHTML = `
-                                Compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
-                            `;
-                        document.getElementById("scsMsgLink").href =
-                            apiUrl + xhrReturn.fileSource;
-                        document.getElementById("scsMsgLink").innerText =
-                            "Download PDF";
-                        resolve({
-                            xhrRequestCondition: "OK",
-                            xhrRequestMessage: xhrReturn.message,
-                            xhrRequestServerMessage: "",
-                            xhrRequestStatus: xhrReturn.status,
-                        });
-                    } else {
-                        document
-                            .getElementById("alert-scs")
-                            .classList.remove("hidden", "opacity-0");
-                        document
-                            .getElementById("alert-err")
-                            .classList.add("hidden", "opacity-0");
-                        document.getElementById(
-                            "scsMsgTitle"
-                        ).innerText = `HANA PDF has processed your document !`;
-                        document.getElementById(
-                            "scsMsgResult"
-                        ).innerText = `Download the file or PDF below.`;
-                        document.getElementById("scsMsgLink").href =
-                            apiUrl + xhrReturn.fileSource;
-                        document.getElementById("scsMsgLink").innerText =
-                            "Download PDF";
-                        resolve({
-                            xhrRequestCondition: "OK",
-                            xhrRequestMessage: xhrReturn.message,
-                            xhrRequestServerMessage: xhrReturn.message,
-                            xhrRequestStatus: xhrReturn.status,
-                        });
-                    }
-                } else {
-                    try {
-                        var xhrReturn = JSON.parse(xhr.responseText);
-                        var errMessage;
-                        if (xhrReturn.errors == null) {
-                            if (xhrReturn.message == null) {
-                                errMessage = "Internal Server Error";
-                            } else {
-                                errMessage = xhrReturn.message;
-                            }
-                        } else {
-                            errMessage = xhrReturn.errors;
-                        }
-                        document
-                            .getElementById("alert-scs")
-                            .classList.add("hidden", "opacity-0");
-                        document
-                            .getElementById("alert-err")
-                            .classList.remove("hidden", "opacity-0");
-                        document.getElementById("errMsgTitle").innerText =
-                            "HANA PDF has processed your document !";
-                        document.getElementById("errMsg").innerText =
-                            errMessage;
-                        document.getElementById("errProcId").innerText =
-                            xhrReturn.groupId;
-                        reject({
-                            xhrRequestCondition: "ERROR",
-                            xhrRequestMessage: xhrReturn.message,
-                            xhrRequestServerMessage: errMessage,
-                            xhrRequestStatus: xhrReturn.status,
-                        });
-                    } catch (e) {
-                        document
-                            .getElementById("alert-scs")
-                            .classList.add("hidden", "opacity-0");
-                        document
-                            .getElementById("alert-err")
-                            .classList.remove("hidden", "opacity-0");
-                        document.getElementById("errMsgTitle").innerText =
-                            "HANA PDF has processed your document !";
-                        document.getElementById("errMsg").innerText =
-                            "Error parsing JSON: " + e;
-                        document
-                            .getElementById("errProcId")
-                            .classList.add("hidden", "opacity-0");
-                        reject({
-                            xhrRequestCondition: "Internal Server Error",
-                            xhrRequestMessage: "Error parsing JSON: " + e,
-                            xhrRequestServerMessage: e,
-                            xhrRequestStatus: 500,
-                        });
-                    }
-                }
-            }
+        xhr.onload = () => {
+            handleResponseSTA(xhr, proc, resolve, reject);
         };
+
+        xhr.onerror = () => {
+            reject({
+                xhrRequestCondition: false,
+                xhrRequestStatus: xhr.status || 500,
+                xhrRequestMessage: "Network error occurred",
+                xhrRequestServerMessage: "Network error",
+            });
+        };
+
         xhr.send(formData);
     });
+}
+
+function handleFormDataSTA(files, proc, action) {
+    const formData = new FormData();
+
+    if (proc == "compress") {
+        formData.append(
+            "compMethod",
+            document.querySelector('input[name="compMethod"]:checked').value
+        );
+    } else if (proc == "convert") {
+        if (document.getElementById("cnvToPDF") !== null) {
+            var cnvValue = "pdf";
+            formData.append("extImage", false.toString());
+        } else if (document.getElementById("cnvFrPDF") !== null) {
+            var cnvValue = document.querySelector(
+                'input[name="convertType"]:checked'
+            ).value;
+            var imgValue = document.getElementById("extImage");
+            if (imgValue.checked) {
+                formData.append("extImage", true.toString());
+            } else {
+                formData.append("extImage", false.toString());
+            }
+        }
+        formData.append("convertType", cnvValue);
+    } else if (proc == "split") {
+        let mergePdf;
+        let usedMethod;
+        var customPageSplit = document.getElementById("customPageSplit").value;
+        var customPageDelete =
+            document.getElementById("customPageDelete").value;
+        var firstPage = document.getElementById("fromPage").value;
+        var lastPage = document.getElementById("toPage").value;
+        if (document.getElementById("thirdRadio").checked) {
+            mergePdf = document.getElementById("mergePDF").checked;
+            usedMethod = "range";
+        } else if (document.getElementById("fourthRadio").checked) {
+            mergePdf = document.getElementById("mergePDF1").checked;
+            usedMethod = "custom";
+        } else if (document.getElementById("secondRadio").checked) {
+            mergePdf = false;
+            usedMethod = "custom";
+        } else {
+            mergePdf = null;
+            usedMethod = null;
+        }
+        formData.append("action", action);
+        formData.append("fromPage", firstPage);
+        formData.append("toPage", lastPage);
+        formData.append("mergePDF", mergePdf.toString());
+        formData.append("customPageSplit", customPageSplit);
+        formData.append("customPageDelete", customPageDelete);
+        formData.append("usedMethod", usedMethod);
+    } else if (proc == "watermark") {
+        if (document.getElementById("firstRadio").checked == true) {
+            let wmLayoutStyle;
+            var imgFile = document.getElementById("wm_file_input").files[0];
+            var wmRotation = document.getElementById(
+                "watermarkImageRotation"
+            ).value;
+            var wmPage = document.getElementById("watermarkPageImage").value;
+            var wmTransparency = document.getElementById(
+                "watermarkImageTransparency"
+            ).value;
+            var wmMosaic = document.getElementById("isMosaicImage").checked;
+            if (
+                document.getElementById("wmRadioImageLayoutStyleA").checked ==
+                true
+            ) {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioImageLayoutStyleA"
+                ).value;
+            } else if (
+                document.getElementById("wmRadioImageLayoutStyleB").checked ==
+                true
+            ) {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioImageLayoutStyleB"
+                ).value;
+            } else {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioImageLayoutStyleA"
+                ).value;
+            }
+            formData.append("action", action);
+            formData.append("imgFile", imgFile);
+            formData.append("wmFontColor", "");
+            formData.append("wmFontSize", "");
+            formData.append("wmFontStyle", "Regular");
+            formData.append("wmFontFamily", "Arial");
+            formData.append("wmLayoutStyle", wmLayoutStyle);
+            formData.append("wmRotation", wmRotation);
+            formData.append("wmPage", wmPage);
+            formData.append("wmText", "");
+            formData.append("wmTransparency", wmTransparency);
+            formData.append("wmMosaic", wmMosaic.toString());
+        } else if (document.getElementById("secondRadio").checked == true) {
+            let wmLayoutStyle;
+            var wmFontColor =
+                document.getElementById("watermarkFontColor").value;
+            var wmFontFamily = document.getElementById(
+                "watermarkFontFamily"
+            ).value;
+            var wmFontSize = document.getElementById("watermarkFontSize").value;
+            var wmFontStyle =
+                document.getElementById("watermarkFontStyle").value;
+            var wmRotation = document.getElementById(
+                "watermarkTextRotation"
+            ).value;
+            var wmPage = document.getElementById("watermarkPageText").value;
+            var wmText = document.getElementById("watermarkText").value;
+            var wmTransparency = document.getElementById(
+                "watermarkTextTransparency"
+            ).value;
+            var wmMosaic = document.getElementById("isMosaicText").checked;
+            if (
+                document.getElementById("wmRadioLayoutStyleA").checked == true
+            ) {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioLayoutStyleA"
+                ).value;
+            } else if (
+                document.getElementById("wmRadioLayoutStyleB").checked == true
+            ) {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioLayoutStyleB"
+                ).value;
+            } else {
+                wmLayoutStyle = document.getElementById(
+                    "wmRadioLayoutStyleA"
+                ).value;
+            }
+            formData.append("action", action);
+            formData.append("imgFile", "");
+            formData.append("wmFontColor", wmFontColor);
+            formData.append("wmFontSize", wmFontSize);
+            formData.append("wmFontStyle", wmFontStyle);
+            formData.append("wmFontFamily", wmFontFamily);
+            formData.append("wmLayoutStyle", wmLayoutStyle);
+            formData.append("wmRotation", wmRotation);
+            formData.append("wmPage", wmPage);
+            formData.append("wmText", wmText);
+            formData.append("wmTransparency", wmTransparency);
+            formData.append("wmMosaic", wmMosaic.toString());
+        }
+    } else if (proc == "html") {
+        var urlValue = document.getElementById("urlToPDF").value;
+        var urlMarginValue = document.getElementById("pageMargin").value;
+        var urlSizeValue = document.getElementById("pageSize").value;
+        var urlPageOrientation = document.querySelector(
+            'input[name="pageOrientation"]:checked'
+        ).value;
+        var urlSinglePage = document.getElementById("isSinglePageText").checked;
+        formData.append("urlToPDF", urlValue);
+        formData.append("urlMarginValue", urlMarginValue);
+        formData.append("urlSizeValue", urlSizeValue);
+        formData.append("urlPageOrientationValue", urlPageOrientation);
+        formData.append("urlSinglePage", urlSinglePage);
+    }
+    if (proc !== "html") {
+        formData.append("batch", files.length > 1);
+        files.forEach((file, index) => formData.append(`file[${index}]`, file));
+    }
+
+    return formData;
+}
+
+function handleResponseSTA(xhr, proc, resolve, reject) {
+    try {
+        const xhrReturn = JSON.parse(xhr.responseText);
+        console.log(xhr.status);
+        if (xhr.status === 200) {
+            scsInterfaceSTA(xhrReturn, proc);
+            resolve({
+                xhrRequestCondition: "OK",
+                xhrRequestMessage: xhrReturn.message,
+                xhrRequestServerMessage: "",
+                xhrRequestStatus: xhrReturn.status,
+            });
+        } else {
+            errInterfaceSTA(xhrReturn);
+            reject({
+                xhrRequestCondition: "ERROR",
+                xhrRequestMessage: xhrReturn.message || "An error occurred",
+                xhrRequestServerMessage:
+                    xhrReturn.errors ||
+                    xhrReturn.message ||
+                    "Internal Server Error",
+                xhrRequestStatus: xhrReturn.status,
+            });
+        }
+    } catch (e) {
+        reject({
+            xhrRequestCondition: "Internal Server Error",
+            xhrRequestMessage: `Error parsing JSON: ${e}`,
+            xhrRequestServerMessage: e,
+            xhrRequestStatus: 500,
+        });
+    }
+}
+
+function scsInterfaceSTA(xhrReturn, proc) {
+    const alertSuccess = document.getElementById("alert-scs");
+    const alertError = document.getElementById("alert-err");
+    alertError.classList.add("hidden", "opacity-0");
+    alertSuccess.classList.remove("hidden", "opacity-0");
+    document.getElementById("scsMsgTitle").innerText =
+        "HANA PDF has processed your document!";
+    if (proc == "compress" && xhrTotalUploads == 1) {
+        document.getElementById("scsMsgResult").innerHTML = `
+        Compressed to <b>${xhrReturn.newFileSize}</b> with <b>${xhrReturn.compMethod}</b> compression level.
+    `;
+    } else {
+        document.getElementById(
+            "scsMsgResult"
+        ).innerText = `Download the file or PDF below.`;
+    }
+    document.getElementById(
+        "scsMsgLink"
+    ).href = `${apiUrl}${xhrReturn.fileSource}`;
+    document.getElementById("scsMsgLink").innerText = "Download PDF";
+}
+
+function errInterfaceSTA(xhrReturn) {
+    const alertSuccess = document.getElementById("alert-scs");
+    const alertError = document.getElementById("alert-err");
+    alertError.classList.remove("hidden", "opacity-0");
+    alertSuccess.classList.add("hidden", "opacity-0");
+    document.getElementById("errMsgTitle").innerText =
+        "HANA PDF has processed your document !";
+    document.getElementById("errMsg").innerText =
+        xhrReturn.errors || "Internal Server Error";
+    document.getElementById("errProcId").innerText = xhrReturn.groupId;
 }
 
 function submit(event) {
@@ -3204,15 +3178,15 @@ function validateVersion() {
         formData.append("appGitVersion", commitHash);
         formData.append("appServicesReferrer", "FE");
 
-        xhr.open("POST", apiUrl + "/api/v1/version/check", true);
+        xhr.open("POST", `${apiUrl}/api/v1/version/check`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("Accept", "application/json");
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var xhrReturn = JSON.parse(xhr.responseText);
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 200) {
                     resolve({
                         versioningCheck: true,
                         versioningStats: xhrReturn.status,
@@ -3220,36 +3194,36 @@ function validateVersion() {
                         versioningError: null,
                     });
                 } else {
-                    try {
-                        var xhrReturn = JSON.parse(xhr.responseText);
-                        let errMessage;
-                        if (xhrReturn.errors == null) {
-                            if (xhrReturn.message == null) {
-                                errMessage = "Internal Server Error";
-                            } else {
-                                errMessage = xhrReturn.message;
-                            }
-                        } else {
-                            errMessage = xhrReturn.errors;
-                        }
-                        reject({
-                            versioningCheck: false,
-                            versioningStats: xhrReturn.status,
-                            versioningMessage: xhrReturn.message,
-                            versioningError: errMessage,
-                        });
-                    } catch (e) {
-                        console.error("Error parsing JSON:", e);
-                        reject({
-                            versioningCheck: false,
-                            versioningStats: 500,
-                            versioningMessage: "Internal Server Error",
-                            versioningError: "Error parsing JSON: " + e,
-                        });
-                    }
+                    reject({
+                        versioningCheck: false,
+                        versioningStats: xhrReturn.status,
+                        versioningMessage:
+                            xhrReturn.message || "An error occurred",
+                        versioningError:
+                            xhrReturn.errors ||
+                            xhrReturn.message ||
+                            "Internal Server Error",
+                    });
                 }
+            } catch (e) {
+                reject({
+                    versioningCheck: false,
+                    versioningStats: 500,
+                    versioningMessage: "Internal Server Error",
+                    versioningError: `Error parsing JSON: ${e}`,
+                });
             }
         };
+
+        xhr.onerror = () => {
+            reject({
+                versioningCheck: false,
+                versioningStats: xhr.status || 500,
+                versioningMessage: "Network error occurred",
+                versioningError: "Network error",
+            });
+        };
+
         xhr.send(formData);
     });
 }
