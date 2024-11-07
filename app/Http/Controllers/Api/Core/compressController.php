@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use ZipArchive;
 
 class compressController extends Controller
 {
@@ -71,6 +68,7 @@ class compressController extends Controller
                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                 $pdfPool_Location = env('PDF_POOL');
                 $loopCount = count($files);
+                $altPoolFiles = array();
                 $poolFiles = array();
                 $procFile = 0;
                 if ($batch == "true") {
@@ -89,35 +87,39 @@ class compressController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    array_push($poolFiles, $newFileNameWithoutExtension);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    if ($batchValue) {
-                        $newFileName = $randomizePdfFileName.'.zip';
-                    } else {
-                        $newFileName = $currentFileName;
-                    }
                     if (file_exists($newFilePath)) {
-                        $fileSize = filesize($newFilePath);
-                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        $procUuid = AppHelper::Instance()->generateUniqueUuid(compressModel::class, 'processId');
-                        if ($loopCount <= 1) {
-                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$trimPhase1)) {
-                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$trimPhase1);
+                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    }
+                }
+                if ($loopCount == count($altPoolFiles)) {
+                    try {
+                        $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                        $ilovepdfTask = $ilovepdf->newTask('compress');
+                        $ilovepdfTask->setFileEncryption($pdfEncKey);
+                        $ilovepdfTask->setEncryptKey($pdfEncKey);
+                        $ilovepdfTask->setEncryption(true);
+                        foreach ($files as $file) {
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                            array_push($poolFiles, $newFileNameWithoutExtension);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            if ($batchValue) {
+                                $newFileName = $randomizePdfFileName.'.zip';
+                            } else {
+                                $newFileName = $currentFileName;
                             }
-                        }
-                        try {
-                            $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                            $ilovepdfTask = $ilovepdf->newTask('compress');
-                            $ilovepdfTask->setFileEncryption($pdfEncKey);
-                            $ilovepdfTask->setEncryptKey($pdfEncKey);
-                            $ilovepdfTask->setEncryption(true);
+                            $fileSize = filesize($newFilePath);
+                            $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                            $procUuid = AppHelper::Instance()->generateUniqueUuid(compressModel::class, 'processId');
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$trimPhase1)) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$trimPhase1);
+                                }
+                            }
                             $pdfFile = $ilovepdfTask->addFile($newFilePath);
                             $pdfFile->setPassword($pdfEncKey);
-                            $ilovepdfTask->setCompressionLevel($compMethod);
-                            $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
-                            $ilovepdfTask->execute();
-                            $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                            $ilovepdfTask->delete();
                             appLogModel::create([
                                 'processId' => $procUuid,
                                 'groupId' => $batchId,
@@ -137,46 +139,17 @@ class compressController extends Controller
                                 'procStartAt' => $startProc,
                                 'procDuration' => null
                             ]);
-                        } catch (\Exception $e) {
-                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                            $duration = $end->diff($startProc);
-                            appLogModel::where('groupId', '=', $batchId)
-                                ->update([
-                                    'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errStatus' => 'Error while processing file: '.$newFilePath
-                                ]);
-                            compressModel::where('groupId', '=', $batchId)
-                                ->update([
-                                    'result' => false,
-                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                    'procDuration' =>  $duration->s.' seconds'
-                                ]);
-                            NotificationHelper::Instance()->sendErrNotify(
-                                $currentFileName,
-                                $fileSize,
-                                $batchId,
-                                'FAIL',
-                                'compress',
-                                'iLovePDF API Error !, Catch on Exception',
-                                $e->getMessage()
-                            );
-                            return $this->returnDataMesage(
-                                400,
-                                'PDF Compression failed !',
-                                $e->getMessage(),
-                                $batchId,
-                                null,
-                                'iLovePDF API Error !, Catch on Exception'
-                            );
                         }
-                    }
-                    if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))) {
-                        $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'));
-                        $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        $procFile += 1;
-                    } else {
+                        $ilovepdfTask->setCompressionLevel($compMethod);
+                        if ($batchValue) {
+                            $ilovepdfTask->setPackagedFilename($randomizePdfFileName);
+                        } else {
+                            $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
+                        }
+                        $ilovepdfTask->execute();
+                        $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
+                        $ilovepdfTask->delete();
+                    } catch (\Exception $e) {
                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         appLogModel::where('groupId', '=', $batchId)
@@ -192,109 +165,54 @@ class compressController extends Controller
                             ]);
                         NotificationHelper::Instance()->sendErrNotify(
                             $currentFileName,
-                            $newFileSize,
+                            $fileSize,
                             $batchId,
                             'FAIL',
                             'compress',
-                            'Failed to download file from iLovePDF API !',
-                            'Error while processing file: '.$newFilePath
+                            'iLovePDF API Error !, Catch on Exception',
+                            $e->getMessage()
                         );
                         return $this->returnDataMesage(
                             400,
                             'PDF Compression failed !',
-                            null,
+                            $e->getMessage(),
                             $batchId,
                             null,
-                            'Failed to download file from iLovePDF API !'
+                            'iLovePDF API Error !, Catch on Exception'
                         );
                     }
-                }
-                if ($loopCount == $procFile) {
-                    if ($loopCount == 1) {
-                        compressModel::where('groupId', '=', $batchId)
-                            ->update([
-                                'compFileSize' => $newCompFileSize,
-                                'result' => true,
-                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                'procDuration' => $duration->s.' seconds'
-                            ]);
-                        return $this->returnCoreMessage(
-                            200,
-                            'OK',
-                            $newFileNameWithoutExtension.'.pdf',
-                            Storage::disk('local')->url($pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'),
-                            'compress',
-                            $batchId,
-                            $newFileSize,
-                            $newCompFileSize,
-                            $compMethod,
-                            null
-                        );
-                    } else {
-                        $folderPath = Storage::disk('local')->path('public/'.$pdfDownload_Location);
-                        $zipFilePath = Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$randomizePdfFileName.'.zip');
-                        $zip = new ZipArchive();
-                        if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
-                            foreach ($poolFiles as $file) {
-                                $filePath = $folderPath.DIRECTORY_SEPARATOR.$file.'.pdf';
-                                if (file_exists($filePath)) {
-                                    $relativePath = $file.'.pdf';
-                                    $zip->addFile($filePath, $relativePath);
-                                } else {
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => 'Failed Compress PDF file !',
-                                            'errStatus' => 'File '. $filePath . ' was not found'
-                                        ]);
-                                    compressModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' =>  $duration->s.' seconds'
-                                        ]);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Compression failed !',
-                                        null,
-                                        $batchId,
-                                        null,
-                                        'File '. $filePath . ' was not found'
-                                    );
-                                }
-                            }
-                            $zip->close();
-                            $tempPDFfiles = glob(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/*'));
-                            $zipFileSize = filesize($zipFilePath);
-                            $newZipFileSize = AppHelper::instance()->convert($zipFileSize, "MB");
-                            foreach($tempPDFfiles as $file){
-                                if(is_file($file)) {
-                                    unlink($file);
-                                }
-                            };
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
+                    if ($batchValue) {
+                        if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))) {
+                            $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'));
+                            $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
                             compressModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'compFileSize' => $newZipFileSize,
+                                    'compFileSize' => $newCompFileSize,
                                     'result' => true,
                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                    'procDuration' =>  $duration->s.' seconds'
+                                    'procDuration' => $duration->s.' seconds'
                                 ]);
                             return $this->returnCoreMessage(
                                 200,
                                 'OK',
                                 $randomizePdfFileName.'.zip',
-                                Storage::disk('local')->url($pdfProcessed_Location.'/'.$randomizePdfFileName.'.zip'),
+                                Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'),
                                 'compress',
                                 $batchId,
-                                null,
-                                $newZipFileSize,
+                                $newFileSize,
+                                $newCompFileSize,
                                 $compMethod,
                                 null
                             );
                         } else {
+                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                            $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Failed archiving PDF files !',
-                                    'errStatus' => null
+                                    'errReason' => 'Failed to download file from iLovePDF API !',
+                                    'errStatus' => 'Error while processing file: '.$randomizePdfFileName.'.zip'
                                 ]);
                             compressModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -303,13 +221,13 @@ class compressController extends Controller
                                     'procDuration' =>  $duration->s.' seconds'
                                 ]);
                             NotificationHelper::Instance()->sendErrNotify(
-                                $randomizePdfFileName.'.zip',
-                                null,
+                                $file,
+                                $newFileSize,
                                 $batchId,
                                 'FAIL',
                                 'compress',
-                                'Failed archiving PDF files !',
-                                null
+                                'Failed to download file from iLovePDF API !',
+                                'Error while processing file: '.$randomizePdfFileName.'.zip'
                             );
                             return $this->returnDataMesage(
                                 400,
@@ -317,29 +235,97 @@ class compressController extends Controller
                                 null,
                                 $batchId,
                                 null,
-                                'Failed archiving PDF files !'
+                                'Failed to download file from iLovePDF API !'
                             );
+                        }
+                    } else {
+                        foreach ($poolFiles as $file) {
+                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'))) {
+                                $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'));
+                                $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
+                                compressModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'compFileSize' => $newCompFileSize,
+                                        'result' => true,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                return $this->returnCoreMessage(
+                                    200,
+                                    'OK',
+                                    $randomizePdfFileName.'.zip',
+                                    Storage::disk('local')->url($pdfDownload_Location.'/'.$file.'.pdf'),
+                                    'compress',
+                                    $batchId,
+                                    $newFileSize,
+                                    $newCompFileSize,
+                                    $compMethod,
+                                    null
+                                );
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => 'Failed to download file from iLovePDF API !',
+                                        'errStatus' => 'Error while processing file: '.$file
+                                    ]);
+                                compressModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' =>  $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $file,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'compress',
+                                    'Failed to download file from iLovePDF API !',
+                                    'Error while processing file: '.$file
+                                );
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Compression failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Failed to download file from iLovePDF API !'
+                                );
+                            }
                         }
                     }
                 } else {
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'PDF Compress failed',
-                            'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
+                            'errReason' => 'File not found on the server',
+                            'errStatus' => 'File not found on our end, please try again'
                         ]);
                     compressModel::where('groupId', '=', $batchId)
                         ->update([
                             'result' => false,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' => $duration->s.' seconds'
+                            'procDuration' =>  $duration->s.' seconds'
                         ]);
+                    NotificationHelper::Instance()->sendErrNotify(
+                        $currentFileName,
+                        null,
+                        $batchId,
+                        'FAIL',
+                        'compress',
+                        'File not found on the server',
+                        'File not found on our end, please try again'
+                    );
                     return $this->returnDataMesage(
                         400,
                         'PDF Compression failed !',
                         null,
                         $batchId,
                         null,
-                        'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
+                        'File not found on our end, please try again'
                     );
                 }
             } else {

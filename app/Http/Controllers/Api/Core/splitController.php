@@ -80,6 +80,8 @@ class splitController extends Controller
                 $pdfDownload_Location = $pdfProcessed_Location;
                 $batchValue = false;
                 $str = rand(1000,10000000);
+                $loopCount = count($files);
+                $altPoolFiles = array();
                 $randomizePdfFileName = 'pdfSplit_'.substr(md5(uniqid($str)), 0, 8);
                 if ($action == 'split' && $usedMethod == 'range') {
                     if (empty($fromPage) || empty($toPage)) {
@@ -121,6 +123,15 @@ class splitController extends Controller
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                     if (file_exists($newFilePath)) {
+                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    }
+                }
+                if ($loopCount == count($altPoolFiles)) {
+                    foreach ($files as $file) {
+                        $currentFileName = basename($file);
+                        $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                        $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                         $fileSize = filesize($newFilePath);
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(splitModel::class, 'processId');
@@ -681,6 +692,37 @@ class splitController extends Controller
                             );
                         }
                     }
+                } else {
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
+                    appLogModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'errReason' => 'File not found on the server',
+                            'errStatus' => 'File not found on our end, please try again'
+                        ]);
+                    splitModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'result' => false,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                    NotificationHelper::Instance()->sendErrNotify(
+                        $currentFileName,
+                        null,
+                        $batchId,
+                        'FAIL',
+                        'split',
+                        'File not found on the server',
+                        'File not found on our end, please try again'
+                    );
+                    return $this->returnDataMesage(
+                        400,
+                        'PDF Split failed !',
+                        null,
+                        $batchId,
+                        null,
+                        'File not found on our end, please try again'
+                    );
                 }
             } else {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());

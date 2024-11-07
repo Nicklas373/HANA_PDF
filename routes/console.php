@@ -10,9 +10,20 @@ use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Stringable;
 
 // Generate unique UUID
-$uuid = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
-$suuid = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
-$muuid = AppHelper::Instance()->generateSingleUniqueUuid(jobLogModel::class, 'groupId');
+$cacheClearUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$cacheClearUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$optimizeClearUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$optimizeClearUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$viewClearUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$viewClearUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$viewCacheUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$viewCacheUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$dailyReportUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$dailyReportUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$cleanSessionUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$cleanSessionUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
+$cleanStorageUUIDProc = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'processId');
+$cleanStorageUUIDGroup = AppHelper::Instance()->generateUniqueUuid(jobLogModel::class, 'groupId');
 
 // Carbon timezone
 date_default_timezone_set('Asia/Jakarta');
@@ -23,10 +34,10 @@ Schedule::command('cache:clear')
     ->weekly()
     ->environments(env('APP_ENV'))
     ->timezone('Asia/Jakarta')
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($cacheClearUUIDProc, $cacheClearUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $cacheClearUUIDProc,
+            'groupId' => $cacheClearUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -36,28 +47,28 @@ Schedule::command('cache:clear')
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
             'groupId' => $muuid,
-            'processId' => $uuid,
+            'processId' => $cacheClearUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($cacheClearUUIDProc, $cacheClearUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $cacheClearUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $cacheClearUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $cacheClearUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -66,7 +77,7 @@ Schedule::command('cache:clear')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'cache:clear',
                 'weekly',
-                $muuid,
+                $cacheClearUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -78,10 +89,10 @@ Schedule::command('optimize:clear')
     ->weekly()
     ->environments(env('APP_ENV'))
     ->timezone('Asia/Jakarta')
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($optimizeClearUUIDProc, $optimizeClearUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $optimizeClearUUIDProc,
+            'groupId' => $optimizeClearUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -90,29 +101,29 @@ Schedule::command('optimize:clear')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
-            'groupId' => $muuid,
-            'processId' => $uuid,
+            'groupId' => $optimizeClearUUIDGroup,
+            'processId' => $optimizeClearUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($optimizeClearUUIDProc, $optimizeClearUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output) || str_contains($output, 'DONE')) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $optimizeClearUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $optimizeClearUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $optimizeClearUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -121,7 +132,7 @@ Schedule::command('optimize:clear')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'optimize:clear',
                 'weekly',
-                $muuid,
+                $optimizeClearUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -133,10 +144,10 @@ Schedule::command('view:clear')
     ->weekly()
     ->environments(env('APP_ENV'))
     ->timezone('Asia/Jakarta')
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($viewClearUUIDProc, $viewClearUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $viewClearUUIDProc,
+            'groupId' => $viewClearUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -145,29 +156,29 @@ Schedule::command('view:clear')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
-            'groupId' => $muuid,
-            'processId' => $uuid,
+            'groupId' => $viewClearUUIDGroup,
+            'processId' => $viewClearUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($viewClearUUIDProc, $viewClearUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $viewClearUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $viewClearUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output,
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $viewClearUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -176,7 +187,7 @@ Schedule::command('view:clear')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'view:clear',
                 'weekly',
-                $muuid,
+                $viewClearUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -188,10 +199,10 @@ Schedule::command('view:cache')
     ->weekly()
     ->environments(env('APP_ENV'))
     ->timezone('Asia/Jakarta')
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($viewCacheUUIDProc, $viewCacheUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $viewCacheUUIDProc,
+            'groupId' => $viewCacheUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -200,29 +211,29 @@ Schedule::command('view:cache')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
-            'groupId' => $muuid,
-            'processId' => $uuid,
+            'groupId' => $viewCacheUUIDGroup,
+            'processId' => $viewCacheUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($viewCacheUUIDProc, $viewCacheUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $viewCacheUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $viewCacheUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output,
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $viewCacheUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -231,7 +242,7 @@ Schedule::command('view:cache')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'view:cache',
                 'weekly',
-                $muuid,
+                $viewCacheUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -243,10 +254,10 @@ Schedule::command('hana:clean-storage')
     ->hourly()
     ->timezone('Asia/Jakarta')
     ->environments(env('APP_ENV'))
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($cleanStorageUUIDProc, $cleanStorageUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $cleanStorageUUIDProc,
+            'groupId' => $cleanStorageUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -255,29 +266,29 @@ Schedule::command('hana:clean-storage')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'hourly',
             'jobsResult' => false,
-            'groupId' => $muuid,
-            'processId' => $uuid,
+            'groupId' => $cleanStorageUUIDGroup,
+            'processId' => $cleanStorageUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($cleanStorageUUIDProc, $cleanStorageUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output)) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -286,7 +297,7 @@ Schedule::command('hana:clean-storage')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'hana:clean-storage',
                 'hourly',
-                $muuid,
+                $cleanStorageUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -298,10 +309,10 @@ Schedule::command('hana:daily-report')
     ->dailyAt('19:00')
     ->timezone('Asia/Jakarta')
     ->environments(env('APP_ENV'))
-    ->before(function(AppHelper $helper) use($uuid, $muuid, $startProc) {
+    ->before(function(AppHelper $helper) use($dailyReportUUIDProc, $dailyReportUUIDGroup, $startProc) {
         appLogModel::create([
-            'processId' => $uuid,
-            'groupId' => $muuid,
+            'processId' => $dailyReportUUIDProc,
+            'groupId' => $dailyReportUUIDGroup,
             'errReason' => null,
             'errStatus' => null
         ]);
@@ -310,29 +321,29 @@ Schedule::command('hana:daily-report')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'daily at 19:00',
             'jobsResult' => false,
-            'groupId' => $muuid,
-            'processId' => $uuid,
+            'groupId' => $dailyReportUUIDGroup,
+            'processId' => $dailyReportUUIDProc,
             'procStartAt' => $startProc
         ]);
     })
-    ->after(function(AppHelper $helper, Stringable $output) use($uuid, $muuid, $startProc)  {
+    ->after(function(AppHelper $helper, Stringable $output) use($dailyReportUUIDProc, $dailyReportUUIDGroup, $startProc)  {
         $start = Carbon::parse($startProc);
         $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
         $duration = $end->diff($start);
         if ($output == null || $output == '' || empty($output)) {
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $dailyReportUUIDProc)
                 ->update([
                     'jobsResult' => true,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
         } else {
-            appLogModel::where('processId', '=', $uuid)
+            appLogModel::where('processId', '=', $dailyReportUUIDProc)
                 ->update([
                     'errReason' => 'Laravel Scheduler Error !',
                     'errStatus' => $output,
                 ]);
-            jobLogModel::where('processId', '=', $uuid)
+            jobLogModel::where('processId', '=', $dailyReportUUIDProc)
                 ->update([
                     'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
@@ -341,7 +352,7 @@ Schedule::command('hana:daily-report')
             NotificationHelper::Instance()->sendSchedErrNotify(
                 'hana:daily-report',
                 'daily at 19:00',
-                $muuid,
+                $dailyReportUUIDGroup,
                 'FAIL',
                 'Laravel Scheduler Error !',
                 $output
@@ -349,57 +360,57 @@ Schedule::command('hana:daily-report')
         }
     });
 
-    Schedule::command('hana:clean-session')
-        ->everyFifteenMinutes()
-        ->environments(env('APP_ENV'))
-        ->timezone('Asia/Jakarta')
-        ->before(function(AppHelper $helper) use($suuid, $muuid, $startProc) {
-            appLogModel::create([
-                'processId' => $suuid,
-                'groupId' => $muuid,
-                'errReason' => null,
-                'errStatus' => null
+Schedule::command('hana:clean-session')
+    ->everyFifteenMinutes()
+    ->environments(env('APP_ENV'))
+    ->timezone('Asia/Jakarta')
+    ->before(function(AppHelper $helper) use($cleanStorageUUIDProc, $cleanStorageUUIDGroup, $startProc) {
+        appLogModel::create([
+            'processId' => $cleanStorageUUIDProc,
+            'groupId' => $cleanStorageUUIDGroup,
+            'errReason' => null,
+            'errStatus' => null
+        ]);
+        jobLogModel::create([
+            'jobsName' => 'hana:clean-session',
+            'jobsEnv' => env('APP_ENV'),
+            'jobsRuntime' => 'every 15 minutes',
+            'jobsResult' => false,
+            'groupId' => $cleanStorageUUIDGroup,
+            'processId' => $cleanStorageUUIDProc,
+            'procStartAt' => $startProc
+        ]);
+    })
+    ->after(function(AppHelper $helper, Stringable $output) use($cleanStorageUUIDProc, $cleanStorageUUIDGroup, $startProc)  {
+        $start = Carbon::parse($startProc);
+        $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
+        $duration = $end->diff($start);
+        if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
+            jobLogModel::where('processId', '=', $cleanStorageUUIDProc)
+            ->update([
+                'jobsResult' => true,
+                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                'procDuration' => $duration->s.' seconds'
             ]);
-            jobLogModel::create([
-                'jobsName' => 'hana:clean-session',
-                'jobsEnv' => env('APP_ENV'),
-                'jobsRuntime' => 'every 15 minutes',
-                'jobsResult' => false,
-                'groupId' => $muuid,
-                'processId' => $suuid,
-                'procStartAt' => $startProc
+        } else {
+            appLogModel::where('processId', '=', $cleanStorageUUIDProc)
+            ->update([
+                'errReason' => 'Laravel Scheduler Error !',
+                'errStatus' => $output,
             ]);
-        })
-        ->after(function(AppHelper $helper, Stringable $output) use($suuid, $muuid, $startProc)  {
-            $start = Carbon::parse($startProc);
-            $end =  Carbon::parse($helper::instance()->getCurrentTimeZone());
-            $duration = $end->diff($start);
-            if ($output == null || $output == '' || empty($output) || str_contains($output, 'successfully')) {
-                jobLogModel::where('processId', '=', $suuid)
+            jobLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
-                    'jobsResult' => true,
+                    'jobsResult' => false,
                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                     'procDuration' => $duration->s.' seconds'
                 ]);
-            } else {
-                appLogModel::where('processId', '=', $suuid)
-                ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output,
-                ]);
-                jobLogModel::where('processId', '=', $suuid)
-                    ->update([
-                        'jobsResult' => false,
-                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                        'procDuration' => $duration->s.' seconds'
-                    ]);
-                NotificationHelper::Instance()->sendSchedErrNotify(
-                    'hana:daily-session',
-                    'every 15 minutes',
-                    $muuid,
-                    'FAIL',
-                    'Laravel Scheduler Error !',
-                    $output
-                );
-            }
-        });
+            NotificationHelper::Instance()->sendSchedErrNotify(
+                'hana:daily-session',
+                'every 15 minutes',
+                $cleanStorageUUIDGroup,
+                'FAIL',
+                'Laravel Scheduler Error !',
+                $output
+            );
+        }
+    });

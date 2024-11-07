@@ -77,12 +77,23 @@ class watermarkController extends Controller
                 $batchValue = false;
                 $str = rand(1000,10000000);
                 $randomizePdfFileName = 'pdfWatermark_'.substr(md5(uniqid($str)), 0, 8);
+                $loopCount = count($files);
+                $altPoolFiles = array();
                 foreach ($files as $file) {
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                     if (file_exists($newFilePath)) {
+                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    }
+                }
+                if ($loopCount == count($altPoolFiles)) {
+                    foreach ($files as $file) {
+                        $currentFileName = basename($file);
+                        $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                        $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                         $fileSize = filesize($newFilePath);
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -124,7 +135,7 @@ class watermarkController extends Controller
                             if (empty($watermarkImage)) {
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                          'errReason' => 'PDF Watermark failed !',
+                                            'errReason' => 'PDF Watermark failed !',
                                             'errStatus' => 'Image file for watermark can not be empty !'
                                     ]);
                                 watermarkModel::where('groupId', '=', $batchId)
@@ -389,6 +400,37 @@ class watermarkController extends Controller
                             );
                         }
                     }
+                } else {
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
+                    appLogModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'errReason' => 'File not found on the server',
+                            'errStatus' => 'File not found on our end, please try again'
+                        ]);
+                    watermarkModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'result' => false,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                    NotificationHelper::Instance()->sendErrNotify(
+                        $currentFileName,
+                        null,
+                        $batchId,
+                        'FAIL',
+                        'compress',
+                        'File not found on the server',
+                        'File not found on our end, please try again'
+                    );
+                    return $this->returnDataMesage(
+                        400,
+                        'PDF Compression failed !',
+                        null,
+                        $batchId,
+                        null,
+                        'File not found on our end, please try again'
+                    );
                 }
             } else {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
