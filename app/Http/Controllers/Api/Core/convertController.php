@@ -121,10 +121,10 @@ class convertController extends Controller
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(cnvModel::class, 'processId');
                         $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
-			if ($pdfNameWithExtension == "pdf") {
-				$pdf = new Pdf($newFilePath);
-				$pdfTotalPages = $pdf->pageCount();
-			}
+                        if ($pdfNameWithExtension == "pdf") {
+                            $pdf = new Pdf($newFilePath);
+                            $pdfTotalPages = $pdf->pageCount();
+                        }
                         appLogModel::create([
                             'processId' => $procUuid,
                             'groupId' => $batchId,

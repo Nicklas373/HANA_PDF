@@ -65,6 +65,8 @@ class mergeController extends Controller
                 $pdfUpload_Location = env('PDF_UPLOAD');
                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                 $pdfPool_Location = env('PDF_POOL');
+                $loopCount = count($files);
+                $altPoolFiles = array();
                 if ($batch == "true") {
                     $batchValue = true;
                 } else {
@@ -73,132 +75,174 @@ class mergeController extends Controller
                 $pdfDownload_Location = $pdfPool_Location;
                 $str = rand(1000,10000000);
                 $randomizePdfFileName = 'pdfMerged_'.substr(md5(uniqid($str)), 0, 8);
-                try {
-                    $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                    $ilovepdfTask = $ilovepdf->newTask('merge');
-                    $ilovepdfTask->setFileEncryption($pdfEncKey);
-                    $ilovepdfTask->setEncryptKey($pdfEncKey);
-                    $ilovepdfTask->setEncryption(true);
-                    foreach ($files as $file) {
-                        $procUuid = AppHelper::Instance()->generateUniqueUuid(mergeModel::class, 'processId');
-                        $currentFileName = basename($file);
-                        $trimPhase1 = str_replace(' ', '_', $currentFileName);
-                        $firstTrim = basename($currentFileName, '.pdf');
-                        $newFileNameWithoutExtension = str_replace('.', '_', $firstTrim);
-                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                        $fileSize = filesize($newFilePath);
-                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                        if ($batchValue) {
-                            $newFileName = $randomizePdfFileName.'.zip';
-                        } else {
-                            $newFileName = $currentFileName;
-                        }
-                        $pdfName = $ilovepdfTask->addFile($newFilePath);
-                        $pdfName->setPassword($pdfEncKey);
-                        appLogModel::create([
-                            'processId' => $procUuid,
-                            'groupId' => $batchId,
-                            'errReason' => null,
-                            'errStatus' => null
-                        ]);
-                        mergeModel::create([
-                            'fileName' => $currentFileName,
-                            'fileSize' => $newFileSize,
-                            'result' => false,
-                            'isBatch' => true,
-                            'batchName' => $newFileName,
-                            'groupId' => $batchId,
-                            'processId' => $procUuid,
-                            'procStartAt' => $startProc,
-                            'procEndAt' => null,
-                            'procDuration' => null
-                        ]);
+                foreach ($files as $file) {
+                    $currentFileName = basename($file);
+                    $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                    $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                    $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                    if (file_exists($newFilePath)) {
+                        array_push($altPoolFiles, $newFileNameWithoutExtension);
                     }
-                    $ilovepdfTask->setOutputFileName($randomizePdfFileName);
-                    $ilovepdfTask->execute();
-                    $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                    $ilovepdfTask->delete();
-                } catch (\Exception $e) {
-                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                    $duration = $end->diff($startProc);
-                    appLogModel::where('groupId', '=', $batchId)
-                        ->update([
-                            'errReason' => 'PDF Merge failed',
-                            'errStatus' => $e->getMessage()
-                        ]);
-                    mergeModel::where('groupId', '=', $batchId)
-                        ->update([
-                            'result' => false,
-                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' => $duration->s.' seconds'
-                        ]);
-                    NotificationHelper::Instance()->sendErrNotify(
-                        $currentFileName,
-                        $fileSize,
-                        $uuid,
-                        'FAIL',
-                        'merge',
-                        'iLovePDF API Error !, Catch on Exception',
-                        $e->getMessage()
-                    );
-                    return $this->returnDataMesage(
-                        400,
-                        'PDF Merge failed !',
-                        $e->getMessage(),
-                        $batchId,
-                        null,
-                        'iLovePDF API Error !, Catch on Exception'
-                    );
                 }
-                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
-                    $mergedFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
-                    $newMergedFileSize = AppHelper::instance()->convert($mergedFileSize, "MB");
-                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                    $duration = $end->diff($startProc);
-                    appLogModel::where('groupId', '=', $batchId)
-                        ->update([
-                            'errReason' => null,
-                            'errStatus' => null
-                        ]);
-                    mergeModel::where('groupId', '=', $batchId)
-                        ->update([
-                            'result' => true,
-                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' => $duration->s.' seconds'
-                        ]);
-                    return $this->returnCoreMessage(
-                        200,
-                        'OK',
-                        $randomizePdfFileName.'.pdf',
-                        Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'),
-                        'merge',
-                        $batchId,
-                        $newMergedFileSize,
-                        null,
-                        null,
-                        null
-                    );
+                if ($loopCount == count($altPoolFiles)) {
+                    try {
+                        $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                        $ilovepdfTask = $ilovepdf->newTask('merge');
+                        $ilovepdfTask->setFileEncryption($pdfEncKey);
+                        $ilovepdfTask->setEncryptKey($pdfEncKey);
+                        $ilovepdfTask->setEncryption(true);
+                        foreach ($files as $file) {
+                            $procUuid = AppHelper::Instance()->generateUniqueUuid(mergeModel::class, 'processId');
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            $firstTrim = basename($currentFileName, '.pdf');
+                            $newFileNameWithoutExtension = str_replace('.', '_', $firstTrim);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            $fileSize = filesize($newFilePath);
+                            $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                            if ($batchValue) {
+                                $newFileName = $randomizePdfFileName.'.zip';
+                            } else {
+                                $newFileName = $currentFileName;
+                            }
+                            $pdfName = $ilovepdfTask->addFile($newFilePath);
+                            $pdfName->setPassword($pdfEncKey);
+                            appLogModel::create([
+                                'processId' => $procUuid,
+                                'groupId' => $batchId,
+                                'errReason' => null,
+                                'errStatus' => null
+                            ]);
+                            mergeModel::create([
+                                'fileName' => $currentFileName,
+                                'fileSize' => $newFileSize,
+                                'result' => false,
+                                'isBatch' => true,
+                                'batchName' => $newFileName,
+                                'groupId' => $batchId,
+                                'processId' => $procUuid,
+                                'procStartAt' => $startProc,
+                                'procEndAt' => null,
+                                'procDuration' => null
+                            ]);
+                        }
+                        $ilovepdfTask->setOutputFileName($randomizePdfFileName);
+                        $ilovepdfTask->execute();
+                        $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
+                        $ilovepdfTask->delete();
+                    } catch (\Exception $e) {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'errReason' => 'PDF Merge failed',
+                                'errStatus' => $e->getMessage()
+                            ]);
+                        mergeModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'result' => false,
+                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                'procDuration' => $duration->s.' seconds'
+                            ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            $currentFileName,
+                            $fileSize,
+                            $uuid,
+                            'FAIL',
+                            'merge',
+                            'iLovePDF API Error !, Catch on Exception',
+                            $e->getMessage()
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            $e->getMessage(),
+                            $batchId,
+                            null,
+                            'iLovePDF API Error !, Catch on Exception'
+                        );
+                    }
+                    if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
+                        $mergedFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
+                        $newMergedFileSize = AppHelper::instance()->convert($mergedFileSize, "MB");
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'errReason' => null,
+                                'errStatus' => null
+                            ]);
+                        mergeModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'result' => true,
+                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                'procDuration' => $duration->s.' seconds'
+                            ]);
+                        return $this->returnCoreMessage(
+                            200,
+                            'OK',
+                            $randomizePdfFileName.'.pdf',
+                            Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'),
+                            'merge',
+                            $batchId,
+                            $newMergedFileSize,
+                            null,
+                            null,
+                            null
+                        );
+                    } else {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'errReason' => 'Failed to download file from iLovePDF API !',
+                                'errStatus' => null
+                            ]);
+                        mergeModel::where('groupId', '=', $batchId)
+                            ->update([
+                                'result' => false,
+                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                'procDuration' => $duration->s.' seconds'
+                            ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            null,
+                            null,
+                            $uuid,
+                            'FAIL',
+                            'Failed to download file from iLovePDF API !',
+                            null
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Merge failed !',
+                            null,
+                            $batchId,
+                            null,
+                            'Failed to download file from iLovePDF API !'
+                        );
+                    }
                 } else {
                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'Failed to download file from iLovePDF API !',
-                            'errStatus' => null
+                            'errReason' => 'File not found on the server',
+                            'errStatus' => 'File not found on our end, please try again'
                         ]);
                     mergeModel::where('groupId', '=', $batchId)
                         ->update([
                             'result' => false,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                            'procDuration' => $duration->s.' seconds'
+                            'procDuration' =>  $duration->s.' seconds'
                         ]);
                     NotificationHelper::Instance()->sendErrNotify(
+                        $currentFileName,
                         null,
-                        null,
-                        $uuid,
+                        $batchId,
                         'FAIL',
-                        'Failed to download file from iLovePDF API !',
-                        null
+                        'merge',
+                        'File not found on the server',
+                        'File not found on our end, please try again'
                     );
                     return $this->returnDataMesage(
                         400,
@@ -206,7 +250,7 @@ class mergeController extends Controller
                         null,
                         $batchId,
                         null,
-                        'Failed to download file from iLovePDF API !'
+                        'File not found on our end, please try again'
                     );
                 }
             } else {
