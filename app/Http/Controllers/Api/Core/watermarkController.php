@@ -36,7 +36,7 @@ class watermarkController extends Controller
 
         // Generate Uni UUID
         $uuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
-        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(watermarkModel::class, 'groupId');
+        $batchId = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'groupId');
 
         // Carbon timezone
         date_default_timezone_set('Asia/Jakarta');

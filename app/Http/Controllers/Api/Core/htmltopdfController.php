@@ -29,7 +29,7 @@ class htmltopdfController extends Controller
 
         // Generate Uni UUID
         $uuid = AppHelper::Instance()->generateUniqueUuid(htmlModel::class, 'processId');
-        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(htmlModel::class, 'groupId');
+        $batchId = AppHelper::Instance()->generateUniqueUuid(htmlModel::class, 'groupId');
 
         // Carbon timezone
         date_default_timezone_set('Asia/Jakarta');

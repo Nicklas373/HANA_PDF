@@ -24,9 +24,9 @@ return new class extends Migration
             $table->char('fileSize', length: 25)->nullable();
             $table->integer('fromPage')->nullable();
             $table->integer('toPage')->nullable();
-            $table->char('customSplitPage', length: 25)->nullable();
-            $table->char('customDeletePage', length: 25)->nullable();
-            $table->char('fixedRange', length: 25)->nullable();
+            $table->text('customSplitPage')->nullable();
+            $table->text('customDeletePage')->nullable();
+            $table->text('fixedRange')->nullable();
             $table->enum('mergePDF', ['true', 'false'])->nullable();
             $table->enum('action', ['delete','split'])->nullable();
             $table->boolean('result');

@@ -26,7 +26,7 @@ class mergeController extends Controller
 
         // Generate Uni UUID
         $uuid = AppHelper::Instance()->generateUniqueUuid(mergeModel::class, 'processId');
-        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(mergeModel::class, 'groupId');
+        $batchId = AppHelper::Instance()->generateUniqueUuid(mergeModel::class, 'groupId');
 
         // Carbon timezone
         date_default_timezone_set('Asia/Jakarta');
