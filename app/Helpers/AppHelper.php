@@ -1,6 +1,15 @@
 <?php
 namespace App\Helpers;
 
+use App\Models\appLogModel;
+use App\Models\jobLogModel;
+use App\Models\notifyLogModel;
+use App\Models\compressModel;
+use App\Models\cnvModel;
+use App\Models\htmlModel;
+use App\Models\mergeModel;
+use App\Models\splitModel;
+use App\Models\watermarkModel;
 use Illuminate\Support\Facades\Http;
 use Ramsey\Uuid\Uuid;
 
@@ -25,30 +34,30 @@ class AppHelper
         return $currentDateTime;
     }
 
-    function generateSingleUniqueUuid($customModel, $customColumn) {
-        $startProc = Carbon::now()->format('Y-m-d H:i:s');
-        // $uniqueID = Uuid::uuid4(); --> Need to know how to avoid unrelated relation on first migration !
-        do {
-            $uniqueID = Uuid::uuid4();
-        } while (
-            $customModel::where($customColumn, $uniqueID)->exists()
-        );
-        $end = Carbon::now();
-        $duration = $end->diffInSeconds(Carbon::parse($startProc));
-        Log::Info('New single unique UUID has been generated with response time: '.$duration.' seconds');
-        return $uniqueID->toString();
-    }
-
     function generateUniqueUuid($customModel, $customColumn) {
         $startProc = Carbon::now()->format('Y-m-d H:i:s');
-        // $uniqueID = Uuid::uuid4(); --> Need to know how to avoid unrelated relation on first migration !
-        do {
-            $uniqueID = Uuid::uuid4();
-        } while (
-            appLogModel::where($customColumn, $uniqueID)->exists() ||
-            notifyLogModel::where($customColumn, $uniqueID)->exists() ||
-            $customModel::where($customColumn, $uniqueID)->exists()
-        );
+        //$uniqueID = Uuid::uuid4();
+        if ($customColumn !== 'processId') {
+            do {
+                $uniqueID = Uuid::uuid4();
+            } while (
+                $customModel::where($customColumn, $uniqueID)->exists()
+            );
+        } else {
+            do {
+                $uniqueID = Uuid::uuid4();
+            } while (
+                appLogModel::where($customColumn, $uniqueID)->exists() ||
+                jobLogModel::where($customColumn, $uniqueID)->exists() ||
+                notifyLogModel::where($customColumn, $uniqueID)->exists() ||
+                compressModel::where($customColumn, $uniqueID)->exists() ||
+                cnvModel::where($customColumn, $uniqueID)->exists() ||
+                htmlModel::where($customColumn, $uniqueID)->exists() ||
+                mergeModel::where($customColumn, $uniqueID)->exists() ||
+                splitModel::where($customColumn, $uniqueID)->exists() ||
+                watermarkModel::where($customColumn, $uniqueID)->exists()
+            );
+        }
         $end = Carbon::now();
         $duration = $end->diffInSeconds(Carbon::parse($startProc));
         Log::Info('New unique UUID has been generated with response time: '.$duration.' seconds');
