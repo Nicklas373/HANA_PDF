@@ -40,7 +40,7 @@ class convertController extends Controller
 
         // Generate Uni UUID
         $uuid = AppHelper::Instance()->generateUniqueUuid(cnvModel::class, 'processId');
-        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(cnvModel::class, 'groupId');
+        $batchId = AppHelper::Instance()->generateUniqueUuid(cnvModel::class, 'groupId');
 
         // Carbon timezone
         date_default_timezone_set('Asia/Jakarta');
@@ -926,7 +926,7 @@ class convertController extends Controller
                     return $this->returnDataMesage(
                         400,
                         'PDF convert failed !',
-                        $e->getMessage(),
+                        null,
                         $batchId,
                         null,
                         'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount

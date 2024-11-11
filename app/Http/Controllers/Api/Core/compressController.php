@@ -32,7 +32,7 @@ class compressController extends Controller
 
         // Generate Uni UUID
         $uuid = AppHelper::Instance()->generateUniqueUuid(compressModel::class, 'processId');
-        $batchId = AppHelper::Instance()->generateSingleUniqueUuid(compressModel::class, 'groupId');
+        $batchId = AppHelper::Instance()->generateUniqueUuid(compressModel::class, 'groupId');
 
 		if ($validator->fails()) {
             appLogModel::create([
