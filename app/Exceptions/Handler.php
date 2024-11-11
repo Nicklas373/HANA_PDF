@@ -41,8 +41,8 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+        $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
 
         try {
             $currentRoute = $request->route();
