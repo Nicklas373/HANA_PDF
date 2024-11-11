@@ -1,20 +1,18 @@
 [
-    {
-        "appServices": "BE",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 5,
-            "patchVersion": 5,
-            "gitRevision": "cfd8e3d"
-        }
-    },
-    {
-        "appServices": "FE",
-        "versioning": {
-            "majorVersion": 3,
-            "minorVersion": 3,
-            "patchVersion": 8,
-            "gitRevision": "0421a23"
-        }
+  {
+    "appServices": "BE",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 5,
+      "patchVersion": 6
     }
+  },
+  {
+    "appServices": "FE",
+    "versioning": {
+      "majorVersion": 3,
+      "minorVersion": 3,
+      "patchVersion": 9
+    }
+  }
 ]

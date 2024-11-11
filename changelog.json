@@ -1,13 +1,23 @@
 [
   {
     "release_date": "November, 11 2024",
+    "version": "3.3.9",
+    "changelog": [
+      "Fix file not found error in some case on split PDF feature",
+      "Fix unproper error message while failed to upload file",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
+    "release_date": "November, 08 2024",
     "version": "3.3.8",
     "changelog": [
       "Fix infinite loading when main task or process unexpectly error",
       "Minor enhancement on our end",
       "Updating our internal libraries to latest version"
     ]
-  },{
+  },
+  {
     "release_date": "November, 05 2024",
     "version": "3.3.6",
     "changelog": [
