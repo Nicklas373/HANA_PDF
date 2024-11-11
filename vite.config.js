@@ -1,11 +1,7 @@
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
-import getGitCommitHash from "./resources/js/getGitCommitHash";
 
 export default defineConfig({
-    define: {
-        gitHash: JSON.stringify(getGitCommitHash()),
-    },
     plugins: [
         laravel({
             input: [
