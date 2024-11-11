@@ -29,10 +29,9 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 8;
+const appPatchVer = 9;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
-const commitHash = gitHash;
 const errModal = new Modal($errModal, options);
 const googleViewerUrl = "https://docs.google.com/viewerng/viewer?url=";
 const loadingModal = new Modal($loadingModal, options);
@@ -490,26 +489,21 @@ if (uploadDropzone) {
                     file.previewElement.querySelector(".dz-error-message");
                 let newErrMessage = "Internal server error";
 
-                if (dzErrorMessage) {
-                    if (
-                        dropzoneErrMessage === "[object Object]" &&
-                        xhr.readyState === XMLHttpRequest.DONE
-                    ) {
-                        try {
-                            const xhrResponse = JSON.parse(xhr.responseText);
-                            newErrMessage =
-                                xhrResponse.errors ||
-                                "There was an unexpected error";
-                        } catch (error) {
-                            newErrMessage = "Failed to parse server response";
-                        }
-                    } else {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    try {
+                        const xhrResponse = JSON.parse(xhr.responseText);
                         newErrMessage =
-                            dropzoneErrMessage || "Server was not ready";
+                            xhrResponse.errors ||
+                            "There was an unexpected error";
+                    } catch (error) {
+                        newErrMessage = "Failed to parse server response";
                     }
-
-                    dzErrorMessage.textContent = newErrMessage;
+                } else {
+                    newErrMessage =
+                        dropzoneErrMessage || "Server was not ready";
                 }
+
+                dzErrorMessage.textContent = newErrMessage;
 
                 errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
@@ -809,26 +803,21 @@ if (uploadDropzoneAlt) {
                     file.previewElement.querySelector(".dz-error-message");
                 let newErrMessage = "Internal server error";
 
-                if (dzErrorMessage) {
-                    if (
-                        dropzoneErrMessage === "[object Object]" &&
-                        xhr.readyState === XMLHttpRequest.DONE
-                    ) {
-                        try {
-                            const xhrResponse = JSON.parse(xhr.responseText);
-                            newErrMessage =
-                                xhrResponse.errors ||
-                                "There was an unexpected error";
-                        } catch (error) {
-                            newErrMessage = "Failed to parse server response";
-                        }
-                    } else {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    try {
+                        const xhrResponse = JSON.parse(xhr.responseText);
                         newErrMessage =
-                            dropzoneErrMessage || "Server was not ready";
+                            xhrResponse.errors ||
+                            "There was an unexpected error";
+                    } catch (error) {
+                        newErrMessage = "Failed to parse server response";
                     }
-
-                    dzErrorMessage.textContent = newErrMessage;
+                } else {
+                    newErrMessage =
+                        dropzoneErrMessage || "Server was not ready";
                 }
+
+                dzErrorMessage.textContent = newErrMessage;
 
                 errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
@@ -1069,7 +1058,7 @@ if (uploadDropzoneSingle) {
                         xhrTotalUploads = xhrTotalUploads - 1;
                     }
 
-                    fetch(`${apiUrl}/api/v1/file/upload`, {
+                    fetch(`${apiUrl}/api/v1/file/remove`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -1111,27 +1100,21 @@ if (uploadDropzoneSingle) {
                 const dzErrorMessage =
                     file.previewElement.querySelector(".dz-error-message");
                 let newErrMessage = "Internal server error";
-
-                if (dzErrorMessage) {
-                    if (
-                        dropzoneErrMessage === "[object Object]" &&
-                        xhr.readyState === XMLHttpRequest.DONE
-                    ) {
-                        try {
-                            const xhrResponse = JSON.parse(xhr.responseText);
-                            newErrMessage =
-                                xhrResponse.errors ||
-                                "There was an unexpected error";
-                        } catch (error) {
-                            newErrMessage = "Failed to parse server response";
-                        }
-                    } else {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    try {
+                        const xhrResponse = JSON.parse(xhr.responseText);
                         newErrMessage =
-                            dropzoneErrMessage || "Server was not ready";
+                            xhrResponse.errors ||
+                            "There was an unexpected error";
+                    } catch (error) {
+                        newErrMessage = "Failed to parse server response";
                     }
-
-                    dzErrorMessage.textContent = newErrMessage;
+                } else {
+                    newErrMessage =
+                        dropzoneErrMessage || "Server was not ready";
                 }
+
+                dzErrorMessage.textContent = newErrMessage;
 
                 errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
@@ -3175,7 +3158,6 @@ function validateVersion() {
         formData.append("appMajorVersion", appMajorVer);
         formData.append("appMinorVersion", appMinorVer);
         formData.append("appPatchVersion", appPatchVer);
-        formData.append("appGitVersion", commitHash);
         formData.append("appServicesReferrer", "FE");
 
         xhr.open("POST", `${apiUrl}/api/v1/version/check`, true);
