@@ -30,8 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $guid,
@@ -117,8 +117,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $guid,
@@ -202,8 +202,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $guid,
@@ -288,8 +288,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (RouteNotFoundException $e, Request $request) {
             if ($request->is('api/*') || $request->is('up')) {
                 $isAjax = $request->ajax();
-                $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-                $guid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+                $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+                $guid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $guid,

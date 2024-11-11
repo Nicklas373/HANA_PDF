@@ -18,8 +18,8 @@ class AuthController extends Controller
     public function getToken()
     {
         $credentials = request(['email', 'password']);
-        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+        $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
 
         if (!$token = auth('api')->attempt($credentials)) {
             appLogModel::create([
