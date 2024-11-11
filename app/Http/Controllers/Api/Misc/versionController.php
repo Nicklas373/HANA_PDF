@@ -19,12 +19,11 @@ class versionController extends Controller {
             'appMajorVersion' => ['required', 'numeric'],
             'appMinorVersion' => ['required', 'numeric'],
             'appPatchVersion' => ['required', 'numeric'],
-            'appGitVersion' => ['required'],
             'appServicesReferrer' => ['required', 'in:FE,BE']
 		]);
 
-        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+        $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
 
 		if ($validator->fails()) {
             return $this->returnDataMesage(
@@ -43,8 +42,7 @@ class versionController extends Controller {
             $appServicesReferrerFE = $request->post('appServicesReferrer');
             $appMajorVersionBE = 3;
             $appMinorVersionBE = 5;
-            $appPatchVersionBE = 5;
-            $appGitVersionBE = appHelper::instance()->getGitCommitHash();
+            $appPatchVersionBE = 6;
             $appVersioningBE = null;
             $appVersioningFE = null;
             $appServicesReferrerBE = "BE";
@@ -70,16 +68,14 @@ class versionController extends Controller {
                                 $majorVersionBE = $service['versioning']['majorVersion'];
                                 $minorVersionBE = $service['versioning']['minorVersion'];
                                 $patchVersionBE = $service['versioning']['patchVersion'];
-                                $gitRevisionBE = $service['versioning']['gitRevision'];
-                                $appVersioningBE = $appMajorVersionBE.'.'.$appMinorVersionBE.'.'.$appPatchVersionBE.'-'.$appGitVersionBE;
-                                $versioningBE = $majorVersionBE.'.'.$minorVersionBE.'.'.$patchVersionBE.'-'.$gitRevisionBE;
+                                $appVersioningBE = $appMajorVersionBE.'.'.$appMinorVersionBE.'.'.$appPatchVersionBE;
+                                $versioningBE = $majorVersionBE.'.'.$minorVersionBE.'.'.$patchVersionBE;
                             } else if ($service['appServices'] === 'FE') {
                                 $majorVersionFE = $service['versioning']['majorVersion'];
                                 $minorVersionFE = $service['versioning']['minorVersion'];
                                 $patchVersionFE = $service['versioning']['patchVersion'];
-                                $gitRevisionFE = $service['versioning']['gitRevision'];
-                                $appVersioningFE = $appMajorVersionFE.'.'.$appMinorVersionFE.'.'.$appPatchVersionFE.'-'.$appGitVersionFE;
-                                $versioningFE = $majorVersionFE.'.'.$minorVersionFE.'.'.$patchVersionFE.'-'.$gitRevisionFE;
+                                $appVersioningFE = $appMajorVersionFE.'.'.$appMinorVersionFE.'.'.$appPatchVersionFE;
+                                $versioningFE = $majorVersionFE.'.'.$minorVersionFE.'.'.$patchVersionFE;
                             }
                         }
 
@@ -215,8 +211,8 @@ class versionController extends Controller {
     }
 
     public function versioningFetch(Request $request) {
-        $uuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'processId');
-        $Muuid = AppHelper::Instance()->generateSingleUniqueUuid(appLogModel::class, 'groupId');
+        $uuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'processId');
+        $Muuid = AppHelper::Instance()->generateUniqueUuid(appLogModel::class, 'groupId');
         $endpoint = 'api/v1/version/fetch';
         $versionFetch = 'https://raw.githubusercontent.com/Nicklas373/Hana-PDF/versioning/changelog.json';
 
