@@ -31,7 +31,8 @@ const appMajorVer = 3;
 const appMinorVer = 3;
 const appPatchVer = 9;
 const apiUrl = "http://192.168.0.2";
-const bearerToken = "STATIC_BEARER";
+const bearerToken =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjIvYXBpL3YxL2F1dGgvZ2V0VG9rZW4iLCJpYXQiOjE3MzE3Mzc0MDgsImV4cCI6MTczMjk0NzAwOCwibmJmIjoxNzMxNzM3NDA4LCJqdGkiOiI4MTZ5THZrb081a1BFcjBaIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.pb3qsSUgPZFkf0mCHKceowwSIl9A09rYVaO27l4Nc-M";
 const errModal = new Modal($errModal, options);
 const googleViewerUrl = "https://docs.google.com/viewerng/viewer?url=";
 const loadingModal = new Modal($loadingModal, options);
@@ -248,7 +249,7 @@ if (uploadDropzone) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        timeout: 600000,
+        timeout: 150000,
         previewTemplate:
             '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
             '<div class="flex flex-col items-center justify-center">' +
@@ -561,7 +562,7 @@ if (uploadDropzoneAlt) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        timeout: 60000,
+        timeout: 15000,
         previewTemplate:
             '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
             '<div class="flex flex-col items-center justify-center">' +
@@ -626,7 +627,7 @@ if (uploadDropzoneAlt) {
                 }
 
                 dzFileLayout.forEach(function (element) {
-                    Object.assign(element.element, {
+                    Object.assign(element.style, {
                         backgroundColor: "#transparent",
                         borderColor: "transparent",
                     });
@@ -836,6 +837,20 @@ if (uploadDropzoneAlt) {
                     ).src = file.dataURL;
                 }
             });
+
+            this.on("timeout", function (file) {
+                uploadDropzoneAlt.removeFile(file);
+                uploadedFile = uploadedFile.filter(
+                    (item) => !file.name.includes(item)
+                );
+                errMessage.innerText = "Connection timeout !";
+                errSubMessage.innerText = "Please try again later";
+                errListTitleMessage.innerText = "Failed to upload:";
+                resetErrListMessage();
+                generateMesssage(file.name);
+                errAltSubMessageModal.style = null;
+                errModal.show();
+            });
         },
     });
 
@@ -863,7 +878,7 @@ if (uploadDropzoneSingle) {
         addRemoveLinks: true,
         dictDefaultMessage: "",
         dictRemoveFile: "Remove",
-        tiemout: 60000,
+        timeout: 15000,
         previewTemplate:
             '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
             '<div class="flex flex-col items-center justify-center">' +
@@ -1127,7 +1142,7 @@ if (uploadDropzoneSingle) {
             });
 
             this.on("timeout", function (file) {
-                uploadDropzone.removeFile(file);
+                uploadDropzoneSingle.removeFile(file);
                 uploadedFile = uploadedFile.filter(
                     (item) => !file.name.includes(item)
                 );
