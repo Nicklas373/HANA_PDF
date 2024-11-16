@@ -29,10 +29,9 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 3;
-const appPatchVer = 9;
+const appPatchVer = 10;
 const apiUrl = "http://192.168.0.2";
-const bearerToken =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjIvYXBpL3YxL2F1dGgvZ2V0VG9rZW4iLCJpYXQiOjE3MzE3Mzc0MDgsImV4cCI6MTczMjk0NzAwOCwibmJmIjoxNzMxNzM3NDA4LCJqdGkiOiI4MTZ5THZrb081a1BFcjBaIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.pb3qsSUgPZFkf0mCHKceowwSIl9A09rYVaO27l4Nc-M";
+const bearerToken = "STATIC_BEARER";
 const errModal = new Modal($errModal, options);
 const googleViewerUrl = "https://docs.google.com/viewerng/viewer?url=";
 const loadingModal = new Modal($loadingModal, options);
