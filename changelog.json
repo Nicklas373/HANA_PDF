@@ -1,5 +1,13 @@
 [
   {
+    "release_date": "November, 16 2024",
+    "version": "3.3.10",
+    "changelog": [
+      "Fix error failed to upload or process on Convert From PDF pages",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
     "release_date": "November, 11 2024",
     "version": "3.3.9",
     "changelog": [
