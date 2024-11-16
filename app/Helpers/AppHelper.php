@@ -78,7 +78,7 @@ class AppHelper
     }
 
     function generateUniqueUuid($customModel, $customColumn) {
-        if (appLogModel::count() >= 1) {
+        try {
             if ($customColumn !== 'processId') {
                 do {
                     $uniqueID = Uuid::uuid4();
@@ -100,7 +100,7 @@ class AppHelper
                     watermarkModel::where($customColumn, $uniqueID)->exists()
                 );
             }
-        } else {
+        } catch (\Exception $e) {
             $uniqueID = Uuid::uuid4();
         }
         return $uniqueID->toString();
