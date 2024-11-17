@@ -46,7 +46,7 @@ Schedule::command('cache:clear')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
-            'groupId' => $muuid,
+            'groupId' => $cacheClearUUIDGroup,
             'processId' => $cacheClearUUIDProc,
             'procStartAt' => $startProc
         ]);
