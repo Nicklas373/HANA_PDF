@@ -34,19 +34,19 @@ class uploadController extends Controller
                 $pdfFileName = str_replace(' ', '_', $currentFileName);
                 $fileSize = filesize($file);
                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                $file->storeAs('public/upload', $pdfFileName);
-                if (Storage::disk('local')->exists('public/'.$pdfUpload_Location.'/'.$pdfFileName)) {
+                Storage::disk('minio')->put($pdfUpload_Location.'/'.$pdfFileName, file_get_contents($file));
+                if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {
                     return $this->returnFileMesage(
                         201,
                         'File uploaded successfully !',
-                        Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$pdfFileName),
+                        Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName),
                         null
                     );
                 } else {
                     return $this->returnFileMesage(
                         400,
                         'Failed to upload file !',
-                        Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfFileName),
+                        Storage::disk('minio')->path($pdfFileName),
                         $pdfFileName.' could not be found in the server'
                     );
                 }
@@ -80,21 +80,29 @@ class uploadController extends Controller
                 $pdfName = basename($file);
                 $currentFileName = basename($pdfName);
                 $pdfFileName = str_replace(' ', '_', $currentFileName);
-                $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfFileName);
-                if (file_exists($pdfNewPath)) {
-                    unlink($pdfNewPath);
-                    return $this->returnFileMesage(
-                        200,
-                        'File removed successfully !',
-                        Storage::disk('local')->url(env('PDF_UPLOAD').'/'.$pdfFileName),
-                        null
-                    );
-                } else {
+                try {
+                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {
+                        Storage::disk('minio')->delete($pdfUpload_Location.'/'.$pdfFileName);
+                        return $this->returnFileMesage(
+                            200,
+                            'File removed successfully !',
+                            Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName),
+                            null
+                        );
+                    } else {
+                        return $this->returnFileMesage(
+                            400,
+                            'Failed to remove file !',
+                            $pdfFileName,
+                            $pdfFileName.' could not be found in the server'
+                        );
+                    }
+                } catch (Exception $e) {
                     return $this->returnFileMesage(
                         400,
                         'Failed to remove file !',
                         $pdfFileName,
-                        $pdfFileName.' could not be found in the server'
+                        $e->getMessage()
                     );
                 }
             } else {
@@ -126,12 +134,15 @@ class uploadController extends Controller
                 $currentFileName = basename($pdfName);
                 $currentFileNameExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                 $pdfUpload_Location = env('PDF_UPLOAD');
-                $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                if (file_exists($newFilePath)) {
+                if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$currentFileName)) {
                     if ($currentFileNameExtension == 'pdf') {
+                        $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                        file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                         try {
                             $pdf = new Pdf($newFilePath);
                             $pdfTotalPages = $pdf->pageCount();
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             return $this->returnDataMesage(
                                 200,
                                 'PDF Page successfully counted',
