@@ -21,7 +21,7 @@ class NotificationHelper
                     "\nStart At: <b>".$CurrentTime.
                     "</b>\nEnvironment: <b>".env('APP_ENV').
                     "\n\n</b>Services: <b>Frontend Services</b>".
-                    "\nSource: <b>https://gw.hana-ci.com</b>".
+                    "\nSource: <b>https://pdf.hana-ci.com</b>".
                     "\nGroup Id: <b>".$processId.
                     "</b>\n\nError Type: <b>Route Error</b>".
                     "\nError Reason: <b>".$errReason.
@@ -56,8 +56,8 @@ class NotificationHelper
             }
             appLogModel::where('processId', '=', $uuid)
                 ->update([
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $errReason
+                    'errReason' => $errReason,
+                    'errStatus' => 'TelegramResponseException'
                 ]);
             notifyLogModel::where('processId', '=', $uuid)
                 ->update([
@@ -68,8 +68,8 @@ class NotificationHelper
         } catch (\Exception $e) {
             appLogModel::where('processId', '=', $uuid)
                 ->update([
-                    'errReason' => 'TelegramResponseException',
-                    'errStatus' => $errReason
+                    'errReason' => $errReason,
+                    'errStatus' => 'TelegramResponseException'
                 ]);
             notifyLogModel::where('processId', '=', $uuid)
                 ->update([

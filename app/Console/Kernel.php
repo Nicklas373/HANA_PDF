@@ -70,8 +70,8 @@ class Kernel extends ConsoleKernel
                 } else {
                     appLogModel::where('processId', '=', $cacheClearUUIDProc)
                         ->update([
-                            'errReason' => 'Laravel Scheduler Error !',
-                            'errStatus' => $output
+                            'errReason' => $output,
+                            'errStatus' => 'Laravel Scheduler Error !'
                         ]);
                     jobLogModel::where('processId', '=', $cacheClearUUIDProc)
                         ->update([
@@ -125,8 +125,8 @@ class Kernel extends ConsoleKernel
                 } else {
                     appLogModel::where('processId', '=', $optimizeClearUUIDProc)
                         ->update([
-                            'errReason' => 'Laravel Scheduler Error !',
-                            'errStatus' => $output
+                            'errReason' => $output,
+                            'errStatus' => 'Laravel Scheduler Error !'
                         ]);
                     jobLogModel::where('processId', '=', $optimizeClearUUIDProc)
                         ->update([
@@ -180,8 +180,8 @@ class Kernel extends ConsoleKernel
                 } else {
                     appLogModel::where('processId', '=', $viewClearUUIDProc)
                         ->update([
-                            'errReason' => 'Laravel Scheduler Error !',
-                            'errStatus' => $output,
+                            'errReason' => $output,
+                            'errStatus' => 'Laravel Scheduler Error !',
                         ]);
                     jobLogModel::where('processId', '=', $viewClearUUIDProc)
                         ->update([
@@ -235,8 +235,8 @@ class Kernel extends ConsoleKernel
                 } else {
                     appLogModel::where('processId', '=', $viewCacheUUIDProc)
                         ->update([
-                            'errReason' => 'Laravel Scheduler Error !',
-                            'errStatus' => $output,
+                            'errReason' => $output,
+                            'errStatus' => 'Laravel Scheduler Error !',
                         ]);
                     jobLogModel::where('processId', '=', $viewCacheUUIDProc)
                         ->update([
