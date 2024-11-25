@@ -16,19 +16,6 @@ use Ramsey\Uuid\Uuid;
 
 class AppHelper
 {
-    function checkWebAvailable($url){
-        try {
-            $response = Http::timeout(5)->get($url);
-            if ($response->successful()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
     function getCurrentTimeZone() {
         date_default_timezone_set('Asia/Jakarta');
         $currentDateTime = date('Y-m-d H:i:s');
