@@ -37,8 +37,8 @@ class mergeController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -141,8 +141,8 @@ class mergeController extends Controller
                         $duration = $end->diff($startProc);
                         appLogModel::where('groupId', '=', $batchId)
                             ->update([
-                                'errReason' => 'PDF Merge failed',
-                                'errStatus' => $e->getMessage()
+                                'errReason' => $e->getMessage(),
+                                'errStatus' => 'PDF Merge failed'
                             ]);
                         mergeModel::where('groupId', '=', $batchId)
                             ->update([
@@ -214,8 +214,8 @@ class mergeController extends Controller
                         $duration = $end->diff($startProc);
                         appLogModel::where('groupId', '=', $batchId)
                             ->update([
-                                'errReason' => 'Failed to download file from iLovePDF API !',
-                                'errStatus' => null
+                                'errReason' => null,
+                                'errStatus' => 'Failed to download file from iLovePDF API !'
                             ]);
                         mergeModel::where('groupId', '=', $batchId)
                             ->update([
@@ -245,8 +245,8 @@ class mergeController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'File not found on the server',
-                            'errStatus' => 'File not found on our end, please try again'
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
                     mergeModel::where('groupId', '=', $batchId)
                         ->update([
@@ -278,8 +278,8 @@ class mergeController extends Controller
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $batchId,
-                    'errReason' => 'PDF failed to upload !',
-                    'errStatus' => null
+                    'errReason' => null,
+                    'errStatus' => 'PDF failed to upload !'
                 ]);
                 mergeModel::create([
                     'fileName' => null,

@@ -51,8 +51,8 @@ class convertController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -175,8 +175,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Symfony runtime process out of time exception !',
-                                        'errStatus' => $message->getMessage()
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Symfony runtime process out of time exception !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -207,8 +207,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Symfony runtime process fail exception !',
-                                        'errStatus' => $message->getMessage()
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Symfony runtime process fail exception !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -251,8 +251,8 @@ class convertController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => 'FTP Server Connection Failed !',
-                                            'errStatus' => null,
+                                            'errReason' => null,
+                                            'errStatus' => 'FTP Server Connection Failed !'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -284,8 +284,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Aspose API Error !, CnvToXLS failure',
-                                        'errStatus' => $asposeAPI->getErrorOutput(),
+                                        'errReason' => $asposeAPI->getErrorOutput(),
+                                        'errStatus' => 'Aspose API Error !, CnvToXLS failure'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -341,8 +341,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Symfony runtime process out of time exception !',
-                                        'errStatus' => $message->getMessage(),
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Symfony runtime process out of time exception !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -373,8 +373,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Symfony runtime process fail exception !',
-                                        'errStatus' => $message->getMessage(),
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Symfony runtime process fail exception !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -417,8 +417,8 @@ class convertController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => 'FTP Server Connection Failed !',
-                                            'errStatus' => null,
+                                            'errReason' => null,
+                                            'errStatus' => 'FTP Server Connection Failed !'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -450,8 +450,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Aspose API Error !, cnvToPptx failure',
-                                        'errStatus' => $asposeAPI->getErrorOutput(),
+                                        'errReason' => $asposeAPI->getErrorOutput(),
+                                        'errStatus' => 'Aspose API Error !, cnvToPptx failure'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -507,8 +507,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Aspose API Error !, CnvToDocx failure',
-                                        'errStatus' => $e->getMessage()
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'Aspose API Error !, CnvToDocx failure'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -551,8 +551,8 @@ class convertController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => 'FTP Server Connection Failed !',
-                                            'errStatus' => null
+                                            'errReason' => null,
+                                            'errStatus' => 'FTP Server Connection Failed !'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -584,8 +584,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Aspose API has fail while process, Please look on Aspose Dashboard !',
-                                        'errStatus' => null
+                                        'errReason' => null,
+                                        'errStatus' => 'Aspose API has fail while process, Please look on Aspose Dashboard !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -637,8 +637,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'errStatus' => $e->getMessage()
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -735,8 +735,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'errStatus' => $e->getMessage()
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -777,8 +777,8 @@ class convertController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Failed to download file from iLovePDF API !',
-                                        'errStatus' => null
+                                        'errReason' => null,
+                                        'errStatus' => 'Failed to download file from iLovePDF API !'
                                     ]);
                                 cnvModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -875,8 +875,8 @@ class convertController extends Controller
                                         $duration = $end->diff($startProc);
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
-                                                'errReason' => 'Failed convert PDF file !',
-                                                'errStatus' => 'File '. $filePath . ' was not found'
+                                                'errReason' => 'File '. $filePath . ' was not found',
+                                                'errStatus' => 'Failed convert PDF file !'
                                             ]);
                                         cnvModel::where('groupId', '=', $batchId)
                                             ->update([
@@ -956,8 +956,8 @@ class convertController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Failed archiving PDF files !',
-                                    'errStatus' => null
+                                    'errReason' => null,
+                                    'errStatus' => 'Failed archiving PDF files !'
                                 ]);
                             cnvModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -992,8 +992,8 @@ class convertController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'PDF convert failed',
-                            'errStatus' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount
+                            'errReason' => 'Processed file are not same with total file, processed: '.$procFile.' totalFile: '.$loopCount,
+                            'errStatus' => 'PDF convert failed'
                         ]);
                     cnvModel::where('groupId', '=', $batchId)
                         ->update([
@@ -1019,8 +1019,8 @@ class convertController extends Controller
                 appLogModel::create([
                     'processId' => $procUuid,
                     'groupId' => $batchId,
-                    'errReason' =>  'PDF Convert failed !',
-                    'errStatus' => 'PDF failed to upload'
+                    'errReason' =>  'PDF failed to upload',
+                    'errStatus' => 'PDF Convert failed !'
                 ]);
                 cnvModel::create([
                     'fileName' => null,

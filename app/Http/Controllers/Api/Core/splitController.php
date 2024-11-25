@@ -43,8 +43,8 @@ class splitController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -188,7 +188,7 @@ class splitController extends Controller
                                                 appLogModel::where('groupId', '=', $batchId)
                                                     ->update([
                                                         'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => null
+                                                        'errStatus' => 'PDF split failed!'
                                                     ]);
                                                 splitModel::where('groupId', '=', $batchId)
                                                     ->update([
@@ -220,7 +220,7 @@ class splitController extends Controller
                                                 appLogModel::where('groupId', '=', $batchId)
                                                     ->update([
                                                         'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => null
+                                                        'errStatus' => 'PDF split failed!'
                                                     ]);
                                                 splitModel::where('groupId', '=', $batchId)
                                                     ->update([
@@ -252,7 +252,7 @@ class splitController extends Controller
                                                 appLogModel::where('groupId', '=', $batchId)
                                                     ->update([
                                                         'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => null
+                                                        'errStatus' => 'PDF split failed!'
                                                     ]);
                                                 splitModel::where('groupId', '=', $batchId)
                                                     ->update([
@@ -297,8 +297,8 @@ class splitController extends Controller
                                             $duration = $end->diff($startProc);
                                             appLogModel::where('groupId', '=', $batchId)
                                                 ->update([
-                                                    'errReason' => 'Failed to count total PDF pages from '.$currentFileName,
-                                                    'errStatus' => $e->getMessage()
+                                                    'errReason' => $e->getMessage(),
+                                                    'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
                                                 ]);
                                             splitModel::where('groupId', '=', $batchId)
                                                 ->update([
@@ -330,7 +330,7 @@ class splitController extends Controller
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
                                                 'errReason' => 'First or Last page can not empty',
-                                                'errStatus' => null
+                                                'errStatus' => 'PDF Split failed !'
                                             ]);
                                         splitModel::where('groupId', '=', $batchId)
                                             ->update([
@@ -365,7 +365,7 @@ class splitController extends Controller
                                                 appLogModel::where('groupId', '=', $batchId)
                                                     ->update([
                                                         'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => null
+                                                        'errStatus' => 'PDF Split failed !'
                                                     ]);
                                                 splitModel::where('groupId', '=', $batchId)
                                                     ->update([
@@ -400,8 +400,8 @@ class splitController extends Controller
                                             $duration = $end->diff($startProc);
                                             appLogModel::where('groupId', '=', $batchId)
                                                 ->update([
-                                                    'errReason' => 'Failed to count total PDF pages from '.$currentFileName,
-                                                    'errStatus' => $e->getMessage()
+                                                    'errReason' => $e->getMessage(),
+                                                    'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
                                                 ]);
                                             splitModel::where('groupId', '=', $batchId)
                                                 ->update([
@@ -442,7 +442,7 @@ class splitController extends Controller
                                             appLogModel::where('groupId', '=', $batchId)
                                                 ->update([
                                                     'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                    'errStatus' => null
+                                                    'errStatus' => 'PDF split failed!'
                                                 ]);
                                             splitModel::where('groupId', '=', $batchId)
                                                 ->update([
@@ -477,8 +477,8 @@ class splitController extends Controller
                                         $duration = $end->diff($startProc);
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
-                                                'errReason' => 'Failed to count total PDF pages from '.$currentFileName,
-                                                'errStatus' => $e->getMessage()
+                                                'errReason' => $e->getMessage(),
+                                                'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
                                             ]);
                                         splitModel::where('groupId', '=', $batchId)
                                             ->update([
@@ -539,8 +539,8 @@ class splitController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                        'errStatus' => $e->getMessage()
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
                                     ]);
                                 splitModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -693,8 +693,8 @@ class splitController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => 'Failed to download file from iLovePDF API !',
-                                            'errStatus' => null
+                                            'errReason' => null,
+                                            'errStatus' => 'Failed to download file from iLovePDF API !'
                                         ]);
                                     splitModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -768,8 +768,8 @@ class splitController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => 'Failed to download file from iLovePDF API !',
-                                            'errStatus' => null
+                                            'errReason' => null,
+                                            'errStatus' => 'Failed to download file from iLovePDF API !'
                                         ]);
                                     splitModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -803,8 +803,8 @@ class splitController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Invalid split request method !',
-                                    'errStatus' => null
+                                    'errReason' => null,
+                                    'errStatus' => 'Invalid split request method !'
                                 ]);
                             splitModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -835,8 +835,8 @@ class splitController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'File not found on the server',
-                            'errStatus' => 'File not found on our end, please try again'
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
                     splitModel::where('groupId', '=', $batchId)
                         ->update([
@@ -868,8 +868,8 @@ class splitController extends Controller
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $batchId,
-                    'errReason' => 'PDF failed to upload !',
-                    'errStatus' => null
+                    'errReason' => null,
+                    'errStatus' => 'PDF failed to upload !'
                 ]);
                 splitModel::create([
                     'fileName' => null,

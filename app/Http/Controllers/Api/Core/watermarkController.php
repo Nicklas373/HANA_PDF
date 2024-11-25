@@ -48,8 +48,8 @@ class watermarkController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -138,8 +138,8 @@ class watermarkController extends Controller
                             if (empty($watermarkImage)) {
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                            'errReason' => 'PDF Watermark failed !',
-                                            'errStatus' => 'Image file for watermark can not be empty !'
+                                        'errReason' => 'Image file for watermark can not be empty !',
+                                        'errStatus' => 'PDF Watermark failed !'
                                     ]);
                                 watermarkModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -189,8 +189,8 @@ class watermarkController extends Controller
                             if (empty($watermarkText)) {
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'PDF Watermark failed !',
-                                        'errStatus' => 'Text for watermark can not be empty !'
+                                        'errReason' => 'Text for watermark can not be empty !',
+                                        'errStatus' => 'PDF Watermark failed !'
                                     ]);
                                 watermarkModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -212,8 +212,8 @@ class watermarkController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'PDF Watermark failed !',
-                                    'errStatus' =>  'Invalid request action !,Current request: '.$watermarkAction
+                                    'errReason' => 'Invalid request action !,Current request: '.$watermarkAction,
+                                    'errStatus' => 'PDF Watermark failed !'
                                 ]);
                             watermarkModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -329,8 +329,8 @@ class watermarkController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                                    'errStatus' => $e->getMessage()
+                                    'errReason' => $e->getMessage(),
+                                    'errStatus' => 'iLovePDF API Error !, Catch on Exception'
                                 ]);
                             watermarkModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -401,8 +401,8 @@ class watermarkController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errStatus' => null
+                                    'errReason' => null,
+                                    'errStatus' => 'Failed to download file from iLovePDF API !'
                                 ]);
                             watermarkModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -435,8 +435,8 @@ class watermarkController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'File not found on the server',
-                            'errStatus' => 'File not found on our end, please try again'
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
                     watermarkModel::where('groupId', '=', $batchId)
                         ->update([
@@ -468,8 +468,8 @@ class watermarkController extends Controller
                 appLogModel::create([
                     'processId' => $uuid,
                     'groupId' => $batchId,
-                    'errReason' => 'PDF failed to upload !',
-                    'errStatus' => null
+                    'errReason' => null,
+                    'errStatus' => 'PDF failed to upload !'
                 ]);
                 watermarkModel::create([
                     'fileName' => null,

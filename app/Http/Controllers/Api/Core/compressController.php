@@ -38,8 +38,8 @@ class compressController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -160,8 +160,8 @@ class compressController extends Controller
                         $duration = $end->diff($startProc);
                         appLogModel::where('groupId', '=', $batchId)
                             ->update([
-                                'errReason' => 'Failed to download file from iLovePDF API !',
-                                'errStatus' => 'Error while processing file: '.$currentFileName
+                                'errReason' =>  $e->getMessage(),
+                                'errStatus' => 'Failed to download file from iLovePDF API !'
                             ]);
                         compressModel::where('groupId', '=', $batchId)
                             ->update([
@@ -230,8 +230,8 @@ class compressController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errStatus' => 'Error while processing file: '.$randomizePdfFileName.'.zip'
+                                    'errReason' => 'Error while processing file: '.$randomizePdfFileName.'.zip',
+                                    'errStatus' => 'Failed to download file from iLovePDF API !'
                                 ]);
                             compressModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -294,8 +294,8 @@ class compressController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Failed to download file from iLovePDF API !',
-                                        'errStatus' => 'Error while processing file: '.$file
+                                        'errReason' => 'Error while processing file: '.$file,
+                                        'errStatus' => 'Failed to download file from iLovePDF API !'
                                     ]);
                                 compressModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -328,8 +328,8 @@ class compressController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'File not found on the server',
-                            'errStatus' => 'File not found on our end, please try again'
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
                     compressModel::where('groupId', '=', $batchId)
                         ->update([
@@ -360,8 +360,8 @@ class compressController extends Controller
                 $duration = $end->diff($startProc);
                 appLogModel::create([
                     'processId' => $uuid,
-                    'errReason' => 'PDF failed to upload !',
-                    'errStatus' => null
+                    'errReason' => null,
+                    'errStatus' => 'PDF failed to upload !'
                 ]);
                 compressModel::create([
                     'fileName' => null,
