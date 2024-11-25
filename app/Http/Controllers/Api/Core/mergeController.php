@@ -79,8 +79,7 @@ class mergeController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    if (file_exists($newFilePath)) {
+                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
                         array_push($altPoolFiles, $newFileNameWithoutExtension);
                     }
                 }
@@ -97,8 +96,10 @@ class mergeController extends Controller
                             $trimPhase1 = str_replace(' ', '_', $currentFileName);
                             $firstTrim = basename($currentFileName, '.pdf');
                             $newFileNameWithoutExtension = str_replace('.', '_', $firstTrim);
-                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                            $fileSize = filesize($newFilePath);
+                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                            $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                             $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                             if ($batchValue) {
                                 $newFileName = $randomizePdfFileName.'.zip';
@@ -130,6 +131,11 @@ class mergeController extends Controller
                         $ilovepdfTask->execute();
                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                         $ilovepdfTask->delete();
+                        foreach ($files as $file) {
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                        }
                     } catch (\Exception $e) {
                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
@@ -153,6 +159,11 @@ class mergeController extends Controller
                             'iLovePDF API Error !, Catch on Exception',
                             $e->getMessage()
                         );
+                        foreach ($files as $file) {
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                        }
                         return $this->returnDataMesage(
                             400,
                             'PDF Merge failed !',
@@ -163,7 +174,12 @@ class mergeController extends Controller
                         );
                     }
                     if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
-                        $mergedFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
+                        Storage::disk('minio')->put(
+                            $pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf',
+                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))
+                        );
+                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
+                        $mergedFileSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
                         $newMergedFileSize = AppHelper::instance()->convert($mergedFileSize, "MB");
                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
@@ -182,7 +198,10 @@ class mergeController extends Controller
                             200,
                             'OK',
                             $randomizePdfFileName.'.pdf',
-                            Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'),
+                            Storage::disk('minio')->temporaryUrl(
+                                $pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf',
+                                now()->addMinutes(5)
+                            ),
                             'merge',
                             $batchId,
                             $newMergedFileSize,

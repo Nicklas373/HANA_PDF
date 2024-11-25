@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\LOG;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
@@ -84,7 +85,7 @@ class watermarkController extends Controller
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    if (file_exists($newFilePath)) {
+                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
                         array_push($altPoolFiles, $newFileNameWithoutExtension);
                     }
                 }
@@ -93,8 +94,10 @@ class watermarkController extends Controller
                         $currentFileName = basename($file);
                         $trimPhase1 = str_replace(' ', '_', $currentFileName);
                         $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                        $fileSize = filesize($newFilePath);
+                        $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                        file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                        $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $watermarkAction = $request->post('action');
@@ -161,14 +164,25 @@ class watermarkController extends Controller
                                     null,
                                     'Image file for watermark can not be empty !'
                                 );
+                            } else {
+                                $currentImageName = basename($watermarkImage);
+                                $trimImagePhase1 = str_replace(' ', '_', $currentImageName);
+                                $newImageNameWithoutExtension = str_replace('.', '_', $trimImagePhase1);
+                                $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
+                                $wmImageName = $newImageNameWithoutExtension.'.'.$randomizeImageExtension;
+                                Storage::disk('local')->put('public/'.$pdfUpload_Location.'/'.$wmImageName, file_get_contents($watermarkImage));
+                                if (!Storage::disk('local')->exists('public/'.$pdfUpload_Location.'/'.$wmImageName)) {
+                                    return $this->returnDataMesage(
+                                        400,
+                                        'PDF Watermark failed !',
+                                        null,
+                                        $batchId,
+                                        null,
+                                        Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$wmImageName)
+                                    );
+                                }
+                                $watermarkText = null;
                             }
-                            $currentImageName = basename($watermarkImage);
-                            $trimImagePhase1 = str_replace(' ', '_', $currentImageName);
-                            $newImageNameWithoutExtension = str_replace('.', '_', $trimImagePhase1);
-                            $randomizeImageExtension = pathinfo($watermarkImage->getClientOriginalName(), PATHINFO_EXTENSION);
-                            $wmImageName = $newImageNameWithoutExtension.'.'.$randomizeImageExtension;
-                            $watermarkImage->storeAs('public/upload', $wmImageName);
-                            $watermarkText = null;
                         } else if ($watermarkAction == 'txt') {
                             $watermarkText = $request->post('wmText');
                             $wmImageName = null;
@@ -292,6 +306,10 @@ class watermarkController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                             $ilovepdfTask->delete();
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            if ($watermarkAction == 'img') {
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$wmImageName);
+                            }
                             watermarkModel::where('processId', '=', $procUuid)
                                 ->update([
                                     'watermarkFontFamily' => $watermarkFontFamily,
@@ -329,6 +347,10 @@ class watermarkController extends Controller
                                 'iLovePDF API Error !, Catch on Exception',
                                 $e->getMessage()
                             );
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            if ($watermarkAction == 'img') {
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$wmImageName);
+                            }
                             return $this->returnDataMesage(
                                 400,
                                 'PDF Watermark failed !',
@@ -339,8 +361,13 @@ class watermarkController extends Controller
                             );
                         }
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
-                            $procFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'));
-                            $newProcFileSize = AppHelper::instance()->convert($procFileSize, "MB");
+                            Storage::disk('minio')->put(
+                                $pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf',
+                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))
+                            );
+                            Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
+                            $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
+                            $newProcFileSize = AppHelper::instance()->convert($fileProcSize, "MB");
                             $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
@@ -358,7 +385,10 @@ class watermarkController extends Controller
                                 200,
                                 'OK',
                                 $randomizePdfFileName.'.pdf',
-                                Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'),
+                                Storage::disk('minio')->temporaryUrl(
+                                    $pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf',
+                                    now()->addMinutes(5)
+                                ),
                                 'watermark',
                                 $batchId,
                                 $newFileSize,

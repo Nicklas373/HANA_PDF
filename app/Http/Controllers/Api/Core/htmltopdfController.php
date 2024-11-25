@@ -179,6 +179,12 @@ class htmltopdfController extends Controller
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);
+                Storage::disk('minio')->put(
+                    $pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf',
+                    file_get_contents(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))
+                );
+                Storage::disk('local')->delete('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
+                $fileProcSize = Storage::disk('minio')->size($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
                 appLogModel::where('groupId', '=', $batchId)
                     ->update([
                         'errReason' => null,
@@ -194,10 +200,13 @@ class htmltopdfController extends Controller
                     200,
                     'OK',
                     $pdfUrl,
-                    Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'),
+                    Storage::disk('minio')->temporaryUrl(
+                        $pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf',
+                        now()->addMinutes(5)
+                    ),
                     'htmltopdf',
                     $batchId,
-                    null,
+                    $fileProcSize,
                     null,
                     null,
                     null
