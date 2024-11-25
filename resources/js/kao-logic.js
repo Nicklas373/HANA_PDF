@@ -28,8 +28,8 @@ const options = {
 
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
-const appMinorVer = 3;
-const appPatchVer = 10;
+const appMinorVer = 4;
+const appPatchVer = 1;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const errModal = new Modal($errModal, options);
@@ -1753,9 +1753,7 @@ function scsInterfaceSTA(xhrReturn, proc) {
             "scsMsgResult"
         ).innerText = `Download the file or PDF below.`;
     }
-    document.getElementById(
-        "scsMsgLink"
-    ).href = `${apiUrl}${xhrReturn.fileSource}`;
+    document.getElementById("scsMsgLink").href = `${xhrReturn.fileSource}`;
     document.getElementById("scsMsgLink").innerText = "Download PDF";
 }
 
