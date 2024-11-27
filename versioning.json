@@ -4,15 +4,15 @@
     "versioning": {
       "majorVersion": 3,
       "minorVersion": 5,
-      "patchVersion": 7
+      "patchVersion": 9
     }
   },
   {
     "appServices": "FE",
     "versioning": {
       "majorVersion": 3,
-      "minorVersion": 3,
-      "patchVersion": 10
+      "minorVersion": 4,
+      "patchVersion": 1
     }
   }
 ]
