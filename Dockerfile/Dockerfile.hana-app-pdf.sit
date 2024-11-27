@@ -25,14 +25,19 @@ RUN apk add --no-cache \
     unzip \
     git \
     libzip-dev \
-    postgresql-dev
+    libpq-dev \
+    postgresql-dev \
+    supervisor \
+    nginx \
+    bash \
+    busybox-suid \
+    nano
 
 # Install PHP extensions
-RUN docker-php-ext-install zip pdo_pgsql
+RUN docker-php-ext-install -j$(nproc) pdo_pgsql
 
 # Clone App Services
 RUN git clone -b dev/fe/master-live https://github.com/Nicklas373/Hana-PDF hanaci-pdf
-RUN chown -R www-data:www-data hanaci-pdf
 
 # Configure Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -40,11 +45,15 @@ RUN cd hanaci-pdf && composer install --no-interaction --no-scripts --no-progres
 
 # Configure App Service
 COPY module/php/php.ini /usr/local/etc/php/conf.d/99-hana.ini
-RUN cd hanaci-pdf && chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 RUN cd hanaci-pdf && cp .env.example .env
-RUN cd hanaci-pdf && php artisan key:generate
-RUN cd hanaci-pdf && php artisan config:cache
-RUN cd hanaci-pdf && php artisan config:clear
+RUN cd hanaci-pdf && \
+    php artisan key:generate && \
+    php artisan config:cache && \
+    php artisan config:clear
+
+# Configure permission
+RUN cd hanaci-pdf && \
+    chmod o+w /var/www/html/hanaci-pdf/storage/ -R
 
 # Configure Laravel Env
 RUN cd hanaci-pdf && echo "VITE_ADOBE_CLIENT_ID=xxxx" >> .env
@@ -60,8 +69,21 @@ RUN cd hanaci-pdf && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASSWORD/" .env
 RUN cd hanaci-pdf && echo "TELEGRAM_BOT_ID=xxxx" >> .env
 RUN cd hanaci-pdf && echo "TELEGRAM_CHAT_ID=xxxx" >> .env
 
-# Expose port 9000
-EXPOSE 9000
+# Configure nginx instances
+RUN mkdir /etc/nginx/sites-enabled
+COPY module/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY module/nginx/sites-available/pdf-hanaci.conf /etc/nginx/sites-available/pdf-hanaci.conf
+RUN ln -s /etc/nginx/sites-available/pdf-hanaci.conf /etc/nginx/sites-enabled/
 
-# Start PHP FPM
-CMD ["php-fpm"]
+# Set up cron job for Laravel scheduler
+COPY module/hanaci/hanaci-pdf/pdf-cron /etc/crontabs/root
+RUN touch /var/log/cron.log && chmod 0644 /var/log/cron.log
+
+# Configure supervisord
+COPY module/instance/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose necessary ports
+EXPOSE 81 9000
+
+# Start Nginx and PHP-FPM with supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
