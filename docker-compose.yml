@@ -1,12 +1,14 @@
 services:
     hana-app-pdf:
-        image: nicklas373/hana-app-pdf-sit:1.4
+        image: nicklas373/hana-app-pdf-sit:1.5
         container_name: "hana-app-pdf"
         cpus: 2.0
         mem_limit: 512M
         mem_reservation: 256M
         restart: unless-stopped
         working_dir: /var/www/html/hanaci-pdf
+        ports:
+            - "81:81"
         environment:
             - APP_NAME=pdf.hana-ci.com
         volumes:
@@ -15,15 +17,16 @@ services:
             - hana-network
         depends_on:
             - hana-api-services
-            - hana-instance-services
     hana-api-services:
-        image: nicklas373/hana-api-services-sit:1.6
+        image: nicklas373/hana-api-services-sit:1.7
         container_name: "hana-api-services"
         cpus: 2.0
         mem_limit: 512M
         mem_reservation: 256M
         restart: always
         working_dir: /var/www/html/hanaci-api
+        ports:
+            - "80:80"
         environment:
             - APP_NAME=gw.hana-ci.com
         volumes:
@@ -32,7 +35,25 @@ services:
             - hana-network
         depends_on:
             - hana-db-services
-            - hana-instance-services
+    hana-minio:
+        image: minio/minio:latest
+        container_name: "hanaci-minio"
+        cpus: 1.0
+        mem_limit: 512M
+        mem_reservation: 256M
+        restart: unless-stopped
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        networks:
+            - hana-network
+        volumes:
+            - minio-data:/data
+            - minio-config:/root/.minio
+        environment:
+        MINIO_ROOT_USER: "eureka"
+        MINIO_ROOT_PASSWORD: "eureka"
+        command: server /data --console-address ":9001"
     hana-db-services:
         image: postgres:16.1
         container_name: "hana-db-services"
@@ -45,10 +66,10 @@ services:
         env_file:
             - .env
         environment:
-            PGPASSWORD: "${DB_PASSWORD}"
-            POSTGRES_DB: "${DB_DATABASE}"
-            POSTGRES_USER: "${DB_USERNAME}"
-            POSTGRES_PASSWORD: "${DB_PASSWORD}"
+            PGPASSWORD: "postgres"
+            POSTGRES_DB: "postgres"
+            POSTGRES_USER: "master"
+            POSTGRES_PASSWORD: "postgres"
             PGDATA: /var/lib/postgresql/data/pgdata
         volumes:
             - "hana-db-services:/var/lib/postgresql/data"
@@ -57,37 +78,13 @@ services:
             - hana-network
         depends_on:
             - hana-instance-services
-    hana-instance-services:
-        image: nicklas373/hana-instance-services-sit:1.3
-        container_name: "hana-instance-services"
-        cpus: 2.0
-        mem_limit: 1G
-        mem_reservation: 512M
-        restart: always
-        ports:
-            - "80:80"
-            - "81:81"
-        volumes:
-            - ./module/imagick/policy.xml:/etc/ImageMagick-6/policy.xml
-            - ./module/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./module/nginx/sites-available/api-hanaci.conf:/etc/nginx/sites-available/api-hanaci.conf
-            - ./module/nginx/sites-available/pdf-hanaci.conf:/etc/nginx/sites-available/pdf-hanaci.conf
-            - ./module/php/php.ini:/etc/php/8.2/cli/conf.d/99-hana.ini
-            - ./module/php/php.ini:/etc/php/8.2/fpm/conf.d/99-hana.ini
-            - hana-app-pdf:/var/www/html/hanaci-pdf
-            - hana-api-services:/var/www/html/hanaci-api
-            - hana-instance-services:/var/log/supervisor
-        networks:
-            - hana-network
 networks:
     hana-network:
         driver: bridge
 volumes:
     hana-db-services:
         driver: local
-    hana-app-pdf:
+    minio-data:
         driver: local
-    hana-api-services:
-        driver: local
-    hana-instance-services:
+    minio-config:
         driver: local
