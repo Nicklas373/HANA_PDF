@@ -40,8 +40,8 @@ class htmltopdfController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -106,8 +106,8 @@ class htmltopdfController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => '404',
-                            'errStatus' => 'Webpage are not available or not valid'
+                            'errReason' => 'Webpage are not available or not valid: '.$pdfUrl,
+                            'errStatus' => '404'
                         ]);
                     htmlModel::where('groupId', '=', $batchId)
                         ->update([
@@ -121,7 +121,7 @@ class htmltopdfController extends Controller
                         $pdfUrl,
                         $batchId,
                         null,
-                        'Webpage are not available or not valid'
+                        'Webpage are not available or not valid: '.$pdfUrl
                     );
                 }
             }
@@ -149,8 +149,8 @@ class htmltopdfController extends Controller
                 $duration = $end->diff($startProc);
                 appLogModel::where('groupId', '=', $batchId)
                     ->update([
-                        'errReason' => 'iLovePDF API Error !, Catch on Exception',
-                        'errStatus' => $e->getMessage()
+                        'errReason' => $e->getMessage(),
+                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
                     ]);
                 htmlModel::where('groupId', '=', $batchId)
                     ->update([
@@ -179,6 +179,12 @@ class htmltopdfController extends Controller
             if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);
+                Storage::disk('minio')->put(
+                    $pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf',
+                    file_get_contents(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))
+                );
+                Storage::disk('local')->delete('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
+                $fileProcSize = Storage::disk('minio')->size($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
                 appLogModel::where('groupId', '=', $batchId)
                     ->update([
                         'errReason' => null,
@@ -194,10 +200,13 @@ class htmltopdfController extends Controller
                     200,
                     'OK',
                     $pdfUrl,
-                    Storage::disk('local')->url($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'),
+                    Storage::disk('minio')->temporaryUrl(
+                        $pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf',
+                        now()->addMinutes(5)
+                    ),
                     'htmltopdf',
                     $batchId,
-                    null,
+                    $fileProcSize,
                     null,
                     null,
                     null
@@ -207,8 +216,8 @@ class htmltopdfController extends Controller
                 $duration = $end->diff($startProc);
                 appLogModel::where('groupId', '=', $batchId)
                     ->update([
-                        'errReason' => 'Failed to download file from iLovePDF API !',
-                        'errStatus' => null
+                        'errReason' => null,
+                        'errStatus' => 'Failed to download file from iLovePDF API !'
                     ]);
                 htmlModel::where('groupId', '=', $batchId)
                     ->update([

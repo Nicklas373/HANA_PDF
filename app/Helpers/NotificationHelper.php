@@ -409,7 +409,7 @@ class NotificationHelper
                     "</b>\nEnvironment: <b>".env('APP_ENV').
                     "\n\n</b>Services: <b>Backend Services</b>".
                     "\nSource: <b>https://gw.hana-ci.com</b>".
-                    "\nEndpoint: <b>api/v2/version</b>".
+                    "\nEndpoint: <b>api/v1/version</b>".
                     "\n\nProcess: <b>Versioning".
                     "</b>\nGroup Id: <b>".$processId.
                     "</b>\nType: <b>Versioning Check</b>".

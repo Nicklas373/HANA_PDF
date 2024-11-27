@@ -38,8 +38,8 @@ class compressController extends Controller
             appLogModel::create([
                 'processId' => $uuid,
                 'groupId' => $batchId,
-                'errReason' => 'Validation Failed!',
-                'errStatus' => $validator->messages()->first()
+                'errReason' => $validator->messages()->first(),
+                'errStatus' => 'Validation Failed!'
             ]);
             NotificationHelper::Instance()->sendErrNotify(
                 null,
@@ -87,8 +87,7 @@ class compressController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    if (file_exists($newFilePath)) {
+                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
                         array_push($altPoolFiles, $newFileNameWithoutExtension);
                     }
                 }
@@ -104,21 +103,23 @@ class compressController extends Controller
                             $trimPhase1 = str_replace(' ', '_', $currentFileName);
                             $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                             array_push($poolFiles, $newFileNameWithoutExtension);
-                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                             if ($batchValue) {
                                 $newFileName = $randomizePdfFileName.'.zip';
                             } else {
                                 $newFileName = $currentFileName;
                             }
-                            $fileSize = filesize($newFilePath);
+                            $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                             $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                             $procUuid = AppHelper::Instance()->generateUniqueUuid(compressModel::class, 'processId');
                             if ($loopCount <= 1) {
-                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$trimPhase1)) {
-                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$trimPhase1);
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileName)) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileName);
                                 }
                             }
-                            $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$trimPhase1);
+                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1), $minioUpload);
+                            $localPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            $pdfFile = $ilovepdfTask->addFile($localPath);
                             $pdfFile->setPassword($pdfEncKey);
                             appLogModel::create([
                                 'processId' => $procUuid,
@@ -149,13 +150,18 @@ class compressController extends Controller
                         $ilovepdfTask->execute();
                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                         $ilovepdfTask->delete();
+                        foreach ($files as $file) {
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                        }
                     } catch (\Exception $e) {
                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
                         appLogModel::where('groupId', '=', $batchId)
                             ->update([
-                                'errReason' => 'Failed to download file from iLovePDF API !',
-                                'errStatus' => 'Error while processing file: '.$newFilePath
+                                'errReason' =>  $e->getMessage(),
+                                'errStatus' => 'Failed to download file from iLovePDF API !'
                             ]);
                         compressModel::where('groupId', '=', $batchId)
                             ->update([
@@ -172,6 +178,11 @@ class compressController extends Controller
                             'iLovePDF API Error !, Catch on Exception',
                             $e->getMessage()
                         );
+                        foreach ($files as $file) {
+                            $currentFileName = basename($file);
+                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                        }
                         return $this->returnDataMesage(
                             400,
                             'PDF Compression failed !',
@@ -185,7 +196,12 @@ class compressController extends Controller
                     $duration = $end->diff($startProc);
                     if ($batchValue) {
                         if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))) {
-                            $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'));
+                            Storage::disk('minio')->put(
+                                $pdfDownload_Location.'/'.$randomizePdfFileName.'.zip',
+                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))
+                            );
+                            Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip');
+                            $compFileSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.zip');
                             $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
                             compressModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -198,7 +214,10 @@ class compressController extends Controller
                                 200,
                                 'OK',
                                 $randomizePdfFileName.'.zip',
-                                Storage::disk('local')->url($pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'),
+                                Storage::disk('minio')->temporaryUrl(
+                                    $pdfDownload_Location.'/'.$randomizePdfFileName.'.zip',
+                                    now()->addMinutes(5)
+                                ),
                                 'compress',
                                 $batchId,
                                 $newFileSize,
@@ -211,8 +230,8 @@ class compressController extends Controller
                             $duration = $end->diff($startProc);
                             appLogModel::where('groupId', '=', $batchId)
                                 ->update([
-                                    'errReason' => 'Failed to download file from iLovePDF API !',
-                                    'errStatus' => 'Error while processing file: '.$randomizePdfFileName.'.zip'
+                                    'errReason' => 'Error while processing file: '.$randomizePdfFileName.'.zip',
+                                    'errStatus' => 'Failed to download file from iLovePDF API !'
                                 ]);
                             compressModel::where('groupId', '=', $batchId)
                                 ->update([
@@ -241,7 +260,12 @@ class compressController extends Controller
                     } else {
                         foreach ($poolFiles as $file) {
                             if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'))) {
-                                $compFileSize = filesize(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'));
+                                Storage::disk('minio')->put(
+                                    $pdfDownload_Location.'/'.$file.'.pdf',
+                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'))
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$file.'.pdf');
+                                $compFileSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$file.'.pdf');
                                 $newCompFileSize = AppHelper::instance()->convert($compFileSize, "MB");
                                 compressModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -253,8 +277,11 @@ class compressController extends Controller
                                 return $this->returnCoreMessage(
                                     200,
                                     'OK',
-                                    $randomizePdfFileName.'.zip',
-                                    Storage::disk('local')->url($pdfDownload_Location.'/'.$file.'.pdf'),
+                                    $file.'.pdf',
+                                    Storage::disk('minio')->temporaryUrl(
+                                        $pdfDownload_Location.'/'.$file.'.pdf',
+                                        now()->addMinutes(5)
+                                    ),
                                     'compress',
                                     $batchId,
                                     $newFileSize,
@@ -267,8 +294,8 @@ class compressController extends Controller
                                 $duration = $end->diff($startProc);
                                 appLogModel::where('groupId', '=', $batchId)
                                     ->update([
-                                        'errReason' => 'Failed to download file from iLovePDF API !',
-                                        'errStatus' => 'Error while processing file: '.$file
+                                        'errReason' => 'Error while processing file: '.$file,
+                                        'errStatus' => 'Failed to download file from iLovePDF API !'
                                     ]);
                                 compressModel::where('groupId', '=', $batchId)
                                     ->update([
@@ -301,8 +328,8 @@ class compressController extends Controller
                     $duration = $end->diff($startProc);
                     appLogModel::where('groupId', '=', $batchId)
                         ->update([
-                            'errReason' => 'File not found on the server',
-                            'errStatus' => 'File not found on our end, please try again'
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
                     compressModel::where('groupId', '=', $batchId)
                         ->update([
@@ -333,8 +360,8 @@ class compressController extends Controller
                 $duration = $end->diff($startProc);
                 appLogModel::create([
                     'processId' => $uuid,
-                    'errReason' => 'PDF failed to upload !',
-                    'errStatus' => null
+                    'errReason' => null,
+                    'errStatus' => 'PDF failed to upload !'
                 ]);
                 compressModel::create([
                     'fileName' => null,

@@ -46,7 +46,7 @@ Schedule::command('cache:clear')
             'jobsEnv' => env('APP_ENV'),
             'jobsRuntime' => 'weekly',
             'jobsResult' => false,
-            'groupId' => $muuid,
+            'groupId' => $cacheClearUUIDGroup,
             'processId' => $cacheClearUUIDProc,
             'procStartAt' => $startProc
         ]);
@@ -65,8 +65,8 @@ Schedule::command('cache:clear')
         } else {
             appLogModel::where('processId', '=', $cacheClearUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !'
                 ]);
             jobLogModel::where('processId', '=', $cacheClearUUIDProc)
                 ->update([
@@ -120,8 +120,8 @@ Schedule::command('optimize:clear')
         } else {
             appLogModel::where('processId', '=', $optimizeClearUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !'
                 ]);
             jobLogModel::where('processId', '=', $optimizeClearUUIDProc)
                 ->update([
@@ -175,8 +175,8 @@ Schedule::command('view:clear')
         } else {
             appLogModel::where('processId', '=', $viewClearUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output,
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !',
                 ]);
             jobLogModel::where('processId', '=', $viewClearUUIDProc)
                 ->update([
@@ -230,8 +230,8 @@ Schedule::command('view:cache')
         } else {
             appLogModel::where('processId', '=', $viewCacheUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output,
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !',
                 ]);
             jobLogModel::where('processId', '=', $viewCacheUUIDProc)
                 ->update([
@@ -285,8 +285,8 @@ Schedule::command('hana:clean-storage')
         } else {
             appLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !'
                 ]);
             jobLogModel::where('processId', '=', $cleanStorageUUIDProc)
                 ->update([
@@ -340,8 +340,8 @@ Schedule::command('hana:daily-report')
         } else {
             appLogModel::where('processId', '=', $dailyReportUUIDProc)
                 ->update([
-                    'errReason' => 'Laravel Scheduler Error !',
-                    'errStatus' => $output,
+                    'errReason' => $output,
+                    'errStatus' => 'Laravel Scheduler Error !',
                 ]);
             jobLogModel::where('processId', '=', $dailyReportUUIDProc)
                 ->update([
@@ -395,8 +395,8 @@ Schedule::command('hana:clean-session')
         } else {
             appLogModel::where('processId', '=', $cleanSessionUUIDProc)
             ->update([
-                'errReason' => 'Laravel Scheduler Error !',
-                'errStatus' => $output,
+                'errReason' => $output,
+                'errStatus' => 'Laravel Scheduler Error !',
             ]);
             jobLogModel::where('processId', '=', $cleanSessionUUIDProc)
                 ->update([
