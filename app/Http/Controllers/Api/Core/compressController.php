@@ -87,8 +87,50 @@ class compressController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
-                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    try {
+                        if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
+                            array_push($altPoolFiles, $newFileNameWithoutExtension);
+                        }
+                    } catch (\Exception $e) {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => $e->getMessage(),
+                            'errStatus' => $currentFileName.' could not be found in the object storage'
+                        ]);
+                        compressModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => null,
+                            'compFileSize' => null,
+                            'compMethod' => $compMethod,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'batchName' => null,
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            $currentFileName,
+                            null,
+                            $batchId,
+                            'FAIL',
+                            'compress',
+                            $currentFileName.' could not be found in the object storage',
+                            $e->getMessage()
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Compress failed !',
+                            null,
+                            $batchId,
+                            null,
+                            $currentFileName.' could not be found in the object storage'
+                        );
                     }
                 }
                 if ($loopCount == count($altPoolFiles)) {

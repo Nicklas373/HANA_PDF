@@ -34,22 +34,33 @@ class uploadController extends Controller
                 $pdfFileName = str_replace(' ', '_', $currentFileName);
                 $fileSize = filesize($file);
                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                $file->storeAs('public/upload', $pdfFileName);
                 Storage::disk('minio')->put($pdfUpload_Location.'/'.$pdfFileName, file_get_contents($file));
-                if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {
-                    return $this->returnFileMesage(
-                        201,
-                        'File uploaded successfully !',
-                        Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName),
-                        null
-                    );
-                } else {
+                try {
+                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {
+                        return $this->returnFileMesage(
+                            201,
+                            'File uploaded successfully !',
+                            Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName),
+                            null
+                        );
+                    } else {
+                        return $this->returnFileMesage(
+                            400,
+                            'Failed to upload file !',
+                            $pdfFileName,
+                            $pdfFileName.' could not be found in the object storage'
+                        );
+                    }
+                } catch (\Exception $e) {
                     return $this->returnFileMesage(
                         400,
                         'Failed to upload file !',
-                        Storage::disk('minio')->path($pdfFileName),
-                        $pdfFileName.' could not be found in the server'
+                        $pdfFileName,
+                        $e->getMessage()
                     );
                 }
+
             } else {
                 return $this->returnFileMesage(
                     400,
@@ -80,6 +91,10 @@ class uploadController extends Controller
                 $pdfName = basename($file);
                 $currentFileName = basename($pdfName);
                 $pdfFileName = str_replace(' ', '_', $currentFileName);
+                $pdfNewPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$pdfFileName);
+                if (file_exists($pdfNewPath)) {
+                    unlink($pdfNewPath);
+                }
                 try {
                     if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {
                         Storage::disk('minio')->delete($pdfUpload_Location.'/'.$pdfFileName);

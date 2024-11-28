@@ -85,8 +85,59 @@ class watermarkController extends Controller
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                     $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
-                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    try {
+                        if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
+                            array_push($altPoolFiles, $newFileNameWithoutExtension);
+                        }
+                    } catch (\Exception $e) {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => $e->getMessage(),
+                            'errStatus' => $currentFileName.' could not be found in the object storage'
+                        ]);
+                        watermarkModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => null,
+                            'watermarkFontFamily' => null,
+                            'watermarkFontStyle' => null,
+                            'watermarkFontSize' => null,
+                            'watermarkFontTransparency' => null,
+                            'watermarkImage' => null,
+                            'watermarkLayout' => null,
+                            'watermarkMosaic' => null,
+                            'watermarkRotation' => null,
+                            'watermarkStyle' => null,
+                            'watermarkText' => null,
+                            'watermarkPage' => null,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'batchName' => null,
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            $currentFileName,
+                            null,
+                            $batchId,
+                            'FAIL',
+                            'watermark',
+                            $currentFileName.' could not be found in the object storage',
+                            $e->getMessage()
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Watermark failed !',
+                            null,
+                            $batchId,
+                            null,
+                            $currentFileName.' could not be found in the object storage'
+                        );
                     }
                 }
                 if ($loopCount == count($altPoolFiles)) {

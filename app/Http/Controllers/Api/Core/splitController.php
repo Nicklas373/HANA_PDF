@@ -121,8 +121,55 @@ class splitController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
-                        array_push($altPoolFiles, $newFileNameWithoutExtension);
+                    try {
+                        if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
+                            array_push($altPoolFiles, $newFileNameWithoutExtension);
+                        }
+                    } catch (\Exception $e) {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => $e->getMessage(),
+                            'errStatus' => $currentFileName.' could not be found in the object storage'
+                        ]);
+                        splitModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => null,
+                            'fromPage' => $fromPage,
+                            'toPage' => $toPage,
+                            'customSplitPage' => null,
+                            'customDeletePage' => null,
+                            'fixedRange' => null,
+                            'mergePDF' => $mergeDBpdf,
+                            'action' => $action,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'batchName' => null,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            $currentFileName,
+                            $newFileSize,
+                            $batchId,
+                            'FAIL',
+                            'split',
+                            $currentFileName.' could not be found in the object storage',
+                            $e->getMessage()
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Split failed !',
+                            null,
+                            $batchId,
+                            null,
+                            $currentFileName.' could not be found in the object storage'
+                        );
                     }
                 }
                 if ($loopCount == count($altPoolFiles)) {
