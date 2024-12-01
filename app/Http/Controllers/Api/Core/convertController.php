@@ -14,6 +14,8 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
@@ -85,6 +87,7 @@ class convertController extends Controller
                 $pdfImageTrueName = null;
                 $loopCount = count($files);
                 $poolFiles = array();
+                $altPoolFiles = array();
                 $procFile = 0;
                 if ($batch == "true") {
                     $batchValue = true;
@@ -109,143 +112,115 @@ class convertController extends Controller
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
                     $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                    if ($batchValue) {
-                        $newFileName = $randomizePdfFileName.'.zip';
-                    } else {
-                        $newFileName = $currentFileName;
-                    }
                     try {
                         if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$trimPhase1)) {
-                            $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
-                            $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                            $procUuid = AppHelper::Instance()->generateUniqueUuid(cnvModel::class, 'processId');
-                            $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
+                            array_push($altPoolFiles, $newFileNameWithoutExtension);
+                        }
+                    } catch (\Exception $e) {
+                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                        $duration = $end->diff($startProc);
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => $e->getMessage(),
+                            'errStatus' => $currentFileName.' could not be found in the object storage'
+                        ]);
+                        cnvModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => $newFileSize,
+                            'container' => $convertType,
+                            'imgExtract' => false,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'batchName' => $newFileName,
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                            'procDuration' =>  $duration->s.' seconds'
+                        ]);
+                        NotificationHelper::Instance()->sendErrNotify(
+                            $currentFileName,
+                            null,
+                            $batchId,
+                            'FAIL',
+                            'convert',
+                            $currentFileName.' could not be found in the object storage',
+                            $e->getMessage()
+                        );
+                        return $this->returnDataMesage(
+                            400,
+                            'PDF Convert failed !',
+                            null,
+                            $batchId,
+                            null,
+                            $currentFileName.' could not be found in the object storage'
+                        );
+                    }
+                }
+                if ($loopCount == count($altPoolFiles)) {
+                    foreach ($files as $file) {
+                        $currentFileName = basename($file);
+                        $trimPhase1 = str_replace(' ', '_', $currentFileName);
+                        $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                        if ($batchValue) {
+                            $newFileName = $randomizePdfFileName.'.zip';
+                        } else {
+                            $newFileName = $currentFileName;
+                        }
+                        $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
+                        $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
+                        $procUuid = AppHelper::Instance()->generateUniqueUuid(cnvModel::class, 'processId');
+                        $pdfNameWithExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
+                        appLogModel::create([
+                            'processId' => $procUuid,
+                            'groupId' => $batchId,
+                            'errReason' => null,
+                            'errStatus' => null
+                        ]);
+                        cnvModel::create([
+                            'fileName' => $currentFileName,
+                            'fileSize' => $newFileSize,
+                            'container' => $convertType,
+                            'imgExtract' => false,
+                            'result' => false,
+                            'isBatch' => $batchValue,
+                            'batchName' => $newFileName,
+                            'groupId' => $batchId,
+                            'processId' => $procUuid,
+                            'procStartAt' => $startProc,
+                            'procEndAt' => null,
+                            'procDuration' => null
+                        ]);
+                        if ($convertType == 'xlsx') {
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
+                                }
+                            }
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
                             file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                            if ($pdfNameWithExtension == 'pdf' && $convertType == 'jpg') {
-                                $pdf = new Pdf($newFilePath);
-                                $pdfTotalPages = $pdf->pageCount();
-                            }
-                            appLogModel::create([
-                                'processId' => $procUuid,
-                                'groupId' => $batchId,
-                                'errReason' => null,
-                                'errStatus' => null
-                            ]);
-                            cnvModel::create([
-                                'fileName' => $currentFileName,
-                                'fileSize' => $newFileSize,
-                                'container' => $convertType,
-                                'imgExtract' => false,
-                                'result' => false,
-                                'isBatch' => $batchValue,
-                                'batchName' => $newFileName,
-                                'groupId' => $batchId,
-                                'processId' => $procUuid,
-                                'procStartAt' => $startProc,
-                                'procEndAt' => null,
-                                'procDuration' => null
-                            ]);
-                            if ($convertType == 'xlsx') {
-                                if ($loopCount <= 1) {
-                                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
-                                    }
-                                }
-                                $asposeAPI = new Process([
-                                    'python3',
-                                    public_path().'/ext-python/asposeAPI.py',
-                                    env('ASPOSE_CLOUD_CLIENT_ID'),
-                                    env('ASPOSE_CLOUD_TOKEN'),
-                                    "xlsx",
-                                    $newFilePath,
-                                    $newFileNameWithoutExtension.".xlsx"
-                                ],
-                                null,
-                                [
-                                    'SYSTEMROOT' => getenv('SYSTEMROOT'),
-                                    'PATH' => getenv("PATH")
-                                ]);
-                                try {
-                                    ini_set('max_execution_time', 300);
-                                    $asposeAPI->setTimeout(300);
-                                    $asposeAPI->run();
-                                } catch (RuntimeException $message) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $message->getMessage(),
-                                            'errStatus' => 'Symfony runtime process out of time exception !'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToXls',
-                                        'Symfony runtime process out of time exception !',
-                                        $message->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $message->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'Symfony runtime process out of time exception !'
-                                    );
-                                } catch (ProcessFailedException $message) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $message->getMessage(),
-                                            'errStatus' => 'Symfony runtime process fail exception !'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToXls',
-                                        'Symfony runtime process fail exception !',
-                                        $message->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $message->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'Symfony runtime process fail exception !'
-                                    );
-                                }
-                                if ($asposeAPI->isSuccessful()) {
-                                    if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'), $newFileNameWithoutExtension.".xlsx") == true) {
+                            $asposeToken = AppHelper::instance()->getAsposeToken(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
+                            if ($asposeToken) {
+                                $fileContent = file_get_contents($newFilePath);
+                                $asposeAPI = Http::withToken($asposeToken)
+                                    ->attach('file', $fileContent, basename($newFilePath))
+                                    ->put("https://api.aspose.cloud/v3.0/pdf/convert/{$convertType}?outPath={$newFileNameWithoutExtension}.xlsx");
+                                if ($asposeAPI->successful()) {
+                                    if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".xlsx")) {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         array_push($poolFiles, $newFileNameWithoutExtension);
                                         $procFile += 1;
+                                        $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.xlsx');
+                                        file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'), $minioDownload);
+                                        $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
                                         Storage::disk('minio')->put(
                                             $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx',
                                             file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'))
                                         );
+                                        Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.xlsx');
                                         Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                     } else {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -285,7 +260,7 @@ class convertController extends Controller
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => $asposeAPI->getErrorOutput(),
+                                            'errReason' => $asposeAPI->body(),
                                             'errStatus' => 'Aspose API Error !, CnvToXLS failure'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
@@ -301,117 +276,80 @@ class convertController extends Controller
                                         'FAIL',
                                         'cnvToXls',
                                         'Aspose API Error !, CnvToXLS failure',
-                                        $asposeAPI->getErrorOutput()
+                                        $asposeAPI->body()
                                     );
                                     Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                     return $this->returnDataMesage(
                                         400,
                                         'PDF Convert failed !',
-                                        $asposeAPI->getErrorOutput(),
+                                        $asposeAPI->body(),
                                         $batchId,
                                         null,
                                         'Aspose API Error !, CnvToXLS failure'
                                     );
                                 }
-                            } else if ($convertType == 'pptx') {
-                                if ($loopCount <= 1) {
-                                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
-                                    }
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Failed to generated Aspose Token !'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'cnvToXls',
+                                    'Failed to generated Aspose Token !',
+                                    null
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Failed to generated Aspose Token !'
+                                );
+                            }
+                        } else if ($convertType == 'pptx') {
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
                                 }
-                                $asposeAPI = new Process([
-                                    'python3',
-                                    public_path().'/ext-python/asposeAPI.py',
-                                    env('ASPOSE_CLOUD_CLIENT_ID'),
-                                    env('ASPOSE_CLOUD_TOKEN'),
-                                    "pptx",
-                                    $newFilePath,
-                                    $newFileNameWithoutExtension.".pptx"
-                                ],
-                                null,
-                                [
-                                    'SYSTEMROOT' => getenv('SYSTEMROOT'),
-                                    'PATH' => getenv("PATH")
-                                ]);
-                                try {
-                                    ini_set('max_execution_time', 600);
-                                    $asposeAPI->setTimeout(600);
-                                    $asposeAPI->run();
-                                } catch (RuntimeException $message) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $message->getMessage(),
-                                            'errStatus' => 'Symfony runtime process out of time exception !'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToPptx',
-                                        'Symfony runtime process out of time exception !',
-                                        $message->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $message->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'Symfony runtime process out of time exception !'
-                                    );
-                                } catch (ProcessFailedException $message) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $message->getMessage(),
-                                            'errStatus' => 'Symfony runtime process fail exception !'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToPptx',
-                                        'Symfony runtime process fail exception !',
-                                        $message->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $message->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'Symfony runtime process fail exception !'
-                                    );
-                                }
-                                if ($asposeAPI->isSuccessful()) {
-                                    if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx'), $newFileNameWithoutExtension.".pptx") == true) {
+                            }
+                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                            $asposeToken = AppHelper::instance()->getAsposeToken(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
+                            if ($asposeToken) {
+                                $fileContent = file_get_contents($newFilePath);
+                                $asposeAPI = Http::withToken($asposeToken)
+                                    ->attach('file', $fileContent, basename($newFilePath))
+                                    ->put("https://api.aspose.cloud/v3.0/pdf/convert/{$convertType}?outPath={$newFileNameWithoutExtension}.pptx");
+                                if ($asposeAPI->successful()) {
+                                    if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".pptx")) {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
-                                        $procFile += 1;
                                         array_push($poolFiles, $newFileNameWithoutExtension);
+                                        $procFile += 1;
+                                        $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.pptx');
+                                        file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx'), $minioDownload);
+                                        $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
                                         Storage::disk('minio')->put(
                                             $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx',
                                             file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx'))
                                         );
+                                        Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.pptx');
                                         Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                     } else {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -480,113 +418,120 @@ class convertController extends Controller
                                         'Aspose API Error !, cnvToPptx failure'
                                     );
                                 }
-                            } else if ($convertType == 'docx') {
-                                if ($loopCount <= 1) {
-                                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx');
-                                    }
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $message->getMessage(),
+                                        'errStatus' => 'Failed to generated Aspose Token !'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'cnvToXls',
+                                    'Failed to generated Aspose Token !',
+                                    null
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Failed to generated Aspose Token !'
+                                );
+                            }
+                        } else if ($convertType == 'docx') {
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx');
                                 }
-                                try {
-                                    $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
-                                    $uploadFileRequest = new UploadFileRequest($newFilePath, $currentFileName);
-                                    $wordsApi->uploadFile($uploadFileRequest);
-                                    $requestSaveOptionsData = new DocxSaveOptionsData(array(
-                                        "save_format" => "docx",
-                                        "file_name" => $newFileNameWithoutExtension.".docx",
-                                    ));
-                                    $request = new SaveAsRequest(
-                                        $currentFileName,
-                                        $requestSaveOptionsData,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL
-                                    );
-                                    $result = $wordsApi->saveAs($request);
-                                } catch (\Exception $e) {
+                            }
+                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                            try {
+                                $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
+                                $uploadFileRequest = new UploadFileRequest($newFilePath, $currentFileName);
+                                $wordsApi->uploadFile($uploadFileRequest);
+                                $requestSaveOptionsData = new DocxSaveOptionsData(array(
+                                    "save_format" => "docx",
+                                    "file_name" => $newFileNameWithoutExtension.".docx",
+                                ));
+                                $request = new SaveAsRequest(
+                                    $currentFileName,
+                                    $requestSaveOptionsData,
+                                    NULL,
+                                    NULL,
+                                    NULL,
+                                    NULL
+                                );
+                                $result = $wordsApi->saveAs($request);
+                            } catch (\Exception $e) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'Aspose API Error !, CnvToDocx failure'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'CnvToDOCX',
+                                    'Aspose API Error !, CnvToDOCX failure',
+                                    $e->getMessage()
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    $e->getMessage(),
+                                    $batchId,
+                                    null,
+                                    'Aspose API Error !, CnvToDOCX failure'
+                                );
+                            }
+                            if (json_decode($result, true) !== NULL) {
+                                if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".docx")) {
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $e->getMessage(),
-                                            'errStatus' => 'Aspose API Error !, CnvToDocx failure'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'CnvToDOCX',
-                                        'Aspose API Error !, CnvToDOCX failure',
-                                        $e->getMessage()
+                                    $procFile += 1;
+                                    array_push($poolFiles, $newFileNameWithoutExtension);
+                                    $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.docx');
+                                    file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx'), $minioDownload);
+                                    $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx');
+                                    Storage::disk('minio')->put(
+                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.docx'))
                                     );
+                                    Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.docx');
                                     Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $e->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'Aspose API Error !, CnvToDOCX failure'
-                                    );
-                                }
-                                if (json_decode($result, true) !== NULL) {
-                                    if (AppHelper::instance()->getFtpResponse(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.".docx"), $newFileNameWithoutExtension.".docx") == true) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        $procFile += 1;
-                                        array_push($poolFiles, $newFileNameWithoutExtension);
-                                        Storage::disk('minio')->put(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.".docx",
-                                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.".docx"))
-                                        );
-                                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    } else {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        appLogModel::where('groupId', '=', $batchId)
-                                            ->update([
-                                                'errReason' => null,
-                                                'errStatus' => 'FTP Server Connection Failed !'
-                                            ]);
-                                        cnvModel::where('groupId', '=', $batchId)
-                                            ->update([
-                                                'result' => false,
-                                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                'procDuration' => $duration->s.' seconds'
-                                            ]);
-                                        NotificationHelper::Instance()->sendErrNotify(
-                                            $currentFileName,
-                                            $newFileSize,
-                                            $batchId,
-                                            'FAIL',
-                                            'cnvToDocx',
-                                            'FTP Server Connection Failed !',
-                                            null
-                                        );
-                                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                        return $this->returnDataMesage(
-                                            400,
-                                            'PDF Convert failed !',
-                                            $e->getMessage(),
-                                            $batchId,
-                                            null,
-                                            'FTP Server Connection Failed',
-                                        );
-                                    }
                                 } else {
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
                                             'errReason' => null,
-                                            'errStatus' => 'Aspose API has fail while process, Please look on Aspose Dashboard !'
+                                            'errStatus' => 'FTP Server Connection Failed !'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -600,7 +545,7 @@ class convertController extends Controller
                                         $batchId,
                                         'FAIL',
                                         'cnvToDocx',
-                                        'Aspose Clouds API Error !',
+                                        'FTP Server Connection Failed !',
                                         null
                                     );
                                     Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
@@ -610,244 +555,316 @@ class convertController extends Controller
                                         $e->getMessage(),
                                         $batchId,
                                         null,
-                                        'Aspose Clouds API Error !'
+                                        'FTP Server Connection Failed',
                                     );
                                 }
-                            } else if ($convertType == 'jpg') {
-                                if ($loopCount <= 1) {
-                                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg');
-                                    } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg');
-                                    }
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => null,
+                                        'errStatus' => 'Aspose API has fail while process, Please look on Aspose Dashboard !'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'cnvToDocx',
+                                    'Aspose Clouds API Error !',
+                                    null
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    $e->getMessage(),
+                                    $batchId,
+                                    null,
+                                    'Aspose Clouds API Error !'
+                                );
+                            }
+                        } else if ($convertType == 'jpg') {
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg');
+                                } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg');
                                 }
-                                try {
-                                    $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                            }
+                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
+                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                            try {
+                                $pdf = new Pdf($newFilePath);
+                                $pdfTotalPages = $pdf->pageCount();
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            } catch (\Exception $e) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'Failed to count total PDF pages'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'cnvToImg',
+                                    'Failed to count total PDF pages',
+                                    $e->getMessage()
+                                );
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    $e->getMessage(),
+                                    $batchId,
+                                    null,
+                                    'Failed to count total PDF pages'
+                                );
+                            }
+                            try {
+                                $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                                $ilovepdfTask->setFileEncryption($pdfEncKey);
+                                $ilovepdfTask->setEncryptKey($pdfEncKey);
+                                $ilovepdfTask->setEncryption(true);
+                                $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                    $pdfUpload_Location.'/'.$trimPhase1,
+                                    now()->addSeconds(30)
+                                );
+                                $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
+                                $ilovepdfTask->setMode($imageModes);
+                                $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
+                                $ilovepdfTask->setPackagedFilename($newFileNameWithoutExtension);
+                                $ilovepdfTask->execute();
+                                $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
+                            } catch (\Exception $e) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'cnvToImg',
+                                    'iLovePDF API Error !, Catch on Exception',
+                                    $e->getMessage()
+                                );
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    $e->getMessage(),
+                                    $batchId,
+                                    null,
+                                    'iLovePDF API Error !, Catch on Exception'
+                                );
+                            }
+                            if ($pdfTotalPages == 1 && $extMode) {
+                                foreach (glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*.jpg') as $filename) {
+                                    rename($filename, Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'));
+                                }
+                            }
+                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip'))) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                $procFile += 1;
+                                array_push($poolFiles, $newFileNameWithoutExtension);
+                                $pdfImageTrueName = $newFileNameWithoutExtension.'.zip';
+                                Storage::disk('minio')->put(
+                                    $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip',
+                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip'))
+                                );
+                            } else {
+                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'))) {
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $duration = $end->diff($startProc);
+                                    $procFile += 1;
+                                    array_push($poolFiles, $newFileNameWithoutExtension);
+                                    $pdfImageTrueName = $newFileNameWithoutExtension.'.jpg';
+                                    Storage::disk('minio')->put(
+                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'))
+                                    );
+                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg'))) {
+                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                    $duration = $end->diff($startProc);
+                                    $procFile += 1;
+                                    array_push($poolFiles, $newFileNameWithoutExtension);
+                                    $pdfImageTrueName = $newFileNameWithoutExtension.'-0001.jpg';
+                                    Storage::disk('minio')->put(
+                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg'))
+                                    );
+                                }
+                            }
+                        } else if ($convertType == 'pdf') {
+                            if ($loopCount <= 1) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                                }
+                            }
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                            try {
+                                if ($pdfNameWithExtension == "jpg" || $pdfNameWithExtension == "jpeg" || $pdfNameWithExtension == "png" || $pdfNameWithExtension == "tiff") {
+                                    $ilovepdfTask = new ImagepdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                     $ilovepdfTask->setFileEncryption($pdfEncKey);
                                     $ilovepdfTask->setEncryptKey($pdfEncKey);
                                     $ilovepdfTask->setEncryption(true);
-                                    $pdfFile = $ilovepdfTask->addFile($newFilePath);
-                                    $ilovepdfTask->setMode($imageModes);
+                                    $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                        $pdfUpload_Location.'/'.$trimPhase1,
+                                        now()->addSeconds(30)
+                                    );
+                                    $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
+                                    $ilovepdfTask->setPageSize('fit');
                                     $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
                                     $ilovepdfTask->setPackagedFilename($newFileNameWithoutExtension);
                                     $ilovepdfTask->execute();
                                     $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                } catch (\Exception $e) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $e->getMessage(),
-                                            'errStatus' => 'iLovePDF API Error !, Catch on Exception'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToImg',
-                                        'iLovePDF API Error !, Catch on Exception',
-                                        $e->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $e->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'iLovePDF API Error !, Catch on Exception'
-                                    );
-                                }
-                                if ($pdfTotalPages == 1 && $extMode) {
-                                    foreach (glob(Storage::disk('local')->path('public/'.$pdfExtImage_Location).'/*.jpg') as $filename) {
-                                        rename($filename, Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'));
-                                    }
-                                }
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip'))) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    $procFile += 1;
-                                    array_push($poolFiles, $newFileNameWithoutExtension);
-                                    $pdfImageTrueName = $newFileNameWithoutExtension.'.zip';
-                                    Storage::disk('minio')->put(
-                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.zip'))
-                                    );
                                 } else {
-                                    if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'))) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        $procFile += 1;
-                                        array_push($poolFiles, $newFileNameWithoutExtension);
-                                        $pdfImageTrueName = $newFileNameWithoutExtension.'.jpg';
-                                        Storage::disk('minio')->put(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg',
-                                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.jpg'))
-                                        );
-                                    } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg'))) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        $procFile += 1;
-                                        array_push($poolFiles, $newFileNameWithoutExtension);
-                                        $pdfImageTrueName = $newFileNameWithoutExtension.'-0001.jpg';
-                                        Storage::disk('minio')->put(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg',
-                                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-0001.jpg'))
-                                        );
-                                    }
+                                    $ilovepdfTask = new OfficepdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
+                                    $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
+                                    $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                        $pdfUpload_Location.'/'.$trimPhase1,
+                                        now()->addSeconds(30)
+                                    );
+                                    $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
+                                    $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
+                                    $ilovepdfTask->execute();
+                                    $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                                 }
-                            } else if ($convertType == 'pdf') {
-                                if ($loopCount <= 1) {
-                                    if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
-                                        Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
-                                    }
-                                }
-                                try {
-                                    if ($pdfNameWithExtension == "jpg" || $pdfNameWithExtension == "jpeg" || $pdfNameWithExtension == "png" || $pdfNameWithExtension == "tiff") {
-                                        $ilovepdfTask = new ImagepdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                                        $ilovepdfTask->setFileEncryption($pdfEncKey);
-                                        $ilovepdfTask->setEncryptKey($pdfEncKey);
-                                        $ilovepdfTask->setEncryption(true);
-                                        $pdfFile = $ilovepdfTask->addFile($newFilePath);
-                                        $ilovepdfTask->setPageSize('fit');
-                                        $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
-                                        $ilovepdfTask->setPackagedFilename($newFileNameWithoutExtension);
-                                        $ilovepdfTask->execute();
-                                        $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                                    } else {
-                                        $ilovepdfTask = new OfficepdfTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
-                                        $ilovepdfTask->setFileEncryption(env('ILOVEPDF_ENC_KEY'));
-                                        $pdfFile = $ilovepdfTask->addFile($newFilePath);
-                                        $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
-                                        $ilovepdfTask->execute();
-                                        $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
-                                    }
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                } catch (\Exception $e) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $e->getMessage(),
-                                            'errStatus' => 'iLovePDF API Error !, Catch on Exception'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'imgToPDF',
-                                        'iLovePDF API Error !, Catch on Exception',
-                                        $e->getMessage()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $e->getMessage(),
-                                        $batchId,
-                                        null,
-                                        'iLovePDF API Error !, Catch on Exception'
-                                    );
-                                }
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))) {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    $procFile += 1;
-                                    array_push($poolFiles, $newFileNameWithoutExtension);
-                                    Storage::disk('minio')->put(
-                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))
-                                    );
-                                } else {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => null,
-                                            'errStatus' => 'Failed to download file from iLovePDF API !'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'pdfToImg',
-                                        'Failed to download file from iLovePDF API !',
-                                        null
-                                    );
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        null,
-                                        $batchId,
-                                        null,
-                                        'Failed to download file from iLovePDF API !'
-                                    );
-                                }
+                            } catch (\Exception $e) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => $e->getMessage(),
+                                        'errStatus' => 'iLovePDF API Error !, Catch on Exception'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'imgToPDF',
+                                    'iLovePDF API Error !, Catch on Exception',
+                                    $e->getMessage()
+                                );
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    $e->getMessage(),
+                                    $batchId,
+                                    null,
+                                    'iLovePDF API Error !, Catch on Exception'
+                                );
+                            }
+                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))) {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                $procFile += 1;
+                                array_push($poolFiles, $newFileNameWithoutExtension);
+                                Storage::disk('minio')->put(
+                                    $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
+                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))
+                                );
+                            } else {
+                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                $duration = $end->diff($startProc);
+                                appLogModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'errReason' => null,
+                                        'errStatus' => 'Failed to download file from iLovePDF API !'
+                                    ]);
+                                cnvModel::where('groupId', '=', $batchId)
+                                    ->update([
+                                        'result' => false,
+                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                        'procDuration' => $duration->s.' seconds'
+                                    ]);
+                                NotificationHelper::Instance()->sendErrNotify(
+                                    $currentFileName,
+                                    $newFileSize,
+                                    $batchId,
+                                    'FAIL',
+                                    'pdfToImg',
+                                    'Failed to download file from iLovePDF API !',
+                                    null
+                                );
+                                return $this->returnDataMesage(
+                                    400,
+                                    'PDF Convert failed !',
+                                    null,
+                                    $batchId,
+                                    null,
+                                    'Failed to download file from iLovePDF API !'
+                                );
                             }
                         }
-                    } catch (\Exception $e) {
-                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                        $duration = $end->diff($startProc);
-                        appLogModel::create([
-                            'processId' => $procUuid,
-                            'groupId' => $batchId,
-                            'errReason' => $e->getMessage(),
-                            'errStatus' => $currentFileName.' could not be found in the object storage'
+                    }
+                } else {
+                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                    $duration = $end->diff($startProc);
+                    appLogModel::where('groupId', '=', $batchId)
+                        ->update([
+                            'errReason' => 'File not found on our end, please try again',
+                            'errStatus' => 'File not found on the server'
                         ]);
-                        cnvModel::create([
-                            'fileName' => $currentFileName,
-                            'fileSize' => null,
-                            'container' => $convertType,
-                            'imgExtract' => false,
+                    convertModel::where('groupId', '=', $batchId)
+                        ->update([
                             'result' => false,
-                            'isBatch' => $batchValue,
-                            'batchName' => null,
-                            'groupId' => $batchId,
-                            'processId' => $procUuid,
-                            'procStartAt' => $startProc,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                             'procDuration' =>  $duration->s.' seconds'
                         ]);
-                        NotificationHelper::Instance()->sendErrNotify(
-                            $currentFileName,
-                            null,
-                            $batchId,
-                            'FAIL',
-                            'cnv',
-                            $currentFileName.' could not be found in the object storage',
-                            $e->getMessage()
-                        );
-                        return $this->returnDataMesage(
-                            400,
-                            'PDF Convert failed !',
-                            null,
-                            $batchId,
-                            null,
-                            $currentFileName.' could not be found in the object storage'
-                        );
-                    }
+                    NotificationHelper::Instance()->sendErrNotify(
+                        $currentFileName,
+                        null,
+                        $batchId,
+                        'FAIL',
+                        'convert',
+                        'File not found on the server',
+                        'File not found on our end, please try again'
+                    );
+                    return $this->returnDataMesage(
+                        400,
+                        'PDF Convert failed !',
+                        null,
+                        $batchId,
+                        null,
+                        'File not found on our end, please try again'
+                    );
                 }
                 if ($loopCount == $procFile) {
                     if ($loopCount == 1) {
