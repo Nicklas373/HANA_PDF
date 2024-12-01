@@ -558,12 +558,17 @@ class splitController extends Controller
                                 }
                             }
                             try {
+                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                 $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                 $ilovepdfTask = $ilovepdf->newTask('split');
                                 $ilovepdfTask->setFileEncryption($pdfEncKey);
                                 $ilovepdfTask->setEncryptKey($pdfEncKey);
                                 $ilovepdfTask->setEncryption(true);
-                                $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                                $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                    $pdfUpload_Location.'/'.$trimPhase1,
+                                    now()->addSeconds(30)
+                                );
+                                $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                                 $pdfFile->setPassword($pdfEncKey);
                                 if ($action == 'split') {
                                     $ilovepdfTask->setRanges($newPageRanges);
@@ -580,7 +585,6 @@ class splitController extends Controller
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                                 $ilovepdfTask->delete();
-                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                             } catch (\Exception $e) {
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);

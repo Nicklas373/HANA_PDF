@@ -145,9 +145,6 @@ class watermarkController extends Controller
                         $currentFileName = basename($file);
                         $trimPhase1 = str_replace(' ', '_', $currentFileName);
                         $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
-                        $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                        file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
-                        $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                         $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(watermarkModel::class, 'processId');
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -323,10 +320,14 @@ class watermarkController extends Controller
                         try {
                             $ilovepdf = new Ilovepdf(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                             $ilovepdfTask = $ilovepdf->newTask('watermark');
+                            $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                $pdfUpload_Location.'/'.$trimPhase1,
+                                now()->addSeconds(30)
+                            );
                             if ($watermarkAction == 'img') {
                                 $ilovepdfTask->setEncryption(true);
                                 $wmImage = $ilovepdfTask->addElementFile(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$wmImageName));
-                                $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                                $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                                 $ilovepdfTask->setMode("image");
                                 $ilovepdfTask->setImageFile($wmImage);
                                 $ilovepdfTask->setTransparency($watermarkTransparency);
@@ -339,7 +340,7 @@ class watermarkController extends Controller
                                 $ilovepdfTask->setFileEncryption($pdfEncKey);
                                 $ilovepdfTask->setEncryptKey($pdfEncKey);
                                 $ilovepdfTask->setEncryption(true);
-                                $pdfFile = $ilovepdfTask->addFile($newFilePath);
+                                $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                                 $ilovepdfTask->setMode("text");
                                 $ilovepdfTask->setText($watermarkText);
                                 $ilovepdfTask->setPages($watermarkPage);
@@ -357,7 +358,6 @@ class watermarkController extends Controller
                             $ilovepdfTask->execute();
                             $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                             $ilovepdfTask->delete();
-                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                             if ($watermarkAction == 'img') {
                                 Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$wmImageName);
                             }
@@ -398,7 +398,6 @@ class watermarkController extends Controller
                                 'iLovePDF API Error !, Catch on Exception',
                                 $e->getMessage()
                             );
-                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                             if ($watermarkAction == 'img') {
                                 Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$wmImageName);
                             }

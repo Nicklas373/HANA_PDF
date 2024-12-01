@@ -158,10 +158,11 @@ class compressController extends Controller
                                     Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileName);
                                 }
                             }
-                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$trimPhase1);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1), $minioUpload);
-                            $localPath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                            $pdfFile = $ilovepdfTask->addFile($localPath);
+                            $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                $pdfUpload_Location.'/'.$trimPhase1,
+                                now()->addSeconds(30)
+                            );
+                            $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                             $pdfFile->setPassword($pdfEncKey);
                             appLogModel::create([
                                 'processId' => $procUuid,
@@ -192,11 +193,6 @@ class compressController extends Controller
                         $ilovepdfTask->execute();
                         $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                         $ilovepdfTask->delete();
-                        foreach ($files as $file) {
-                            $currentFileName = basename($file);
-                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
-                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                        }
                     } catch (\Exception $e) {
                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                         $duration = $end->diff($startProc);
@@ -220,11 +216,6 @@ class compressController extends Controller
                             'iLovePDF API Error !, Catch on Exception',
                             $e->getMessage()
                         );
-                        foreach ($files as $file) {
-                            $currentFileName = basename($file);
-                            $trimPhase1 = str_replace(' ', '_', $currentFileName);
-                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                        }
                         return $this->returnDataMesage(
                             400,
                             'PDF Compression failed !',
