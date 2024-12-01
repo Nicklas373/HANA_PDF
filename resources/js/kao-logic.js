@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 4;
-const appPatchVer = 1;
+const appPatchVer = 2;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const errModal = new Modal($errModal, options);
@@ -357,29 +357,44 @@ if (uploadDropzone) {
                             var uploadedFile1 = fileNameFormat(
                                 filenameElement.innerText
                             );
-                            var newUrl = apiUrl + uploadPath + uploadedFile1;
-                            var adobeDCView = new AdobeDC.View({
-                                clientId: adobeClientID,
-                                divId: "adobe-dc-view",
-                            });
-                            adobeDCView.previewFile(
-                                {
-                                    content: {
-                                        location: {
-                                            url: newUrl,
+                            getTemporaryURL(uploadedFile1)
+                                .then(function (temporaryURL) {
+                                    var newUrl = temporaryURL.temporaryURL;
+                                    var adobeDCView = new AdobeDC.View({
+                                        clientId: adobeClientID,
+                                        divId: "adobe-dc-view",
+                                    });
+                                    adobeDCView.previewFile(
+                                        {
+                                            content: {
+                                                location: {
+                                                    url: newUrl,
+                                                },
+                                            },
+                                            metaData: {
+                                                fileName: uploadedFile1,
+                                            },
                                         },
-                                    },
-                                    metaData: {
-                                        fileName: uploadedFile1,
-                                    },
-                                },
-                                {
-                                    embedMode: "SIZED_CONTAINER",
-                                    focusOnRendering: true,
-                                    showDownloadPDF: false,
-                                }
-                            );
-                            previewModal.show();
+                                        {
+                                            embedMode: "SIZED_CONTAINER",
+                                            focusOnRendering: true,
+                                            showDownloadPDF: false,
+                                        }
+                                    );
+                                    previewModal.show();
+                                })
+                                .catch(function (temporaryURL) {
+                                    errMessage.innerText = `File ${uploadedFile1} not found !`;
+                                    errSubMessage.innerText =
+                                        temporaryURL.temporaryError;
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    resetErrListMessage();
+                                    generateMesssage(errMessage);
+                                    errAltSubMessageModal.style = null;
+                                    previewDocumentModal.hide();
+                                    errModal.show();
+                                });
                         });
                     });
                     rmvBtn.forEach(function (button) {
@@ -665,20 +680,34 @@ if (uploadDropzoneAlt) {
                         var uploadedFile1 = fileNameFormat(
                             filenameElement.innerText
                         );
-                        var imageUrl = apiUrl + uploadPath + uploadedFile1;
-                        var documentUrl =
-                            googleViewerUrl +
-                            apiUrl +
-                            uploadPath +
-                            uploadedFile1 +
-                            "&embedded=true";
-                        if (checkImageExtensions(uploadedFile1)) {
-                            document.getElementById("imgPrv").src = imageUrl;
-                            previewImageModal.show();
-                        } else {
-                            document.getElementById("iFrame").src = documentUrl;
-                            previewDocumentModal.show();
-                        }
+                        getTemporaryURL(uploadedFile1)
+                            .then(function (temporaryURL) {
+                                if (checkImageExtensions(uploadedFile1)) {
+                                    var imageUrl = temporaryURL.temporaryURL;
+                                    document.getElementById("imgPrv").src =
+                                        imageUrl;
+                                    previewImageModal.show();
+                                } else {
+                                    var documentUrl =
+                                        googleViewerUrl +
+                                        temporaryURL.temporaryURL +
+                                        "&embedded=true";
+                                    document.getElementById("iFrame").src =
+                                        documentUrl;
+                                    previewDocumentModal.show();
+                                }
+                            })
+                            .catch(function (temporaryURL) {
+                                errMessage.innerText = `File ${uploadedFile1} not found !`;
+                                errSubMessage.innerText =
+                                    temporaryURL.temporaryError;
+                                errListTitleMessage.innerText = "Error message";
+                                resetErrListMessage();
+                                generateMesssage(errMessage);
+                                errAltSubMessageModal.style = null;
+                                previewDocumentModal.hide();
+                                errModal.show();
+                            });
                     });
                 });
                 rmvBtn.forEach(function (button) {
@@ -987,29 +1016,44 @@ if (uploadDropzoneSingle) {
                             var uploadedFile1 = fileNameFormat(
                                 filenameElement.innerText
                             );
-                            var newUrl = apiUrl + uploadPath + uploadedFile1;
-                            var adobeDCView = new AdobeDC.View({
-                                clientId: adobeClientID,
-                                divId: "adobe-dc-view",
-                            });
-                            adobeDCView.previewFile(
-                                {
-                                    content: {
-                                        location: {
-                                            url: newUrl,
+                            getTemporaryURL(uploadedFile1)
+                                .then(function (temporaryURL) {
+                                    var newUrl = temporaryURL.temporaryURL;
+                                    var adobeDCView = new AdobeDC.View({
+                                        clientId: adobeClientID,
+                                        divId: "adobe-dc-view",
+                                    });
+                                    adobeDCView.previewFile(
+                                        {
+                                            content: {
+                                                location: {
+                                                    url: newUrl,
+                                                },
+                                            },
+                                            metaData: {
+                                                fileName: uploadedFile1,
+                                            },
                                         },
-                                    },
-                                    metaData: {
-                                        fileName: uploadedFile1,
-                                    },
-                                },
-                                {
-                                    embedMode: "SIZED_CONTAINER",
-                                    focusOnRendering: true,
-                                    showDownloadPDF: false,
-                                }
-                            );
-                            previewModal.show();
+                                        {
+                                            embedMode: "SIZED_CONTAINER",
+                                            focusOnRendering: true,
+                                            showDownloadPDF: false,
+                                        }
+                                    );
+                                    previewModal.show();
+                                })
+                                .catch(function (temporaryURL) {
+                                    errMessage.innerText = `File ${uploadedFile1} not found !`;
+                                    errSubMessage.innerText =
+                                        temporaryURL.temporaryError;
+                                    errListTitleMessage.innerText =
+                                        "Error message";
+                                    resetErrListMessage();
+                                    generateMesssage(errMessage);
+                                    errAltSubMessageModal.style = null;
+                                    previewDocumentModal.hide();
+                                    errModal.show();
+                                });
                         });
                     });
                     rmvBtn.forEach(function (button) {
@@ -1385,6 +1429,62 @@ function generateThumbnail(fileName) {
 
         xhr.onerror = () => {
             new Error("Network error occurred");
+        };
+
+        xhr.send(formData);
+    });
+}
+
+function getTemporaryURL(fileName) {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        var formData = new FormData();
+        formData.append("fileName", fileName);
+
+        xhr.open("POST", `${apiUrl}/api/v1/file/getTemporaryURL`, true);
+        xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("Accept", "application/json");
+
+        xhr.onload = () => {
+            try {
+                const xhrReturn = JSON.parse(xhr.responseText);
+                if (xhr.status === 200) {
+                    resolve({
+                        temporaryURLStats: xhrReturn.status,
+                        temporaryURLMessage: xhrReturn.message,
+                        temporaryURL: xhrReturn.files,
+                        temporaryError: null,
+                    });
+                } else {
+                    reject({
+                        temporaryURLStats: xhrReturn.status,
+                        temporaryURLMessage:
+                            xhrReturn.message || "An error occurred",
+                        temporaryURL: null,
+                        temporaryError:
+                            xhrReturn.errors ||
+                            xhrReturn.message ||
+                            "Internal Server Error",
+                    });
+                }
+            } catch (e) {
+                reject({
+                    temporaryURLStats: 500,
+                    temporaryURLMessage: "Internal server error",
+                    temporaryURL: null,
+                    temporaryError: `Error parsing JSON: ${e}`,
+                });
+            }
+        };
+
+        xhr.onerror = () => {
+            reject({
+                temporaryURLStats: xhr.status || 500,
+                temporaryURLMessage: "Network error occurred",
+                temporaryURL: null,
+                temporaryError: "Network error",
+            });
         };
 
         xhr.send(formData);
