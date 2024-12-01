@@ -192,10 +192,10 @@ class convertController extends Controller
                             'procEndAt' => null,
                             'procDuration' => null
                         ]);
-                        if ($convertType == 'xlsx') {
+                        if ($convertType == 'xlsx' || $convertType == 'pptx') {
                             if ($loopCount <= 1) {
-                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx')) {
-                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType)) {
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType);
                                 }
                             }
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
@@ -204,31 +204,66 @@ class convertController extends Controller
                             $asposeToken = AppHelper::instance()->getAsposeToken(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                             if ($asposeToken) {
                                 $fileContent = file_get_contents($newFilePath);
-                                $asposeAPI = Http::withToken($asposeToken)
-                                    ->attach('file', $fileContent, basename($newFilePath))
-                                    ->put("https://api.aspose.cloud/v3.0/pdf/convert/{$convertType}?outPath={$newFileNameWithoutExtension}.xlsx");
-                                if ($asposeAPI->successful()) {
-                                    if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".xlsx")) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        array_push($poolFiles, $newFileNameWithoutExtension);
-                                        $procFile += 1;
-                                        $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.xlsx');
-                                        file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'), $minioDownload);
-                                        $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx');
-                                        Storage::disk('minio')->put(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx',
-                                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.xlsx'))
-                                        );
-                                        Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.xlsx');
-                                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                try {
+                                    $asposeAPI = Http::timeout(300)
+                                        ->withToken($asposeToken)
+                                        ->attach('file', $fileContent, basename($newFilePath))
+                                        ->put("https://api.aspose.cloud/v3.0/pdf/convert/{$convertType}?outPath={$newFileNameWithoutExtension}.{$convertType}");
+                                    if ($asposeAPI->successful()) {
+                                        if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".xlsx")) {
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $duration = $end->diff($startProc);
+                                            array_push($poolFiles, $newFileNameWithoutExtension);
+                                            $procFile += 1;
+                                            $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.'.$convertType);
+                                            file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType), $minioDownload);
+                                            $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType);
+                                            Storage::disk('minio')->put(
+                                                $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType,
+                                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.'.$convertType))
+                                            );
+                                            Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.'.$convertType);
+                                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                        } else {
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $duration = $end->diff($startProc);
+                                            appLogModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'errReason' => null,
+                                                    'errStatus' => 'FTP Server Connection Failed !'
+                                                ]);
+                                            cnvModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'result' => false,
+                                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                                    'procDuration' => $duration->s.' seconds'
+                                                ]);
+                                            NotificationHelper::Instance()->sendErrNotify(
+                                                $currentFileName,
+                                                $newFileSize,
+                                                $batchId,
+                                                'FAIL',
+                                                'Aspose API v3.0 - '.$convertType,
+                                                'FTP Server Connection Failed !',
+                                                null
+                                            );
+                                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                            return $this->returnDataMesage(
+                                                400,
+                                                'PDF Convert failed !',
+                                                null,
+                                                $batchId,
+                                                null,
+                                                'FTP Server Connection Failed !'
+                                            );
+                                        }
                                     } else {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                         $duration = $end->diff($startProc);
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
-                                                'errReason' => null,
-                                                'errStatus' => 'FTP Server Connection Failed !'
+                                                'errReason' => $asposeAPI->body(),
+                                                'errStatus' => 'Aspose API v3.0 - '.$convertType.' failure'
                                             ]);
                                         cnvModel::where('groupId', '=', $batchId)
                                             ->update([
@@ -242,26 +277,26 @@ class convertController extends Controller
                                             $batchId,
                                             'FAIL',
                                             'cnvToXls',
-                                            'FTP Server Connection Failed !',
-                                            null
+                                            'Aspose API v3.0 - '.$convertType.' failure',
+                                            $asposeAPI->body()
                                         );
                                         Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                         return $this->returnDataMesage(
                                             400,
                                             'PDF Convert failed !',
-                                            null,
+                                            $asposeAPI->body(),
                                             $batchId,
                                             null,
-                                            'FTP Server Connection Failed !'
+                                            'Aspose API v3.0 - '.$convertType.' failure'
                                         );
                                     }
-                                } else {
+                                } catch (\Exception $e) {
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     appLogModel::where('groupId', '=', $batchId)
                                         ->update([
-                                            'errReason' => $asposeAPI->body(),
-                                            'errStatus' => 'Aspose API Error !, CnvToXLS failure'
+                                            'errReason' => $e->getMessage(),
+                                            'errStatus' => 'Guzzle HTTP failure'
                                         ]);
                                     cnvModel::where('groupId', '=', $batchId)
                                         ->update([
@@ -275,17 +310,17 @@ class convertController extends Controller
                                         $batchId,
                                         'FAIL',
                                         'cnvToXls',
-                                        'Aspose API Error !, CnvToXLS failure',
-                                        $asposeAPI->body()
+                                        'Guzzle HTTP failure',
+                                        $e->getMessage()
                                     );
                                     Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                     return $this->returnDataMesage(
                                         400,
                                         'PDF Convert failed !',
-                                        $asposeAPI->body(),
+                                        $e->getMessage(),
                                         $batchId,
                                         null,
-                                        'Aspose API Error !, CnvToXLS failure'
+                                        'Guzzle HTTP failure'
                                     );
                                 }
                             } else {
@@ -307,137 +342,7 @@ class convertController extends Controller
                                     $newFileSize,
                                     $batchId,
                                     'FAIL',
-                                    'cnvToXls',
-                                    'Failed to generated Aspose Token !',
-                                    null
-                                );
-                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                return $this->returnDataMesage(
-                                    400,
-                                    'PDF Convert failed !',
-                                    null,
-                                    $batchId,
-                                    null,
-                                    'Failed to generated Aspose Token !'
-                                );
-                            }
-                        } else if ($convertType == 'pptx') {
-                            if ($loopCount <= 1) {
-                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx')) {
-                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
-                                }
-                            }
-                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
-                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                            $asposeToken = AppHelper::instance()->getAsposeToken(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
-                            if ($asposeToken) {
-                                $fileContent = file_get_contents($newFilePath);
-                                $asposeAPI = Http::withToken($asposeToken)
-                                    ->attach('file', $fileContent, basename($newFilePath))
-                                    ->put("https://api.aspose.cloud/v3.0/pdf/convert/{$convertType}?outPath={$newFileNameWithoutExtension}.pptx");
-                                if ($asposeAPI->successful()) {
-                                    if (Storage::disk('ftp')->exists($newFileNameWithoutExtension.".pptx")) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        array_push($poolFiles, $newFileNameWithoutExtension);
-                                        $procFile += 1;
-                                        $minioDownload = Storage::disk('ftp')->get($newFileNameWithoutExtension.'.pptx');
-                                        file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx'), $minioDownload);
-                                        $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx');
-                                        Storage::disk('minio')->put(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx',
-                                            file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pptx'))
-                                        );
-                                        Storage::disk('ftp')->delete($newFileNameWithoutExtension.'.pptx');
-                                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    } else {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
-                                        appLogModel::where('groupId', '=', $batchId)
-                                            ->update([
-                                                'errReason' => null,
-                                                'errStatus' => 'FTP Server Connection Failed !'
-                                            ]);
-                                        cnvModel::where('groupId', '=', $batchId)
-                                            ->update([
-                                                'result' => false,
-                                                'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                'procDuration' => $duration->s.' seconds'
-                                            ]);
-                                        NotificationHelper::Instance()->sendErrNotify(
-                                            $currentFileName,
-                                            $newFileSize,
-                                            $batchId,
-                                            'FAIL',
-                                            'cnvToPptx',
-                                            'FTP Server Connection Failed !',
-                                            null
-                                        );
-                                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                        return $this->returnDataMesage(
-                                            400,
-                                            'PDF Convert failed !',
-                                            null,
-                                            $batchId,
-                                            null,
-                                            'FTP Server Connection Failed !'
-                                        );
-                                    }
-                                } else {
-                                    $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                    $duration = $end->diff($startProc);
-                                    appLogModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'errReason' => $asposeAPI->getErrorOutput(),
-                                            'errStatus' => 'Aspose API Error !, cnvToPptx failure'
-                                        ]);
-                                    cnvModel::where('groupId', '=', $batchId)
-                                        ->update([
-                                            'result' => false,
-                                            'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                            'procDuration' => $duration->s.' seconds'
-                                        ]);
-                                    NotificationHelper::Instance()->sendErrNotify(
-                                        $currentFileName,
-                                        $newFileSize,
-                                        $batchId,
-                                        'FAIL',
-                                        'cnvToPptx',
-                                        'Aspose API Error !,
-                                        cnvToPptx failure',
-                                        $asposeAPI->getErrorOutput()
-                                    );
-                                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                    return $this->returnDataMesage(
-                                        400,
-                                        'PDF Convert failed !',
-                                        $asposeAPI->getErrorOutput(),
-                                        $batchId,
-                                        null,
-                                        'Aspose API Error !, cnvToPptx failure'
-                                    );
-                                }
-                            } else {
-                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                $duration = $end->diff($startProc);
-                                appLogModel::where('groupId', '=', $batchId)
-                                    ->update([
-                                        'errReason' => $message->getMessage(),
-                                        'errStatus' => 'Failed to generated Aspose Token !'
-                                    ]);
-                                cnvModel::where('groupId', '=', $batchId)
-                                    ->update([
-                                        'result' => false,
-                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                        'procDuration' => $duration->s.' seconds'
-                                    ]);
-                                NotificationHelper::Instance()->sendErrNotify(
-                                    $currentFileName,
-                                    $newFileSize,
-                                    $batchId,
-                                    'FAIL',
-                                    'cnvToXls',
+                                    'Aspose API v3.0 - '.$convertType.' failure',
                                     'Failed to generated Aspose Token !',
                                     null
                                 );
