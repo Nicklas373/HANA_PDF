@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\Core\htmltopdfController;
 use App\Http\Controllers\Api\Core\mergeController;
 use App\Http\Controllers\Api\Core\splitController;
 use App\Http\Controllers\Api\Core\watermarkController;
-use App\Http\Controllers\Api\File\uploadController;
+use App\Http\Controllers\Api\File\fileController;
 use App\Http\Controllers\Api\File\thumbnailController;
 use App\Http\Controllers\Api\Misc\versionController;
 
@@ -26,8 +26,9 @@ Route::group([
 
 Route::middleware(['auth:api'],['throttle:api'])->prefix('v1/file')->group(function() {
     // API v1 Backend File Management Route
-    Route::post('/upload', [uploadController::class, 'upload']);
-    Route::post('/remove', [uploadController::class, 'remove']);
+    Route::post('/getTemporaryURL', [fileController::class, 'getTemporaryURL']);
+    Route::post('/upload', [fileController::class, 'upload']);
+    Route::post('/remove', [fileController::class, 'remove']);
     Route::post('/thumbnail', [thumbnailController::class, 'getThumbnail']);
 });
 
@@ -35,7 +36,7 @@ Route::middleware(['auth:api'],['throttle:api'])->prefix('v2/pdf')->group(functi
     // API v1 Backend PDF Management Route
     Route::post('/compress', [compressController::class, 'compress']);
     Route::post('/convert', [convertController::class, 'convert']);
-    Route::post('/getTotalPagesPDF', [uploadController::class, 'getTotalPagesPDF']);
+    Route::post('/getTotalPagesPDF', [fileController::class, 'getTotalPagesPDF']);
     Route::post('/html', [htmltopdfController::class, 'html']);
     Route::post('/merge', [mergeController::class, 'merge']);
     Route::post('/split', [splitController::class, 'split']);

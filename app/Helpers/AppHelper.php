@@ -52,6 +52,21 @@ class AppHelper
         return $size;
     }
 
+    function getAsposeToken($clientId, $clientSecret)
+    {
+        $response = Http::asForm()->post('https://api.aspose.cloud/connect/token', [
+            'grant_type' => 'client_credentials',
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+        ]);
+
+        if ($response->successful()) {
+            return $response->json()['access_token'];
+        } else {
+            return false;
+        }
+    }
+
     function getCurrentTimeZone() {
         date_default_timezone_set('Asia/Jakarta');
         $currentDateTime = date('Y-m-d H:i:s');

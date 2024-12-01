@@ -9,8 +9,53 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Spatie\PdfToImage\Pdf;
 
-class uploadController extends Controller
+class fileController extends Controller
 {
+    public function getTemporaryURL(Request $request) {
+        $validator = Validator::make($request->all(),[
+			'fileName' => 'required'
+		]);
+
+		if ($validator->fails()) {
+            return $this->returnFileMesage(
+                400,
+                'Validation failed',
+                null,
+                $validator->messages()->first()
+            );
+		} else {
+			$pdfUpload_Location = env('PDF_UPLOAD');
+            $fileName = $request->post('fileName');
+            try {
+                if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$fileName)) {
+                    return $this->returnFileMesage(
+                        200,
+                        'OK',
+                        Storage::disk('minio')->temporaryUrl(
+                            $pdfUpload_Location.'/'.$fileName,
+                            now()->addMinutes(5)
+                        ),
+                        null
+                    );
+                } else {
+                    return $this->returnFileMesage(
+                        400,
+                        'File not found in the object storage !',
+                        $fileName,
+                        $fileName.' could not be found in the object storage'
+                    );
+                }
+            } catch (\Exception $e) {
+                return $this->returnFileMesage(
+                    400,
+                    'File not found in the object storage !',
+                    $fileName,
+                    $e->getMessage()
+                );
+            }
+        }
+    }
+
     public function upload(Request $request) {
 		$validator = Validator::make($request->all(),[
 			'file' => 'required|mimes:pdf,pptx,docx,xlsx,jpg,png,jpeg|max:25600',
@@ -34,7 +79,6 @@ class uploadController extends Controller
                 $pdfFileName = str_replace(' ', '_', $currentFileName);
                 $fileSize = filesize($file);
                 $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
-                $file->storeAs('public/upload', $pdfFileName);
                 Storage::disk('minio')->put($pdfUpload_Location.'/'.$pdfFileName, file_get_contents($file));
                 try {
                     if (Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName)) {

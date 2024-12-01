@@ -42,7 +42,7 @@ class versionController extends Controller {
             $appServicesReferrerFE = $request->post('appServicesReferrer');
             $appMajorVersionBE = 3;
             $appMinorVersionBE = 6;
-            $appPatchVersionBE = 0;
+            $appPatchVersionBE = 1;
             $appVersioningBE = null;
             $appVersioningFE = null;
             $appServicesReferrerBE = "BE";

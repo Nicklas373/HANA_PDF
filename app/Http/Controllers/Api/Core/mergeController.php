@@ -136,9 +136,6 @@ class mergeController extends Controller
                             $trimPhase1 = str_replace(' ', '_', $currentFileName);
                             $firstTrim = basename($currentFileName, '.pdf');
                             $newFileNameWithoutExtension = str_replace('.', '_', $firstTrim);
-                            $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
-                            $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                             $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                             if ($batchValue) {
@@ -146,7 +143,11 @@ class mergeController extends Controller
                             } else {
                                 $newFileName = $currentFileName;
                             }
-                            $pdfName = $ilovepdfTask->addFile($newFilePath);
+                            $pdfTempUrl =  Storage::disk('minio')->temporaryUrl(
+                                $pdfUpload_Location.'/'.$trimPhase1,
+                                now()->addSeconds(30)
+                            );
+                            $pdfName = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                             $pdfName->setPassword($pdfEncKey);
                             appLogModel::create([
                                 'processId' => $procUuid,
