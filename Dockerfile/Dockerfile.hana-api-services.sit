@@ -3,7 +3,7 @@ FROM php:8.3-fpm-alpine
 
 # Configure image maintainer
 LABEL maintainer="Nicklas373 <herlambangdicky5@gmail.com>"
-LABEL version="1.6"
+LABEL version="1.7"
 LABEL description="Docker container for https://gw.hana-ci.com"
 
 # Configure ARG
@@ -30,8 +30,6 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     libpng-dev \
     ghostscript \
-    python3 \
-    py3-pip \
     autoconf \
     build-base \
     postgresql-dev \
@@ -55,10 +53,6 @@ RUN cd /tmp && curl -L -o /tmp/imagick.tar.gz https://pecl.php.net/get/imagick-3
     && make install \
     && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
     && rm -rf /tmp/*
-
-# Configure Python modules
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
-RUN pip3 install --upgrade pip && pip3 install requests
 
 # Clone App Services
 RUN git clone -b dev/be/master https://github.com/Nicklas373/Hana-PDF hanaci-api
@@ -112,6 +106,12 @@ RUN cd hanaci-api && echo "PDF_POOL=pool" >> .env
 RUN cd hanaci-api && echo "TELEGRAM_BOT_ID=xxxx" >> .env
 RUN cd hanaci-api && echo "TELEGRAM_CHAT_ID=xxxx" >> .env
 RUN cd hanaci-api && echo "HANA_UNIQUE_KEY=xxxx" >> .env
+RUN cd hanaci-api && echo "MINIO_ACCESS_KEY=xxxx" >> .env
+RUN cd hanaci-api && echo "MINIO_SECRET_KEY=xxxx" >> .env
+RUN cd hanaci-api && echo "MINIO_REGION=us-east-1" >> .env
+RUN cd hanaci-api && echo "MINIO_BUCKET=hana-pdf-sit" >> .env
+RUN cd hanaci-api && echo "MINIO_ENDPOINT=xxxx" >> .env
+
 
 # Configure permission
 RUN cd hanaci-api && \

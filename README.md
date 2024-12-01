@@ -30,12 +30,6 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 ---
 
-### Python Module Requirements
-
--   Requests
-
----
-
 ### Build Status
 
 -   [![CodeQL](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Nicklas373/Hana-PDF/actions/workflows/github-code-scanning/codeql)
@@ -80,6 +74,9 @@ used of Flowbite library to maintain responsive and materialize interface. And p
        - docker compose exec hana-api-services sed -i "s/FTP_ROOT=xxxx/FTP_USERNAME=YOUR_FTP_ROOT_DIR/" >> .env
        - docker compose exec hana-api-services sed -i "s/ILOVEPDF_PUBLIC_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_PUBLIC_KEY/" >> .env
        - docker compose exec hana-api-services sed -i "s/ILOVEPDF_SECRET_KEY=xxxx/FTP_USERNAME=YOUR_ILOVEPDF_SECRET_KEY/" >> .env
+       - docker compose exec hana-api-services sed -i "s/MINIO_ACCESS_KEY=xxxx/MINIO_ACCESS_KEY=YOUR_MINIO_ACCESS_KEY/" >> .env
+       - docker compose exec hana-api-services sed -i "s/MINIO_SECRET_KEY=xxxx/MINIO_SECRET_KEY=YOUR_MINIO_SECRET_KEY/" >> .env
+       - docker compose exec hana-api-services sed -i "s/MINIO_ENDPOINT=xxxx/MINIO_ENDPOINT=YOUR_MINIO_ENDPOINT_URL/" >> .env
     ```
 4. Configure Client Host
     ```bash
@@ -193,6 +190,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 -   [DropzoneJS](https://www.dropzone.dev/)
 -   [Flowbite](https://flowbite.com/)
 -   [Laravel](https://laravel.com/)
+-   [Minio](https://min.io/)
 -   [Node JS](https://nodejs.org/en)
 -   [Mozilla PDFJS](https://mozilla.github.io/pdf.js/)
 -   [Tailwind CSS](https://tailwindcss.com/)
