@@ -42,7 +42,7 @@ class versionController extends Controller {
             $appServicesReferrerFE = $request->post('appServicesReferrer');
             $appMajorVersionBE = 3;
             $appMinorVersionBE = 6;
-            $appPatchVersionBE = 1;
+            $appPatchVersionBE = 3;
             $appVersioningBE = null;
             $appVersioningFE = null;
             $appServicesReferrerBE = "BE";
@@ -59,55 +59,84 @@ class versionController extends Controller {
             ]);
 
             if (appHelper::instance()->checkWebAvailable($url)) {
-                $response = Http::get($url);
                 try {
-                    $data = $response->json();
-                    foreach ($data as $service) {
-                        if ($service['appServices'] === 'BE') {
-                            $majorVersionBE = $service['versioning']['majorVersion'];
-                            $minorVersionBE = $service['versioning']['minorVersion'];
-                            $patchVersionBE = $service['versioning']['patchVersion'];
-                            $appVersioningBE = $appMajorVersionBE.'.'.$appMinorVersionBE.'.'.$appPatchVersionBE;
-                            $versioningBE = $majorVersionBE.'.'.$minorVersionBE.'.'.$patchVersionBE;
-                        } else if ($service['appServices'] === 'FE') {
-                            $majorVersionFE = $service['versioning']['majorVersion'];
-                            $minorVersionFE = $service['versioning']['minorVersion'];
-                            $patchVersionFE = $service['versioning']['patchVersion'];
-                            $appVersioningFE = $appMajorVersionFE.'.'.$appMinorVersionFE.'.'.$appPatchVersionFE;
-                            $versioningFE = $majorVersionFE.'.'.$minorVersionFE.'.'.$patchVersionFE;
+                    $response = Http::timeout(30)
+                                    ->acceptJson()
+                                    ->get($url);
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        foreach ($data as $service) {
+                            if ($service['appServices'] === 'BE') {
+                                $majorVersionBE = $service['versioning']['majorVersion'];
+                                $minorVersionBE = $service['versioning']['minorVersion'];
+                                $patchVersionBE = $service['versioning']['patchVersion'];
+                                $appVersioningBE = $appMajorVersionBE.'.'.$appMinorVersionBE.'.'.$appPatchVersionBE;
+                                $versioningBE = $majorVersionBE.'.'.$minorVersionBE.'.'.$patchVersionBE;
+                            } else if ($service['appServices'] === 'FE') {
+                                $majorVersionFE = $service['versioning']['majorVersion'];
+                                $minorVersionFE = $service['versioning']['minorVersion'];
+                                $patchVersionFE = $service['versioning']['patchVersion'];
+                                $appVersioningFE = $appMajorVersionFE.'.'.$appMinorVersionFE.'.'.$appPatchVersionFE;
+                                $versioningFE = $majorVersionFE.'.'.$minorVersionFE.'.'.$patchVersionFE;
+                            }
                         }
-                    }
 
-                    if ($appVersioningBE == $versioningBE) {
-                        $validateBE = true;
-                        if ($appVersioningFE == $versioningFE) {
-                            $validateFE = true;
+                        if ($appVersioningBE == $versioningBE) {
+                            $validateBE = true;
+                            if ($appVersioningFE == $versioningFE) {
+                                $validateFE = true;
+                            } else {
+                                $validateFE = false;
+                                $validateMessage = 'Front-End module version missmatch !';
+                            }
                         } else {
+                            $validateBE = false;
                             $validateFE = false;
-                            $validateMessage = 'Front-End module version missmatch !';
+                            $validateMessage = 'Back-End module version missmatch !';
                         }
-                    } else {
-                        $validateBE = false;
-                        $validateFE = false;
-                        $validateMessage = 'Back-End module version missmatch !';
-                    }
 
-                    if ($validateBE && $validateFE) {
-                        return $this->returnVersioningMessage(
-                            200,
-                            'OK',
-                            $appVersioningBE,
-                            $versioningBE,
-                            $appVersioningFE,
-                            $versioningFE,
-                            null
-                        );
+                        if ($validateBE && $validateFE) {
+                            return $this->returnVersioningMessage(
+                                200,
+                                'OK',
+                                $appVersioningBE,
+                                $versioningBE,
+                                $appVersioningFE,
+                                $versioningFE,
+                                null
+                            );
+                        } else {
+                            appLogModel::where('groupId', '=', $Muuid)
+                                ->update([
+                                    'errReason' => 'Version Check Failed !',
+                                    'errStatus' => $validateMessage
+                                ]);
+                            NotificationHelper::Instance()->sendVersioningErrNotify(
+                                $appVersioningFE,
+                                $versioningFE,
+                                $appVersioningBE,
+                                $versioningBE,
+                                'FAIL',
+                                $Muuid,
+                                'Version Check Failed !',
+                                $validateMessage
+                            );
+                            return $this->returnVersioningMessage(
+                                400,
+                                'Version Check Failed !',
+                                $appVersioningBE,
+                                $versioningBE,
+                                $appVersioningFE,
+                                $versioningFE,
+                                $validateMessage
+                            );
+                        }
                     } else {
                         appLogModel::where('groupId', '=', $Muuid)
-                            ->update([
-                                'errReason' => 'Version Check Failed !',
-                                'errStatus' => $validateMessage
-                            ]);
+                        ->update([
+                            'errReason' => 'Failed to parse response from request server !',
+                            'errStatus' => 'Version Check Failed !'
+                        ]);
                         NotificationHelper::Instance()->sendVersioningErrNotify(
                             $appVersioningFE,
                             $versioningFE,
@@ -116,7 +145,7 @@ class versionController extends Controller {
                             'FAIL',
                             $Muuid,
                             'Version Check Failed !',
-                            $validateMessage
+                            'Failed to parse response from request server !'
                         );
                         return $this->returnVersioningMessage(
                             400,
@@ -125,14 +154,14 @@ class versionController extends Controller {
                             $versioningBE,
                             $appVersioningFE,
                             $versioningFE,
-                            $validateMessage
+                            'Failed to parse response from request server !'
                         );
                     }
                 } catch (\Exception $e) {
                     appLogModel::where('groupId', '=', $Muuid)
                         ->update([
-                            'errReason' => 'Unable to parsing JSON versioning !',
-                            'errStatus' => $e->getMessage()
+                            'errReason' => $e->getMessage(),
+                            'errStatus' => 'Cannot establish response with the server'
                         ]);
                     NotificationHelper::Instance()->sendVersioningErrNotify(
                         null,
@@ -141,12 +170,12 @@ class versionController extends Controller {
                         null,
                         'FAIL',
                         $Muuid,
-                        'Unable to parsing JSON versioning !',
+                        'Cannot establish response with the server',
                         $e->getMessage()
                     );
                     return $this->returnVersioningMessage(
                         500,
-                        'Unable to parsing JSON versioning !',
+                        'Cannot establish response with the server',
                         null,
                         null,
                         null,
@@ -157,8 +186,8 @@ class versionController extends Controller {
             } else {
                 appLogModel::where('groupId', '=', $Muuid)
                     ->update([
-                        'errReason' => 'Version Check Failed !',
-                        'errStatus' => 'Cannot establish response with the server'
+                        'errReason' => 'Cannot establish response with the server',
+                        'errStatus' => 'Version Check Failed !'
                     ]);
                 NotificationHelper::Instance()->sendVersioningErrNotify(
                     null,
@@ -197,24 +226,59 @@ class versionController extends Controller {
         ]);
 
 		if (appHelper::instance()->checkWebAvailable($versionFetch)) {
-            $response = Http::get($versionFetch);
             try {
-                $data = $response->json();
-                return $this->returnDataMesage(
-                    200,
-                    'OK',
-                    $data,
-                    null,
-                    null,
-                    null
-                );
+                $response = Http::timeout(30)
+                                ->acceptJson()
+                                ->get($versionFetch);
+                if ($response->successful()) {
+                    $data = $response->json();
+                    return $this->returnDataMesage(
+                        200,
+                        'OK',
+                        $data,
+                        null,
+                        null,
+                        null
+                    );
+                } else {
+                    appLogModel::where('groupId', '=', $Muuid)
+                    ->update([
+                        'errReason' => 'Failed to parse response from request server !',
+                        'errStatus' => 'Version Fetch Failed !'
+                    ]);
+                    NotificationHelper::Instance()->sendErrGlobalNotify(
+                        $endpoint,
+                        'Version Fetch',
+                        'FAIL',
+                        $Muuid,
+                        'Failed to parse response from request server !',
+                        null,
+                        false
+                    );
+                    return $this->returnDataMesage(
+                        400,
+                        'Failed to parse response from request server !',
+                        null,
+                        null,
+                        null,
+                        $e->getMessage()
+                    );
+                }
             } catch (\Exception $e) {
                 appLogModel::where('groupId', '=', $Muuid)
                     ->update([
                         'errReason' => 'Failed to parsing JSON !',
                         'errStatus' =>  $e->getMessage()
                     ]);
-                NotificationHelper::Instance()->sendErrGlobalNotify($endpoint, 'Version Fetch', 'FAIL', $Muuid,'Failed to parsing JSON !', $e->getMessage(), false);
+                NotificationHelper::Instance()->sendErrGlobalNotify(
+                    $endpoint,
+                    'Version Fetch',
+                    'FAIL',
+                    $Muuid,
+                    'Failed to parsing JSON !',
+                    $e->getMessage(),
+                    false
+                );
                 return $this->returnDataMesage(
                     400,
                     'Failed to parsing JSON !',
