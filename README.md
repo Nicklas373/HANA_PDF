@@ -25,7 +25,7 @@ used of Flowbite library to maintain responsive and materialize interface. And p
     -   On Linux use docker-compose and docker.io
 -   [Node JS 20.11](https://nodejs.org/en)
 -   [PHP 8.2.12](https://www.php.net/downloads.php)
--   [PostgreSQL 16.2](https://www.postgresql.org/)
+-   [PostgreSQL 17.0](https://www.postgresql.org/)
 -   [Postman](https://www.postman.com/)
 
 ---
@@ -80,7 +80,6 @@ used of Flowbite library to maintain responsive and materialize interface. And p
     ```
 4. Configure Client Host
     ```bash
-       - docker compose exec hana-app-pdf sed -i "s/VITE_ADOBE_CLIENT_ID=xxxx/VITE_ADOBE_CLIENT_ID=YOUR_ADOBE_CLIENT_ID/" >> .env
        - docker compose exec hana-app-pdf echo "TELEGRAM_BOT_ID=YOUR_TELEGRAM_BOT_ID" >> .env
        - docker compose exec hana-app-pdf echo "TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHANNEL_ID" >> .env
        - docker compose exec hana-app-pdf chmod o+w /var/www/html/hanaci-pdf/storage/ -R
@@ -99,7 +98,31 @@ used of Flowbite library to maintain responsive and materialize interface. And p
             - docker compose exec hana-app-pdf sed -i 's|http://192.168.0.2|YOUR_BACKEND_URL:PORT|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
             - docker compose exec hana-app-pdf sed -i 's|STATIC_CLIENT_ID|YOUR_ADOBE_CLIENT_ID|' public/build/assets/kao-logic-CHECK_LATEST_REVISION.js
         ```
-6. Refresh page and done.
+6. Configure Min.io
+    - Open minio console page, URL: http://YOUR_LOCAL_IP:9001
+    - Go to administrator -> bucket
+    - Create new bucket with name "hana-pdf"
+    - Go to user -> access key
+    - Create new access key
+    - Check "Restrict beyond user policy"
+        - Fill custom policy
+        ```bash
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                    "Effect": "Allow",
+                    "Action": ["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
+                    "Resource": ["arn:aws:s3:::hana-pdf", "arn:aws:s3:::hana-pdf/*"]
+                    }
+                ]
+            }
+        ```
+    - Copy Access key into backend module environment "MINIO_ACCESS_KEY"
+    - Copy Secret key into backend module environment "MINIO_SECRET_KEY"
+    - Set name access key into "hana-pdf"
+    - Create access key
+7. Refresh page and done.
 
 ---
 
@@ -112,7 +135,6 @@ used of Flowbite library to maintain responsive and materialize interface. And p
     A. Copy **.env.example** file to **.env** and modify database credentials
 
     ```bash
-        - VITE_ADOBE_CLIENT_ID="ADOBE_CLIENT_ID" [https://developer.adobe.com/document-services/docs/overview/pdf-embed-api/]
         - VITE_JWT_TOKEN="YOUR_CURRENT_BEARER_TOKEN" [Get it from Backend with route api/v1/auth/getToken]
         - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
         - TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
@@ -135,52 +157,80 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 
 2. Clone the repository with branch \_\_dev/be/master [Backend Services]
 
-    A. Copy **.env.example** file to **.env** and modify database credentials
-
-    ```bash
-        - ASPOSE_CLOUD_CLIENT_ID="ASPOSE_CLOUD_CLIENT_ID" [https://dashboard.aspose.cloud/]
-        - ASPOSE_CLOUD_TOKEN="ASPOSE_CLOUD_TOKEN" [https://dashboard.aspose.cloud/]
-        - FTP_USERNAME="FTP_USERNAME" [https://dashboard.aspose.cloud/]
-        - FTP_USERPASS="FTP_USERPASS" [https://dashboard.aspose.cloud/]
-        - FTP_SERVER="FTP_SERVER" [https://dashboard.aspose.cloud/]
-        - ILOVEPDF_ENC_KEY="ILOVEPDF_ENC_KEY" [Generate your hash key (Max. 25 digits)]
-        - ILOVEPDF_PUBLIC_KEY="ILOVEPDF_PUBLIC_KEY" [https://developer.ilovepdf.com/]
-        - ILOVEPDF_SECRET_KEY="ILOVEPDF_SECRET_KEY" [https://developer.ilovepdf.com/]
-        - PDF_IMG_POOL="image"
-        - PDF_BATCH="batch"
-        - PDF_UPLOAD="upload"
-        - PDF_DOWNLOAD="download"
-        - PDF_POOL="pool"
-        - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
-        - TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
-        - HANA_UNIQUE_TOKEN="YOUR_SHA512_UNIQUE_TOKEN"
-    ```
-
-    B. Run the following command [Make sure to configure database connectivity before use migrate function]
-
-    ```bash
-        - composer install
-        - php artisan key:generate
-        - php artisan jwt:secret
-        - php artisan storage:link
-    ```
-
-    C. Create new directory inside storage/app/public
-
-    - image
-    - batch
-    - upload
-    - download
-    - pool
-
-    D. Start to deploy
-
-    ```bash
-        - npm run dev -- --host
-        - php artisan serve --host=localhost --port=80
-    ```
-
-    E. Configure apiUrl variable on resources/js/kao-logic.js to your considered BE address and port !
+    - Copy **.env.example** file to **.env** and modify database credentials
+        ```bash
+            - ASPOSE_CLOUD_CLIENT_ID="ASPOSE_CLOUD_CLIENT_ID" [https://dashboard.aspose.cloud/]
+            - ASPOSE_CLOUD_TOKEN="ASPOSE_CLOUD_TOKEN" [https://dashboard.aspose.cloud/]
+            - FTP_USERNAME="FTP_USERNAME" [https://dashboard.aspose.cloud/]
+            - FTP_USERPASS="FTP_USERPASS" [https://dashboard.aspose.cloud/]
+            - FTP_SERVER="FTP_SERVER" [https://dashboard.aspose.cloud/]
+            - ILOVEPDF_ENC_KEY="ILOVEPDF_ENC_KEY" [Generate your hash key (Max. 25 digits)]
+            - ILOVEPDF_PUBLIC_KEY="ILOVEPDF_PUBLIC_KEY" [https://developer.ilovepdf.com/]
+            - ILOVEPDF_SECRET_KEY="ILOVEPDF_SECRET_KEY" [https://developer.ilovepdf.com/]
+            - PDF_IMG_POOL="image"
+            - PDF_BATCH="batch"
+            - PDF_UPLOAD="upload"
+            - PDF_DOWNLOAD="download"
+            - PDF_POOL="pool"
+            - TELEGRAM_BOT_ID="YOUR_TELEGRAM_BOT_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+            - TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHANNEL_ID" [https://telegram-bot-sdk.com/docs/getting-started/installation]
+            - HANA_UNIQUE_TOKEN="YOUR_SHA512_UNIQUE_TOKEN"
+            - MINIO_ACCESS_KEY="YOUR_MINIO_ACCESS_KEY"
+            - MINIO_SECRET_KEY="YOUR_MINIO_SECRET_KEY"
+            - MINIO_ENDPOINT="YOUR_MINIO_ENDPOINT_URL"
+        ```
+    - Run the following command [Make sure to configure database connectivity before use migrate function]
+        ```bash
+            - composer install
+            - php artisan key:generate
+            - php artisan jwt:secret
+            - php artisan storage:link
+        ```
+    - Create new directory inside storage/app/public
+        - image
+        - batch
+        - upload
+        - download
+        - pool
+    - Configure REST API
+        - Install Postman
+        - Create a new HTTP request with POST format
+            - URL: http://YOUR_LOCAL_IP:YOUR_LOCAL_PORT/api/v1/auth/getToken
+            - Body: form-data
+            - email: eureka@hana-ci.com
+            - password: YOUR_SHA512_UNIQUE_TOKEN
+        - Send a POST request to get access token
+    - Configure frontend credentials
+        - Set adobeClientID -> YOUR_ADOBE_CLIENT_ID
+        - Set apiUrl -> YOUR_BACKEND_URL
+        - Set bearerToken -> response token
+    - Configure Min.io
+        - Open minio console page, URL: http://YOUR_LOCAL_IP:9001
+        - Go to administrator -> bucket - Create new bucket with name "hana-pdf"
+        - Go to user -> access key - Create new access key
+        - Check "Restrict beyond user policy"
+            - Fill custom policy
+            ```bash
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                        "Effect": "Allow",
+                        "Action": ["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
+                        "Resource": ["arn:aws:s3:::hana-pdf", "arn:aws:s3:::hana-pdf/*"]
+                        }
+                    ]
+                }
+            ```
+        - Copy Access key into backend module environment "MINIO_ACCESS_KEY"
+        - Copy Secret key into backend module environment "MINIO_SECRET_KEY"
+        - Set name access key into "hana-pdf"
+        - Create access key
+    - Start to deploy
+        ```bash
+            - npm run dev -- --host
+            - php artisan serve --host=localhost --port=80
+        ```
 
 ---
 
@@ -190,9 +240,9 @@ used of Flowbite library to maintain responsive and materialize interface. And p
 -   [DropzoneJS](https://www.dropzone.dev/)
 -   [Flowbite](https://flowbite.com/)
 -   [Laravel](https://laravel.com/)
--   [Minio](https://min.io/)
+-   [Min.io](https://min.io/)
 -   [Node JS](https://nodejs.org/en)
--   [Mozilla PDFJS](https://mozilla.github.io/pdf.js/)
+-   [Mozilla PDF.JS](https://mozilla.github.io/pdf.js/)
 -   [Tailwind CSS](https://tailwindcss.com/)
 -   [Vite JS](https://vitejs.dev/)
 

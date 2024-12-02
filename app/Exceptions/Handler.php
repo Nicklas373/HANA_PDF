@@ -80,7 +80,7 @@ class Handler extends ExceptionHandler
                     ]);
                 Log::error($message);
             }
-            abort(403);
+            return response()->view('errors.403', [], 403);
         } else if ($exception instanceof TokenMismatchException || ($exception instanceof HttpException && $exception->getStatusCode() == 419)) {
              $message = 'TokenMismatchException: ' . $exception->getMessage();
             Log::error($message);
@@ -89,7 +89,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => 'TokenMismatchException'
                 ]);
-            abort(401);
+            return response()->view('errors.401', [], 401);
         } else if ($exception instanceof RouteNotFoundException) {
             $message = 'RouteNotFoundException: ' . $exception->getMessage();
             appLogModel::where('groupId', '=', $Muuid)
@@ -97,7 +97,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => 'Route not found exception!'
                 ]);
-            abort(404);
+            return response()->view('errors.404', [], 404);
         } else if ($exception instanceof NotFoundHttpException || ($exception instanceof HttpException && $exception->getStatusCode() == 404)) {
             $message = 'NotFoundHttpException: ' . $exception->getMessage();
             Log::error($message);
@@ -106,7 +106,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '404 - Page not found'
                 ]);
-            abort(404);
+            return response()->view('errors.404', [], 404);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 403) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
@@ -115,7 +115,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '403 - Forbidden'
                 ]);
-            abort(403);
+            return response()->view('errors.403', [], 403);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 419) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
@@ -124,7 +124,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '419 - Page Expired'
                 ]);
-            abort(419);
+            return response()->view('errors.419', [], 419);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 429) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
@@ -133,7 +133,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '429 - Too Many Requests'
                 ]);
-            abort(429);
+            return response()->view('errors.429', [], 429);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 500) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
@@ -142,7 +142,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '500 - Internal Server Error'
                 ]);
-            abort(500);
+            return response()->view('errors.500', [], 500);
         } else if ($exception instanceof HttpException && $exception->getStatusCode() == 503) {
             $message = 'HTTPResponseException: ' . $exception->getMessage();
             Log::error($message);
@@ -151,7 +151,7 @@ class Handler extends ExceptionHandler
                     'errReason' => $message,
                     'errStatus' => '503 - Service Temporary Unavailable'
                 ]);
-            abort(503);
+            return response()->view('errors.503', [], 503);
         }
         return parent::render($request, $exception);
     }
