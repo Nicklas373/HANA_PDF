@@ -19,7 +19,8 @@ class AppHelper
 {
     function checkWebAvailable($url){
         try {
-            $response = Http::timeout(5)->get($url);
+            $response = Http::timeout(30)
+                            ->get($url);
             if ($response->successful()) {
                 return true;
             } else {

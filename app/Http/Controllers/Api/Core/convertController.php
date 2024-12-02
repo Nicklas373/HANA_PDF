@@ -243,9 +243,9 @@ class convertController extends Controller
                                                 $newFileSize,
                                                 $batchId,
                                                 'FAIL',
-                                                'Aspose API v3.0 - '.$convertType,
+                                                'cnvTo'.$convertType,
                                                 'FTP Server Connection Failed !',
-                                                null
+                                                'Aspose API v3.0 - '.$convertType
                                             );
                                             Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                             return $this->returnDataMesage(
@@ -276,7 +276,7 @@ class convertController extends Controller
                                             $newFileSize,
                                             $batchId,
                                             'FAIL',
-                                            'cnvToXls',
+                                            'cnvTo'.$convertType,
                                             'Aspose API v3.0 - '.$convertType.' failure',
                                             $asposeAPI->body()
                                         );
@@ -309,7 +309,7 @@ class convertController extends Controller
                                         $newFileSize,
                                         $batchId,
                                         'FAIL',
-                                        'cnvToXls',
+                                        'cnvTo'.$convertType,
                                         'Guzzle HTTP failure',
                                         $e->getMessage()
                                     );
@@ -342,9 +342,9 @@ class convertController extends Controller
                                     $newFileSize,
                                     $batchId,
                                     'FAIL',
-                                    'Aspose API v3.0 - '.$convertType.' failure',
+                                    'cnvTo'.$convertType,
                                     'Failed to generated Aspose Token !',
-                                    null
+                                    'Aspose API v3.0 - '.$convertType.' failure'
                                 );
                                 Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                 return $this->returnDataMesage(
