@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Spatie\PdfToImage\Pdf;
 
 class fileController extends Controller
 {
@@ -198,28 +197,16 @@ class fileController extends Controller
                         $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
                         file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
                         $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                        try {
-                            $pdf = new Pdf($newFilePath);
-                            $pdfTotalPages = $pdf->pageCount();
-                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                            return $this->returnDataMesage(
-                                200,
-                                'PDF Page successfully counted',
-                                $pdfTotalPages,
-                                null,
-                                null,
-                                null
-                            );
-                        } catch (\Exception $e) {
-                            return $this->returnDataMesage(
-                                400,
-                                'Failed to count total PDF pages from '.$currentFileName,
-                                null,
-                                null,
-                                null,
-                                $e->getMessage()
-                            );
-                        }
+                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                        Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$currentFileName);
+                        return $this->returnDataMesage(
+                            200,
+                            'PDF Page successfully counted',
+                            $pdfTotalPages,
+                            null,
+                            null,
+                            null
+                        );
                     } else {
                         return $this->returnDataMesage(
                             400,
