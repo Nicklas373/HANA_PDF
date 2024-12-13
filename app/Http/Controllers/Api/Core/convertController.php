@@ -22,7 +22,6 @@ use Ilovepdf\Ilovepdf;
 use Ilovepdf\ImagepdfTask;
 use Ilovepdf\OfficepdfTask;
 use Ilovepdf\PdfjpgTask;
-use Spatie\PdfToImage\Pdf;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -507,43 +506,8 @@ class convertController extends Controller
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
                             file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
-                            try {
-                                $pdf = new Pdf($newFilePath);
-                                $pdfTotalPages = $pdf->pageCount();
-                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                            } catch (\Exception $e) {
-                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                $duration = $end->diff($startProc);
-                                appLogModel::where('groupId', '=', $batchId)
-                                    ->update([
-                                        'errReason' => $e->getMessage(),
-                                        'errStatus' => 'Failed to count total PDF pages'
-                                    ]);
-                                cnvModel::where('groupId', '=', $batchId)
-                                    ->update([
-                                        'result' => false,
-                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                        'procDuration' => $duration->s.' seconds'
-                                    ]);
-                                NotificationHelper::Instance()->sendErrNotify(
-                                    $currentFileName,
-                                    $newFileSize,
-                                    $batchId,
-                                    'FAIL',
-                                    'cnvToImg',
-                                    'Failed to count total PDF pages',
-                                    $e->getMessage()
-                                );
-                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                return $this->returnDataMesage(
-                                    400,
-                                    'PDF Convert failed !',
-                                    $e->getMessage(),
-                                    $batchId,
-                                    null,
-                                    'Failed to count total PDF pages'
-                                );
-                            }
+                            $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                             try {
                                 $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                 $ilovepdfTask->setFileEncryption($pdfEncKey);

@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ilovepdf\Ilovepdf;
-use Spatie\PdfToImage\Pdf;
 
 class splitController extends Controller
 {
@@ -226,126 +225,14 @@ class splitController extends Controller
                             if ($action == 'split') {
                                 if ($usedMethod == 'range') {
                                     if ($fromPage != '' && $toPage != '') {
-                                        try {
-                                            $pdf = new Pdf($newFilePath);
-                                            $pdfTotalPages = $pdf->pageCount();
-                                            if ($toPage > $pdfTotalPages) {
-                                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                                $duration = $end->diff($startProc);
-                                                appLogModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => 'PDF split failed!'
-                                                    ]);
-                                                splitModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'result' => false,
-                                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                        'procDuration' => $duration->s.' seconds'
-                                                    ]);
-                                                NotificationHelper::Instance()->sendErrNotify(
-                                                    $currentFileName,
-                                                    $newFileSize,
-                                                    $batchId,
-                                                    'FAIL',
-                                                    'split',
-                                                    'PDF split failed!',
-                                                    'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                                return $this->returnDataMesage(
-                                                    400,
-                                                    'PDF Split failed !',
-                                                    null,
-                                                    $batchId,
-                                                    null,
-                                                    'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                            } else if ($fromPage > $pdfTotalPages) {
-                                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                                $duration = $end->diff($startProc);
-                                                appLogModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => 'PDF split failed!'
-                                                    ]);
-                                                splitModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'result' => false,
-                                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                        'procDuration' => $duration->s.' seconds'
-                                                    ]);
-                                                NotificationHelper::Instance()->sendErrNotify(
-                                                    $currentFileName,
-                                                    $newFileSize,
-                                                    $batchId,
-                                                    'FAIL',
-                                                    'split',
-                                                    'PDF split failed!',
-                                                    'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                                return $this->returnDataMesage(
-                                                    400,
-                                                    'PDF Split failed !',
-                                                    null,
-                                                    $batchId,
-                                                    null,
-                                                    'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                            } else if ($fromPage > $toPage) {
-                                                $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                                $duration = $end->diff($startProc);
-                                                appLogModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => 'PDF split failed!'
-                                                    ]);
-                                                splitModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'result' => false,
-                                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                        'procDuration' => $duration->s.' seconds'
-                                                    ]);
-                                                NotificationHelper::Instance()->sendErrNotify(
-                                                    $currentFileName,
-                                                    $newFileSize,
-                                                    $batchId,
-                                                    'FAIL',
-                                                    'split',
-                                                    'PDF split failed!',
-                                                    'First Page has more page than last page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                                return $this->returnDataMesage(
-                                                    400,
-                                                    'PDF Split failed !',
-                                                    null,
-                                                    $batchId,
-                                                    null,
-                                                    'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                );
-                                            } else {
-                                                if ($mergeDBpdf == "true") {
-                                                    $newPageRanges = $fromPage.'-'.$toPage;
-                                                } else if ($mergeDBpdf == "false") {
-                                                    $pdfStartPages = $fromPage;
-                                                    $pdfTotalPages = $toPage;
-                                                    while($pdfStartPages <= intval($pdfTotalPages))
-                                                    {
-                                                        $pdfArrayPages[] = $pdfStartPages;
-                                                        $pdfStartPages += 1;
-                                                    }
-                                                    $newPageRanges = implode(', ', $pdfArrayPages);
-                                                }
-                                            }
-                                        } catch (\Exception $e) {
+                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        if ($toPage > $pdfTotalPages) {
                                             $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                             $duration = $end->diff($startProc);
                                             appLogModel::where('groupId', '=', $batchId)
                                                 ->update([
-                                                    'errReason' => $e->getMessage(),
-                                                    'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
+                                                    'errReason' => 'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                                    'errStatus' => 'PDF split failed!'
                                                 ]);
                                             splitModel::where('groupId', '=', $batchId)
                                                 ->update([
@@ -359,17 +246,95 @@ class splitController extends Controller
                                                 $batchId,
                                                 'FAIL',
                                                 'split',
-                                                'Failed to count total PDF pages from '.$currentFileName, $e->getMessage()
+                                                'PDF split failed!',
+                                                'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
                                             );
                                             Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                             return $this->returnDataMesage(
                                                 400,
                                                 'PDF Split failed !',
-                                                $e->getMessage(),
+                                                null,
                                                 $batchId,
                                                 null,
-                                                'Failed to count total PDF pages from '.$currentFileName
+                                                'Last page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
                                             );
+                                        } else if ($fromPage > $pdfTotalPages) {
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $duration = $end->diff($startProc);
+                                            appLogModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'errReason' => 'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')',
+                                                    'errStatus' => 'PDF split failed!'
+                                                ]);
+                                            splitModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'result' => false,
+                                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                                    'procDuration' => $duration->s.' seconds'
+                                                ]);
+                                            NotificationHelper::Instance()->sendErrNotify(
+                                                $currentFileName,
+                                                $newFileSize,
+                                                $batchId,
+                                                'FAIL',
+                                                'split',
+                                                'PDF split failed!',
+                                                'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
+                                            );
+                                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                            return $this->returnDataMesage(
+                                                400,
+                                                'PDF Split failed !',
+                                                null,
+                                                $batchId,
+                                                null,
+                                                'First page has more page than total PDF page ! (total page: '.$pdfTotalPages.')'
+                                            );
+                                        } else if ($fromPage > $toPage) {
+                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
+                                            $duration = $end->diff($startProc);
+                                            appLogModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'errReason' => 'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                                    'errStatus' => 'PDF split failed!'
+                                                ]);
+                                            splitModel::where('groupId', '=', $batchId)
+                                                ->update([
+                                                    'result' => false,
+                                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
+                                                    'procDuration' => $duration->s.' seconds'
+                                                ]);
+                                            NotificationHelper::Instance()->sendErrNotify(
+                                                $currentFileName,
+                                                $newFileSize,
+                                                $batchId,
+                                                'FAIL',
+                                                'split',
+                                                'PDF split failed!',
+                                                'First Page has more page than last page ! (total page: '.$pdfTotalPages.')'
+                                            );
+                                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
+                                            return $this->returnDataMesage(
+                                                400,
+                                                'PDF Split failed !',
+                                                null,
+                                                $batchId,
+                                                null,
+                                                'First Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                            );
+                                        } else {
+                                            if ($mergeDBpdf == "true") {
+                                                $newPageRanges = $fromPage.'-'.$toPage;
+                                            } else if ($mergeDBpdf == "false") {
+                                                $pdfStartPages = $fromPage;
+                                                $pdfTotalPages = $toPage;
+                                                while($pdfStartPages <= intval($pdfTotalPages))
+                                                {
+                                                    $pdfArrayPages[] = $pdfStartPages;
+                                                    $pdfStartPages += 1;
+                                                }
+                                                $newPageRanges = implode(', ', $pdfArrayPages);
+                                            }
                                         }
                                     } else {
                                         $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
@@ -405,95 +370,16 @@ class splitController extends Controller
                                     }
                                 } else if ($usedMethod == 'custom') {
                                     if (is_numeric($customInputSplitPage)) {
-                                        try {
-                                            $pdf = new Pdf($newFilePath);
-                                            $pdfTotalPages = $pdf->pageCount();
-                                            if ($customInputSplitPage > $pdfTotalPages) {
-                                                appLogModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                        'errStatus' => 'PDF Split failed !'
-                                                    ]);
-                                                splitModel::where('groupId', '=', $batchId)
-                                                    ->update([
-                                                        'customSplitPage' => $customInputSplitPage,
-                                                        'result' => false,
-                                                        'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                        'procDuration' => $duration->s.' seconds'
-                                                    ]);
-                                                NotificationHelper::Instance()->sendErrNotify(
-                                                    $currentFileName,
-                                                    $newFileSize,
-                                                    $batchId,
-                                                    'FAIL',
-                                                    'split',
-                                                    'PDF split failed!',
-                                                    'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                                Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                                return $this->returnDataMesage(
-                                                    400,
-                                                    'PDF Split failed !',
-                                                    null,
-                                                    $batchId,
-                                                    null,
-                                                    'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
-                                                );
-                                            } else {
-                                                $newPageRanges = $customInputSplitPage;
-                                            }
-                                        } catch (\Exception $e) {
-                                            $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                            $duration = $end->diff($startProc);
-                                            appLogModel::where('groupId', '=', $batchId)
-                                                ->update([
-                                                    'errReason' => $e->getMessage(),
-                                                    'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
-                                                ]);
-                                            splitModel::where('groupId', '=', $batchId)
-                                                ->update([
-                                                    'result' => false,
-                                                    'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
-                                                    'procDuration' => $duration->s.' seconds'
-                                                ]);
-                                            NotificationHelper::Instance()->sendErrNotify(
-                                                $currentFileName,
-                                                $newFileSize,
-                                                $batchId,
-                                                'FAIL',
-                                                'split',
-                                                'Failed to count total PDF pages from '.$currentFileName, $e->getMessage()
-                                            );
-                                            Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                                            return $this->returnDataMesage(
-                                                400,
-                                                'PDF Split failed !',
-                                                $e->getMessage(),
-                                                $batchId,
-                                                null,
-                                                'Failed to count total PDF pages from '.$currentFileName
-                                            );
-                                        }
-                                    } else if (is_string($customInputSplitPage)) {
-                                        $newPageRanges = strtolower($customInputSplitPage);
-                                    } else {
-                                        $newPageRanges = $customInputSplitPage;
-                                    }
-                                }
-                            } else {
-                                if (is_numeric($customInputDeletePage)) {
-                                    try {
-                                        $pdf = new Pdf($newFilePath);
-                                        $pdfTotalPages = $pdf->pageCount();
-                                        if ($customInputDeletePage > $pdfTotalPages) {
+                                        $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                        if ($customInputSplitPage > $pdfTotalPages) {
                                             appLogModel::where('groupId', '=', $batchId)
                                                 ->update([
                                                     'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
-                                                    'errStatus' => 'PDF split failed!'
+                                                    'errStatus' => 'PDF Split failed !'
                                                 ]);
                                             splitModel::where('groupId', '=', $batchId)
                                                 ->update([
-                                                    'customDeletePage' => $customInputDeletePage,
+                                                    'customSplitPage' => $customInputSplitPage,
                                                     'result' => false,
                                                     'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                                     'procDuration' => $duration->s.' seconds'
@@ -517,18 +403,26 @@ class splitController extends Controller
                                                 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
                                             );
                                         } else {
-                                            $newPageRanges = $customInputDeletePage;
+                                            $newPageRanges = $customInputSplitPage;
                                         }
-                                    } catch (\Exception $e) {
-                                        $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
-                                        $duration = $end->diff($startProc);
+                                    } else if (is_string($customInputSplitPage)) {
+                                        $newPageRanges = strtolower($customInputSplitPage);
+                                    } else {
+                                        $newPageRanges = $customInputSplitPage;
+                                    }
+                                }
+                            } else {
+                                if (is_numeric($customInputDeletePage)) {
+                                    $pdfTotalPages = AppHelper::instance()->count($newFilePath);
+                                    if ($customInputDeletePage > $pdfTotalPages) {
                                         appLogModel::where('groupId', '=', $batchId)
                                             ->update([
-                                                'errReason' => $e->getMessage(),
-                                                'errStatus' => 'Failed to count total PDF pages from '.$currentFileName
+                                                'errReason' => 'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')',
+                                                'errStatus' => 'PDF split failed!'
                                             ]);
                                         splitModel::where('groupId', '=', $batchId)
                                             ->update([
+                                                'customDeletePage' => $customInputDeletePage,
                                                 'result' => false,
                                                 'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
                                                 'procDuration' => $duration->s.' seconds'
@@ -539,17 +433,20 @@ class splitController extends Controller
                                             $batchId,
                                             'FAIL',
                                             'split',
-                                            'Failed to count total PDF pages from '.$currentFileName, $e->getMessage()
+                                            'PDF split failed!',
+                                            'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
                                         );
                                         Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
                                         return $this->returnDataMesage(
                                             400,
                                             'PDF Split failed !',
-                                            $e->getMessage(),
+                                            null,
                                             $batchId,
                                             null,
-                                            'Failed to count total PDF pages from '.$currentFileName
+                                            'Input Page has more page than last page ! (total page: '.$pdfTotalPages.')'
                                         );
+                                    } else {
+                                        $newPageRanges = $customInputDeletePage;
                                     }
                                 } else if (is_string($customInputDeletePage)) {
                                     $newPageRanges = strtolower($customInputDeletePage);

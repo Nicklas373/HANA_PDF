@@ -42,6 +42,13 @@ class AppHelper
         }
     }
 
+    function count($path)
+    {
+        $pdf = file_get_contents($path);
+        $number = preg_match_all("/\/Page\W/", $pdf, $dummy);
+        return $number;
+    }
+
     function folderSize($dir)
     {
         $size = 0;
