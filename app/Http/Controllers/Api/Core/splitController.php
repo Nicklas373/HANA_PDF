@@ -176,6 +176,7 @@ class splitController extends Controller
                         $currentFileName = basename($file);
                         $trimPhase1 = str_replace(' ', '_', $currentFileName);
                         $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                        $newFormattedFilename = str_replace('_pdf', '', $newFileNameWithoutExtension);
                         $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
                         file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
                         $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
@@ -183,8 +184,8 @@ class splitController extends Controller
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
                         $procUuid = AppHelper::Instance()->generateUniqueUuid(splitModel::class, 'processId');
                         if ($tempPDF == 'true') {
-                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf')) {
-                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')) {
+                                Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
                             }
                         }
                         if ($request->has('action')) {
@@ -478,7 +479,7 @@ class splitController extends Controller
                                     $ilovepdfTask->setRemovePages($newPageRanges);
                                 }
                                 $ilovepdfTask->setPackagedFilename($randomizePdfFileName);
-                                $ilovepdfTask->setOutputFileName($newFileNameWithoutExtension);
+                                $ilovepdfTask->setOutputFileName($newFormattedFilename);
                                 $ilovepdfTask->execute();
                                 $ilovepdfTask->download(Storage::disk('local')->path('public/'.$pdfDownload_Location));
                                 $ilovepdfTask->delete();
@@ -519,13 +520,13 @@ class splitController extends Controller
                                 );
                             }
                             if ($action == 'split') {
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))) {
+                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))) {
                                     Storage::disk('minio')->put(
-                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))
+                                        $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))
                                     );
-                                    Storage::disk('local')->delete('public/'.$newFileNameWithoutExtension.'.pdf');
-                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                                    Storage::disk('local')->delete('public/'.$newFormattedFilename.'.pdf');
+                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
                                     $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
@@ -546,9 +547,9 @@ class splitController extends Controller
                                     return $this->returnCoreMessage(
                                         200,
                                         'OK',
-                                        $newFileNameWithoutExtension.'.pdf',
+                                        $newFormattedFilename.'.pdf',
                                         Storage::disk('minio')->temporaryUrl(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
+                                            $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
                                             now()->addMinutes(5)
                                         ),
                                         'split',
@@ -597,13 +598,13 @@ class splitController extends Controller
                                         null,
                                         null
                                     );
-                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf'))) {
+                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf'))) {
                                     Storage::disk('minio')->put(
-                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf'))
+                                        $pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf'))
                                     );
-                                    Storage::disk('local')->delete('public/'.$newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf');
-                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf');
+                                    Storage::disk('local')->delete('public/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf');
+                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf');
                                     $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
@@ -624,9 +625,9 @@ class splitController extends Controller
                                     return $this->returnCoreMessage(
                                         200,
                                         'OK',
-                                        $randomizePdfFileName.'.zip',
+                                        $newFormattedFilename.'-'.$newPageRanges.'.pdf',
                                         Storage::disk('minio')->temporaryUrl(
-                                            $newFileNameWithoutExtension.'-'.$newPageRanges.'.pdf',
+                                            $pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf',
                                             now()->addMinutes(5)
                                         ),
                                         'split',
@@ -672,13 +673,13 @@ class splitController extends Controller
                                     );
                                 }
                             } else if ($action == 'delete') {
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))) {
+                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))) {
                                     Storage::disk('minio')->put(
-                                        $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf'))
+                                        $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
+                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))
                                     );
-                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
-                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf');
+                                    Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
+                                    $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
                                     $newFileProcSize = AppHelper::instance()->convert($fileProcSize, "MB");
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
@@ -699,9 +700,9 @@ class splitController extends Controller
                                     return $this->returnCoreMessage(
                                         200,
                                         'OK',
-                                        $newFileNameWithoutExtension.'.pdf',
+                                        $newFormattedFilename.'.pdf',
                                         Storage::disk('minio')->temporaryUrl(
-                                            $pdfDownload_Location.'/'.$newFileNameWithoutExtension.'.pdf',
+                                            $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
                                             now()->addMinutes(5)
                                         ),
                                         'split_delete',
