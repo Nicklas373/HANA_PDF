@@ -142,8 +142,10 @@ class compressController extends Controller
                         $ilovepdfTask->setEncryption(true);
                         foreach ($files as $file) {
                             $currentFileName = basename($file);
+                            $currentFileNameExtension = pathinfo($currentFileName, PATHINFO_EXTENSION);
                             $trimPhase1 = str_replace(' ', '_', $currentFileName);
-                            $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
+                            $trimPhase2 = str_replace('.', '_', $trimPhase1);
+                            $newFileNameWithoutExtension = str_replace('_'.$currentFileNameExtension, '', $trimPhase2);
                             array_push($poolFiles, $newFileNameWithoutExtension);
                             if ($batchValue) {
                                 $newFileName = $randomizePdfFileName.'.zip';
