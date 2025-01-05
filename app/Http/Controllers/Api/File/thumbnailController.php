@@ -45,10 +45,14 @@ class thumbnailController extends Controller
                 $pdfRealName = pathinfo($trimPhase1, PATHINFO_FILENAME);
                 $newFormattedFilename = str_replace('_'.$pdfRealExtension, '', $newFileNameWithoutExtension);
                 $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$trimPhase1);
+                if (Storage::disk('local')->exists('public/'.$pdfUpload_Location.'/'.$newFormattedFilename.'.'.$pdfRealExtension)) {
+                    Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$newFormattedFilename.'.'.$pdfRealExtension);
+                }
                 file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$newFormattedFilename.'.'.$pdfRealExtension), $minioUpload);
                 $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$newFormattedFilename.'.'.$pdfRealExtension);
                 $thumbnailFilePath =  Storage::disk('local')->path('public/'.$pdfThumbnail_Location.'/'.$pdfRealName.'.png');
                 try {
+                    ini_set("pcre.backtrack_limit", "5000000");
                     Settings::setPdfRendererPath(base_path('vendor/mpdf/mpdf'));
                     Settings::setPdfRendererName('MPDF');
 
@@ -74,18 +78,45 @@ class thumbnailController extends Controller
                         ->format(\Spatie\PdfToImage\Enums\OutputFormat::Png)
                         ->quality(90)
                         ->save($thumbnailFilePath);
-                    return $this->returnFileMesage(
-                        201,
-                        'Thumbnail generated !',
-                        Storage::disk('local')->url(env('PDF_IMG_POOL').'/'.$pdfRealName.'.png'),
-                        null,
-                    );
+                    if (Storage::disk('local')->exists('public/'.$pdfThumbnail_Location.'/'.$pdfRealName.'.png')) {
+                        Storage::disk('minio')->put($pdfThumbnail_Location.'/'.$pdfRealName.'.png', file_get_contents($thumbnailFilePath));
+                        Storage::disk('local')->delete('public/'.$pdfThumbnail_Location.'/'.$pdfRealName.'.png');
+                        Storage::disk('local')->delete('public/'.$pdfPool_Location.'/'.$newFormattedFilename.'.'.$pdfRealExtension);
+                        try {
+                            if (Storage::disk('minio')->exists($pdfThumbnail_Location.'/'.$pdfRealName.'.png')) {
+                                return $this->returnFileMesage(
+                                    201,
+                                    'Thumbnail generated !',
+                                    Storage::disk('minio')->temporaryUrl(
+                                        env('PDF_IMG_POOL').'/'.$pdfRealName.'.png',
+                                        now()->addMinutes(5)
+                                    ),
+                                    Storage::disk('local')->url(env('PDF_IMG_POOL').'/'.$pdfRealName.'.png'),
+                                    null,
+                                );
+                            } else {
+                                return $this->returnFileMesage(
+                                    400,
+                                    'Failed to upload file !',
+                                    $pdfFileName,
+                                    $pdfFileName.' could not be found in the object storage'
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            return $this->returnFileMesage(
+                                400,
+                                'Failed to upload thumbnail to object storage !',
+                                $pdfFileName,
+                                $e->getMessage()
+                            );
+                        }
+                    }
                 } catch (Exception $e) {
                     return $this->returnFileMesage(
                         500,
                         'Failed to generate thumbnail !',
                         $pdfRealName,
-                        $pdfRealName.' could not generate thumbnail with error: '.$e->getMessage()
+                        'Could not generate thumbnail with error: '.$e->getMessage()
                     );
                 }
             }
