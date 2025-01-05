@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 4;
-const appPatchVer = 2;
+const appPatchVer = 3;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const errModal = new Modal($errModal, options);
@@ -385,12 +385,13 @@ if (uploadDropzone) {
                                 })
                                 .catch(function (temporaryURL) {
                                     errMessage.innerText = `File ${uploadedFile1} not found !`;
-                                    errSubMessage.innerText =
-                                        temporaryURL.temporaryError;
+                                    errSubMessage.innerText = "";
                                     errListTitleMessage.innerText =
                                         "Error message";
                                     resetErrListMessage();
-                                    generateMesssage(errMessage);
+                                    generateMesssage(
+                                        temporaryURL.temporaryError
+                                    );
                                     errAltSubMessageModal.style = null;
                                     previewDocumentModal.hide();
                                     errModal.show();
@@ -581,7 +582,10 @@ if (uploadDropzoneAlt) {
             '<div class="dz-file-preview dz-preview dz-processing dz-success dz-complete z-0">' +
             '<div class="flex flex-col items-center justify-center">' +
             '<div class="mt-2 flex items-center justify-center lg:h-[200px] lg:w-[150px]">' +
-            '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down" src="/assets/icons/placeholder_pdf.svg">' +
+            '<div id="loadingThumbnail" class="animate-spin-counter-clockwise inline-block p-4 mx-4 w-24 h-24 object-scale-down" role="status" aria-label="loading">' +
+            `<img src="/assets/icons/process.svg" alt="loading">` +
+            "</div>" +
+            '<img id="imgThumbnail" class="dz-image-thumbnail h-48 w-32 object-scale-down hidden" src="/assets/icons/placeholder_pdf.svg">' +
             "</div>" +
             '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
             '<div class="dz-success-mark"><svg class="w-4 h-4 text-ac" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div>' +
@@ -699,11 +703,10 @@ if (uploadDropzoneAlt) {
                             })
                             .catch(function (temporaryURL) {
                                 errMessage.innerText = `File ${uploadedFile1} not found !`;
-                                errSubMessage.innerText =
-                                    temporaryURL.temporaryError;
+                                errSubMessage.innerText = "";
                                 errListTitleMessage.innerText = "Error message";
                                 resetErrListMessage();
-                                generateMesssage(errMessage);
+                                generateMesssage(temporaryURL.temporaryError);
                                 errAltSubMessageModal.style = null;
                                 previewDocumentModal.hide();
                                 errModal.show();
@@ -806,7 +809,12 @@ if (uploadDropzoneAlt) {
                 if (!file.type.startsWith("image/")) {
                     generateThumbnail(file.name)
                         .then(function (thumbnailURL) {
-                            console.log(file.type);
+                            file.previewElement
+                                .querySelector("#loadingThumbnail")
+                                .classList.add("hidden");
+                            file.previewElement
+                                .querySelector("#imgThumbnail")
+                                .classList.remove("hidden");
                             if (
                                 file.type ==
                                 "application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -817,9 +825,15 @@ if (uploadDropzoneAlt) {
                             else
                                 file.previewElement.querySelector(
                                     ".dz-image-thumbnail"
-                                ).src = apiUrl + thumbnailURL;
+                                ).src = thumbnailURL;
                         })
                         .catch(function () {
+                            file.previewElement
+                                .querySelector("#loadingThumbnail")
+                                .classList.add("hidden");
+                            file.previewElement
+                                .querySelector("#imgThumbnail")
+                                .classList.remove("hidden");
                             file.previewElement.querySelector(
                                 ".dz-image-thumbnail"
                             ).src = "/assets/icons/placeholder_pptx.svg";
@@ -848,6 +862,13 @@ if (uploadDropzoneAlt) {
 
                 dzErrorMessage.textContent = newErrMessage;
 
+                file.previewElement
+                    .querySelector("#loadingThumbnail")
+                    .classList.add("hidden");
+                file.previewElement
+                    .querySelector("#imgThumbnail")
+                    .classList.remove("hidden");
+
                 errMessage.innerText = `Failed to upload ${file.name}`;
                 errSubMessage.innerText = "";
                 errListTitleMessage.innerText = "Error message";
@@ -860,9 +881,38 @@ if (uploadDropzoneAlt) {
 
             this.on("thumbnail", function (file) {
                 if (file.type.startsWith("image/")) {
-                    file.previewElement.querySelector(
-                        ".dz-image-thumbnail"
-                    ).src = file.dataURL;
+                    getTemporaryURL(file.name)
+                        .then(function (temporaryURL) {
+                            file.previewElement
+                                .querySelector("#loadingThumbnail")
+                                .classList.add("hidden");
+                            file.previewElement
+                                .querySelector("#imgThumbnail")
+                                .classList.remove("hidden");
+                            var newUrl = temporaryURL.temporaryURL;
+                            file.previewElement.querySelector(
+                                ".dz-image-thumbnail"
+                            ).src = newUrl;
+                        })
+                        .catch(function (temporaryURL) {
+                            file.previewElement
+                                .querySelector("#loadingThumbnail")
+                                .classList.add("hidden");
+                            file.previewElement
+                                .querySelector("#imgThumbnail")
+                                .classList.remove("hidden");
+                            file.previewElement.querySelector(
+                                ".dz-image-thumbnail"
+                            ).src = "/assets/icons/placeholder_pptx.svg";
+                            errMessage.innerText = `Failed to generated thumbnail for ${file.name}`;
+                            errSubMessage.innerText = "";
+                            errListTitleMessage.innerText = "Error message";
+                            resetErrListMessage();
+                            generateMesssage(temporaryURL.temporaryError);
+                            errAltSubMessageModal.style = null;
+                            previewDocumentModal.hide();
+                            errModal.show();
+                        });
                 }
             });
 
@@ -871,6 +921,12 @@ if (uploadDropzoneAlt) {
                 uploadedFile = uploadedFile.filter(
                     (item) => !file.name.includes(item)
                 );
+                file.previewElement
+                    .querySelector("#loadingThumbnail")
+                    .classList.add("hidden");
+                file.previewElement
+                    .querySelector("#imgThumbnail")
+                    .classList.remove("hidden");
                 errMessage.innerText = "Connection timeout !";
                 errSubMessage.innerText = "Please try again later";
                 errListTitleMessage.innerText = "Failed to upload:";
@@ -1044,12 +1100,13 @@ if (uploadDropzoneSingle) {
                                 })
                                 .catch(function (temporaryURL) {
                                     errMessage.innerText = `File ${uploadedFile1} not found !`;
-                                    errSubMessage.innerText =
-                                        temporaryURL.temporaryError;
+                                    errSubMessage.innerText = "";
                                     errListTitleMessage.innerText =
                                         "Error message";
                                     resetErrListMessage();
-                                    generateMesssage(errMessage);
+                                    generateMesssage(
+                                        temporaryURL.temporaryError
+                                    );
                                     errAltSubMessageModal.style = null;
                                     previewDocumentModal.hide();
                                     errModal.show();
@@ -1403,7 +1460,7 @@ function generateThumbnail(fileName) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
-        formData.append("file", fileName);
+        formData.append("file", fileName.replace(/\s/g, "_"));
         xhr.open("POST", `${apiUrl}/api/v1/file/thumbnail`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -1439,7 +1496,7 @@ function getTemporaryURL(fileName) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
-        formData.append("fileName", fileName);
+        formData.append("fileName", fileName.replace(/\s/g, "_"));
 
         xhr.open("POST", `${apiUrl}/api/v1/file/getTemporaryURL`, true);
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken);
@@ -1806,7 +1863,6 @@ function handleFormDataSTA(files, proc, action) {
 function handleResponseSTA(xhr, proc, resolve, reject) {
     try {
         const xhrReturn = JSON.parse(xhr.responseText);
-        console.log(xhr.status);
         if (xhr.status === 200) {
             scsInterfaceSTA(xhrReturn, proc);
             resolve({
