@@ -1,5 +1,13 @@
 [
   {
+    "release_date": "January, 05 2025",
+    "version": "3.4.3",
+    "changelog": [
+      "Fix thumbnail are not generated properly for document and spreadsheet file",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
     "release_date": "December, 01 2024",
     "version": "3.4.2",
     "changelog": [
