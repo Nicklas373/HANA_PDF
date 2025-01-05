@@ -85,7 +85,7 @@ class fileController extends Controller
                             201,
                             'File uploaded successfully !',
                             Storage::disk('minio')->exists($pdfUpload_Location.'/'.$pdfFileName),
-                            null
+                            null,
                         );
                     } else {
                         return $this->returnFileMesage(
@@ -103,7 +103,6 @@ class fileController extends Controller
                         $e->getMessage()
                     );
                 }
-
             } else {
                 return $this->returnFileMesage(
                     400,
