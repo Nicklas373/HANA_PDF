@@ -1,5 +1,13 @@
 [
   {
+    "release_date": "January, 12 2025",
+    "version": "3.4.4",
+    "changelog": [
+      "Fix PDF to file conversion issue with non-standarize or duplicate characters on filename",
+      "Updating our internal libraries to latest version"
+    ]
+  },
+  {
     "release_date": "January, 05 2025",
     "version": "3.4.3",
     "changelog": [
