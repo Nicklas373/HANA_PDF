@@ -29,7 +29,7 @@ const options = {
 const adobeClientID = "STATIC_CLIENT_ID";
 const appMajorVer = 3;
 const appMinorVer = 4;
-const appPatchVer = 3;
+const appPatchVer = 4;
 const apiUrl = "http://192.168.0.2";
 const bearerToken = "STATIC_BEARER";
 const errModal = new Modal($errModal, options);
@@ -242,6 +242,9 @@ if (uploadDropzone) {
     let uploadDropzone = new Dropzone("#dropzoneArea", {
         url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
+        renameFile: function (file) {
+            return fileNameFormat(fileNameFormat(file.name));
+        },
         maxFilesize: 25,
         maxFiles: 5,
         acceptedFiles: "application/pdf",
@@ -443,7 +446,7 @@ if (uploadDropzone) {
                 }
 
                 if (file) {
-                    const filePath = uploadPath + file.name;
+                    const filePath = uploadPath + fileNameFormat(file.name);
 
                     if (xhrScsUploads > 0) {
                         let dzErrorMessage =
@@ -454,7 +457,7 @@ if (uploadDropzone) {
                             xhrScsUploads = xhrScsUploads - 1;
                         }
                         uploadedFile = uploadedFile.filter(
-                            (item) => !file.name.includes(item)
+                            (item) => !fileNameFormat(file.name).includes(item)
                         );
                     }
 
@@ -488,7 +491,7 @@ if (uploadDropzone) {
             });
 
             this.on("success", function (response) {
-                var uploadedFileName = response.name;
+                var uploadedFileName = fileNameFormat(response.name);
                 uploadedFile.push(uploadedFileName);
 
                 xhrScsUploads = xhrScsUploads + 1;
@@ -534,7 +537,7 @@ if (uploadDropzone) {
             this.on("timeout", function (file) {
                 uploadDropzone.removeFile(file);
                 uploadedFile = uploadedFile.filter(
-                    (item) => !file.name.includes(item)
+                    (item) => !fileNameFormat(file.name).includes(item)
                 );
                 errMessage.innerText = "Connection timeout !";
                 errSubMessage.innerText = "Please try again later";
@@ -571,6 +574,9 @@ if (uploadDropzoneAlt) {
     let uploadDropzoneAlt = new Dropzone("#dropzoneAreaCnv", {
         url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
+        renameFile: function (file) {
+            return fileNameFormat(file.name);
+        },
         maxFilesize: 25,
         maxFiles: 5,
         acceptedFiles: ".xlsx, .xls, .ppt, .pptx, .docx, .doc, image/*",
@@ -750,7 +756,7 @@ if (uploadDropzoneAlt) {
                 }
 
                 if (file) {
-                    const filePath = uploadPath + file.name;
+                    const filePath = uploadPath + fileNameFormat(file.name);
 
                     if (xhrScsUploads > 0) {
                         let dzErrorMessage =
@@ -761,7 +767,7 @@ if (uploadDropzoneAlt) {
                             xhrScsUploads = xhrScsUploads - 1;
                         }
                         uploadedFile = uploadedFile.filter(
-                            (item) => !file.name.includes(item)
+                            (item) => !fileNameFormat(file.name).includes(item)
                         );
                     }
 
@@ -795,7 +801,7 @@ if (uploadDropzoneAlt) {
             });
 
             this.on("success", function (file) {
-                var uploadedFileName = file.name;
+                var uploadedFileName = fileNameFormat(file.name);
                 uploadedFile.push(uploadedFileName);
 
                 xhrScsUploads = xhrScsUploads + 1;
@@ -807,7 +813,7 @@ if (uploadDropzoneAlt) {
                 }
 
                 if (!file.type.startsWith("image/")) {
-                    generateThumbnail(file.name)
+                    generateThumbnail(fileNameFormat(file.name))
                         .then(function (thumbnailURL) {
                             file.previewElement
                                 .querySelector("#loadingThumbnail")
@@ -881,7 +887,7 @@ if (uploadDropzoneAlt) {
 
             this.on("thumbnail", function (file) {
                 if (file.type.startsWith("image/")) {
-                    getTemporaryURL(file.name)
+                    getTemporaryURL(fileNameFormat(file.name))
                         .then(function (temporaryURL) {
                             file.previewElement
                                 .querySelector("#loadingThumbnail")
@@ -919,7 +925,7 @@ if (uploadDropzoneAlt) {
             this.on("timeout", function (file) {
                 uploadDropzoneAlt.removeFile(file);
                 uploadedFile = uploadedFile.filter(
-                    (item) => !file.name.includes(item)
+                    (item) => !fileNameFormat(file.name).includes(item)
                 );
                 file.previewElement
                     .querySelector("#loadingThumbnail")
@@ -956,6 +962,9 @@ if (uploadDropzoneSingle) {
     let uploadDropzoneSingle = new Dropzone("#dropzoneAreaSingle", {
         url: `${apiUrl}/api/v1/file/upload`,
         paramName: "file",
+        renameFile: function (file) {
+            return fileNameFormat(file.name);
+        },
         maxFilesize: 25,
         maxFiles: 1,
         acceptedFiles: "application/pdf",
@@ -1154,7 +1163,7 @@ if (uploadDropzoneSingle) {
                 }
 
                 if (file) {
-                    const filePath = uploadPath + file.name;
+                    const filePath = uploadPath + fileNameFormat(file.name);
 
                     if (xhrScsUploads > 0) {
                         let dzErrorMessage =
@@ -1165,7 +1174,7 @@ if (uploadDropzoneSingle) {
                             xhrScsUploads = xhrScsUploads - 1;
                         }
                         uploadedFile = uploadedFile.filter(
-                            (item) => !file.name.includes(item)
+                            (item) => !fileNameFormat(file.name).includes(item)
                         );
                     }
 
@@ -1199,7 +1208,7 @@ if (uploadDropzoneSingle) {
             });
 
             this.on("success", function (response) {
-                var uploadedFileName = response.name;
+                var uploadedFileName = fileNameFormat(response.name);
                 uploadedFile.push(uploadedFileName);
 
                 xhrScsUploads = xhrScsUploads + 1;
@@ -1244,7 +1253,7 @@ if (uploadDropzoneSingle) {
             this.on("timeout", function (file) {
                 uploadDropzoneSingle.removeFile(file);
                 uploadedFile = uploadedFile.filter(
-                    (item) => !file.name.includes(item)
+                    (item) => !fileNameFormat(file.name).includes(item)
                 );
                 errMessage.innerText = "Connection timeout !";
                 errSubMessage.innerText = "Please try again later";
@@ -1444,7 +1453,9 @@ function fetchVersion() {
 
 function fileNameFormat(fileName) {
     let trimmedFileName = fileName.trim();
-    let newFileName = trimmedFileName.replace(/\s+/g, "_");
+    let newFileName = trimmedFileName
+        .replace(/[^\w.]+/g, "_")
+        .replace(/_+/g, "_");
 
     return newFileName;
 }
