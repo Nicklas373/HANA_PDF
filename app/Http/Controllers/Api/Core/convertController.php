@@ -509,7 +509,6 @@ class convertController extends Controller
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             $pdfTotalPages = AppHelper::instance()->count($newFilePath);
                             Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
-                            log::info($trimPhase1);
                             try {
                                 $ilovepdfTask = new PdfjpgTask(env('ILOVEPDF_PUBLIC_KEY'),env('ILOVEPDF_SECRET_KEY'));
                                 $ilovepdfTask->setFileEncryption($pdfEncKey);
@@ -519,7 +518,6 @@ class convertController extends Controller
                                     $pdfUpload_Location.'/'.$trimPhase1,
                                     now()->addSeconds(30)
                                 );
-                                log::info($newFormattedFilename);
                                 $pdfFile = $ilovepdfTask->addFileFromUrl($pdfTempUrl);
                                 $ilovepdfTask->setMode($imageModes);
                                 $ilovepdfTask->setOutputFileName($newFormattedFilename);
