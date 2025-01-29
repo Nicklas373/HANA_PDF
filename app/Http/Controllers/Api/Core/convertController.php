@@ -712,7 +712,7 @@ class convertController extends Controller
                             'errReason' => 'File not found on our end, please try again',
                             'errStatus' => 'File not found on the server'
                         ]);
-                    convertModel::where('groupId', '=', $batchId)
+                        cnvModel::where('groupId', '=', $batchId)
                         ->update([
                             'result' => false,
                             'procEndAt' => AppHelper::instance()->getCurrentTimeZone(),
