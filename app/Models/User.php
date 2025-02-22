@@ -42,6 +42,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'email_verified_at' => 'datetime',
+            // file deepcode ignore HardcodedPassword: This is not hardcoded password, but hashed password
+            // So ignore it from SNYK security issue
             'password' => 'hashed',
         ];
     }

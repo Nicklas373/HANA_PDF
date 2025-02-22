@@ -78,10 +78,9 @@ class splitController extends Controller
                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                 $pdfDownload_Location = $pdfProcessed_Location;
                 $batchValue = false;
-                $str = rand(1000,10000000);
                 $loopCount = count($files);
                 $altPoolFiles = array();
-                $randomizePdfFileName = 'pdfSplit_'.substr(md5(uniqid($str)), 0, 8);
+                $randomizePdfFileName = 'pdfSplit_'.substr(bin2hex(random_bytes(4)), 0, 8);
                 if ($action == 'split' && $usedMethod == 'range') {
                     if (empty($fromPage) || empty($toPage)) {
                         return $this->returnDataMesage(
@@ -178,7 +177,7 @@ class splitController extends Controller
                         $newFileNameWithoutExtension = str_replace('.', '_', $trimPhase1);
                         $newFormattedFilename = str_replace('_pdf', '', $newFileNameWithoutExtension);
                         $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                        file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                        Storage::disk('local')->get('public/'.$pdfUpload_Location.'/'.$currentFileName, $minioUpload);
                         $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                         $fileSize = Storage::disk('minio')->size($pdfUpload_Location.'/'.$trimPhase1);
                         $newFileSize = AppHelper::instance()->convert($fileSize, "MB");
@@ -520,10 +519,10 @@ class splitController extends Controller
                                 );
                             }
                             if ($action == 'split') {
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')) {
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')
                                     );
                                     Storage::disk('local')->delete('public/'.$newFormattedFilename.'.pdf');
                                     $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
@@ -559,10 +558,10 @@ class splitController extends Controller
                                         null,
                                         null
                                     );
-                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))) {
+                                } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip')) {
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$randomizePdfFileName.'.zip',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip')
                                     );
                                     Storage::disk('local')->delete('public/'.$randomizePdfFileName.'.zip');
                                     $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.zip');
@@ -598,10 +597,10 @@ class splitController extends Controller
                                         null,
                                         null
                                     );
-                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf'))) {
+                                } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf')) {
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf')
                                     );
                                     Storage::disk('local')->delete('public/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf');
                                     $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'-'.$newPageRanges.'.pdf');
@@ -673,10 +672,10 @@ class splitController extends Controller
                                     );
                                 }
                             } else if ($action == 'delete') {
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))) {
+                                if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')) {
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')
                                     );
                                     Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');
                                     $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$newFormattedFilename.'.pdf');

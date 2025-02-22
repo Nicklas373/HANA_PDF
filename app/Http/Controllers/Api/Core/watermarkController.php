@@ -76,8 +76,7 @@ class watermarkController extends Controller
                 $pdfProcessed_Location = env('PDF_DOWNLOAD');
                 $pdfDownload_Location = $pdfProcessed_Location;
                 $batchValue = false;
-                $str = rand(1000,10000000);
-                $randomizePdfFileName = 'pdfWatermark_'.substr(md5(uniqid($str)), 0, 8);
+                $randomizePdfFileName = 'pdfWatermark_'.substr(bin2hex(random_bytes(4)), 0, 8);
                 $loopCount = count($files);
                 $altPoolFiles = array();
                 foreach ($files as $file) {
@@ -410,10 +409,10 @@ class watermarkController extends Controller
                                 'iLovePDF API Error !, Catch on Exception'
                             );
                         }
-                        if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))) {
+                        if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf')) {
                             Storage::disk('minio')->put(
                                 $pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf',
-                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf'))
+                                Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf')
                             );
                             Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
                             $fileProcSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.pdf');
