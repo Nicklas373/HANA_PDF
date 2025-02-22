@@ -62,9 +62,8 @@ class htmltopdfController extends Controller
             );
 		} else {
             $start = Carbon::parse($startProc);
-            $str = rand(1000,10000000);
             $pdfEncKey = bin2hex(random_bytes(16));
-            $pdfDefaultFileName ='pdf_htmltopdf_'.substr(md5(uniqid($str)), 0, 8);
+            $pdfDefaultFileName ='pdf_htmltopdf_'.substr(bin2hex(random_bytes(4)), 0, 8);
             $pdfProcessed_Location = env('PDF_DOWNLOAD');
             $pdfUpload_Location = env('PDF_UPLOAD');
             $pdfUrl = $request->post('urlToPDF');
@@ -176,12 +175,12 @@ class htmltopdfController extends Controller
                     'iLovePDF API Error !, Catch on Exception'
                 );
             }
-            if (file_exists(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))) {
+            if (Storage::disk('local')->exists('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf')) {
                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                 $duration = $end->diff($startProc);
                 Storage::disk('minio')->put(
                     $pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf',
-                    file_get_contents(Storage::disk('local')->path('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf'))
+                    Storage::disk('local')->get('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf')
                 );
                 Storage::disk('local')->delete('public/'.$pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');
                 $fileProcSize = Storage::disk('minio')->size($pdfProcessed_Location.'/'.$pdfDefaultFileName.'.pdf');

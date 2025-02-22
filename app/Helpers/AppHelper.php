@@ -89,15 +89,16 @@ class AppHelper
 
         if (ftp_size($ftp_conn, $proc_file) != -1) {
             if (ftp_get($ftp_conn, $download_file, $proc_file, FTP_BINARY)) {
+                ftp_close($ftp_conn);
                 return true;
             } else {
+                ftp_close($ftp_conn);
                 return false;
             }
         } else {
+            ftp_close($ftp_conn);
             return false;
         }
-
-        ftp_close($ftp_conn);
     }
 
     function generateUniqueUuid($customModel, $customColumn) {

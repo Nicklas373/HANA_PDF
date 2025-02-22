@@ -81,8 +81,7 @@ class compressController extends Controller
                 } else {
                     $pdfDownload_Location = $pdfProcessed_Location;
                 }
-                $str = rand(1000,10000000);
-                $randomizePdfFileName = 'pdfCompress_'.substr(md5(uniqid($str)), 0, 8);
+                $randomizePdfFileName = 'pdfCompress_'.substr(bin2hex(random_bytes(4)), 0, 8);
                 foreach ($files as $file) {
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
@@ -230,10 +229,10 @@ class compressController extends Controller
                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                     $duration = $end->diff($startProc);
                     if ($batchValue) {
-                        if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))) {
+                        if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip')) {
                             Storage::disk('minio')->put(
                                 $pdfDownload_Location.'/'.$randomizePdfFileName.'.zip',
-                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip'))
+                                Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip')
                             );
                             Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$randomizePdfFileName.'.zip');
                             $compFileSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$randomizePdfFileName.'.zip');
@@ -294,10 +293,10 @@ class compressController extends Controller
                         }
                     } else {
                         foreach ($poolFiles as $file) {
-                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'))) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$file.'.pdf')) {
                                 Storage::disk('minio')->put(
                                     $pdfDownload_Location.'/'.$file.'.pdf',
-                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$file.'.pdf'))
+                                    Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$file.'.pdf')
                                 );
                                 Storage::disk('local')->delete('public/'.$pdfDownload_Location.'/'.$file.'.pdf');
                                 $compFileSize = Storage::disk('minio')->size($pdfDownload_Location.'/'.$file.'.pdf');

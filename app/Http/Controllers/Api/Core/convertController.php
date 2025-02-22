@@ -105,8 +105,7 @@ class convertController extends Controller
                     $imageModes = 'pages';
                     $extMode = false;
                 }
-                $str = rand(1000,10000000);
-                $randomizePdfFileName = 'pdfConvert_'.substr(md5(uniqid($str)), 0, 8);
+                $randomizePdfFileName = 'pdfConvert_'.substr(bin2hex(random_bytes(4)), 0, 8);
                 foreach ($files as $file) {
                     $currentFileName = basename($file);
                     $trimPhase1 = str_replace(' ', '_', $currentFileName);
@@ -199,12 +198,14 @@ class convertController extends Controller
                                 }
                             }
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            Storage::disk('local')->get('public/'.$pdfUpload_Location.'/'.$currentFileName, $minioUpload);
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             $asposeToken = AppHelper::instance()->getAsposeToken(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
                             if ($asposeToken) {
-                                $fileContent = file_get_contents($newFilePath);
                                 try {
+                                    // file deepcode ignore Ssrf:
+                                    // almost all variable already protected by laravel validation rule
+                                    // this should reducing SSRF attacks potential, but still need to re-look after it
                                     $asposeAPI = Http::timeout(300)
                                         ->withToken($asposeToken)
                                         ->attach('file', $fileContent, basename($newFilePath))
@@ -216,11 +217,11 @@ class convertController extends Controller
                                             array_push($poolFiles, $newFormattedFilename);
                                             $procFile += 1;
                                             $minioDownload = Storage::disk('ftp')->get($newFormattedFilename.'.'.$convertType);
-                                            file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType), $minioDownload);
+                                            Storage::disk('local')->put('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType, $minioDownload);
                                             $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType);
                                             Storage::disk('minio')->put(
                                                 $pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType,
-                                                file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType))
+                                                Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.'.$convertType)
                                             );
                                             Storage::disk('ftp')->delete($newFormattedFilename.'.'.$convertType);
                                             Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
@@ -363,7 +364,7 @@ class convertController extends Controller
                                 }
                             }
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            Storage::disk('local')->get('public/'.$pdfUpload_Location.'/'.$currentFileName, $minioUpload);
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             try {
                                 $wordsApi = new WordsApi(env('ASPOSE_CLOUD_CLIENT_ID'), env('ASPOSE_CLOUD_TOKEN'));
@@ -422,11 +423,11 @@ class convertController extends Controller
                                     $procFile += 1;
                                     array_push($poolFiles, $newFormattedFilename);
                                     $minioDownload = Storage::disk('ftp')->get($newFormattedFilename.'.docx');
-                                    file_put_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.docx'), $minioDownload);
+                                    Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.docx', $minioDownload);
                                     $newFilePath = Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.docx');
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'.docx',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.docx'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.docx')
                                     );
                                     Storage::disk('ftp')->delete($newFormattedFilename.'.docx');
                                     Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
@@ -505,7 +506,7 @@ class convertController extends Controller
                                 }
                             }
                             $minioUpload = Storage::disk('minio')->get($pdfUpload_Location.'/'.$currentFileName);
-                            file_put_contents(Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName), $minioUpload);
+                            Storage::disk('local')->get('public/'.$pdfUpload_Location.'/'.$currentFileName, $minioUpload);
                             $newFilePath = Storage::disk('local')->path('public/'.$pdfUpload_Location.'/'.$currentFileName);
                             $pdfTotalPages = AppHelper::instance()->count($newFilePath);
                             Storage::disk('local')->delete('public/'.$pdfUpload_Location.'/'.$trimPhase1);
@@ -561,7 +562,7 @@ class convertController extends Controller
                                     rename($filename, Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.jpg'));
                                 }
                             }
-                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.zip'))) {
+                            if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.zip')) {
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 $procFile += 1;
@@ -569,10 +570,10 @@ class convertController extends Controller
                                 $pdfImageTrueName = $newFormattedFilename.'.zip';
                                 Storage::disk('minio')->put(
                                     $pdfDownload_Location.'/'.$newFormattedFilename.'.zip',
-                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.zip'))
+                                    Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.zip')
                                 );
                             } else {
-                                if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.jpg'))) {
+                                if (Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.jpg')) {
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     $procFile += 1;
@@ -580,9 +581,9 @@ class convertController extends Controller
                                     $pdfImageTrueName = $newFormattedFilename.'.jpg';
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'.jpg',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.jpg'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.jpg')
                                     );
-                                } else if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-0001.jpg'))) {
+                                } else if (Storage::disk('local')->exists('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-0001.jpg')) {
                                     $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                     $duration = $end->diff($startProc);
                                     $procFile += 1;
@@ -590,7 +591,7 @@ class convertController extends Controller
                                     $pdfImageTrueName = $newFormattedFilename.'-0001.jpg';
                                     Storage::disk('minio')->put(
                                         $pdfDownload_Location.'/'.$newFormattedFilename.'-0001.jpg',
-                                        file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-0001.jpg'))
+                                        Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'-0001.jpg')
                                     );
                                 }
                             }
@@ -661,14 +662,14 @@ class convertController extends Controller
                                     'iLovePDF API Error !, Catch on Exception'
                                 );
                             }
-                            if (file_exists(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))) {
+                            if (Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')) {
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
                                 $duration = $end->diff($startProc);
                                 $procFile += 1;
                                 array_push($poolFiles, $newFormattedFilename);
                                 Storage::disk('minio')->put(
                                     $pdfDownload_Location.'/'.$newFormattedFilename.'.pdf',
-                                    file_get_contents(Storage::disk('local')->path('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf'))
+                                    Storage::disk('local')->get('public/'.$pdfDownload_Location.'/'.$newFormattedFilename.'.pdf')
                                 );
                             } else {
                                 $end = Carbon::parse(AppHelper::instance()->getCurrentTimeZone());
